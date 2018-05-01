@@ -1,6 +1,6 @@
 # DisplayRendersFromWeb-monitoring-db
 
-# # **[Display Renders From Web-monitoring-db](https://github.com/ftsalamp/DisplayRendersFromWeb-monitoring-db)**
+# # **[Display Renders From Web-monitoring-processing](https://github.com/ftsalamp/DisplayRendersFromWeb-monitoring-processing)**
 
 **THIS PROJECT IS STILL UNDER HEAVY DEVELOPMENT! MANY THINGS ARE STILL BROKEN.**
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
