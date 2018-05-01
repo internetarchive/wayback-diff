@@ -1,5 +1,5 @@
 {
-  "name": "display-renders-from-web-monitoring-db",
+  "name": "display-renders-from-web-monitoring-processing",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

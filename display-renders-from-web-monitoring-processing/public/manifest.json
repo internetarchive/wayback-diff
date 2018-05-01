@@ -1,6 +1,6 @@
 {
-  "short_name": "Display renders from web-monitoring-db",
-  "name": "Display renders from web-monitoring-db",
+  "short_name": "Display renders from web-monitoring-processing",
+  "name": "Display renders from web-monitoring-processing",
   "icons": [
     {
       "src": "favicon.ico",
