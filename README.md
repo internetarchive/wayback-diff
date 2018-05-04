@@ -11,6 +11,6 @@ This project uses a lot of code from the [web-monitoring-ui](https://github.com/
 Run the server with the command `yarn start`
 The URL calls should look like this: 
 
-> http://localhost:port(default 3000)/snapshotAURL/snapshotBURL/diffingMethod
+> http://localhost:port(default 3000)/snapshotAURL/snapshotBURL/diffingMethod/pageURL
 
-Example request: http://localhost:3002/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/SIDE_BY_SIDE_RENDERED
+Example request: http://localhost:3002/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/SIDE_BY_SIDE_RENDERED/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com
