@@ -1,10 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom'
 import {diffTypes} from '../constants/diff-types';
 import Loading from './loading';
 
@@ -31,16 +26,6 @@ import SideBySideRawVersions from './side-by-side-raw-versions';
  * @param {DiffViewProps} props
  */
 
-const ExportParametersFromURL = ({match}) => (
-  <div className="diff-view">
-        {console.log('I am here!!!')}
-        {this._loadDiffData(match.params.a, match.params.b, match.params.diffType)}
-        {this.renderNoChangeMessage() || this.renderUndiffableMessage()}
-        {this.renderDiff()}
-  </div>
-
-)
-
 export default class DiffView extends React.Component {
   constructor (props) {
     super(props);
@@ -50,7 +35,7 @@ export default class DiffView extends React.Component {
   componentWillMount () {
     const {props} = this;
     if (this._canFetch(props)) {
-      this._loadDiffData(props.a, props.b, props.diffType);
+      this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
   }
 
@@ -59,30 +44,26 @@ export default class DiffView extends React.Component {
    */
   componentWillReceiveProps (nextProps) {
     if (this._canFetch(nextProps) && !this._propsSpecifySameDiff(nextProps)) {
-      this._loadDiffData(nextProps.a, nextProps.b, nextProps.diffType);
+      this._loadDiffData(nextProps.page, nextProps.a, nextProps.b, nextProps.diffType);
     }
   }
 
   render () {
+    if (!this.state.diffData) {
+      return <Loading />;
+    }
     return (
-      <Router>
-        <Route path = '/:a/:b/:diffType' render={({match}) =>
-          <div className="diff-view">
-            {console.log('I am here!!!')}
-            {this._loadDiffData('none',match.params.a, match.params.b, match.params.diffType)}
-            {this.renderNoChangeMessage() || this.renderUndiffableMessage()}
-            {this.renderDiff()}
-          </div>
-          }
-        />
-      </Router>
+      <div className="diff-view">
+        {this.renderNoChangeMessage() || this.renderUndiffableMessage()}
+        {this.renderDiff()}
+      </div>
     );
   }
 
   renderNoChangeMessage () {
     const sameContent = this.props.a
       && this.props.b
-      && this.props.a.version_hash === this.props.b.version_hash;
+      // && this.props.a.version_hash === this.props.b.version_hash;
 
     const className = 'diff-view__alert alert alert-warning';
 
@@ -210,11 +191,8 @@ export default class DiffView extends React.Component {
         .then(data => this.setState({diffData: data}));
     }
 
-// http://localhost:8888/html_token?format=json&include=all&a=&b=
-
-    console.log(`http://localhost:8888/${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`)
-    fetch(`http://localhost:8888/${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`)
-      .then(response => response.json())
+    fetch(`http://localhost:8888/${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+      .then(response => console.log(response))
       .then((data) => {
         console.log('getDiffMessage')
         this.setState({

@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import DiffView from './components/diff-view';
+import DiffContainer from './components/diff-container';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<DiffView />, document.getElementById('root'));
+ReactDOM.render(<DiffContainer />, document.getElementById('root'));
 registerServiceWorker();
