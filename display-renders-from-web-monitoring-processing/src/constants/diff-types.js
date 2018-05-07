@@ -3,7 +3,7 @@ import {
   parseMediaType,
   unknownType
 } from '../scripts/media-type';
-console.log("diff-types")
+
 export const diffTypes = {
   RAW_FROM_CONTENT: {
     description: '“From” Version',
