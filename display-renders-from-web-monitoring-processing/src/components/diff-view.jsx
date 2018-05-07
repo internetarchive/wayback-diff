@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {diffTypes} from '../constants/diff-types';
 import Loading from './loading';
@@ -192,7 +191,7 @@ export default class DiffView extends React.Component {
     }
 
     fetch(`http://localhost:8888/${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
-      .then(response => console.log(response))
+      .then(response => response.json())
       .then((data) => {
         console.log('getDiffMessage')
         this.setState({

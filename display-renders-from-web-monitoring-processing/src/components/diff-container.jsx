@@ -1,10 +1,8 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import DiffView from './diff-view';
 import {
     BrowserRouter as Router,
-    Route,
-    Link
+    Route
   } from 'react-router-dom'
 
 /**
@@ -15,9 +13,6 @@ import {
  * @param {DiffContainerProps} props
  */
 export default class DiffContainer extends React.Component {
-  constructor (props) {
-    super (props);
-  }
 
   render () {
 
