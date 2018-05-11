@@ -8,9 +8,12 @@ This project uses a lot of code from the [web-monitoring-ui](https://github.com/
 
 # Usage
 
+In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism implemented.
+You can find my implementation of a CORS-enabled web-monitoring-processing server [here](https://github.com/ftsalamp/web-monitoring-processing/tree/cors).
+
 Run the server with the command `yarn start`
 The URL calls should look like this: 
 
-> http://localhost:port(default 3000)/snapshotAURL/snapshotBURL/diffingMethod/pageURL
+> http://localhost:port(default 3000)/diffingMethod?format=VALUE&include=VALUE&a=aURL&b=bURL
 
-Example request: http://localhost:3002/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com%2Fversionista1%2F69957-6026616%2Fversion-10663938.html/SIDE_BY_SIDE_RENDERED/https%3A%2F%2Fedgi-versionista-archive.s3.amazonaws.com
+Example request: http://localhost:3000/SIDE_BY_SIDE_RENDERED?format=json&include=all&a=http://example.org&b=http://example.org
