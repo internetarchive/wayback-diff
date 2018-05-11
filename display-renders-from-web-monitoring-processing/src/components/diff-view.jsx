@@ -182,11 +182,11 @@ export default class DiffView extends React.Component {
         .catch(error => error)
         .then(data => this.setState({diffData: data}));
     }
-
-    fetch(`http://localhost:8888/${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+    var url = `${process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL}${process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;
+    url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
+    fetch(url)
       .then(response => response.json())
       .then((data) => {
-        console.log('getDiffMessage')
         this.setState({
           diffData: data
         });

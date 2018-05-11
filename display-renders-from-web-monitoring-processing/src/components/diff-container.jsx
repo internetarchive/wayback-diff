@@ -14,9 +14,7 @@ import qs from 'qs'
  * @param {DiffContainerProps} props
  */
 export default class DiffContainer extends React.Component {
-    constructor (props) {
-        super(props);
-    }
+
   render () {
 
     return (
