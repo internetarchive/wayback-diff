@@ -4,6 +4,7 @@ import {
     BrowserRouter as Router,
     Route
   } from 'react-router-dom'
+import qs from 'qs'
 
 /**
  * Display a change between two versions of a page.
@@ -13,18 +14,26 @@ import {
  * @param {DiffContainerProps} props
  */
 export default class DiffContainer extends React.Component {
-
+    constructor (props) {
+        super(props);
+    }
   render () {
 
     return (
         <Router>
-        <Route path = '/:a/:b/:diffType/:page' render={({match}) =>
+        <Route path = '/:diffType' render={({match, history}) =>
           <div className="diffcontainer-view">
-          <DiffView page = {{url: match.params.page}} diffType={match.params.diffType} a={match.params.a} b={match.params.b} />
+              {this.exportQueryParams(history.location.search, match.params)}
         </div>
           }
         />
       </Router>
     );
+  }
+
+  exportQueryParams(query, matchP){
+        query = query.substring(1);
+        var qParams=qs.parse(query);
+        return <DiffView page = {{url: qParams["url"]}} diffType={matchP.diffType} a={qParams["a"]} b={qParams["b"]} />
   }
 }

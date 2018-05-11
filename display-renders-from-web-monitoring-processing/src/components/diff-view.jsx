@@ -60,23 +60,16 @@ export default class DiffView extends React.Component {
   }
 
   renderNoChangeMessage () {
-    const sameContent = this.props.a
-      && this.props.b
-      // && this.props.a.version_hash === this.props.b.version_hash;
 
     const className = 'diff-view__alert alert alert-warning';
 
-    if (sameContent) {
-      return <div className={className}>
-        These two versions are <strong>exactly the same</strong>.
-      </div>;
-    }
-    else if (this.state.diffData.change_count === 0) {
-      return <div className={className}>
-        There were <strong>no changes for this diff type</strong>. (Other diff
-        types may show changes.)
-      </div>;
-    }
+      if (this.state.diffData.change_count === 0) {
+
+          return <div className={className}>
+              There were <strong>no changes for this diff type</strong>. (Other diff
+              types may show changes.)
+          </div>;
+      }
 
     return null;
   }
