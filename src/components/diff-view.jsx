@@ -1,4 +1,5 @@
 import React from 'react';
+import '../css/diff.css';
 import {diffTypes} from '../js/constants/diff-types';
 import Loading from './loading';
 
