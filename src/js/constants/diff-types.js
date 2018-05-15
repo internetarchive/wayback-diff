@@ -2,7 +2,7 @@ import {
   mediaTypeForExtension,
   parseMediaType,
   unknownType
-} from '../scripts/media-type';
+} from '../media-type';
 
 export const diffTypes = {
   RAW_FROM_CONTENT: {

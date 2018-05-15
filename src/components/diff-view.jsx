@@ -1,5 +1,5 @@
 import React from 'react';
-import {diffTypes} from '../constants/diff-types';
+import {diffTypes} from '../js/constants/diff-types';
 import Loading from './loading';
 
 import HighlightedTextDiff from './highlighted-text-diff';
