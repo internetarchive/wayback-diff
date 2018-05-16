@@ -27,7 +27,7 @@ export default class RawVersion extends React.Component {
 
     return (
       <div className="inline-render">
-        <iframe src={this.props.version.uri} />
+        <iframe src={this.props.version} />
       </div>
     );
   }

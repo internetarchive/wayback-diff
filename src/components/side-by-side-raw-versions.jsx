@@ -32,5 +32,5 @@ function renderVersion (page, version, content) {
     return <SandboxedHtml html={content} baseUrl={page.url} />;
   }
 
-  return <iframe src={version.uri} />;
+  return <iframe src={version} />;
 }

@@ -91,9 +91,6 @@ export default class DiffView extends React.Component {
     // TODO: if we have multiple ways to render content from a single service
     // in the future (e.g. inline vs. side-by-side text), we need a better
     // way to ensure we use the correct rendering and avoid race conditions
-    console.log(this.props.diffType + " renderDiff****")
-    console.log("----------------------")
-    console.log(this.state.diffData)
     switch (this.props.diffType) {
     case diffTypes.RAW_SIDE_BY_SIDE.value:
       return (
@@ -183,8 +180,8 @@ export default class DiffView extends React.Component {
         .catch(error => error)
         .then(data => this.setState({diffData: data}));
     }
-    var url = `${process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL}${process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;
-    url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
+      let url = `${process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL}${process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;
+      url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
     fetch(url)
       .then(response => response.json())
       .then((data) => {
