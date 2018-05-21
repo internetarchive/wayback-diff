@@ -4,6 +4,11 @@
 
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
 
+# Instalation
+
+Install node dependencies with `yarn`
+
+`yarn install`
 
 # Usage
 
