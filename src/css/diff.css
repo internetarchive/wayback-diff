@@ -20,6 +20,13 @@
     text-align: center;
 }
 
+.diff-select{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.7em;
+}
+
 .loading {
     align-items: center;
     background: transparent;

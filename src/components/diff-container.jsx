@@ -15,25 +15,54 @@ import qs from 'qs'
  */
 export default class DiffContainer extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        let pr = process.env;
+        let diffMethodsSupported = [];
+
+        Object.keys(pr).map(function(key) {
+            if (key.startsWith("REACT_APP_DIFFING_METHOD")) {
+                diffMethodsSupported.push(pr[key]);
+            }
+        });
+
+        this.state = {diffMethods: diffMethodsSupported,
+            selectedMethod:diffMethodsSupported[0]};
+
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(event){
+        this.setState({selectedMethod: event.target.value});
+    }
+
   render () {
 
     return (
-        <Router>
-            <switch>
-                <Route path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
-                    <div className="diffcontainer-view">
-                        {this.exportParams(location.pathname)}
+        <div>
+            <select className="diff-select" onChange={this.handleChange}>
+                {this.state.diffMethods.map(function (val) {
+                    return <option value = {val}>{val}</option>
+                })}</select>
+            <Router>
+                <switch>
+                    <Route path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
+                        <div className="diffcontainer-view">
+                            {this.exportParams(location.pathname)}
+                        </div>
+                    }
+                    />
+                    <Route exact path = '/:diffType' render={({match, history}) =>
+                      <div className="diffcontainer-view">
+                              Diffing Method:
+                          {this.exportQueryParams(history.location.search, match.params)}
                     </div>
-                }
-                />
-                <Route exact path = '/:diffType' render={({match, history}) =>
-                  <div className="diffcontainer-view">
-                      {this.exportQueryParams(history.location.search, match.params)}
-                </div>
-                }
-                />
-            </switch>
-        </Router>
+                    }
+                    />
+                </switch>
+            </Router>
+        </div>
     );
   }
 
@@ -46,7 +75,7 @@ export default class DiffContainer extends React.Component {
           let urlB = 'https://web.archive.org/web/' + path.substring(21,35) + '/' + site;
 
           return <DiffView page = {{url: site}}
-                           diffType='SIDE_BY_SIDE_RENDERED' a={urlA} b={urlB} />
+                           diffType={this.state.selectedMethod} a={urlA} b={urlB} />
       }
   }
 
