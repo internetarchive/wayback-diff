@@ -1,6 +1,6 @@
 import React from 'react';
-import DiffItem from './diff-item';
-import List from './list';
+import DiffItem from './diff-item.jsx';
+import List from './list.jsx';
 
 // The context for a change should be constrained to this many lines
 const maxContextLines = 3;

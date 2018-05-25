@@ -1,5 +1,5 @@
 import React from 'react';
-import DiffView from './diff-view';
+import DiffView from './diff-view.jsx';
 import {
   BrowserRouter as Router,
   Route,
@@ -16,7 +16,7 @@ import DiffingMethodSelector from './diffing-method-selector';
  * @class DiffContainer
  * @extends {React.Component}
  */
-export default class DiffContainer extends React.Component {
+export class DiffContainer extends React.Component {
 
   constructor(props) {
     super(props);
@@ -29,7 +29,6 @@ export default class DiffContainer extends React.Component {
 
   handleMethodChange(method) {
     this.setState ({selectedMethod: method});
-  }
 
   render () {
     return (

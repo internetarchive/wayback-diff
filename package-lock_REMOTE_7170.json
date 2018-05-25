@@ -1240,18 +1240,7 @@
         "on-finished": "2.3.0",
         "qs": "6.5.1",
         "raw-body": "2.3.2",
-<<<<<<< HEAD
-        "type-is": "~1.6.15"
-      },
-      "dependencies": {
-        "qs": {
-          "version": "6.5.1",
-          "resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz",
-          "integrity": "sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A=="
-        }
-=======
         "type-is": "1.6.16"
->>>>>>> Add rollup support
       }
     },
     "bonjour": {
@@ -3504,47 +3493,15 @@
       },
       "dependencies": {
         "fill-range": {
-          "version": "2.2.4",
-          "resolved": "https://registry.npmjs.org/fill-range/-/fill-range-2.2.4.tgz",
-          "integrity": "sha512-cnrcCbj01+j2gTG921VZPnHbjmdAf8oQV/iGeV2kZxGSyfYjjTyY79ErsK1WJWMpw6DaApEX72binqJE+/d+5Q==",
+          "version": "2.2.3",
+          "resolved": "https://registry.npmjs.org/fill-range/-/fill-range-2.2.3.tgz",
+          "integrity": "sha1-ULd9/X5Gm8dJJHCWNpn+eoSFpyM=",
           "requires": {
-<<<<<<< HEAD
-            "is-number": "^2.1.0",
-            "isobject": "^2.0.0",
-            "randomatic": "^3.0.0",
-            "repeat-element": "^1.1.2",
-            "repeat-string": "^1.5.2"
-          },
-          "dependencies": {
-            "kind-of": {
-              "version": "6.0.2",
-              "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-6.0.2.tgz",
-              "integrity": "sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA=="
-            },
-            "randomatic": {
-              "version": "3.0.0",
-              "resolved": "https://registry.npmjs.org/randomatic/-/randomatic-3.0.0.tgz",
-              "integrity": "sha512-VdxFOIEY3mNO5PtSRkkle/hPJDHvQhK21oa73K4yAc9qmp6N429gAyF1gZMOTMeS0/AYzaV/2Trcef+NaIonSA==",
-              "requires": {
-                "is-number": "^4.0.0",
-                "kind-of": "^6.0.0",
-                "math-random": "^1.0.1"
-              },
-              "dependencies": {
-                "is-number": {
-                  "version": "4.0.0",
-                  "resolved": "https://registry.npmjs.org/is-number/-/is-number-4.0.0.tgz",
-                  "integrity": "sha512-rSklcAIlf1OmFdyAqbnWTLVelsQ58uvZ66S/ZyawjWqIviTWCjg2PzVGw8WUA+nNuPTqb4wgA+NszrJ+08LlgQ=="
-                }
-              }
-            }
-=======
             "is-number": "2.1.0",
             "isobject": "2.1.0",
             "randomatic": "1.1.7",
             "repeat-element": "1.1.2",
             "repeat-string": "1.6.1"
->>>>>>> Add rollup support
           }
         },
         "is-number": {
@@ -3619,11 +3576,6 @@
           "version": "0.1.7",
           "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.1.7.tgz",
           "integrity": "sha1-32BBeABfUi8V60SQ5yR6G/qmf4w="
-        },
-        "qs": {
-          "version": "6.5.1",
-          "resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz",
-          "integrity": "sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A=="
         },
         "safe-buffer": {
           "version": "5.1.1",
@@ -3954,18 +3906,13 @@
       "integrity": "sha1-FQStJSMVjKpA20onh8sBQRmU6k8="
     },
     "fsevents": {
-      "version": "1.2.4",
-      "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-1.2.4.tgz",
-      "integrity": "sha512-z8H8/diyk76B7q5wg+Ud0+CqzcAF3mBBI/bA5ne5zrRUUIvNkJY//D3BqyH571KuAC4Nr7Rw7CjWX4r0y9DvNg==",
+      "version": "1.2.3",
+      "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-1.2.3.tgz",
+      "integrity": "sha512-X+57O5YkDTiEQGiw8i7wYc2nQgweIekqkepI8Q3y4wVlurgBt2SuwxTeYUYMZIGpLZH3r/TsMjczCMXE5ZOt7Q==",
       "optional": true,
       "requires": {
-<<<<<<< HEAD
-        "nan": "^2.9.2",
-        "node-pre-gyp": "^0.10.0"
-=======
         "nan": "2.10.0",
         "node-pre-gyp": "0.9.1"
->>>>>>> Add rollup support
       },
       "dependencies": {
         "abbrev": {
@@ -4034,7 +3981,7 @@
           }
         },
         "deep-extend": {
-          "version": "0.5.1",
+          "version": "0.4.2",
           "bundled": true,
           "optional": true
         },
@@ -4190,7 +4137,7 @@
           }
         },
         "node-pre-gyp": {
-          "version": "0.10.0",
+          "version": "0.9.1",
           "bundled": true,
           "optional": true,
           "requires": {
@@ -4286,21 +4233,14 @@
           "optional": true
         },
         "rc": {
-          "version": "1.2.7",
+          "version": "1.2.6",
           "bundled": true,
           "optional": true,
           "requires": {
-<<<<<<< HEAD
-            "deep-extend": "^0.5.1",
-            "ini": "~1.3.0",
-            "minimist": "^1.2.0",
-            "strip-json-comments": "~2.0.1"
-=======
             "deep-extend": "0.4.2",
             "ini": "1.3.5",
             "minimist": "1.2.0",
             "strip-json-comments": "2.0.1"
->>>>>>> Add rollup support
           },
           "dependencies": {
             "minimist": {
@@ -6243,8 +6183,6 @@
         }
       }
     },
-<<<<<<< HEAD
-=======
     "macaddress": {
       "version": "0.2.8",
       "resolved": "https://registry.npmjs.org/macaddress/-/macaddress-0.2.8.tgz",
@@ -6258,7 +6196,6 @@
         "vlq": "0.2.3"
       }
     },
->>>>>>> Add rollup support
     "make-dir": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/make-dir/-/make-dir-1.2.0.tgz",
@@ -6304,11 +6241,6 @@
       "version": "1.2.17",
       "resolved": "https://registry.npmjs.org/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz",
       "integrity": "sha1-3oGf282E3M2PrlnGrreWFbnSZqw="
-    },
-    "math-random": {
-      "version": "1.0.1",
-      "resolved": "https://registry.npmjs.org/math-random/-/math-random-1.0.1.tgz",
-      "integrity": "sha1-izqsWIuKZuSXXjzepn97sylgH6w="
     },
     "md5.js": {
       "version": "1.3.4",
@@ -7462,16 +7394,12 @@
       }
     },
     "postcss-filter-plugins": {
-      "version": "2.0.3",
-      "resolved": "https://registry.npmjs.org/postcss-filter-plugins/-/postcss-filter-plugins-2.0.3.tgz",
-      "integrity": "sha512-T53GVFsdinJhgwm7rg1BzbeBRomOg9y5MBVhGcsV0CxurUdVj1UlPdKtn7aqYA/c/QVkzKMjq2bSV5dKG5+AwQ==",
+      "version": "2.0.2",
+      "resolved": "https://registry.npmjs.org/postcss-filter-plugins/-/postcss-filter-plugins-2.0.2.tgz",
+      "integrity": "sha1-bYWGJTTXNaxCDkqFgG4fXUKG2Ew=",
       "requires": {
-<<<<<<< HEAD
-        "postcss": "^5.0.4"
-=======
         "postcss": "5.2.18",
         "uniqid": "4.1.1"
->>>>>>> Add rollup support
       },
       "dependencies": {
         "has-flag": {
@@ -8313,9 +8241,9 @@
       "integrity": "sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc="
     },
     "qs": {
-      "version": "6.5.2",
-      "resolved": "https://registry.npmjs.org/qs/-/qs-6.5.2.tgz",
-      "integrity": "sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA=="
+      "version": "6.5.1",
+      "resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz",
+      "integrity": "sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A=="
     },
     "query-string": {
       "version": "4.3.4",
@@ -8355,8 +8283,6 @@
       "integrity": "sha512-GXpfrYVPwx3K7RQ6aYT8KPS8XViSXUVJT1ONhoKPE9VAleW42YE+U+8VEyGWt41EnEQW7gwecYJriTI0pKoecQ==",
       "dev": true
     },
-<<<<<<< HEAD
-=======
     "randomatic": {
       "version": "1.1.7",
       "resolved": "https://registry.npmjs.org/randomatic/-/randomatic-1.1.7.tgz",
@@ -8376,7 +8302,6 @@
         }
       }
     },
->>>>>>> Add rollup support
     "randombytes": {
       "version": "2.0.6",
       "resolved": "https://registry.npmjs.org/randombytes/-/randombytes-2.0.6.tgz",
@@ -9835,9 +9760,9 @@
       }
     },
     "stringstream": {
-      "version": "0.0.6",
-      "resolved": "https://registry.npmjs.org/stringstream/-/stringstream-0.0.6.tgz",
-      "integrity": "sha512-87GEBAkegbBcweToUrdzf3eLhWNg06FJTebl4BVJz/JgWy8CvEr9dRtX5qWphiynMSQlxxi+QqN0z5T32SLlhA=="
+      "version": "0.0.5",
+      "resolved": "https://registry.npmjs.org/stringstream/-/stringstream-0.0.5.tgz",
+      "integrity": "sha1-TkhM1N5aC7vuGORjB3EKioFiGHg="
     },
     "strip-ansi": {
       "version": "3.0.1",
@@ -10434,8 +10359,6 @@
       "resolved": "https://registry.npmjs.org/uniq/-/uniq-1.0.1.tgz",
       "integrity": "sha1-sxxa6CVIRKOoKBVBzisEuGWnNP8="
     },
-<<<<<<< HEAD
-=======
     "uniqid": {
       "version": "4.1.1",
       "resolved": "https://registry.npmjs.org/uniqid/-/uniqid-4.1.1.tgz",
@@ -10444,7 +10367,6 @@
         "macaddress": "0.2.8"
       }
     },
->>>>>>> Add rollup support
     "uniqs": {
       "version": "2.0.0",
       "resolved": "https://registry.npmjs.org/uniqs/-/uniqs-2.0.0.tgz",

@@ -1,5 +1,5 @@
 import React from 'react';
-import SandboxedHtml from './sandboxed-html';
+import SandboxedHtml from './sandboxed-html.jsx';
 
 const showRemovals = showType.bind(null, 'removals');
 const showAdditions = showType.bind(null, 'additions');

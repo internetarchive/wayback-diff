@@ -1,5 +1,5 @@
 import React from 'react';
-import SandboxedHtml from './sandboxed-html';
+import SandboxedHtml from './sandboxed-html.jsx';
 
 /**
  * @typedef {Object} SideBySideRawVersionsProps

@@ -1,14 +1,14 @@
 import React from 'react';
-import '../css/diff.css';
+// import '../css/diff.css';
 import {diffTypes} from '../js/constants/diff-types';
-import Loading from './loading';
+import Loading from './loading.jsx';
 
-import HighlightedTextDiff from './highlighted-text-diff';
-import InlineRenderedDiff from './inline-rendered-diff';
-import SideBySideRenderedDiff from './side-by-side-rendered-diff';
-import ChangesOnlyDiff from './changes-only-diff';
-import RawVersion from './raw-version';
-import SideBySideRawVersions from './side-by-side-raw-versions';
+import HighlightedTextDiff from './highlighted-text-diff.jsx';
+import InlineRenderedDiff from './inline-rendered-diff.jsx';
+import SideBySideRenderedDiff from './side-by-side-rendered-diff.jsx';
+import ChangesOnlyDiff from './changes-only-diff.jsx';
+import RawVersion from './raw-version.jsx';
+import SideBySideRawVersions from './side-by-side-raw-versions.jsx';
 
 /**
  * @typedef DiffViewProps
