@@ -64,13 +64,13 @@ export default class DiffView extends React.Component {
 
     const className = 'diff-view__alert alert alert-warning';
 
-      if (this.state.diffData.change_count === 0) {
+    if (this.state.diffData.change_count === 0) {
 
-          return <div className={className}>
+      return <div className={className}>
               There were <strong>no changes for this diff type</strong>. (Other diff
               types may show changes.)
-          </div>;
-      }
+      </div>;
+    }
 
     return null;
   }
@@ -180,8 +180,8 @@ export default class DiffView extends React.Component {
         .catch(error => error)
         .then(data => this.setState({diffData: data}));
     }
-      let url = `${process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL}${process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;
-      url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
+    let url = `${process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL}${process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;
+    url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
     fetch(url)
       .then(response => response.json())
       .then((data) => {
