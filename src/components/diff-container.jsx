@@ -6,6 +6,7 @@ import {
   Switch
 } from 'react-router-dom';
 import qs from 'qs';
+import Loading from './loading'
 
 /**
  * Display a change between two versions of a page.
@@ -67,6 +68,7 @@ export default class DiffContainer extends React.Component {
           <Switch>
             <Route exact path = '/diff/:site' render={({location}) =>
               <div className="diffcontainer-view">
+                <Loading/>
                 {this.widgetRender(location.pathname)}
               </div>
             }/>
