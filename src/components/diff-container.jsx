@@ -6,7 +6,8 @@ import {
   Switch
 } from 'react-router-dom';
 import qs from 'qs';
-import Loading from './loading'
+import Loading from './loading';
+import '../css/diff-container.css';
 
 /**
  * Display a change between two versions of a page.
@@ -30,29 +31,51 @@ export default class DiffContainer extends React.Component {
     });
 
     this.state = {diffMethods: diffMethodsSupported,
-      selectedMethod:diffMethodsSupported[0]};
+      selectedMethod:diffMethodsSupported[0],
+      firstTime:true};
 
     this.handleChange = this.handleChange.bind(this);
+
+    this.handleLeftTimestampChange = this.handleLeftTimestampChange.bind(this);
+
+    this.handleRightTimestampChange = this.handleRightTimestampChange.bind(this);
   }
 
   handleChange(event){
     this.setState({selectedMethod: event.target.value});
   }
 
+  handleRightTimestampChange(event){
+    console.log(event);
+    const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
+    let allowedSnapshots = this.state.cdxData;
+    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+    this.setState({
+      leftSnaps: allowedSnapshots,
+      leftSnapElements : this.prepareOptionElements(allowedSnapshots)
+    });
+  }
+
+  handleLeftTimestampChange(event){
+    console.log(event);
+    const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
+    let allowedSnapshots = this.state.cdxData;
+    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+    this.setState({
+      rightSnaps: allowedSnapshots,
+      rightSnapElements : this.prepareOptionElements(allowedSnapshots)
+    });
+  }
+
   render () {
     if (this.state.cdxData) {
-      var temp = [];
-      for (let i = 1; i < this.state.cdxData.length; i++){
-        temp.push(<option key = {i} value = {this.state.cdxData[i][0]}>{this.state.cdxData[i][0]}</option>);
-      }
       return (
         <div>
-          <select className="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
-            {temp}
+          <select id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
+            {this.state.leftSnapElements}
           </select>
-
-          <select className="timestamp-select-right" onChange={this.handleRightTimestampChange}>
-            {temp}
+          <select id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
+            {this.state.rightSnapElements}
           </select>
         </div>
       );
@@ -112,14 +135,31 @@ export default class DiffContainer extends React.Component {
 
   widgetRender (pathname) {
     pathname = pathname.substring(6);
-    let url = `https://web.archive.org/cdx/search?url=${pathname}/&status=200&fl=timestamp,digest&output=json`;
+    let url = `https://web.archive.org/cdx/search?url=${pathname}/&status=200&fl=timestamp,digest&output=json&limit=3`;
     fetch(url)
       .then(response => response.json())
       .then((data) => {
-        this.setState({
-          cdxData: data
-        });
+        this.prepareData(data);
       });
+  }
+
+  prepareData(data){
+    data.shift();
+    this.setState({
+      cdxData: data,
+      leftSnaps : data,
+      rightSnaps : data,
+      leftSnapElements : this.prepareOptionElements(data),
+      rightSnapElements : this.prepareOptionElements(data)
+    });
+  }
+
+  prepareOptionElements(data){
+    var initialSnapshots = [];
+    for (let i = 0; i < data.length; i++){
+      initialSnapshots.push(<option key = {i} value = {data[i][0]}>{data[i][0]}</option>);
+    }
+    return initialSnapshots;
   }
 
 }
