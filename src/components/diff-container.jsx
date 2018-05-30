@@ -14,7 +14,6 @@ import '../css/diff-container.css';
  *
  * @class DiffContainer
  * @extends {React.Component}
- * @param {DiffContainerProps} props
  */
 export default class DiffContainer extends React.Component {
 
@@ -39,14 +38,17 @@ export default class DiffContainer extends React.Component {
     this.handleLeftTimestampChange = this.handleLeftTimestampChange.bind(this);
 
     this.handleRightTimestampChange = this.handleRightTimestampChange.bind(this);
+
+    this.clearPressed = this.clearPressed.bind(this);
+
+    this.renderPressed = this.renderPressed.bind(this);
   }
 
   handleChange(event){
     this.setState({selectedMethod: event.target.value});
   }
 
-  handleRightTimestampChange(event){
-    console.log(event);
+  handleRightTimestampChange(){
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
     let allowedSnapshots = this.state.cdxData;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -56,8 +58,7 @@ export default class DiffContainer extends React.Component {
     });
   }
 
-  handleLeftTimestampChange(event){
-    console.log(event);
+  handleLeftTimestampChange(){
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
     let allowedSnapshots = this.state.cdxData;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -74,6 +75,10 @@ export default class DiffContainer extends React.Component {
           <select id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
             {this.state.leftSnapElements}
           </select>
+          <div id="center-buttons">
+            <button id="clear-btn" onClick={this.clearPressed}>Clear</button>
+            <button id="render-btn" onClick={this.renderPressed}>Show differences</button>
+          </div>
           <select id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
             {this.state.rightSnapElements}
           </select>
@@ -97,7 +102,7 @@ export default class DiffContainer extends React.Component {
             }/>
             <Route path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
               <div className="diffcontainer-view">
-                {this.widgetRender(location.pathname)}
+                {this.exportParams(location.pathname)}
               </div>
             }
             />
@@ -135,7 +140,7 @@ export default class DiffContainer extends React.Component {
 
   widgetRender (pathname) {
     pathname = pathname.substring(6);
-    let url = `https://web.archive.org/cdx/search?url=${pathname}/&status=200&fl=timestamp,digest&output=json&limit=3`;
+    let url = `https://web.archive.org/cdx/search?url=${pathname}/&status=200&fl=timestamp,digest&output=json`;
     fetch(url)
       .then(response => response.json())
       .then((data) => {
@@ -162,4 +167,21 @@ export default class DiffContainer extends React.Component {
     return initialSnapshots;
   }
 
+  clearPressed () {
+    let initialData = this.state.cdxData;
+    this.setState({
+      leftSnaps : initialData,
+      rightSnaps : initialData,
+      leftSnapElements : this.prepareOptionElements(initialData),
+      rightSnapElements : this.prepareOptionElements(initialData)
+    });
+  }
+
+  renderPressed () {
+    let timestampA = document.getElementById('timestamp-select-left').value;
+    let timestampB = document.getElementById('timestamp-select-right').value;
+    let url = window.location.href.split('/');
+
+    window.location.href= `./${timestampA}/${timestampB}/${url[url.length-1]}`;
+  }
 }

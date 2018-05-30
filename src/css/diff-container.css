@@ -1,3 +1,13 @@
 #timestamp-select-right{
     float: right;
 }
+
+#center-buttons {
+    position: absolute;
+    left: 50%;
+}
+
+#clear-btn {
+    margin-right: 10px;
+    margin-left: -10px;
+}
