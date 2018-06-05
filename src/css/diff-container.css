@@ -3,11 +3,12 @@
 }
 
 #center-buttons {
-    position: absolute;
-    left: 50%;
+    display: flex;
+    margin-bottom: 0.7em;
 }
 
-#clear-btn {
-    margin-right: 10px;
-    margin-left: -10px;
+#clear-btn, #show-diff-btn {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
 }

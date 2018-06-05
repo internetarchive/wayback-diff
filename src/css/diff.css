@@ -20,7 +20,7 @@
     text-align: center;
 }
 
-.diff-select{
+#diff-select{
     display: block;
     margin-left: auto;
     margin-right: auto;
