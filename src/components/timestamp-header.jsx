@@ -114,9 +114,22 @@ export default class TimestampHeader extends React.Component {
   prepareOptionElements(data){
     var initialSnapshots = [];
     for (let i = 0; i < data.length; i++){
-      initialSnapshots.push(<option key = {i} value = {data[i][0]}>{data[i][0]}</option>);
+      let utcTime = this.getUTCDateFormat(data[i][0]);
+      initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
     }
     return initialSnapshots;
+  }
+
+  getUTCDateFormat (date){
+    let year = date.substring(0,4);
+    let month = date.substring(4,6);
+    let day = date.substring(6,8);
+    let hour = date.substring(8,10);
+    let minutes = date.substring(10,12);
+    let seconds = date.substring(12,14);
+
+    let niceTime = new Date(`${year}-${month}-${day}T${hour}:${minutes}:${seconds}`);
+    return (niceTime.toUTCString());
   }
 
   clearPressed () {
