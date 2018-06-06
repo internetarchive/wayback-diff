@@ -75,14 +75,14 @@ export default class TimestampHeader extends React.Component {
 
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
-    let site = path.substring(6);
+    let site = path.split('/').pop();
     // let selectedMethod = document.getElementById('diff-select').value;
     //
     // let urlA = 'https://web.archive.org/web/' + timestampA + '/' + site;
     // let urlB = 'https://web.archive.org/web/' + timestampB + '/' + site;
 
     // window.history.pushState({'html':document.html,'pageTitle':document.pageTitle}, '', `http://localhost:3000/diff/${timestampA}/${timestampB}/${site}`);
-    window.location.href = `./${timestampA}/${timestampB}/${site}`;
+    window.location.href = `/diff/${timestampA}/${timestampB}/${site}`;
     // return <DiffView page = {{url: site}}
     //   diffType={selectedMethod} a={urlA} b={urlB} />;
   }
