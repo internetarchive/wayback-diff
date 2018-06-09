@@ -8,7 +8,7 @@ import resolve from 'rollup-plugin-node-resolve';
 export default {
   input: 'src/index.js',
   output: {
-    file: '/var/www/html/wayback-diff/build/app.js',
+    file: 'build/app.js',
     format: 'iife',
     sourcemap: true
   },

@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "babel-core": "6.26.3",
+    "babel-plugin-external-helpers": "6.18.0",
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-react": "6.24.1",
+    "babel-preset-stage-0": "6.24.1",
+    "browser-sync": "^2.24.4",
+    "npm-run-all": "4.1.2",
     "prop-types": "^15.6.1",
     "qs": "latest",
     "react": "^16.3.2",
@@ -14,13 +21,6 @@
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-globals": "^1.2.1",
     "rollup-plugin-replace": "^2.0.0",
-    "babel-core": "6.26.3",
-    "babel-plugin-external-helpers": "6.18.0",
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
-    "browser-sync": "2.18.13",
-    "npm-run-all": "4.1.2",
     "rollup-watch": "4.3.1",
     "snazzy": "6.0.0",
     "standard": "10.0.3"
@@ -33,6 +33,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "babel-plugin-css-modules-transform": "^1.6.1",
     "eslint": "^4.19.1",
     "eslint-plugin-mocha": "^5.0.0",
     "rollup-plugin-node-resolve": "^3.3.0"

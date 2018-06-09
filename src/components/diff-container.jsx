@@ -6,9 +6,9 @@ import {
   Switch
 } from 'react-router-dom';
 import qs from 'qs';
-import '../css/diff-container.css';
-import TimestampHeader from './timestamp-header';
-import DiffingMethodSelector from './diffing-method-selector';
+// import '../css/diff-container.css';
+import TimestampHeader from './timestamp-header.jsx';
+import DiffingMethodSelector from './diffing-method-selector.jsx';
 
 /**
  * Display a change between two versions of a page.
@@ -28,7 +28,8 @@ export class DiffContainer extends React.Component {
   }
 
   handleMethodChange(method) {
-    this.setState ({selectedMethod: method});
+    this.setState({selectedMethod: method});
+  }
 
   render () {
     return (
@@ -41,14 +42,16 @@ export class DiffContainer extends React.Component {
               {this.exportParams(location.pathname)}
             </div>
           }/>
-          <Route exact path = '/diff/:site' render={ () =>
+          <Route exact path = '/wayback-diff/html/index.html/diff/:site' render={ () =>
             <div className="diffcontainer-view">
               <TimestampHeader isInitial={true}/>
             </div>
           }/>
-          <Route exact path = '/:diffType' render={({match, history}) =>
+          <Route path = '/:diffType' render={({match, history}) =>
             <div className="diffcontainer-view">
-              Diffing Method:
+              <TimestampHeader isInitial = {false}/>
+              <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
+                Diffing Method:
               {this.exportQueryParams(history.location.search, match.params)}</div>
           }/>
         </Switch>

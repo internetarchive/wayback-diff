@@ -1,6 +1,6 @@
 import React from 'react';
-import Loading from './loading';
-import '../css/diff-container.css';
+import Loading from './loading.jsx';
+// import '../css/diff-container.css';
 
 /**
  * Display a timestamp selector
@@ -66,7 +66,7 @@ export default class TimestampHeader extends React.Component {
     }
     return (<div>
       <Loading/>
-      {this.widgetRender(window.location.pathname)}
+      {this.widgetRender(window.location.href)}
     </div>
     );
   }
@@ -82,7 +82,7 @@ export default class TimestampHeader extends React.Component {
     // let urlB = 'https://web.archive.org/web/' + timestampB + '/' + site;
 
     // window.history.pushState({'html':document.html,'pageTitle':document.pageTitle}, '', `http://localhost:3000/diff/${timestampA}/${timestampB}/${site}`);
-    window.location.href = `/diff/${timestampA}/${timestampB}/${site}`;
+    window.location.href = `./${timestampA}/${timestampB}/${site}`;
     // return <DiffView page = {{url: site}}
     //   diffType={selectedMethod} a={urlA} b={urlB} />;
   }

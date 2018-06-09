@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/diff-container.css';
+// import '../css/diff-container.css';
 
 /**
  * Display a diffing method selector
