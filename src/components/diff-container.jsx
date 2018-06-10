@@ -35,14 +35,14 @@ export class DiffContainer extends React.Component {
     return (
       <Router>
         <Switch>
-          <Route path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
+          <Route path = '/wayback-diff/html/index/diff/:timestampA/:timestampB/:site' render={({location}) =>
             <div className="diffcontainer-view">
               <TimestampHeader isInitial = {false}/>
               <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
               {this.exportParams(location.pathname)}
             </div>
           }/>
-          <Route exact path = '/wayback-diff/html/index.html/diff/:site' render={ () =>
+          <Route exact path = '/wayback-diff/html/index/diff/:site' render={ () =>
             <div className="diffcontainer-view">
               <TimestampHeader isInitial={true}/>
             </div>
@@ -62,6 +62,7 @@ export class DiffContainer extends React.Component {
   exportParams(path){
 
     if(this.state.selectedMethod !== null) {
+      path = path.substring(24);
       if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
 
         let site = path.substring(36);
