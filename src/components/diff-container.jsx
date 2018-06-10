@@ -56,11 +56,19 @@ export class DiffContainer extends React.Component {
 
     if(this.state.selectedMethod !== undefined) {
 
+<<<<<<< HEAD
       if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
         path = path.split('/');
         let site = path[path.length-1];
         let urlA = 'https://web.archive.org/web/' + path[path.length-3] + '/' + site;
         let urlB = 'https://web.archive.org/web/' + path[path.length-2] + '/' + site;
+=======
+        path = path.split('/');
+
+        let site = path[4];
+        let urlA = 'https://web.archive.org/web/' + path[2] + '/' + site;
+        let urlB = 'https://web.archive.org/web/' + path[3] + '/' + site;
+>>>>>>> 5846f88... Change URL substring with split
 
         return <DiffView page={{url: site}}
           diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>;
