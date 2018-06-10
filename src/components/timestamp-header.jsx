@@ -134,14 +134,14 @@ export default class TimestampHeader extends React.Component {
   }
 
   getUTCDateFormat (date){
-    let year = date.substring(0,4);
-    let month = date.substring(4,6);
-    let day = date.substring(6,8);
-    let hour = date.substring(8,10);
-    let minutes = date.substring(10,12);
-    let seconds = date.substring(12,14);
+    let year = parseInt(date.substring(0,4));
+    let month = parseInt(date.substring(4,6));
+    let day = parseInt(date.substring(6,8));
+    let hour = parseInt(date.substring(8,10));
+    let minutes = parseInt(date.substring(10,12));
+    let seconds = parseInt(date.substring(12,14));
 
-    let niceTime = new Date(`${year}-${month}-${day}T${hour}:${minutes}:${seconds}`);
+    let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
     return (niceTime.toUTCString());
   }
 
