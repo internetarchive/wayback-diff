@@ -62,15 +62,15 @@ export class DiffContainer extends React.Component {
   exportParams(path){
 
     if(this.state.selectedMethod !== null) {
-      path = path.substring(24);
+      // path = path.substring(24);
       if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
-
-        let site = path.substring(36);
-        let urlA = 'https://web.archive.org/web/' + path.substring(6, 20) + '/' + site;
-        let urlB = 'https://web.archive.org/web/' + path.substring(21, 35) + '/' + site;
+        path = path.split('/');
+        let site = path[path.length-1];
+        let urlA = 'https://web.archive.org/web/' + path[path.length-3] + '/' + site;
+        let urlB = 'https://web.archive.org/web/' + path[path.length-2] + '/' + site;
 
         return <DiffView page={{url: site}}
-          diffType={this.state.selectedMethod} a={urlA} b={urlB}/>;
+          diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}/>;
       }
     }
   }
