@@ -61,8 +61,8 @@ export class DiffContainer extends React.Component {
 
   exportParams(path){
 
-    if(this.state.selectedMethod !== null) {
-      // path = path.substring(24);
+    if(this.state.selectedMethod !== undefined) {
+
       if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
         path = path.split('/');
         let site = path[path.length-1];
@@ -70,7 +70,7 @@ export class DiffContainer extends React.Component {
         let urlB = 'https://web.archive.org/web/' + path[path.length-2] + '/' + site;
 
         return <DiffView page={{url: site}}
-          diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}/>;
+          diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>;
       }
     }
   }

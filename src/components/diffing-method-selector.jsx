@@ -1,4 +1,5 @@
 import React from 'react';
+import {supportedDiffTypes} from '../js/supported-diffing-methods.js';
 // import '../css/diff-container.css';
 
 /**
@@ -12,31 +13,22 @@ export default class DiffingMethodSelector extends React.Component {
   constructor(props) {
     super(props);
 
-    let pr = process.env;
-    let diffMethodsSupported = [];
-
-    Object.keys(pr).map(function(key) {
-      if (key.startsWith('REACT_APP_DIFFING_METHOD')) {
-        diffMethodsSupported.push(pr[key]);
-      }
-    });
-
-    this.state = {diffMethods: diffMethodsSupported,
-      selectedMethod:diffMethodsSupported[0]};
-    this.props.parentHandle(diffMethodsSupported[0]);
+    this.state = {diffMethods: supportedDiffTypes,
+      selectedMethod:supportedDiffTypes[0]};
+    this.props.parentHandle(supportedDiffTypes[0]);
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event){
-    this.setState({selectedMethod: event.target.value});
-    this.props.parentHandle(event.target.value);
+    this.setState({selectedMethod: event.target.value.split(',')});
+    this.props.parentHandle(event.target.value.split(','));
   }
 
   render () {
     return (
       <select id="diff-select" onChange={this.handleChange}>
         {this.state.diffMethods.map(function (val, index) {
-          return <option key = {index} value = {val}>{val}</option>;
+          return <option key = {index} value = {val}>{val[1]}</option>;
         })}
       </select>
     );
