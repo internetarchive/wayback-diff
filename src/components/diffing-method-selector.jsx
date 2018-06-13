@@ -1,6 +1,8 @@
 import React from 'react';
 import {supportedDiffTypes} from '../js/supported-diffing-methods.js';
 import '../css/diff-container.css';
+import {supportedDiffTypes} from '../js/supported-diffing-methods.js';
+
 
 /**
  * Display a diffing method selector
