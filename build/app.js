@@ -18859,7 +18859,7 @@
                   return react.createElement(
                     "div",
                     { className: "loading" },
-                    react.createElement("object", { type: "image/svg+xml", data: '../img/wayback-loader.svg' })
+                    react.createElement("object", { type: "image/svg+xml", data: '/src/img/wayback-loader.svg' })
                   );
                 }
               }]);
