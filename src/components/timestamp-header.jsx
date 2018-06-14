@@ -82,7 +82,7 @@ export default class TimestampHeader extends React.Component {
     // let urlB = 'https://web.archive.org/web/' + timestampB + '/' + site;
 
     // window.history.pushState({'html':document.html,'pageTitle':document.pageTitle}, '', `http://localhost:3000/diff/${timestampA}/${timestampB}/${site}`);
-    window.location.href = `./${timestampA}/${timestampB}/${site}`;
+    window.location.href = `/diff/${timestampA}/${timestampB}/${site}`;
     // return <DiffView page = {{url: site}}
     //   diffType={selectedMethod} a={urlA} b={urlB} />;
   }

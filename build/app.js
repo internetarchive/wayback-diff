@@ -18859,7 +18859,7 @@
                   return react.createElement(
                     "div",
                     { className: "loading" },
-                    react.createElement("object", { type: "image/svg+xml", data: '../../../src/img/wayback-loader.svg' })
+                    react.createElement("object", { type: "image/svg+xml", data: '../img/wayback-loader.svg' })
                   );
                 }
               }]);
@@ -23856,7 +23856,7 @@
                   // let urlB = 'https://web.archive.org/web/' + timestampB + '/' + site;
 
                   // window.history.pushState({'html':document.html,'pageTitle':document.pageTitle}, '', `http://localhost:3000/diff/${timestampA}/${timestampB}/${site}`);
-                  window.location.href = './' + timestampA + '/' + timestampB + '/' + site;
+                  window.location.href = '/diff/' + timestampA + '/' + timestampB + '/' + site;
                   // return <DiffView page = {{url: site}}
                   //   diffType={selectedMethod} a={urlA} b={urlB} />;
                 }
