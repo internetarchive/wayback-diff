@@ -35,24 +35,17 @@ export class DiffContainer extends React.Component {
     return (
       <Router>
         <Switch>
-          <Route path = '/wayback-diff/html/index/diff/:timestampA/:timestampB/:site' render={({location}) =>
+          <Route exact path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
             <div className="diffcontainer-view">
               <TimestampHeader isInitial = {false}/>
               <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
               {this.exportParams(location.pathname)}
             </div>
           }/>
-          <Route exact path = '/wayback-diff/html/index/diff/:site' render={ () =>
+          <Route exact path = '/diff/:site' render={ () =>
             <div className="diffcontainer-view">
               <TimestampHeader isInitial={true}/>
             </div>
-          }/>
-          <Route path = '/:diffType' render={({match, history}) =>
-            <div className="diffcontainer-view">
-              <TimestampHeader isInitial = {false}/>
-              <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
-                Diffing Method:
-              {this.exportQueryParams(history.location.search, match.params)}</div>
           }/>
         </Switch>
       </Router>

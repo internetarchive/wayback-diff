@@ -88,6 +88,9 @@ export default class TimestampHeader extends React.Component {
   }
 
   widgetRender (pathname) {
+    if (pathname[pathname.length-1] === '/') {
+      pathname = pathname.substring(0,pathname.length-2);
+    }
     let domain = pathname.split('/').pop();
     let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
     fetch(url)
@@ -143,7 +146,7 @@ export default class TimestampHeader extends React.Component {
   }
 
   getYear (date) {
-    return parseInt(date.substring(0,4));
+    return parseInt(date.substring(0,4), 10);
   }
 
   clearPressed () {
