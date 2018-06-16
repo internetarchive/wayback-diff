@@ -26,7 +26,6 @@
     "snazzy": "6.0.0",
     "standard": "10.0.3",
     "webpack": "^4.12.0",
-    "css-loader": "^0.28.11",
     "cssnano": "^4.0.0-rc.2"
   },
   "scripts": {
