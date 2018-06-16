@@ -4,4 +4,4 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { DiffContainer } from './components/diff-container.jsx';
 
-ReactDOM.render(<DiffContainer />, document.getElementById('root'));
+ReactDOM.render(<DiffContainer />, document.getElementById('wayback-diff'));

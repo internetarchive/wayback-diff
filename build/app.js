@@ -24321,7 +24321,7 @@
 
             /*eslint-disable no-unused-vars*/
 
-            reactDom.render(react.createElement(DiffContainer, null), document.getElementById('root'));
+            reactDom.render(react.createElement(DiffContainer, null), document.getElementById('wayback-diff'));
 
 }());
 //# sourceMappingURL=app.js.map
