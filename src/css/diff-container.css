@@ -1,0 +1,14 @@
+#timestamp-select-right{
+    float: right;
+}
+
+#center-buttons {
+    display: flex;
+    margin-bottom: 0.7em;
+}
+
+#clear-btn, #show-diff-btn {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}

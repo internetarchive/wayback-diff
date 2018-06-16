@@ -1,6 +1,6 @@
 import React from 'react';
 import Loading from './loading.jsx';
-// import '../css/diff-container.css';
+import '../css/diff-container.css';
 
 /**
  * Display a timestamp selector

@@ -1,0 +1,35 @@
+.side-by-side-render,
+.inline-render {
+    display: flex;
+    flex: 1 0 auto;
+    height: 94vh;
+}
+
+.side-by-side-render > iframe,
+.inline-render > iframe {
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    width: 100%;
+}
+
+.side-by-side-render > iframe:first-of-type {
+    margin-right: 0.5em;
+}
+
+.diff-view__alert.alert.alert-warning{
+    text-align: center;
+}
+
+#diff-select{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.7em;
+}
+
+.loading {
+    align-items: center;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+}

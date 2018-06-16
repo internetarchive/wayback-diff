@@ -2,8 +2,11 @@
 import babel from 'rollup-plugin-babel';
 import cjs from 'rollup-plugin-commonjs';
 import globals from 'rollup-plugin-node-globals';
+import postcss from 'rollup-plugin-postcss';
 import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
+
+import cssnano from 'cssnano';
 
 export default {
   input: 'src/index.js',
@@ -13,6 +16,10 @@ export default {
     sourcemap: true
   },
   plugins: [
+    postcss({
+      extensions: [ '.css' ]
+    }),
+    cssnano(),
     babel({
       babelrc: false,
       exclude: 'node_modules/**',

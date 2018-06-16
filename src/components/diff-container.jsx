@@ -6,7 +6,7 @@ import {
   Switch
 } from 'react-router-dom';
 import qs from 'qs';
-// import '../css/diff-container.css';
+import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffingMethodSelector from './diffing-method-selector.jsx';
 
