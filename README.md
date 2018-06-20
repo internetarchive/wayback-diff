@@ -35,7 +35,7 @@ In order to use this app as a library in an other React/JS app you sould run
 
 `build:dev`
 
-In the HTML file you want to use **wayback-diff** library you should include the following code:
+In the HTML file you want to use the **wayback-diff** library you should include the following code:
 
 ```HTML
 <script src="../../../../public/wayback-diff.js"></script>
