@@ -1,6 +1,6 @@
-# DisplayRendersFromWeb-monitoring-processing
+# Wayback-diff
 
-# # **[Display Renders From Web-monitoring-processing](https://github.com/ftsalamp/DisplayRendersFromWeb-monitoring-processing)**
+# # **[Wayback-diff](https://github.com/ftsalamp/wayback-diff)**
 
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
 
@@ -28,3 +28,22 @@ Example request: http://localhost:3000/SIDE_BY_SIDE_RENDERED?format=json&include
 > http://localhost:port(default 3000)/diff/TIMESTAMP_A/TIMESTAMP_B/WEBSITE
 
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
+
+# Use it as a library
+
+In order to use this app as a library in an other React/JS app you sould run
+
+`build:dev`
+
+In the HTML file you want to use **wayback-diff** library you should include the following code:
+
+```HTML
+<script src="../../../../public/wayback-diff.js"></script>
+    <script>
+      new LoadWaybackDiff();
+    </script>
+ ```
+
+If you want to test the exported JS library you should run
+
+`example:local`
