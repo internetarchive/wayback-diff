@@ -1,6 +1,6 @@
 {
-  "short_name": "Display renders from web-monitoring-processing",
-  "name": "Display renders from web-monitoring-processing",
+  "short_name": "Wayback-Diff",
+  "name": "Wayback-Diff",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",

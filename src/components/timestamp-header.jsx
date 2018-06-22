@@ -118,7 +118,7 @@ export default class TimestampHeader extends React.Component {
     var initialSnapshots = [];
     if (data.length > 0) {
       var yearGroup = this.getYear(data[0][0]);
-      initialSnapshots.push(<optgroup label={yearGroup}/>);
+      initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
 
     for (let i = 0; i < data.length; i++){
@@ -126,7 +126,7 @@ export default class TimestampHeader extends React.Component {
       var year = this.getYear(data[i][0]);
       if (year > yearGroup) {
         yearGroup = year;
-        initialSnapshots.push(<optgroup label={yearGroup}/>);
+        initialSnapshots.push(<optgroup key={-i+2} label={yearGroup}/>);
       }
       initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
     }
@@ -196,8 +196,8 @@ export default class TimestampHeader extends React.Component {
 
   selectValues (pathname) {
     pathname = pathname.split('/');
-    let firstTimestamp = pathname[2];
-    let secondTimestamp = pathname[3];
+    let firstTimestamp = pathname[pathname.length - 3];
+    let secondTimestamp = pathname[pathname.length - 2];
 
     document.getElementById('timestamp-select-left').value = firstTimestamp;
     document.getElementById('timestamp-select-right').value = secondTimestamp;
