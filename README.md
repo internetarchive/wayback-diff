@@ -1,6 +1,6 @@
 # Wayback-diff
 
-# # **[Wayback-diff](https://github.com/ftsalamp/wayback-diff)**
+## **[Wayback-diff](https://github.com/ftsalamp/wayback-diff)**
 
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
 
@@ -35,15 +35,45 @@ In order to use this app as a library in an other React/JS app you sould run
 
 `build:dev`
 
-In the HTML file you want to use the **wayback-diff** library you should include the following code:
+The waybackDiff function receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
+
+- If null is passed as the second parameter a default fallback method is going to be used instead.
+
+- The callback function should return a fetch Promise.
+
+## Examples
+In the HTML file you want to use the **wayback-diff** library in you should include the following script and call the waybackDiff method:
+
+An example of how to use the library without defining a callback function.
 
 ```HTML
-<script src="../../../../public/wayback-diff.js"></script>
+<script src="../../../../build/app.js"></script>
     <script>
-      new LoadWaybackDiff();
+      waybackDiff(document.getElementById('wayback-diff'), null);
+    </script>
+ ```
+ 
+An example of how to use the library with a callback function.
+
+```HTML
+<script src="../../../../build/app.js"></script>
+    <script>
+        function fetchData() {
+          var pathname = window.location.pathname;
+          if (pathname[pathname.length-1] === '/') {
+            pathname = pathname.substring(0,pathname.length-2);
+          }
+          let domain = pathname.split('/').pop();
+          let url = 'https://web.archive.org/cdx/search?url='+domain+'/&status=200&fl=timestamp,digest&output=json';
+          return fetch(url)
+            .then(response => {return response.json()});
+        }
+
+      waybackDiff(document.getElementById('wayback-diff'), fetchData);
     </script>
  ```
 
-If you want to test the exported JS library you should run
+
+## If you want to test the exported JS library you should run
 
 `example:local`
