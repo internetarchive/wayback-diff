@@ -144,7 +144,7 @@ export default class TimestampHeader extends React.Component {
 
   getUTCDateFormat (date){
     let year = parseInt(date.substring(0,4), 10);
-    let month = parseInt(date.substring(4,6), 10);
+    let month = parseInt(date.substring(4,6), 10) - 1;
     let day = parseInt(date.substring(6,8), 10);
     let hour = parseInt(date.substring(8,10), 10);
     let minutes = parseInt(date.substring(10,12), 10);
