@@ -37,14 +37,14 @@ export class DiffContainer extends React.Component {
         <Switch>
           <Route exact path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
             <div className="diffcontainer-view">
-              <TimestampHeader isInitial = {false}/>
+              <TimestampHeader isInitial = {false} fetchCallback = {this.props.fetchCallback} />
               <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
               {this.exportParams(location.pathname)}
             </div>
           }/>
           <Route exact path = '/diff/:site' render={ () =>
             <div className="diffcontainer-view">
-              <TimestampHeader isInitial={true}/>
+              <TimestampHeader isInitial={true} fetchCallback = {this.props.fetchCallback}/>
               <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
             </div>
           }/>

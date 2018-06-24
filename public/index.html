@@ -25,9 +25,20 @@
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="wayback-diff">This</div>
-    <script src="../../../../public/wayback-diff.js"></script>
+    <script src="../../../../build/app.js"></script>
     <script>
-      new LoadWaybackDiff();
+        function fetchData() {
+          var pathname = "window.location.pathname";
+          if (pathname[pathname.length-1] === '/') {
+            pathname = pathname.substring(0,pathname.length-2);
+          }
+          let domain = pathname.split('/').pop();
+          let url = 'https://web.archive.org/cdx/search?url=$'+domain'+/&status=200&fl=timestamp,digest&output=json';
+          fetch(url)
+            .then(response => {return response.json()});
+        }
+
+      waybackDiff(document.getElementById('wayback-diff'), fetchData);
     </script>
   </body>
 </html>

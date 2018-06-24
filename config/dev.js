@@ -11,6 +11,7 @@ import cssnano from 'cssnano';
 export default {
   input: 'src/index.js',
   output: {
+    name: 'waybackDiff',
     file: 'build/app.js',
     format: 'iife',
     sourcemap: true

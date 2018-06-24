@@ -88,19 +88,28 @@ export default class TimestampHeader extends React.Component {
   }
 
   widgetRender (pathname) {
-    if (pathname[pathname.length-1] === '/') {
-      pathname = pathname.substring(0,pathname.length-2);
-    }
-    let domain = pathname.split('/').pop();
-    let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
-    fetch(url)
-      .then(response => response.json())
-      .then((data) => {
+    if (this.props.fetchCallback) {
+      this.props.fetchCallback().then((data => {
         this.prepareData(data);
         if (!this.props.isInitial) {
           this.selectValues(pathname);
         }
-      });
+      }));
+    } else {
+      if (pathname[pathname.length-1] === '/') {
+        pathname = pathname.substring(0,pathname.length-2);
+      }
+      let domain = pathname.split('/').pop();
+      let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+      fetch(url)
+        .then(response => response.json())
+        .then((data) => {
+          this.prepareData(data);
+          if (!this.props.isInitial) {
+            this.selectValues(pathname);
+          }
+        });
+    }
   }
 
   prepareData(data){
