@@ -20161,7 +20161,7 @@ var waybackDiff = (function () {
                       return _this2.setState({ diffData: data });
                     });
                   }
-                  // let url = `${{"NVM_DIR":"/home/user/.nvm","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","XDG_MENU_PREFIX":"xfce-","LANG":"en_US.utf8","DISPLAY":":0.0","COMP_WORDBREAKS":" \t\n\"'><;|&(:","COLORTERM":"truecolor","NVM_CD_FLAGS":"","JAVA_HOME":"/usr/lib/jvm/java-1.7.0-openjdk-i386","XDG_VTNR":"7","SSH_AUTH_SOCK":"/tmp/ssh-dneqGPNTdlsT/agent.1294","GLADE_CATALOG_PATH":":","XDG_SESSION_ID":"2","XDG_GREETER_DATA_DIR":"/var/lib/lightdm/data/user","USER":"user","GLADE_MODULE_PATH":":","DESKTOP_SESSION":"xfce","PWD":"/home/user/Desktop/gsoc/wayback-diff","HOME":"/home/user","SSH_AGENT_PID":"1330","QT_ACCESSIBILITY":"1","XDG_SESSION_TYPE":"x11","XDG_DATA_DIRS":"/usr/share/xfce4:/usr/local/share/:/usr/share/:/usr/share","XDG_SESSION_DESKTOP":"xfce","GLADE_PIXMAP_PATH":":","TERM":"xterm-256color","SHELL":"/bin/bash","VTE_VERSION":"4601","XDG_SEAT_PATH":"/org/freedesktop/DisplayManager/Seat0","NVM_BIN":"/home/user/.nvm/versions/node/v8.10.0/bin","XDG_CURRENT_DESKTOP":"XFCE","QT_LINUX_ACCESSIBILITY_ALWAYS_ON":"1","SHLVL":"1","XDG_SEAT":"seat0","LANGUAGE":"en_US:en","WINDOWID":"77594627","GDMSESSION":"xfce","LOGNAME":"user","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/1000/bus","XDG_RUNTIME_DIR":"/run/user/1000","XAUTHORITY":"/home/user/.Xauthority","XDG_SESSION_PATH":"/org/freedesktop/DisplayManager/Session0","XDG_CONFIG_DIRS":"/etc/xdg","PATH":"/home/user/.nvm/versions/node/v8.10.0/bin:/home/user/anaconda2/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games","SESSION_MANAGER":"local/debian:@/tmp/.ICE-unix/1340,unix/debian:/tmp/.ICE-unix/1340","OLDPWD":"/home/user/Desktop/gsoc","_":"/home/user/.nvm/versions/node/v8.10.0/bin/rollup"}.REACT_APP_WEB_MONITORING_PROCESSING_URL}${{"NVM_DIR":"/home/user/.nvm","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","XDG_MENU_PREFIX":"xfce-","LANG":"en_US.utf8","DISPLAY":":0.0","COMP_WORDBREAKS":" \t\n\"'><;|&(:","COLORTERM":"truecolor","NVM_CD_FLAGS":"","JAVA_HOME":"/usr/lib/jvm/java-1.7.0-openjdk-i386","XDG_VTNR":"7","SSH_AUTH_SOCK":"/tmp/ssh-dneqGPNTdlsT/agent.1294","GLADE_CATALOG_PATH":":","XDG_SESSION_ID":"2","XDG_GREETER_DATA_DIR":"/var/lib/lightdm/data/user","USER":"user","GLADE_MODULE_PATH":":","DESKTOP_SESSION":"xfce","PWD":"/home/user/Desktop/gsoc/wayback-diff","HOME":"/home/user","SSH_AGENT_PID":"1330","QT_ACCESSIBILITY":"1","XDG_SESSION_TYPE":"x11","XDG_DATA_DIRS":"/usr/share/xfce4:/usr/local/share/:/usr/share/:/usr/share","XDG_SESSION_DESKTOP":"xfce","GLADE_PIXMAP_PATH":":","TERM":"xterm-256color","SHELL":"/bin/bash","VTE_VERSION":"4601","XDG_SEAT_PATH":"/org/freedesktop/DisplayManager/Seat0","NVM_BIN":"/home/user/.nvm/versions/node/v8.10.0/bin","XDG_CURRENT_DESKTOP":"XFCE","QT_LINUX_ACCESSIBILITY_ALWAYS_ON":"1","SHLVL":"1","XDG_SEAT":"seat0","LANGUAGE":"en_US:en","WINDOWID":"77594627","GDMSESSION":"xfce","LOGNAME":"user","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/1000/bus","XDG_RUNTIME_DIR":"/run/user/1000","XAUTHORITY":"/home/user/.Xauthority","XDG_SESSION_PATH":"/org/freedesktop/DisplayManager/Session0","XDG_CONFIG_DIRS":"/etc/xdg","PATH":"/home/user/.nvm/versions/node/v8.10.0/bin:/home/user/anaconda2/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games","SESSION_MANAGER":"local/debian:@/tmp/.ICE-unix/1340,unix/debian:/tmp/.ICE-unix/1340","OLDPWD":"/home/user/Desktop/gsoc","_":"/home/user/.nvm/versions/node/v8.10.0/bin/rollup"}.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;.
+                  // let url = `${{"NVM_DIR":"/home/user/.nvm","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","XDG_MENU_PREFIX":"xfce-","LANG":"en_US.utf8","DISPLAY":":0.0","COMP_WORDBREAKS":" \t\n\"'><;|&(:","COLORTERM":"truecolor","NVM_CD_FLAGS":"","JAVA_HOME":"/usr/lib/jvm/java-1.7.0-openjdk-i386","XDG_VTNR":"7","SSH_AUTH_SOCK":"/tmp/ssh-V3cAMQekplK2/agent.1299","GLADE_CATALOG_PATH":":","XDG_SESSION_ID":"2","XDG_GREETER_DATA_DIR":"/var/lib/lightdm/data/user","USER":"user","GLADE_MODULE_PATH":":","DESKTOP_SESSION":"xfce","PWD":"/home/user/Desktop/gsoc/wayback-diff","HOME":"/home/user","SSH_AGENT_PID":"1335","QT_ACCESSIBILITY":"1","XDG_SESSION_TYPE":"x11","XDG_DATA_DIRS":"/usr/share/xfce4:/usr/local/share/:/usr/share/:/usr/share","XDG_SESSION_DESKTOP":"xfce","GLADE_PIXMAP_PATH":":","TERM":"xterm-256color","SHELL":"/bin/bash","VTE_VERSION":"4601","XDG_SEAT_PATH":"/org/freedesktop/DisplayManager/Seat0","NVM_BIN":"/home/user/.nvm/versions/node/v8.10.0/bin","XDG_CURRENT_DESKTOP":"XFCE","QT_LINUX_ACCESSIBILITY_ALWAYS_ON":"1","SHLVL":"1","XDG_SEAT":"seat0","LANGUAGE":"en_US:en","WINDOWID":"88080387","GDMSESSION":"xfce","LOGNAME":"user","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/1000/bus","XDG_RUNTIME_DIR":"/run/user/1000","XAUTHORITY":"/home/user/.Xauthority","XDG_SESSION_PATH":"/org/freedesktop/DisplayManager/Session0","XDG_CONFIG_DIRS":"/etc/xdg","PATH":"/home/user/.nvm/versions/node/v8.10.0/bin:/home/user/anaconda2/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games","SESSION_MANAGER":"local/debian:@/tmp/.ICE-unix/1346,unix/debian:/tmp/.ICE-unix/1346","OLDPWD":"/home/user/Desktop/gsoc","_":"/home/user/.nvm/versions/node/v8.10.0/bin/rollup"}.REACT_APP_WEB_MONITORING_PROCESSING_URL}${{"NVM_DIR":"/home/user/.nvm","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","XDG_MENU_PREFIX":"xfce-","LANG":"en_US.utf8","DISPLAY":":0.0","COMP_WORDBREAKS":" \t\n\"'><;|&(:","COLORTERM":"truecolor","NVM_CD_FLAGS":"","JAVA_HOME":"/usr/lib/jvm/java-1.7.0-openjdk-i386","XDG_VTNR":"7","SSH_AUTH_SOCK":"/tmp/ssh-V3cAMQekplK2/agent.1299","GLADE_CATALOG_PATH":":","XDG_SESSION_ID":"2","XDG_GREETER_DATA_DIR":"/var/lib/lightdm/data/user","USER":"user","GLADE_MODULE_PATH":":","DESKTOP_SESSION":"xfce","PWD":"/home/user/Desktop/gsoc/wayback-diff","HOME":"/home/user","SSH_AGENT_PID":"1335","QT_ACCESSIBILITY":"1","XDG_SESSION_TYPE":"x11","XDG_DATA_DIRS":"/usr/share/xfce4:/usr/local/share/:/usr/share/:/usr/share","XDG_SESSION_DESKTOP":"xfce","GLADE_PIXMAP_PATH":":","TERM":"xterm-256color","SHELL":"/bin/bash","VTE_VERSION":"4601","XDG_SEAT_PATH":"/org/freedesktop/DisplayManager/Seat0","NVM_BIN":"/home/user/.nvm/versions/node/v8.10.0/bin","XDG_CURRENT_DESKTOP":"XFCE","QT_LINUX_ACCESSIBILITY_ALWAYS_ON":"1","SHLVL":"1","XDG_SEAT":"seat0","LANGUAGE":"en_US:en","WINDOWID":"88080387","GDMSESSION":"xfce","LOGNAME":"user","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/1000/bus","XDG_RUNTIME_DIR":"/run/user/1000","XAUTHORITY":"/home/user/.Xauthority","XDG_SESSION_PATH":"/org/freedesktop/DisplayManager/Session0","XDG_CONFIG_DIRS":"/etc/xdg","PATH":"/home/user/.nvm/versions/node/v8.10.0/bin:/home/user/anaconda2/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games","SESSION_MANAGER":"local/debian:@/tmp/.ICE-unix/1346,unix/debian:/tmp/.ICE-unix/1346","OLDPWD":"/home/user/Desktop/gsoc","_":"/home/user/.nvm/versions/node/v8.10.0/bin/rollup"}.REACT_APP_WEB_MONITORING_PROCESSING_PORT}/`;.
                   var url = 'http://localhost:8888/';
                   url += diffTypes[diffType].diffService + '?format=json&include=all&a=' + a + '&b=' + b;
                   fetch(url).then(function (response) {
@@ -24154,19 +24154,28 @@ var waybackDiff = (function () {
                 value: function widgetRender(pathname) {
                   var _this2 = this;
 
-                  if (pathname[pathname.length - 1] === '/') {
-                    pathname = pathname.substring(0, pathname.length - 2);
-                  }
-                  var domain = pathname.split('/').pop();
-                  var url = 'https://web.archive.org/cdx/search?url=' + domain + '/&status=200&fl=timestamp,digest&output=json';
-                  fetch(url).then(function (response) {
-                    return response.json();
-                  }).then(function (data) {
-                    _this2.prepareData(data);
-                    if (!_this2.props.isInitial) {
-                      _this2.selectValues(pathname);
+                  if (this.props.fetchCallback) {
+                    this.props.fetchCallback().then(function (data) {
+                      _this2.prepareData(data);
+                      if (!_this2.props.isInitial) {
+                        _this2.selectValues(pathname);
+                      }
+                    });
+                  } else {
+                    if (pathname[pathname.length - 1] === '/') {
+                      pathname = pathname.substring(0, pathname.length - 2);
                     }
-                  });
+                    var domain = pathname.split('/').pop();
+                    var url = 'https://web.archive.org/cdx/search?url=' + domain + '/&status=200&fl=timestamp,digest&output=json';
+                    fetch(url).then(function (response) {
+                      return response.json();
+                    }).then(function (data) {
+                      _this2.prepareData(data);
+                      if (!_this2.props.isInitial) {
+                        _this2.selectValues(pathname);
+                      }
+                    });
+                  }
                 }
               }, {
                 key: 'prepareData',
@@ -24208,7 +24217,7 @@ var waybackDiff = (function () {
                 key: 'getUTCDateFormat',
                 value: function getUTCDateFormat(date) {
                   var year = parseInt(date.substring(0, 4), 10);
-                  var month = parseInt(date.substring(4, 6), 10);
+                  var month = parseInt(date.substring(4, 6), 10) - 1;
                   var day = parseInt(date.substring(6, 8), 10);
                   var hour = parseInt(date.substring(8, 10), 10);
                   var minutes = parseInt(date.substring(10, 12), 10);
@@ -24390,7 +24399,7 @@ var waybackDiff = (function () {
                           return react.createElement(
                             'div',
                             { className: 'diffcontainer-view' },
-                            react.createElement(TimestampHeader, { isInitial: false }),
+                            react.createElement(TimestampHeader, { isInitial: false, fetchCallback: _this2.props.fetchCallback }),
                             react.createElement(DiffingMethodSelector, { parentHandle: _this2.handleMethodChange }),
                             _this2.exportParams(location.pathname)
                           );
@@ -24399,7 +24408,7 @@ var waybackDiff = (function () {
                           return react.createElement(
                             'div',
                             { className: 'diffcontainer-view' },
-                            react.createElement(TimestampHeader, { isInitial: true }),
+                            react.createElement(TimestampHeader, { isInitial: true, fetchCallback: _this2.props.fetchCallback }),
                             react.createElement(DiffingMethodSelector, { parentHandle: _this2.handleMethodChange })
                           );
                         } })
@@ -24436,10 +24445,22 @@ var waybackDiff = (function () {
 
             /*eslint-disable no-unused-vars*/
 
-            function ShowDiffContainer(data) {
-              alert(data);
-              reactDom.render(react.createElement(DiffContainer, { fetchedData: data }), document.getElementById('wayback-diff'));
+            function ShowDiffContainer(element, callbck) {
+              reactDom.render(react.createElement(DiffContainer, { fetchCallback: callbck }), element);
             }
+
+            // function fetchData() {
+            //   var pathname = window.location.pathname;
+            //   if (pathname[pathname.length-1] === '/') {
+            //     pathname = pathname.substring(0,pathname.length-2);
+            //   }
+            //   let domain = pathname.split('/').pop();
+            //   let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+            //   return fetch(url)
+            //     .then(response => response.json());
+            // }
+
+            // ShowDiffContainer(document.getElementById('wayback-diff'), null);
 
             return ShowDiffContainer;
 

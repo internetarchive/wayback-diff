@@ -19,4 +19,4 @@ export default function ShowDiffContainer(element, callbck){
 //     .then(response => response.json());
 // }
 
-ShowDiffContainer(document.getElementById('wayback-diff'), null);
+// ShowDiffContainer(document.getElementById('wayback-diff'), null);
