@@ -29,13 +29,36 @@ Example request: http://localhost:3000/SIDE_BY_SIDE_RENDERED?format=json&include
 
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
 
+# Running as a React app
+You must call the ShowDiffContainer function. It receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
+
+- If null is passed as the second parameter a default fallback method is going to be used instead.
+
+- The callback function should return a fetch Promise.
+
+In the **index.js** file the following code should be included:
+
+```Javascript
+ function fetchData() {
+   var pathname = window.location.pathname;
+   if (pathname[pathname.length-1] === '/') {
+     pathname = pathname.substring(0,pathname.length-2);
+   }
+   let domain = pathname.split('/').pop();
+   let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+   return fetch(url)
+     .then(response => response.json());
+ }
+ ShowDiffContainer(document.getElementById('wayback-diff'), fetchData);
+```
+
 # Use it as a library
 
 In order to use this app as a library in an other React/JS app you sould run
 
 `build:dev`
 
-The waybackDiff function receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
+The waybackDiff function just like the ShowDiffContainer function receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
 
 - If null is passed as the second parameter a default fallback method is going to be used instead.
 
@@ -74,6 +97,7 @@ An example of how to use the library with a callback function.
  ```
 
 
-## If you want to test the exported JS library you should run
+## Testing the exported JS library
+If you want to test the exported JS library you should run
 
 `example:local`
