@@ -85,7 +85,7 @@ After importing the component you might use it like any other React component:
 <DiffContainer fetchCallback = {null}/>
 ```
 
-## Testing the exported JS library
-If you want to test the exported JS library you should run
+~~## Testing the exported JS library
+If you want to test the exported JS library you should run~~
 
-`example:local`
+~~`example:local`~~
