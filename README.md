@@ -48,7 +48,7 @@ ReactDOM.render(<DiffContainer fetchCallback = {null} />, document.getElementByI
 
 ## Add code
 
-In order to use this app as a component in an other React app you sould run include in the **index.js** file the following code:
+In order to use this app as a component in an other React app you should include in the **index.js** file the following code:
 
 ```Javascript
 export DiffContainer from './components/diff-container.jsx';
@@ -67,7 +67,7 @@ To install the component library, inside your new project directory you should r
 ```
 yarn add file:[PATH_TO]/wayback-diff
 ```
-where [PATH_TO] equals with the path you have wayback-diff saved.
+where [PATH_TO] equals with the path where you have wayback-diff saved.
 
 ## Import the component
 
