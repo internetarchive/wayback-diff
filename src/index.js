@@ -1,13 +1,12 @@
 /*eslint-disable no-unused-vars*/
 import React from 'react';
 /*eslint-enable no-unused-vars*/
-import ReactDOM from 'react-dom';
-export DiffContainer from './components/diff-container.jsx';
 
-// export default function ShowDiffContainer(element, callbck){
-//   ReactDOM.render(<DiffContainer fetchCallback = {callbck} />, element);
-// }
-//
+//If on dev uncomment this lines
+// import ReactDOM from 'react-dom';
+// import DiffContainer from './components/diff-container.jsx';
+// ReactDOM.render(<DiffContainer fetchCallback = {null} />, document.getElementById('wayback-diff'));
+
 // function fetchData() {
 //   var pathname = window.location.pathname;
 //   if (pathname[pathname.length-1] === '/') {
@@ -18,5 +17,6 @@ export DiffContainer from './components/diff-container.jsx';
 //   return fetch(url)
 //     .then(response => response.json());
 // }
-//
-// ShowDiffContainer(document.getElementById('wayback-diff'), null);
+
+//If using as a component in an other project uncomment the following line
+export DiffContainer from './components/diff-container.jsx';
