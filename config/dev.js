@@ -13,7 +13,7 @@ export default {
   output: {
     name: 'waybackDiff',
     file: 'build/app.js',
-    format: 'iife',
+    format: 'es',
     sourcemap: true
   },
   plugins: [

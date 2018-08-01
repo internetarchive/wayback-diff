@@ -2,12 +2,12 @@
 import React from 'react';
 /*eslint-enable no-unused-vars*/
 import ReactDOM from 'react-dom';
-import { DiffContainer } from './components/diff-container.jsx';
+export DiffContainer from './components/diff-container.jsx';
 
-export default function ShowDiffContainer(element, callbck){
-  ReactDOM.render(<DiffContainer fetchCallback = {callbck} />, element);
-}
-
+// export default function ShowDiffContainer(element, callbck){
+//   ReactDOM.render(<DiffContainer fetchCallback = {callbck} />, element);
+// }
+//
 // function fetchData() {
 //   var pathname = window.location.pathname;
 //   if (pathname[pathname.length-1] === '/') {
@@ -18,5 +18,5 @@ export default function ShowDiffContainer(element, callbck){
 //   return fetch(url)
 //     .then(response => response.json());
 // }
-
+//
 // ShowDiffContainer(document.getElementById('wayback-diff'), null);

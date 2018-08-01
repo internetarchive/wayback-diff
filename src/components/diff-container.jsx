@@ -16,7 +16,7 @@ import DiffingMethodSelector from './diffing-method-selector.jsx';
  * @class DiffContainer
  * @extends {React.Component}
  */
-export class DiffContainer extends React.Component {
+export default class DiffContainer extends React.Component {
 
   constructor(props) {
     super(props);

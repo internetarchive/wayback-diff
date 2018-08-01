@@ -25,20 +25,20 @@
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="wayback-diff">This</div>
-    <script src="../../../../build/app.js"></script>
-    <script>
-        function fetchData() {
-          var pathname = window.location.pathname;
-          if (pathname[pathname.length-1] === '/') {
-            pathname = pathname.substring(0,pathname.length-2);
-          }
-          let domain = pathname.split('/').pop();
-          let url = 'https://web.archive.org/cdx/search?url='+domain+'/&status=200&fl=timestamp,digest&output=json';
-          return fetch(url)
-            .then(response => {return response.json()});
-        }
+    <!--<script src="../../../../build/app.js"></script>-->
+    <!--<script>-->
+        <!--function fetchData() {-->
+          <!--var pathname = window.location.pathname;-->
+          <!--if (pathname[pathname.length-1] === '/') {-->
+            <!--pathname = pathname.substring(0,pathname.length-2);-->
+          <!--}-->
+          <!--let domain = pathname.split('/').pop();-->
+          <!--let url = 'https://web.archive.org/cdx/search?url='+domain+'/&status=200&fl=timestamp,digest&output=json';-->
+          <!--return fetch(url)-->
+            <!--.then(response => {return response.json()});-->
+        <!--}-->
 
-      waybackDiff(document.getElementById('wayback-diff'), null);
-    </script>
+      <!--waybackDiff(document.getElementById('wayback-diff'), null);-->
+    <!--</script>-->
   </body>
 </html>
