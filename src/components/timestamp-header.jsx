@@ -1,6 +1,7 @@
 import React from 'react';
 import Loading from './loading.jsx';
 import '../css/diff-container.css';
+import DiffingMethodSelector from './diffing-method-selector.jsx';
 
 /**
  * Display a timestamp selector
@@ -22,7 +23,7 @@ export default class TimestampHeader extends React.Component {
 
     this.handleRightTimestampChange = this.handleRightTimestampChange.bind(this);
 
-    this.clearPressed = this.clearPressed.bind(this);
+    this.restartPressed = this.restartPressed.bind(this);
 
     this.showDiffs = this.showDiffs.bind(this);
 
@@ -51,7 +52,7 @@ export default class TimestampHeader extends React.Component {
   render () {
     if (this.state.showDiff) {
       return(
-        <div className="diffcontainer-view">
+        <div className="timestamp-header-view">
           {this.showTimestampSelector()}
           {this.exportParams(window.location.pathname)}
         </div>
@@ -59,7 +60,7 @@ export default class TimestampHeader extends React.Component {
     }
     if (this.state.cdxData) {
       return (
-        <div className="diffcontainer-view">
+        <div className="timestamp-header-view">
           {this.showTimestampSelector()}
         </div>
       );
@@ -76,15 +77,7 @@ export default class TimestampHeader extends React.Component {
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
     let site = path.split('/').pop();
-    // let selectedMethod = document.getElementById('diff-select').value;
-    //
-    // let urlA = 'https://web.archive.org/web/' + timestampA + '/' + site;
-    // let urlB = 'https://web.archive.org/web/' + timestampB + '/' + site;
-
-    // window.history.pushState({'html':document.html,'pageTitle':document.pageTitle}, '', `http://localhost:3000/diff/${timestampA}/${timestampB}/${site}`);
     window.location.href = `/diff/${timestampA}/${timestampB}/${site}`;
-    // return <DiffView page = {{url: site}}
-    //   diffType={selectedMethod} a={urlA} b={urlB} />;
   }
 
   widgetRender (pathname) {
@@ -158,7 +151,7 @@ export default class TimestampHeader extends React.Component {
     return parseInt(date.substring(0,4), 10);
   }
 
-  clearPressed () {
+  restartPressed () {
     let initialData = this.state.cdxData;
     this.setState({
       leftSnaps : initialData,
@@ -170,17 +163,16 @@ export default class TimestampHeader extends React.Component {
 
   showTimestampSelector () {
     return (
-      <div>
+      <div className="timestamp-container-view">
         <select id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
+        <DiffingMethodSelector diffMethodSelectorCallback = {this.props.diffMethodSelectorCallback}/>
+        <button id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
+        <button id="restart-btn" onClick={this.restartPressed}>Restart</button>
         <select id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
           {this.state.rightSnapElements}
         </select>
-        <div id="center-buttons">
-          <button id="clear-btn" onClick={this.clearPressed}>Clear</button>
-          <button id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
-        </div>
       </div>
     );
   }

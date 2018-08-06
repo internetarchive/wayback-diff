@@ -8,7 +8,6 @@ import {
 import qs from 'qs';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
-import DiffingMethodSelector from './diffing-method-selector.jsx';
 
 /**
  * Display a change between two versions of a page.
@@ -37,15 +36,13 @@ export default class DiffContainer extends React.Component {
         <Switch>
           <Route exact path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
             <div className="diffcontainer-view">
-              <TimestampHeader isInitial = {false} fetchCallback = {this.props.fetchCallback} />
-              <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
+              <TimestampHeader isInitial = {false} fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
               {this.exportParams(location.pathname)}
             </div>
           }/>
           <Route exact path = '/diff/:site' render={ () =>
             <div className="diffcontainer-view">
-              <TimestampHeader isInitial={true} fetchCallback = {this.props.fetchCallback}/>
-              <DiffingMethodSelector parentHandle = {this.handleMethodChange}/>
+              <TimestampHeader isInitial={true} fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
             </div>
           }/>
         </Switch>

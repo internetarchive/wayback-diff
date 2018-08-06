@@ -16,13 +16,13 @@ export default class DiffingMethodSelector extends React.Component {
 
     this.state = {diffMethods: supportedDiffTypes,
       selectedMethod:supportedDiffTypes[0]};
-    this.props.parentHandle(supportedDiffTypes[0]);
+    this.props.diffMethodSelectorCallback(supportedDiffTypes[0]);
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event){
     this.setState({selectedMethod: event.target.value.split(',')});
-    this.props.parentHandle(event.target.value.split(','));
+    this.props.diffMethodSelectorCallback(event.target.value.split(','));
   }
 
   render () {
