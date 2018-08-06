@@ -20,9 +20,9 @@ Run the server with the command `yarn start`
 There are two types of URL calls:
  
 **1)**
-> http://localhost:port(default 3000)/diffingMethod?format=VALUE&include=VALUE&a=aURL&b=bURL
+> http://localhost:port(default 3000)/diff/WEBSITE
 
-Example request: http://localhost:3000/SIDE_BY_SIDE_RENDERED?format=json&include=all&a=http://example.org&b=http://example.org
+Example request: http://localhost:3000/diff/iskme.org
 
 **2)**
 > http://localhost:port(default 3000)/diff/TIMESTAMP_A/TIMESTAMP_B/WEBSITE
@@ -30,74 +30,62 @@ Example request: http://localhost:3000/SIDE_BY_SIDE_RENDERED?format=json&include
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
 
 # Running as a React app
-You must call the ShowDiffContainer function. It receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
+You must render a DiffContainer component. It receives one prop. The fetchCallback which is a callback function that will be used to fetch the snapshots available from the CDX server.
 
-- If null is passed as the second parameter a default fallback method is going to be used instead.
+- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
 
 - The callback function should return a fetch Promise.
 
 In the **index.js** file the following code should be included:
 
 ```Javascript
- function fetchData() {
-   var pathname = window.location.pathname;
-   if (pathname[pathname.length-1] === '/') {
-     pathname = pathname.substring(0,pathname.length-2);
-   }
-   let domain = pathname.split('/').pop();
-   let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
-   return fetch(url)
-     .then(response => response.json());
- }
- ShowDiffContainer(document.getElementById('wayback-diff'), fetchData);
+import ReactDOM from 'react-dom';
+import DiffContainer from './components/diff-container.jsx';
+ReactDOM.render(<DiffContainer fetchCallback = {null} />, document.getElementById('wayback-diff'));
 ```
 
-# Use it as a library
+# Use it as a component in an other project
 
-In order to use this app as a library in an other React/JS app you sould run
+## Add code
+
+In order to use this app as a component in an other React app you should include in the **index.js** file the following code:
+
+```Javascript
+export DiffContainer from './components/diff-container.jsx';
+```
+
+## Build the project
+
+Run
 
 `build:dev`
 
-The waybackDiff function just like the ShowDiffContainer function receives two parameters. First, the element in which wayback-diff is going to be rendered and a callback function that will be used to fetch the snapshots available from the CDX server.
+## Install the library
 
-- If null is passed as the second parameter a default fallback method is going to be used instead.
+To install the component library, inside your new project directory you should run:
 
-- The callback function should return a fetch Promise.
+```
+yarn add file:[PATH_TO]/wayback-diff
+```
+where [PATH_TO] equals with the path where you have wayback-diff saved.
 
-## Examples
-In the HTML file you want to use the **wayback-diff** library in you should include the following script and call the waybackDiff method:
+## Import the component
 
-An example of how to use the library without defining a callback function.
+In the file you want to use the wayback-diff component use the following code to import it:
 
-```HTML
-<script src="../../../../build/app.js"></script>
-    <script>
-      waybackDiff(document.getElementById('wayback-diff'), null);
-    </script>
- ```
- 
-An example of how to use the library with a callback function.
+```
+import {DiffContainer} from 'wayback-diff';
+```
 
-```HTML
-<script src="../../../../build/app.js"></script>
-    <script>
-        function fetchData() {
-          var pathname = window.location.pathname;
-          if (pathname[pathname.length-1] === '/') {
-            pathname = pathname.substring(0,pathname.length-2);
-          }
-          let domain = pathname.split('/').pop();
-          let url = 'https://web.archive.org/cdx/search?url='+domain+'/&status=200&fl=timestamp,digest&output=json';
-          return fetch(url)
-            .then(response => {return response.json()});
-        }
+## Use the component
 
-      waybackDiff(document.getElementById('wayback-diff'), fetchData);
-    </script>
- ```
+After importing the component you might use it like any other React component:
 
+```
+<DiffContainer fetchCallback = {null}/>
+```
 
-## Testing the exported JS library
-If you want to test the exported JS library you should run
+~~## Testing the exported JS library
+If you want to test the exported JS library you should run~~
 
-`example:local`
+~~`example:local`~~
