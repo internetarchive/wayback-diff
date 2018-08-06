@@ -1,6 +1,4 @@
 export const supportedDiffTypes = [
-  ['RAW_FROM_CONTENT','“From” Version'],
-  ['RAW_TO_CONTENT', '“To” Version'],
   ['RAW_SIDE_BY_SIDE', 'Side-by-side Content'],
   ['HIGHLIGHTED_TEXT', 'Highlighted Text'],
   ['HIGHLIGHTED_SOURCE', 'Highlighted Source'],
