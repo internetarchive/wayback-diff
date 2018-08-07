@@ -57,14 +57,18 @@ export default class DiffContainer extends React.Component {
       if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
         path = path.split('/');
         let site = path[path.length-1];
-        let urlA = 'https://web.archive.org/web/' + path[path.length-3] + '/' + site;
-        let urlB = 'https://web.archive.org/web/' + path[path.length-2] + '/' + site;
+        let timestampA = path[path.length-3];
+        let timestampB = path[path.length-2];
+        let urlA = 'http://web.archive.org/web/' + timestampA + '/' + site;
+        let urlB = 'http://web.archive.org/web/' + timestampB + '/' + site;
+
+        this.checkURL(urlA, timestampA, urlB, timestampB);
 
         return <DiffView page={{url: site}}
           diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>;
       }
     }
-}
+  }
 
   exportQueryParams(query, matchP){
     query = query.substring(1);
@@ -72,4 +76,26 @@ export default class DiffContainer extends React.Component {
     return <DiffView page = {{url: qParams['url']}} diffType={matchP.diffType} a={qParams['a']} b={qParams['b']} />;
   }
 
+  checkURL (urlA, timestampA, urlB, timestampB) {
+
+    fetch(urlA, {redirect: 'follow'})
+      .then(response => {
+        urlA = response.url;
+        let fetchedTimestampA = urlA.split('/')[4];
+        fetch(urlB, {redirect: 'follow'})
+          .then(response => {
+            urlB = response.url;
+            let fetchedTimestampB = urlB.split('/')[4];
+
+            if (timestampA !== fetchedTimestampA || timestampB !== fetchedTimestampB) {
+              let tempURL = urlA.split('/');
+              var url = '';
+              for(var i = 7; i <= (tempURL.length-1); i++){
+                url = url + tempURL[i];
+              }
+              window.location.href = '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + url;
+            }
+          });
+      });
+  }
 }

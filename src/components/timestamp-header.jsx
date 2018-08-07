@@ -73,7 +73,6 @@ export default class TimestampHeader extends React.Component {
   }
 
   exportParams(path){
-
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
     let site = path.split('/').pop();
@@ -93,7 +92,7 @@ export default class TimestampHeader extends React.Component {
         pathname = pathname.substring(0,pathname.length-2);
       }
       let domain = pathname.split('/').pop();
-      let url = `https://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+      let url = `http://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
       fetch(url)
         .then(response => response.json())
         .then((data) => {
@@ -179,7 +178,6 @@ export default class TimestampHeader extends React.Component {
 
   showDiffs () {
     this.setState({showDiff: true});
-    // this.redirNewURL();
   }
 
   redirNewURL () {
@@ -203,4 +201,5 @@ export default class TimestampHeader extends React.Component {
     document.getElementById('timestamp-select-left').value = firstTimestamp;
     document.getElementById('timestamp-select-right').value = secondTimestamp;
   }
+
 }
