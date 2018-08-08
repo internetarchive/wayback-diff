@@ -6882,7 +6882,7 @@ var TimestampHeader = function (_React$Component) {
           'div',
           { className: 'timestamp-header-view' },
           this.showTimestampSelector(),
-          this.exportParams(window.location.pathname)
+          this.prepareDiffView(window.location.pathname)
         );
       }
       if (this.state.cdxData) {
@@ -6900,7 +6900,7 @@ var TimestampHeader = function (_React$Component) {
       );
     }
   }, {
-    key: 'exportParams',
+    key: 'prepareDiffView',
     value: function exportParams(path) {
       var timestampA = document.getElementById('timestamp-select-left').value;
       var timestampB = document.getElementById('timestamp-select-right').value;
@@ -7106,7 +7106,7 @@ var DiffContainer = function (_React$Component) {
                 'div',
                 { className: 'diffcontainer-view' },
                 react.createElement(TimestampHeader, { isInitial: false, fetchCallback: _this2.props.fetchCallback, diffMethodSelectorCallback: _this2.handleMethodChange }),
-                _this2.exportParams(location.pathname)
+                _this2.prepareDiffView(location.pathname)
               );
             } }),
           react.createElement(Route, { exact: true, path: '/diff/:site', render: function render() {
@@ -7120,7 +7120,7 @@ var DiffContainer = function (_React$Component) {
       );
     }
   }, {
-    key: 'exportParams',
+    key: 'prepareDiffView',
     value: function exportParams(path) {
 
       if (this.state.selectedMethod !== undefined) {

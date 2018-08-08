@@ -54,7 +54,7 @@ export default class TimestampHeader extends React.Component {
       return(
         <div className="timestamp-header-view">
           {this.showTimestampSelector()}
-          {this.exportParams(window.location.pathname)}
+          {this.exportParams()}
         </div>
       );
     }
@@ -67,38 +67,33 @@ export default class TimestampHeader extends React.Component {
     }
     return (<div>
       <Loading/>
-      {this.widgetRender(window.location.href)}
+      {this.widgetRender()}
     </div>
     );
   }
 
-  exportParams(path){
+  exportParams(){
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
-    let site = path.split('/').pop();
-    window.location.href = `/diff/${timestampA}/${timestampB}/${site}`;
+    window.location.href = `/diff/${timestampA}/${timestampB}/${this.props.site}`;
   }
 
-  widgetRender (pathname) {
+  widgetRender () {
     if (this.props.fetchCallback) {
       this.props.fetchCallback().then((data => {
         this.prepareData(data);
         if (!this.props.isInitial) {
-          this.selectValues(pathname);
+          this.selectValues();
         }
       }));
     } else {
-      if (pathname[pathname.length-1] === '/') {
-        pathname = pathname.substring(0,pathname.length-2);
-      }
-      let domain = pathname.split('/').pop();
-      let url = `http://web.archive.org/cdx/search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+      let url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       fetch(url)
         .then(response => response.json())
         .then((data) => {
           this.prepareData(data);
           if (!this.props.isInitial) {
-            this.selectValues(pathname);
+            this.selectValues();
           }
         });
     }
@@ -180,26 +175,9 @@ export default class TimestampHeader extends React.Component {
     this.setState({showDiff: true});
   }
 
-  redirNewURL () {
-    let timestampA = (document.getElementById('timestamp-select-left')).value;
-    let timestampB = (document.getElementById('timestamp-select-right')).value;
-    let site = window.location.pathname;
-    site = site.split('/').pop();
-
-    this.context.history.push({
-      pathname: `/diff/${timestampA}/${timestampB}/${site}`,
-      state: {email: this.state.email}
-    });
-
-  }
-
-  selectValues (pathname) {
-    pathname = pathname.split('/');
-    let firstTimestamp = pathname[pathname.length - 3];
-    let secondTimestamp = pathname[pathname.length - 2];
-
-    document.getElementById('timestamp-select-left').value = firstTimestamp;
-    document.getElementById('timestamp-select-right').value = secondTimestamp;
+  selectValues () {
+    document.getElementById('timestamp-select-left').value = this.props.timestampA;
+    document.getElementById('timestamp-select-right').value = this.props.timestampB;
   }
 
 }
