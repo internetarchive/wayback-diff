@@ -19,7 +19,7 @@ export default class DiffContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {timestampsValidated: false};
 
     this.handleMethodChange = this.handleMethodChange.bind(this);
     this.exportParams = this.exportParams.bind(this);
@@ -62,10 +62,12 @@ export default class DiffContainer extends React.Component {
         let urlA = 'http://web.archive.org/web/' + timestampA + '/' + site;
         let urlB = 'http://web.archive.org/web/' + timestampB + '/' + site;
 
-        this.checkURL(urlA, timestampA, urlB, timestampB);
+        if (this.state.timestampsValidated){
+          return(<DiffView page={{url: site}}
+            diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>);
 
-        return <DiffView page={{url: site}}
-          diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>;
+        }
+        this.checkURL(urlA, timestampA, urlB, timestampB);
       }
     }
   }
@@ -94,6 +96,8 @@ export default class DiffContainer extends React.Component {
                 url = url + tempURL[i];
               }
               window.location.href = '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + url;
+            } else {
+              this.setState({timestampsValidated: true});
             }
           });
       });

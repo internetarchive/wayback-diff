@@ -5,6 +5,7 @@ import globals from 'rollup-plugin-node-globals';
 import postcss from 'rollup-plugin-postcss';
 import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
+require('dotenv').load();
 
 import cssnano from 'cssnano';
 
@@ -35,7 +36,9 @@ export default {
     }),
     globals(),
     replace({ 'process.env.NODE_ENV': JSON.stringify('development'),
-      'process.env': JSON.stringify(process.env)}),
+      'process.env': JSON.stringify(process.env),
+      'process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL': JSON.stringify(process.env.REACT_APP_WEB_MONITORING_PROCESSING_URL),
+      'process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT': JSON.stringify(process.env.REACT_APP_WEB_MONITORING_PROCESSING_PORT)}),
     resolve({
       browser: true,
       main: true
