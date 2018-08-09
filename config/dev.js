@@ -6,6 +6,7 @@ import postcss from 'rollup-plugin-postcss';
 import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
 require('dotenv').load();
+import image from 'rollup-plugin-image';
 
 import cssnano from 'cssnano';
 
@@ -18,6 +19,7 @@ export default {
     sourcemap: true
   },
   plugins: [
+    image(),
     postcss({
       extensions: [ '.css' ]
     }),

@@ -42,30 +42,11 @@ export default class DiffContainer extends React.Component {
           fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
       </div>
     );
-
-    // return (
-    //   <Router>
-    //     <Switch>
-    //       <Route exact path = '/diff/:timestampA/:timestampB/:site' render={({location}) =>
-    //
-    //       }/>
-    //       <Route exact path = '/diff/:site' render={ () =>
-    //
-    //       }/>
-    //     </Switch>
-    //   </Router>
-    // );
   }
 
   prepareDiffView(){
 
     if(this.state.selectedMethod !== undefined) {
-
-      // if (/[0-9]{14}\/[0-9]{14}\/.+/.test(path)) {
-      // path = path.split('/');
-      // let site = path[path.length-1];
-      // let timestampA = path[path.length-3];
-      // let timestampB = path[path.length-2];
       let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
       let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
@@ -74,12 +55,11 @@ export default class DiffContainer extends React.Component {
           diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>);
 
       }
-      this.checkURL(urlA, urlB);
+      this.checkTimestamps(urlA, urlB);
     }
-    // }
   }
 
-  checkURL (urlA, urlB) {
+  checkTimestamps (urlA, urlB) {
 
     fetch(urlA, {redirect: 'follow'})
       .then(response => {
