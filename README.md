@@ -96,7 +96,7 @@ where [PATH_TO] equals with the path where you have wayback-diff saved.
 
 In the file you want to use the wayback-diff component use the following code to import it:
 
-```
+```Javascript
 import {DiffContainer} from 'wayback-diff';
 ```
 
@@ -104,7 +104,7 @@ import {DiffContainer} from 'wayback-diff';
 
 After importing the component you might use it like any other React component:
 
-```
+```Javascript
 <DiffContainer site={site} timestampA={timestampA}
                       webMonitoringProcessingURL={this.webMonitoringProcessingURL}
                       webMonitoringProcessingPort={this.webMonitoringProcessingPort}
