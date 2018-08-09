@@ -51,7 +51,8 @@ export default class DiffContainer extends React.Component {
       let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
       if (this.state.timestampsValidated){
-        return(<DiffView page={{url: this.props.site}}
+        return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
+          webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
           diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>);
 
       }

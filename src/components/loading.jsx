@@ -5,7 +5,7 @@ export default class Loading extends React.Component {
   render () {
     return (
       <div className="loading">
-        <img src={waybackLoaderPath} />
+        <object type="image/svg+xml" data={waybackLoaderPath} />
       </div>
     );
   }
