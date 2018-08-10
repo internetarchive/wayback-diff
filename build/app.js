@@ -3252,12 +3252,49 @@ var DiffContainer = function (_React$Component) {
           react.createElement(DiffFooter, null)
         );
       }
+      if (this.props.timestampA) {
+        return react.createElement(
+          'div',
+          { className: 'diffcontainer-view' },
+          react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
+            isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
+            fetchCallback: this.props.fetchCallback }),
+          this.showLeftSnapshot()
+        );
+      }
+      if (this.props.timestampB) {
+        return react.createElement(
+          'div',
+          { className: 'diffcontainer-view' },
+          react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
+            timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
+            fetchCallback: this.props.fetchCallback }),
+          this.showRightSnapshot()
+        );
+      }
       return react.createElement(
         'div',
         { className: 'diffcontainer-view' },
         react.createElement(TimestampHeader, { isInitial: true, timestampA: this.props.timestampA, limit: this.props.limit,
           timestampB: this.props.timestampB, site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
           fetchCallback: this.props.fetchCallback })
+      );
+    }
+  }, {
+    key: 'showLeftSnapshot',
+    value: function showLeftSnapshot() {
+      var urlB;
+      if (this.props.noSnapshotURL) {
+        urlB = this.props.noSnapshotURL;
+      } else {
+        urlB = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      }
+      var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+      return react.createElement(
+        'div',
+        { className: 'side-by-side-render' },
+        react.createElement('iframe', { src: urlA }),
+        react.createElement('iframe', { src: urlB })
       );
     }
   }, {
@@ -3298,6 +3335,23 @@ var DiffContainer = function (_React$Component) {
           }
         });
       });
+    }
+  }, {
+    key: 'showRightSnapshot',
+    value: function showRightSnapshot() {
+      var urlA;
+      if (this.props.noSnapshotURL) {
+        urlA = this.props.noSnapshotURL;
+      } else {
+        urlA = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      }
+      var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+      return react.createElement(
+        'div',
+        { className: 'side-by-side-render' },
+        react.createElement('iframe', { src: urlA }),
+        react.createElement('iframe', { src: urlB })
+      );
     }
   }]);
   return DiffContainer;

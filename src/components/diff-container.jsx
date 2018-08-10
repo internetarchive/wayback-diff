@@ -32,11 +32,45 @@ export default class DiffContainer extends React.Component {
           <DiffFooter/>
         </div>);
     }
+    if (this.props.timestampA) {
+      return (
+        <div className="diffcontainer-view">
+          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
+            isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
+            fetchCallback = {this.props.fetchCallback}/>
+          {this.showLeftSnapshot()}
+        </div>);
+    }
+    if (this.props.timestampB) {
+      return (
+        <div className="diffcontainer-view">
+          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
+            timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
+            fetchCallback = {this.props.fetchCallback}/>
+          {this.showRightSnapshot()}
+        </div>);
+    }
     return(
       <div className="diffcontainer-view">
         <TimestampHeader isInitial={true} timestampA={this.props.timestampA} limit={this.props.limit}
           timestampB={this.props.timestampB} site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
           fetchCallback = {this.props.fetchCallback}/>
+      </div>
+    );
+  }
+
+  showLeftSnapshot () {
+    var urlB;
+    if(this.props.noSnapshotURL) {
+      urlB = this.props.noSnapshotURL;
+    } else {
+      urlB= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+    }
+    let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+    return(
+      <div className={'side-by-side-render'}>
+        {React.createElement('iframe', { src: urlA })}
+        {React.createElement('iframe', { src: urlB })}
       </div>
     );
   }
@@ -77,5 +111,21 @@ export default class DiffContainer extends React.Component {
             }
           });
       });
+  }
+
+  showRightSnapshot () {
+    var urlA;
+    if(this.props.noSnapshotURL) {
+      urlA = this.props.noSnapshotURL;
+    } else {
+      urlA= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+    }
+    let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+    return(
+      <div className={'side-by-side-render'}>
+        {React.createElement('iframe', { src: urlA })}
+        {React.createElement('iframe', { src: urlB })}
+      </div>
+    );
   }
 }
