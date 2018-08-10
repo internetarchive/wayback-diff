@@ -41,7 +41,23 @@ In the **index.js** file the following code should be included:
 ```Javascript
 import ReactDOM from 'react-dom';
 import DiffContainer from './components/diff-container.jsx';
-ReactDOM.render(<DiffContainer fetchCallback = {null} />, document.getElementById('wayback-diff'));
+var path = window.location.pathname;
+let webMonitoringProcessingURL= 'http://localhost';
+let webMonitoringProcessingPort= '8888';
+path = path.split('/');
+let site = path[path.length-1];
+if (path.length === 3) {
+  ReactDOM.render(<DiffContainer site={site} fetchCallback = {null}
+    webMonitoringProcessingURL={webMonitoringProcessingURL}
+    webMonitoringProcessingPort={webMonitoringProcessingPort}/>, document.getElementById('wayback-diff'));
+} else {
+  let timestampA = path[path.length-3];
+  let timestampB = path[path.length-2];
+  ReactDOM.render(<DiffContainer site={site} timestampA={timestampA} timestampB={timestampB}
+    webMonitoringProcessingURL={webMonitoringProcessingURL}
+    webMonitoringProcessingPort={webMonitoringProcessingPort}
+    fetchCallback = {null} />, document.getElementById('wayback-diff'));
+}
 ```
 
 # Use it as a component in an other project
@@ -67,13 +83,20 @@ To install the component library, inside your new project directory you should r
 ```
 yarn add file:[PATH_TO]/wayback-diff
 ```
+
+If you are installing this component as a library from this Github repository:
+
+```
+yarn add https://github.com/ftsalamp/wayback-diff
+```
+
 where [PATH_TO] equals with the path where you have wayback-diff saved.
 
 ## Import the component
 
 In the file you want to use the wayback-diff component use the following code to import it:
 
-```
+```Javascript
 import {DiffContainer} from 'wayback-diff';
 ```
 
@@ -81,11 +104,9 @@ import {DiffContainer} from 'wayback-diff';
 
 After importing the component you might use it like any other React component:
 
+```Javascript
+<DiffContainer site={site} timestampA={timestampA}
+                      webMonitoringProcessingURL={this.webMonitoringProcessingURL}
+                      webMonitoringProcessingPort={this.webMonitoringProcessingPort}
+                      timestampB={timestampB} fetchCallback = {null}
 ```
-<DiffContainer fetchCallback = {null}/>
-```
-
-~~## Testing the exported JS library
-If you want to test the exported JS library you should run~~
-
-~~`example:local`~~
