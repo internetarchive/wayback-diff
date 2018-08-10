@@ -1962,8 +1962,6 @@ for (var key in diffTypes) {
   diffTypes[key].value = key;
 }
 
-var waybackLoaderPath = "e0c4d8ec27a02a1d.svg";
-
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -2059,12 +2057,12 @@ var Loading = function (_React$Component) {
   }
 
   createClass(Loading, [{
-    key: 'render',
+    key: "render",
     value: function render() {
       return react.createElement(
-        'div',
-        { className: 'loading' },
-        react.createElement('object', { type: 'image/svg+xml', data: waybackLoaderPath })
+        "div",
+        { className: "loading" },
+        react.createElement("img", { src: this.props.waybackLoaderPath })
       );
     }
   }]);
@@ -2749,7 +2747,7 @@ var DiffView = function (_React$Component) {
     key: 'render',
     value: function render() {
       if (!this.state.diffData) {
-        return react.createElement(Loading, null);
+        return react.createElement(Loading, { waybackLoaderPath: this.props.waybackLoaderPath });
       }
       return react.createElement(
         'div',
@@ -3026,7 +3024,7 @@ var TimestampHeader = function (_React$Component) {
       return react.createElement(
         'div',
         null,
-        react.createElement(Loading, null),
+        react.createElement(Loading, { waybackLoaderPath: this.props.waybackLoaderPath }),
         this.widgetRender()
       );
     }
@@ -3207,7 +3205,7 @@ var DiffContainer = function (_React$Component) {
           'div',
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA,
-            timestampB: this.props.timestampB, isInitial: false,
+            timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
             fetchCallback: this.props.fetchCallback, diffMethodSelectorCallback: this.handleMethodChange }),
           this.prepareDiffView()
         );
@@ -3216,7 +3214,7 @@ var DiffContainer = function (_React$Component) {
         'div',
         { className: 'diffcontainer-view' },
         react.createElement(TimestampHeader, { isInitial: true, timestampA: this.props.timestampA,
-          timestampB: this.props.timestampB, site: this.props.site,
+          timestampB: this.props.timestampB, site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
           fetchCallback: this.props.fetchCallback, diffMethodSelectorCallback: this.handleMethodChange })
       );
     }
@@ -3231,7 +3229,7 @@ var DiffContainer = function (_React$Component) {
         if (this.state.timestampsValidated) {
           return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
             webMonitoringProcessingPort: this.props.webMonitoringProcessingPort, page: { url: this.props.site },
-            diffType: this.state.selectedMethod[0], a: urlA, b: urlB });
+            diffType: this.state.selectedMethod[0], a: urlA, b: urlB, waybackLoaderPath: this.props.waybackLoaderPath });
         }
         this.checkTimestamps(urlA, urlB);
       }

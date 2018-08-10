@@ -66,7 +66,7 @@ export default class TimestampHeader extends React.Component {
       );
     }
     return (<div>
-      <Loading/>
+      <Loading waybackLoaderPath={this.props.waybackLoaderPath}/>
       {this.widgetRender()}
     </div>
     );

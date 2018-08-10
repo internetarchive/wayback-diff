@@ -50,7 +50,7 @@ export default class DiffView extends React.Component {
 
   render () {
     if (!this.state.diffData) {
-      return <Loading />;
+      return <Loading waybackLoaderPath={this.props.waybackLoaderPath}/>;
     }
     return (
       <div className="diff-view">

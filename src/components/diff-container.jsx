@@ -30,7 +30,7 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA}
-            timestampB={this.props.timestampB} isInitial = {false}
+            timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
             fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
           {this.prepareDiffView()}
         </div>);
@@ -38,7 +38,7 @@ export default class DiffContainer extends React.Component {
     return(
       <div className="diffcontainer-view">
         <TimestampHeader isInitial={true} timestampA={this.props.timestampA}
-          timestampB={this.props.timestampB} site = {this.props.site}
+          timestampB={this.props.timestampB} site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
           fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
       </div>
     );
@@ -53,7 +53,7 @@ export default class DiffContainer extends React.Component {
       if (this.state.timestampsValidated){
         return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
           webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
-          diffType={this.state.selectedMethod[0]} a={urlA} b={urlB}/>);
+          diffType={this.state.selectedMethod[0]} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
 
       }
       this.checkTimestamps(urlA, urlB);

@@ -14,14 +14,14 @@ import React from 'react';
 // let site = path[path.length-1];
 // if (path.length === 3) {
 //   ReactDOM.render(<DiffContainer site={site} fetchCallback = {null}
-//     webMonitoringProcessingURL={webMonitoringProcessingURL}
+//     webMonitoringProcessingURL={webMonitoringProcessingURL} waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}
 //     webMonitoringProcessingPort={webMonitoringProcessingPort}/>, document.getElementById('wayback-diff'));
 // } else {
 //   let timestampA = path[path.length-3];
 //   let timestampB = path[path.length-2];
 //
 //   ReactDOM.render(<DiffContainer site={site} timestampA={timestampA} timestampB={timestampB}
-//     webMonitoringProcessingURL={webMonitoringProcessingURL}
+//     webMonitoringProcessingURL={webMonitoringProcessingURL} waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}
 //     webMonitoringProcessingPort={webMonitoringProcessingPort}
 //     fetchCallback = {null} />, document.getElementById('wayback-diff'));
 // }
