@@ -24,7 +24,7 @@ export default class DiffContainer extends React.Component {
     if (this.props.timestampA && this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA}
+          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
             fetchCallback = {this.props.fetchCallback}/>
           {this.prepareDiffView()}
@@ -32,7 +32,7 @@ export default class DiffContainer extends React.Component {
     }
     return(
       <div className="diffcontainer-view">
-        <TimestampHeader isInitial={true} timestampA={this.props.timestampA}
+        <TimestampHeader isInitial={true} timestampA={this.props.timestampA} limit={this.props.limit}
           timestampB={this.props.timestampB} site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
           fetchCallback = {this.props.fetchCallback}/>
       </div>

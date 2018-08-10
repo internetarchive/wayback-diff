@@ -87,7 +87,12 @@ export default class TimestampHeader extends React.Component {
         }
       }));
     } else {
-      let url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
+      var url;
+      if (this.props.limit){
+        url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&limit=${this.props.limit}&fl=timestamp,digest&output=json`;
+      } else {
+        url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
+      }
       fetch(url)
         .then(response => response.json())
         .then((data) => {
