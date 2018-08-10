@@ -2894,7 +2894,7 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n}\n";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}";
 styleInject(css$1);
 
 var supportedDiffTypes = [['RAW_SIDE_BY_SIDE', 'Side-by-side Content'], ['HIGHLIGHTED_TEXT', 'Highlighted Text'], ['HIGHLIGHTED_SOURCE', 'Highlighted Source'], ['HIGHLIGHTED_RENDERED', 'Highlighted Rendered'], ['SIDE_BY_SIDE_RENDERED', 'Side-by-Side Rendered'], ['OUTGOING_LINKS', 'Outgoing Links'], ['CHANGES_ONLY_TEXT', 'Changes Only Text'], ['CHANGES_ONLY_SOURCE', 'Changes Only Source']];
@@ -3173,6 +3173,49 @@ var TimestampHeader = function (_React$Component) {
 }(react.Component);
 
 /**
+ * Display a footer explaining the colors showing in the diffs
+ *
+ * @class DiffFooter
+ * @extends {React.Component}
+ */
+
+var DiffFooter = function (_React$Component) {
+  inherits(DiffFooter, _React$Component);
+
+  function DiffFooter() {
+    classCallCheck(this, DiffFooter);
+    return possibleConstructorReturn(this, (DiffFooter.__proto__ || Object.getPrototypeOf(DiffFooter)).apply(this, arguments));
+  }
+
+  createClass(DiffFooter, [{
+    key: 'render',
+    value: function render() {
+      return react.createElement(
+        'div',
+        null,
+        react.createElement(
+          'p',
+          { id: 'diff-footer' },
+          react.createElement(
+            'red-diff-footer',
+            null,
+            'Red'
+          ),
+          ' indicates content deletion. ',
+          react.createElement(
+            'green-diff-footer',
+            null,
+            'Green'
+          ),
+          ' indicates content addition'
+        )
+      );
+    }
+  }]);
+  return DiffFooter;
+}(react.Component);
+
+/**
  * Display a change between two versions of a page.
  *
  * @class DiffContainer
@@ -3205,7 +3248,8 @@ var DiffContainer = function (_React$Component) {
           react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
             timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
             fetchCallback: this.props.fetchCallback }),
-          this.prepareDiffView()
+          this.prepareDiffView(),
+          react.createElement(DiffFooter, null)
         );
       }
       return react.createElement(

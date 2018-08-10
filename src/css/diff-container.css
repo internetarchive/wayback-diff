@@ -6,3 +6,15 @@
     display: flex;
     justify-content: space-between;
 }
+
+#diff-footer{
+    text-align: center;
+}
+
+red-diff-footer{
+    background-color: #fbb6c2;
+}
+
+green-diff-footer{
+    background-color: #d4fcbc;
+}

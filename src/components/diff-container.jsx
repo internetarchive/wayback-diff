@@ -2,6 +2,7 @@ import React from 'react';
 import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
+import DiffFooter from './footer.jsx';
 
 /**
  * Display a change between two versions of a page.
@@ -28,6 +29,7 @@ export default class DiffContainer extends React.Component {
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
             fetchCallback = {this.props.fetchCallback}/>
           {this.prepareDiffView()}
+          <DiffFooter/>
         </div>);
     }
     return(
