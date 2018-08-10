@@ -15,13 +15,8 @@ export default class DiffContainer extends React.Component {
     super(props);
     this.state = {timestampsValidated: false};
 
-    this.handleMethodChange = this.handleMethodChange.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
 
-  }
-
-  handleMethodChange(method) {
-    this.setState({selectedMethod: method});
   }
 
   render () {
@@ -31,7 +26,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA}
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
+            fetchCallback = {this.props.fetchCallback}/>
           {this.prepareDiffView()}
         </div>);
     }
@@ -39,23 +34,20 @@ export default class DiffContainer extends React.Component {
       <div className="diffcontainer-view">
         <TimestampHeader isInitial={true} timestampA={this.props.timestampA}
           timestampB={this.props.timestampB} site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
-          fetchCallback = {this.props.fetchCallback} diffMethodSelectorCallback = {this.handleMethodChange}/>
+          fetchCallback = {this.props.fetchCallback}/>
       </div>
     );
   }
 
   prepareDiffView(){
+    let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+    let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
-    if(this.state.selectedMethod !== undefined) {
-      let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-      let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
-
-      if (this.state.timestampsValidated){
-        return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
-          webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
-          diffType={this.state.selectedMethod[0]} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
-
-      }
+    if (this.state.timestampsValidated){
+      return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
+        webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
+        diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
+    } else {
       this.checkTimestamps(urlA, urlB);
     }
   }

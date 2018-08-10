@@ -161,7 +161,6 @@ export default class TimestampHeader extends React.Component {
         <select id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
-        <DiffingMethodSelector diffMethodSelectorCallback = {this.props.diffMethodSelectorCallback}/>
         <button id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
         <button id="restart-btn" onClick={this.restartPressed}>Restart</button>
         <select id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
