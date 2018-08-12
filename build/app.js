@@ -1834,7 +1834,7 @@ function styleInject(css, ref) {
   }
 }
 
-var css = ".side-by-side-render,\n.inline-render {\n    display: flex;\n    flex: 1 0 auto;\n    height: 94vh;\n}\n\n.side-by-side-render > iframe,\n.inline-render > iframe {\n    border: 1px solid #ccc;\n    border-radius: 2px;\n    width: 100%;\n}\n\n.side-by-side-render > iframe:first-of-type {\n    margin-right: 0.5em;\n}\n\n.diff-view__alert.alert.alert-warning{\n    text-align: center;\n}\n\n.loading {\n    align-items: center;\n    background: transparent;\n    display: flex;\n    justify-content: center;\n}";
+var css = ".side-by-side-render,\n.inline-render {\n    display: flex;\n    flex: 1 0 auto;\n}\n\n.side-by-side-render > iframe,\n.inline-render > iframe {\n    border: 1px solid #ccc;\n    border-radius: 2px;\n    width: 100%;\n}\n\n.side-by-side-render > iframe:first-of-type {\n    margin-right: 0.5em;\n}\n\n.diff-view__alert.alert.alert-warning{\n    text-align: center;\n}\n\n.loading {\n    align-items: center;\n    background: transparent;\n    display: flex;\n    justify-content: center;\n}";
 styleInject(css);
 
 /**
@@ -2256,8 +2256,10 @@ var SandboxedHtml = function (_React$PureComponent) {
     value: function render() {
       var _this2 = this;
 
-      return react.createElement('iframe', {
-        sandbox: 'allow-forms allow-scripts',
+      return react.createElement('iframe', { height: window.innerHeight, scrolling: 'no', onLoad: function onLoad() {
+          _this2.handleHeight();
+        },
+        sandbox: 'allow-same-origin allow-forms allow-scripts',
         ref: function ref(frame) {
           return _this2._frame = frame;
         }
@@ -2276,6 +2278,11 @@ var SandboxedHtml = function (_React$PureComponent) {
       });
 
       this._frame.setAttribute('srcdoc', source);
+    }
+  }, {
+    key: 'handleHeight',
+    value: function handleHeight() {
+      this._frame.height = this._frame.contentDocument.scrollingElement.offsetHeight;
     }
   }]);
   return SandboxedHtml;
@@ -3230,10 +3237,11 @@ var DiffContainer = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (DiffContainer.__proto__ || Object.getPrototypeOf(DiffContainer)).call(this, props));
 
-    _this.state = { timestampsValidated: false };
+    _this.state = { timestampsValidated: false,
+      fetchedRaw: null };
+    _this._oneFrame = null;
 
     _this.prepareDiffView = _this.prepareDiffView.bind(_this);
-
     return _this;
   }
 
@@ -3266,7 +3274,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
+          react.createElement(TimestampHeader, { site: this.props.site, limit: this.props.limit,
             timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
             fetchCallback: this.props.fetchCallback }),
           this.showRightSnapshot()
@@ -3275,27 +3283,44 @@ var DiffContainer = function (_React$Component) {
       return react.createElement(
         'div',
         { className: 'diffcontainer-view' },
-        react.createElement(TimestampHeader, { isInitial: true, timestampA: this.props.timestampA, limit: this.props.limit,
-          timestampB: this.props.timestampB, site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
+        react.createElement(TimestampHeader, { isInitial: true, limit: this.props.limit,
+          site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
           fetchCallback: this.props.fetchCallback })
       );
     }
   }, {
     key: 'showLeftSnapshot',
     value: function showLeftSnapshot() {
-      var urlB;
-      if (this.props.noSnapshotURL) {
-        urlB = this.props.noSnapshotURL;
-      } else {
-        urlB = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      var _this2 = this;
+
+      if (this.state.fetchedRaw) {
+        var urlB;
+        if (this.props.noSnapshotURL) {
+          urlB = this.props.noSnapshotURL;
+        } else {
+          urlB = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+        }
+        return react.createElement(
+          'div',
+          { className: 'side-by-side-render' },
+          react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
+              _this2.handleHeight();
+            },
+            srcdoc: this.state.fetchedRaw, scrolling: 'no',
+            ref: function ref(frame) {
+              return _this2._oneFrame = frame;
+            }
+          }),
+          react.createElement('iframe', { src: urlB })
+        );
       }
       var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-      return react.createElement(
-        'div',
-        { className: 'side-by-side-render' },
-        react.createElement('iframe', { src: urlA }),
-        react.createElement('iframe', { src: urlB })
-      );
+      fetch(urlA).then(function (response) {
+        return response.text();
+      }).then(function (responseText) {
+        _this2.setState({ fetchedRaw: responseText });
+      });
+      return react.createElement(Loading, null);
     }
   }, {
     key: 'prepareDiffView',
@@ -3314,7 +3339,7 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: 'checkTimestamps',
     value: function checkTimestamps(urlA, urlB) {
-      var _this2 = this;
+      var _this3 = this;
 
       fetch(urlA, { redirect: 'follow' }).then(function (response) {
         urlA = response.url;
@@ -3323,7 +3348,7 @@ var DiffContainer = function (_React$Component) {
           urlB = response.url;
           var fetchedTimestampB = urlB.split('/')[4];
 
-          if (_this2.props.timestampA !== fetchedTimestampA || _this2.props.timestampB !== fetchedTimestampB) {
+          if (_this3.props.timestampA !== fetchedTimestampA || _this3.props.timestampB !== fetchedTimestampB) {
             var tempURL = urlA.split('/');
             var url = '';
             for (var i = 7; i <= tempURL.length - 1; i++) {
@@ -3331,7 +3356,7 @@ var DiffContainer = function (_React$Component) {
             }
             window.location.href = '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + url;
           } else {
-            _this2.setState({ timestampsValidated: true });
+            _this3.setState({ timestampsValidated: true });
           }
         });
       });
@@ -3339,19 +3364,41 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: 'showRightSnapshot',
     value: function showRightSnapshot() {
-      var urlA;
-      if (this.props.noSnapshotURL) {
-        urlA = this.props.noSnapshotURL;
-      } else {
-        urlA = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      var _this4 = this;
+
+      if (this.state.fetchedRaw) {
+        var urlA;
+        if (this.props.noSnapshotURL) {
+          urlA = this.props.noSnapshotURL;
+        } else {
+          urlA = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+        }
+        return react.createElement(
+          'div',
+          { className: 'side-by-side-render' },
+          react.createElement('iframe', { src: urlA }),
+          react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
+              _this4.handleHeight();
+            },
+            srcdoc: this.state.fetchedRaw, scrolling: 'no',
+            ref: function ref(frame) {
+              return _this4._oneFrame = frame;
+            }
+          })
+        );
       }
       var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
-      return react.createElement(
-        'div',
-        { className: 'side-by-side-render' },
-        react.createElement('iframe', { src: urlA }),
-        react.createElement('iframe', { src: urlB })
-      );
+      fetch(urlB).then(function (response) {
+        return response.text();
+      }).then(function (responseText) {
+        _this4.setState({ fetchedRaw: responseText });
+      });
+      return react.createElement(Loading, null);
+    }
+  }, {
+    key: 'handleHeight',
+    value: function handleHeight() {
+      this._oneFrame.height = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
     }
   }]);
   return DiffContainer;
