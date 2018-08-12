@@ -72,7 +72,7 @@ export default class DiffContainer extends React.Component {
       return(
         <div className={'side-by-side-render'}>
           <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
-            srcdoc={this.state.fetchedRaw}
+            srcdoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
           {React.createElement('iframe', { src: urlB})}
@@ -138,7 +138,7 @@ export default class DiffContainer extends React.Component {
         <div className={'side-by-side-render'}>
           {React.createElement('iframe', { src: urlA})}
           <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
-            srcdoc={this.state.fetchedRaw}
+            srcdoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
         </div>

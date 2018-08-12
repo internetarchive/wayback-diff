@@ -31,7 +31,7 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   render () {
-    return <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
+    return <iframe height={window.innerHeight} scrolling={'no'} onLoad={()=>{this.handleHeight();}}
       sandbox="allow-same-origin allow-forms allow-scripts"
       ref={frame => this._frame = frame}
     />;
