@@ -2,7 +2,6 @@
 .inline-render {
     display: flex;
     flex: 1 0 auto;
-    height: 94vh;
 }
 
 .side-by-side-render > iframe,

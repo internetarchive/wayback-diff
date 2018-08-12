@@ -8,6 +8,7 @@ import React from 'react';
  *           function to apply to the document before rendering.
  */
 
+
 /**
  * Display HTML source code or document in a sandboxed frame.
  *
@@ -30,8 +31,8 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   render () {
-    return <iframe
-      sandbox="allow-forms allow-scripts"
+    return <iframe onLoad={()=>{this.handleHeight();}}
+      sandbox="allow-same-origin allow-forms allow-scripts"
       ref={frame => this._frame = frame}
     />;
   }
@@ -45,6 +46,10 @@ export default class SandboxedHtml extends React.PureComponent {
     });
 
     this._frame.setAttribute('srcdoc', source);
+  }
+
+  handleHeight () {
+    this._frame.height = this._frame.contentDocument.scrollingElement.offsetHeight;
   }
 }
 
