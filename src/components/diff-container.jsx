@@ -3,6 +3,7 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
+import Loading from './loading.jsx';
 
 /**
  * Display a change between two versions of a page.
@@ -14,10 +15,11 @@ export default class DiffContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {timestampsValidated: false};
+    this.state = {timestampsValidated: false,
+      fetchedRaw: null};
+    this._oneFrame = null;
 
     this.prepareDiffView = this.prepareDiffView.bind(this);
-
   }
 
   render () {
@@ -44,7 +46,7 @@ export default class DiffContainer extends React.Component {
     if (this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
+          <TimestampHeader site = {this.props.site} limit={this.props.limit}
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
             fetchCallback = {this.props.fetchCallback}/>
           {this.showRightSnapshot()}
@@ -52,27 +54,39 @@ export default class DiffContainer extends React.Component {
     }
     return(
       <div className="diffcontainer-view">
-        <TimestampHeader isInitial={true} timestampA={this.props.timestampA} limit={this.props.limit}
-          timestampB={this.props.timestampB} site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
+        <TimestampHeader isInitial={true} limit={this.props.limit}
+          site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
           fetchCallback = {this.props.fetchCallback}/>
       </div>
     );
   }
 
   showLeftSnapshot () {
-    var urlB;
-    if(this.props.noSnapshotURL) {
-      urlB = this.props.noSnapshotURL;
-    } else {
-      urlB= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+    if(this.state.fetchedRaw){
+      var urlB;
+      if(this.props.noSnapshotURL) {
+        urlB = this.props.noSnapshotURL;
+      } else {
+        urlB= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      }
+      return(
+        <div className={'side-by-side-render'}>
+          <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
+            srcdoc={this.state.fetchedRaw}
+            ref={frame => this._oneFrame = frame}
+          />
+          {React.createElement('iframe', { src: urlB})}
+        </div>
+      );
     }
     let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-    return(
-      <div className={'side-by-side-render'}>
-        {React.createElement('iframe', { src: urlA })}
-        {React.createElement('iframe', { src: urlB })}
-      </div>
-    );
+    fetch(urlA)
+      .then(response => {
+        return response.text();
+      }).then((responseText) => {
+        this.setState({fetchedRaw: responseText});
+      });
+    return(<Loading/>);
   }
 
   prepareDiffView(){
@@ -89,7 +103,6 @@ export default class DiffContainer extends React.Component {
   }
 
   checkTimestamps (urlA, urlB) {
-
     fetch(urlA, {redirect: 'follow'})
       .then(response => {
         urlA = response.url;
@@ -114,18 +127,35 @@ export default class DiffContainer extends React.Component {
   }
 
   showRightSnapshot () {
-    var urlA;
-    if(this.props.noSnapshotURL) {
-      urlA = this.props.noSnapshotURL;
-    } else {
-      urlA= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+    if(this.state.fetchedRaw){
+      var urlA;
+      if(this.props.noSnapshotURL) {
+        urlA = this.props.noSnapshotURL;
+      } else {
+        urlA= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
+      }
+      return(
+        <div className={'side-by-side-render'}>
+          {React.createElement('iframe', { src: urlA})}
+          <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
+            srcdoc={this.state.fetchedRaw}
+            ref={frame => this._oneFrame = frame}
+          />
+        </div>
+      );
     }
     let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
-    return(
-      <div className={'side-by-side-render'}>
-        {React.createElement('iframe', { src: urlA })}
-        {React.createElement('iframe', { src: urlB })}
-      </div>
-    );
+    fetch(urlB)
+      .then(response => {
+        return response.text();
+      }).then((responseText) => {
+        this.setState({fetchedRaw: responseText});
+      });
+    return(<Loading/>);
+  }
+
+
+  handleHeight () {
+    this._oneFrame.height = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
   }
 }
