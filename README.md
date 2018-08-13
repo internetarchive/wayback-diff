@@ -4,7 +4,7 @@
 
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
 
-# Instalation
+# Installation
 
 Install node dependencies with `yarn`
 
@@ -129,3 +129,7 @@ After importing the component you might use it like any other React component:
                       timestampB={timestampB} fetchCallback = {null} limit={'1000'}
                       waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />
 ```
+
+# Example project
+
+If you need an example on how to use the component check [this repository out](https://github.com/ftsalamp/wayback-diff-test)
