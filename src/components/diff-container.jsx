@@ -16,10 +16,16 @@ export default class DiffContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {timestampsValidated: false,
-      fetchedRaw: null};
+      fetchedRaw: null,
+      showNotFound: false
+    };
     this._oneFrame = null;
-
+    this.snapshotsNotFound = this.snapshotsNotFound.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
+  }
+
+  snapshotsNotFound() {
+    this.setState({showNotFound:true});
   }
 
   render () {
@@ -29,7 +35,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback}/>
+            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.prepareDiffView()}
           <DiffFooter/>
         </div>);
@@ -39,7 +45,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
             isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback}/>
+            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showLeftSnapshot()}
         </div>);
     }
@@ -48,7 +54,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader site = {this.props.site} limit={this.props.limit}
             timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback}/>
+            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showRightSnapshot()}
         </div>);
     }
@@ -56,7 +62,7 @@ export default class DiffContainer extends React.Component {
       <div className="diffcontainer-view">
         <TimestampHeader isInitial={true} limit={this.props.limit}
           site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
-          fetchCallback = {this.props.fetchCallback}/>
+          fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
       </div>
     );
   }
@@ -90,15 +96,17 @@ export default class DiffContainer extends React.Component {
   }
 
   prepareDiffView(){
-    let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-    let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+    if (!this.state.showNotFound){
+      let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+      let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
-    if (this.state.timestampsValidated){
-      return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
-        webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
-        diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
-    } else {
-      this.checkTimestamps(urlA, urlB);
+      if (this.state.timestampsValidated){
+        return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
+          webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
+          diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
+      } else {
+        this.checkTimestamps(urlA, urlB);
+      }
     }
   }
 

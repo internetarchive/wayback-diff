@@ -1,7 +1,6 @@
 import React from 'react';
 import Loading from './loading.jsx';
 import '../css/diff-container.css';
-import DiffingMethodSelector from './diffing-method-selector.jsx';
 
 /**
  * Display a timestamp selector
@@ -16,7 +15,8 @@ export default class TimestampHeader extends React.Component {
 
     this.state = {
       cdxData: false,
-      showDiff: false
+      showDiff: false,
+      showNotFound: false
     };
 
     this.handleLeftTimestampChange = this.handleLeftTimestampChange.bind(this);
@@ -50,6 +50,12 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
+    if (this.state.showNotFound){
+      return(
+        <div>
+          {this.notFound()}
+        </div>);
+    }
     if (this.state.showDiff) {
       return(
         <div className="timestamp-header-view">
@@ -96,9 +102,15 @@ export default class TimestampHeader extends React.Component {
       fetch(url)
         .then(response => response.json())
         .then((data) => {
-          this.prepareData(data);
-          if (!this.props.isInitial) {
-            this.selectValues();
+          if (data && data.length > 0 ){
+            this.prepareData(data);
+            if (!this.props.isInitial) {
+              this.selectValues();
+            }
+          } else {
+            this.props.snapshotsNotFoundCallback();
+            this.setState({showNotFound:true});
+
           }
         });
     }
@@ -175,6 +187,10 @@ export default class TimestampHeader extends React.Component {
     );
   }
 
+  notFound () {
+    return (<p style={{textAlign: 'center'}}>The Wayback Machine doesn't have {this.props.site} archived.</p>);
+  }
+
   showDiffs () {
     this.setState({showDiff: true});
   }
@@ -183,5 +199,4 @@ export default class TimestampHeader extends React.Component {
     document.getElementById('timestamp-select-left').value = this.props.timestampA;
     document.getElementById('timestamp-select-right').value = this.props.timestampB;
   }
-
 }
