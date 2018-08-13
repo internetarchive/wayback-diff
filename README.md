@@ -15,6 +15,8 @@ Install node dependencies with `yarn`
 In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism implemented.
 You can find my implementation of a CORS-enabled web-monitoring-processing server [here](https://github.com/ftsalamp/web-monitoring-processing/tree/cors).
 
+You also need to have a CORS-enabled browser for this component to work.
+
 Run the server with the command `yarn start`
 
 There are two types of URL calls:
@@ -74,7 +76,7 @@ export DiffContainer from './components/diff-container.jsx';
 
 Run
 
-`build:dev`
+`yarn build:dev`
 
 ## Install the library
 
@@ -84,13 +86,14 @@ To install the component library, inside your new project directory you should r
 yarn add file:[PATH_TO]/wayback-diff
 ```
 
+where [PATH_TO] equals with the path where you have wayback-diff saved.
+
+
 If you are installing this component as a library from this Github repository:
 
 ```
 yarn add https://github.com/ftsalamp/wayback-diff
 ```
-
-where [PATH_TO] equals with the path where you have wayback-diff saved.
 
 ## Import the component
 
@@ -108,5 +111,6 @@ After importing the component you might use it like any other React component:
 <DiffContainer site={site} timestampA={timestampA}
                       webMonitoringProcessingURL={this.webMonitoringProcessingURL}
                       webMonitoringProcessingPort={this.webMonitoringProcessingPort}
-                      timestampB={timestampB} fetchCallback = {null}
+                      timestampB={timestampB} fetchCallback = {null} limit={'1000'}
+                      waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />
 ```
