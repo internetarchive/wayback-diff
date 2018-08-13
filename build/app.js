@@ -2904,55 +2904,6 @@ var DiffView = function (_React$Component) {
 var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}";
 styleInject(css$1);
 
-var supportedDiffTypes = [['RAW_SIDE_BY_SIDE', 'Side-by-side Content'], ['HIGHLIGHTED_TEXT', 'Highlighted Text'], ['HIGHLIGHTED_SOURCE', 'Highlighted Source'], ['HIGHLIGHTED_RENDERED', 'Highlighted Rendered'], ['SIDE_BY_SIDE_RENDERED', 'Side-by-Side Rendered'], ['OUTGOING_LINKS', 'Outgoing Links'], ['CHANGES_ONLY_TEXT', 'Changes Only Text'], ['CHANGES_ONLY_SOURCE', 'Changes Only Source']];
-
-/**
- * Display a diffing method selector
- *
- * @class TimestampHeader
- * @extends {React.Component}
- */
-
-var DiffingMethodSelector = function (_React$Component) {
-  inherits(DiffingMethodSelector, _React$Component);
-
-  function DiffingMethodSelector(props) {
-    classCallCheck(this, DiffingMethodSelector);
-
-    var _this = possibleConstructorReturn(this, (DiffingMethodSelector.__proto__ || Object.getPrototypeOf(DiffingMethodSelector)).call(this, props));
-
-    _this.state = { diffMethods: supportedDiffTypes,
-      selectedMethod: supportedDiffTypes[0] };
-    _this.props.diffMethodSelectorCallback(supportedDiffTypes[0]);
-    _this.handleChange = _this.handleChange.bind(_this);
-    return _this;
-  }
-
-  createClass(DiffingMethodSelector, [{
-    key: 'handleChange',
-    value: function handleChange(event) {
-      this.setState({ selectedMethod: event.target.value.split(',') });
-      this.props.diffMethodSelectorCallback(event.target.value.split(','));
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return react.createElement(
-        'select',
-        { id: 'diff-select', onChange: this.handleChange },
-        this.state.diffMethods.map(function (val, index) {
-          return react.createElement(
-            'option',
-            { key: index, value: val },
-            val[1]
-          );
-        })
-      );
-    }
-  }]);
-  return DiffingMethodSelector;
-}(react.Component);
-
 /**
  * Display a timestamp selector
  *
@@ -2970,7 +2921,8 @@ var TimestampHeader = function (_React$Component) {
 
     _this.state = {
       cdxData: false,
-      showDiff: false
+      showDiff: false,
+      showNotFound: false
     };
 
     _this.handleLeftTimestampChange = _this.handleLeftTimestampChange.bind(_this);
@@ -3013,6 +2965,13 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      if (this.state.showNotFound) {
+        return react.createElement(
+          'div',
+          null,
+          this.notFound()
+        );
+      }
       if (this.state.showDiff) {
         return react.createElement(
           'div',
@@ -3064,9 +3023,14 @@ var TimestampHeader = function (_React$Component) {
         fetch(url).then(function (response) {
           return response.json();
         }).then(function (data) {
-          _this2.prepareData(data);
-          if (!_this2.props.isInitial) {
-            _this2.selectValues();
+          if (data && data.length > 0) {
+            _this2.prepareData(data);
+            if (!_this2.props.isInitial) {
+              _this2.selectValues();
+            }
+          } else {
+            _this2.props.snapshotsNotFoundCallback();
+            _this2.setState({ showNotFound: true });
           }
         });
       }
@@ -3165,6 +3129,17 @@ var TimestampHeader = function (_React$Component) {
       );
     }
   }, {
+    key: 'notFound',
+    value: function notFound() {
+      return react.createElement(
+        'p',
+        { style: { textAlign: 'center' } },
+        'The Wayback Machine doesn\'t have ',
+        this.props.site,
+        ' archived.'
+      );
+    }
+  }, {
     key: 'showDiffs',
     value: function showDiffs() {
       this.setState({ showDiff: true });
@@ -3237,25 +3212,37 @@ var DiffContainer = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (DiffContainer.__proto__ || Object.getPrototypeOf(DiffContainer)).call(this, props));
 
-    _this.state = { timestampsValidated: false,
-      fetchedRaw: null };
+    _this.state = {
+      timestampsValidated: false,
+      fetchedRaw: null,
+      showNotFound: false
+    };
     _this._oneFrame = null;
-
+    _this.snapshotsNotFound = _this.snapshotsNotFound.bind(_this);
     _this.prepareDiffView = _this.prepareDiffView.bind(_this);
     return _this;
   }
 
   createClass(DiffContainer, [{
+    key: 'snapshotsNotFound',
+    value: function snapshotsNotFound() {
+      this.setState({ showNotFound: true });
+    }
+  }, {
     key: 'render',
     value: function render() {
-
+      if (this.urlIsInvalid()) {
+        return this.invalidURL();
+      }
       if (this.props.timestampA && this.props.timestampB) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
-            timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback }),
+            timestampB: this.props.timestampB, isInitial: false,
+            waybackLoaderPath: this.props.waybackLoaderPath,
+            fetchCallback: this.props.fetchCallback,
+            snapshotsNotFoundCallback: this.snapshotsNotFound }),
           this.prepareDiffView(),
           react.createElement(DiffFooter, null)
         );
@@ -3266,7 +3253,7 @@ var DiffContainer = function (_React$Component) {
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
             isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback }),
+            fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound }),
           this.showLeftSnapshot()
         );
       }
@@ -3275,8 +3262,9 @@ var DiffContainer = function (_React$Component) {
           'div',
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, { site: this.props.site, limit: this.props.limit,
-            timestampB: this.props.timestampB, isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback }),
+            timestampB: this.props.timestampB, isInitial: false,
+            waybackLoaderPath: this.props.waybackLoaderPath,
+            fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound }),
           this.showRightSnapshot()
         );
       }
@@ -3285,7 +3273,7 @@ var DiffContainer = function (_React$Component) {
         { className: 'diffcontainer-view' },
         react.createElement(TimestampHeader, { isInitial: true, limit: this.props.limit,
           site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
-          fetchCallback: this.props.fetchCallback })
+          fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound })
       );
     }
   }, {
@@ -3325,15 +3313,17 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
-      var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-      var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+      if (!this.state.showNotFound) {
+        var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+        var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
-      if (this.state.timestampsValidated) {
-        return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
-          webMonitoringProcessingPort: this.props.webMonitoringProcessingPort, page: { url: this.props.site },
-          diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB, waybackLoaderPath: this.props.waybackLoaderPath });
-      } else {
-        this.checkTimestamps(urlA, urlB);
+        if (this.state.timestampsValidated) {
+          return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
+            webMonitoringProcessingPort: this.props.webMonitoringProcessingPort, page: { url: this.props.site },
+            diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB, waybackLoaderPath: this.props.waybackLoaderPath });
+        } else {
+          this.checkTimestamps(urlA, urlB);
+        }
       }
     }
   }, {
@@ -3399,6 +3389,22 @@ var DiffContainer = function (_React$Component) {
     key: 'handleHeight',
     value: function handleHeight() {
       this._oneFrame.height = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+    }
+  }, {
+    key: 'urlIsInvalid',
+    value: function urlIsInvalid() {
+      var regex = /^([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
+      return !regex.test(this.props.site);
+    }
+  }, {
+    key: 'invalidURL',
+    value: function invalidURL() {
+      return react.createElement(
+        'p',
+        { style: { textAlign: 'center' } },
+        'Invalid URL ',
+        this.props.site
+      );
     }
   }]);
   return DiffContainer;
