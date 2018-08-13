@@ -13,9 +13,10 @@ import Loading from './loading.jsx';
  */
 export default class DiffContainer extends React.Component {
 
-  constructor(props) {
+  constructor (props) {
     super(props);
-    this.state = {timestampsValidated: false,
+    this.state = {
+      timestampsValidated: false,
       fetchedRaw: null,
       showNotFound: false
     };
@@ -24,18 +25,22 @@ export default class DiffContainer extends React.Component {
     this.prepareDiffView = this.prepareDiffView.bind(this);
   }
 
-  snapshotsNotFound() {
-    this.setState({showNotFound:true});
+  snapshotsNotFound () {
+    this.setState({showNotFound: true});
   }
 
   render () {
-
+    if (this.urlIsInvalid()) {
+      return this.invalidURL();
+    }
     if (this.props.timestampA && this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
-            timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          <TimestampHeader site={this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
+            timestampB={this.props.timestampB} isInitial={false}
+            waybackLoaderPath={this.props.waybackLoaderPath}
+            fetchCallback={this.props.fetchCallback}
+            snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.prepareDiffView()}
           <DiffFooter/>
         </div>);
@@ -43,26 +48,27 @@ export default class DiffContainer extends React.Component {
     if (this.props.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site = {this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
-            isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          <TimestampHeader site={this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
+            isInitial={false} waybackLoaderPath={this.props.waybackLoaderPath}
+            fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showLeftSnapshot()}
         </div>);
     }
     if (this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site = {this.props.site} limit={this.props.limit}
-            timestampB={this.props.timestampB} isInitial = {false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          <TimestampHeader site={this.props.site} limit={this.props.limit}
+            timestampB={this.props.timestampB} isInitial={false}
+            waybackLoaderPath={this.props.waybackLoaderPath}
+            fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showRightSnapshot()}
         </div>);
     }
-    return(
+    return (
       <div className="diffcontainer-view">
         <TimestampHeader isInitial={true} limit={this.props.limit}
-          site = {this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
-          fetchCallback = {this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          site={this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
+          fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
       </div>
     );
   }
@@ -165,5 +171,14 @@ export default class DiffContainer extends React.Component {
 
   handleHeight () {
     this._oneFrame.height = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+  }
+
+  urlIsInvalid () {
+    const regex = /^([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
+    return (!regex.test(this.props.site));
+  }
+
+  invalidURL () {
+    return (<p style={{textAlign: 'center'}}>Invalid URL {this.props.site}</p>);
   }
 }
