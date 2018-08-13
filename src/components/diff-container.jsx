@@ -132,7 +132,7 @@ export default class DiffContainer extends React.Component {
               for(var i = 7; i <= (tempURL.length-1); i++){
                 url = url + tempURL[i];
               }
-              window.location.href = '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + url;
+              window.location.href = '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site;
             } else {
               this.setState({timestampsValidated: true});
             }
