@@ -32,11 +32,7 @@ Example request: http://localhost:3000/diff/iskme.org
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
 
 # Running as a React app
-You must render a DiffContainer component. It receives one prop. The fetchCallback which is a callback function that will be used to fetch the snapshots available from the CDX server.
-
-- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
-
-- The callback function should return a fetch Promise.
+You must render a DiffContainer component. It can receive up to seven props. See props for more info.
 
 In the **index.js** file the following code should be included:
 
@@ -71,6 +67,25 @@ In order to use this app as a component in an other React app you should include
 ```Javascript
 export DiffContainer from './components/diff-container.jsx';
 ```
+
+# Props 
+DiffContainer can receive up to seven props. All of them are optional. 
+
+The **fetchCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
+
+- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
+
+- The callback function should return a fetch Promise.
+
+  If you use this prop, the **limit** prop does not have any effect.
+
+The **waybackLoaderPath** which indicates the URL where the image that will be shown when loading is.
+
+The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
+
+The **webMonitoringProcessingURL** and **webMonitoringProcessingPort** which contain the URL and the port of the wm-diffing-server that will be used from this component.
+
+The **limit** which sets a limit on how many snapshots the CDX server should reply with.
 
 ## Build the project
 
