@@ -103,6 +103,10 @@ export default class TimestampHeader extends React.Component {
         .then(response => response.json())
         .then((data) => {
           if (data && data.length > 0 ){
+            if (data.length === 2) {
+              let timestamp = data[1][0];
+              window.location.href = `/diff/${timestamp}//${this.props.site}`;
+            }
             this.prepareData(data);
             if (!this.props.isInitial) {
               this.selectValues();
