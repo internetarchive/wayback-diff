@@ -18,3 +18,11 @@ red-diff-footer{
 green-diff-footer{
     background-color: #d4fcbc;
 }
+
+#timestamp-select-left{
+    width: auto;
+}
+
+#timestamp-select-right{
+    width: auto;
+}

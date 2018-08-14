@@ -179,6 +179,6 @@ export default class DiffContainer extends React.Component {
   }
 
   invalidURL () {
-    return (<p style={{textAlign: 'center'}}>Invalid URL {this.props.site}</p>);
+    return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.site}</div>);
   }
 }

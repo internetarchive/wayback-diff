@@ -179,12 +179,12 @@ export default class TimestampHeader extends React.Component {
   showTimestampSelector () {
     return (
       <div className="timestamp-container-view">
-        <select id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
+        <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
-        <button id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
-        <button id="restart-btn" onClick={this.restartPressed}>Restart</button>
-        <select id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
+        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
+        <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
           {this.state.rightSnapElements}
         </select>
       </div>
@@ -192,7 +192,7 @@ export default class TimestampHeader extends React.Component {
   }
 
   notFound () {
-    return (<p style={{textAlign: 'center'}}>The Wayback Machine doesn't have {this.props.site} archived.</p>);
+    return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.site} archived.</div>);
   }
 
   showDiffs () {
