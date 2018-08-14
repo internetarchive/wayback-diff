@@ -4,7 +4,7 @@
 
 This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
 
-# Instalation
+# Installation
 
 Install node dependencies with `yarn`
 
@@ -14,6 +14,8 @@ Install node dependencies with `yarn`
 
 In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism implemented.
 You can find my implementation of a CORS-enabled web-monitoring-processing server [here](https://github.com/ftsalamp/web-monitoring-processing/tree/cors).
+
+You also need to have a CORS-enabled browser for this component to work.
 
 Run the server with the command `yarn start`
 
@@ -30,11 +32,7 @@ Example request: http://localhost:3000/diff/iskme.org
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
 
 # Running as a React app
-You must render a DiffContainer component. It receives one prop. The fetchCallback which is a callback function that will be used to fetch the snapshots available from the CDX server.
-
-- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
-
-- The callback function should return a fetch Promise.
+You must render a DiffContainer component. It can receive up to seven props. See props for more info.
 
 In the **index.js** file the following code should be included:
 
@@ -70,11 +68,30 @@ In order to use this app as a component in an other React app you should include
 export DiffContainer from './components/diff-container.jsx';
 ```
 
+# Props 
+DiffContainer can receive up to seven props. All of them are optional. 
+
+The **fetchCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
+
+- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
+
+- The callback function should return a fetch Promise.
+
+  If you use this prop, the **limit** prop does not have any effect.
+
+The **waybackLoaderPath** which indicates the URL where the image that will be shown when loading is.
+
+The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
+
+The **webMonitoringProcessingURL** and **webMonitoringProcessingPort** which contain the URL and the port of the wm-diffing-server that will be used from this component.
+
+The **limit** which sets a limit on how many snapshots the CDX server should reply with.
+
 ## Build the project
 
 Run
 
-`build:dev`
+`yarn build:dev`
 
 ## Install the library
 
@@ -84,13 +101,14 @@ To install the component library, inside your new project directory you should r
 yarn add file:[PATH_TO]/wayback-diff
 ```
 
+where [PATH_TO] equals with the path where you have wayback-diff saved.
+
+
 If you are installing this component as a library from this Github repository:
 
 ```
 yarn add https://github.com/ftsalamp/wayback-diff
 ```
-
-where [PATH_TO] equals with the path where you have wayback-diff saved.
 
 ## Import the component
 
@@ -108,5 +126,10 @@ After importing the component you might use it like any other React component:
 <DiffContainer site={site} timestampA={timestampA}
                       webMonitoringProcessingURL={this.webMonitoringProcessingURL}
                       webMonitoringProcessingPort={this.webMonitoringProcessingPort}
-                      timestampB={timestampB} fetchCallback = {null}
+                      timestampB={timestampB} fetchCallback = {null} limit={'1000'}
+                      waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />
 ```
+
+# Example project
+
+If you need an example on how to use the component check [this repository out](https://github.com/ftsalamp/wayback-diff-test)
