@@ -174,7 +174,7 @@ export default class DiffContainer extends React.Component {
   }
 
   urlIsInvalid () {
-    const regex = /^([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
+    const regex = /([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
     return (!regex.test(this.props.site));
   }
 
