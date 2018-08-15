@@ -168,9 +168,13 @@ export default class DiffContainer extends React.Component {
     return(<Loading/>);
   }
 
-
   handleHeight () {
-    this._oneFrame.height = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+    let offsetHeight = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+    if (offsetHeight > 0.1 * this._oneFrame.height) {
+      this._oneFrame.height = offsetHeight;
+    } else {
+      this._oneFrame.height = 0.5 * this._oneFrame.height;
+    }
   }
 
   urlIsInvalid () {
