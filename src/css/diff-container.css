@@ -34,7 +34,7 @@ green-diff-footer{
 
 #timestamp-p-left{
     display: inline-block;
-    position: absolute;
+    position: relative;
     left: 1%;
 }
 

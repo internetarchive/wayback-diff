@@ -2245,6 +2245,7 @@ var SandboxedHtml = function (_React$PureComponent) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this._updateContent();
+      this.addLoaderImg();
     }
   }, {
     key: 'componentDidUpdate',
@@ -2258,6 +2259,7 @@ var SandboxedHtml = function (_React$PureComponent) {
 
       return react.createElement('iframe', { height: window.innerHeight, scrolling: 'no', onLoad: function onLoad() {
           _this2.handleHeight();
+          _this2.removeLoaderImg();
         },
         sandbox: 'allow-same-origin allow-forms allow-scripts',
         ref: function ref(frame) {
@@ -2288,6 +2290,27 @@ var SandboxedHtml = function (_React$PureComponent) {
       } else {
         this._frame.height = 0.5 * this._frame.height;
       }
+    }
+  }, {
+    key: 'removeLoaderImg',
+    value: function removeLoaderImg() {
+      this._frame.loaderImage.parentNode.removeChild(this._frame.loaderImage);
+    }
+  }, {
+    key: 'addLoaderImg',
+    value: function addLoaderImg() {
+      var width = this._frame.contentDocument.scrollingElement.offsetWidth;
+      var height = this._frame.contentDocument.scrollingElement.offsetHeight;
+
+      var centerX = this._frame.offsetLeft + width / 2;
+      var centerY = this._frame.offsetTop + height / 2;
+
+      var elem = document.createElement('img');
+      var cssText = 'position:absolute;left:' + centerX + 'px;top:' + centerY + 'px;';
+      elem.setAttribute('style', cssText);
+      elem.src = 'https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif';
+      document.body.appendChild(elem);
+      this._frame.loaderImage = elem;
     }
   }]);
   return SandboxedHtml;
@@ -2906,7 +2929,7 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-p-left{\n    display: inline-block;\n    position: relative;\n    left: 1%;\n}\n\n#timestamp-p-right{\n    display: inline-block;\n    position: absolute;\n    right: 1%;\n}\n\n#timestamp-a-left{\n    display: inline-block;\n    position: absolute;\n    left: 1%;\n}\n\n#timestamp-a-right{\n    display: inline-block;\n    position: absolute;\n    right: 1%;\n}";
 styleInject(css$1);
 
 /**
@@ -2981,6 +3004,7 @@ var TimestampHeader = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'timestamp-header-view' },
+          this.showInfo(),
           this.showTimestampSelector(),
           this.exportParams()
         );
@@ -2989,7 +3013,9 @@ var TimestampHeader = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'timestamp-header-view' },
-          this.showTimestampSelector()
+          this.showInfo(),
+          this.showTimestampSelector(),
+          this.showOpenLinks()
         );
       }
       return react.createElement(
@@ -3053,7 +3079,8 @@ var TimestampHeader = function (_React$Component) {
         leftSnaps: data,
         rightSnaps: data,
         leftSnapElements: this.prepareOptionElements(data),
-        rightSnapElements: this.prepareOptionElements(data)
+        rightSnapElements: this.prepareOptionElements(data),
+        headerInfo: this.getHeaderInfo(data)
       });
     }
   }, {
@@ -3064,7 +3091,6 @@ var TimestampHeader = function (_React$Component) {
         var yearGroup = this.getYear(data[0][0]);
         initialSnapshots.push(react.createElement('optgroup', { key: -1, label: yearGroup }));
       }
-
       for (var i = 0; i < data.length; i++) {
         var utcTime = this.getUTCDateFormat(data[i][0]);
         var year = this.getYear(data[i][0]);
@@ -3092,6 +3118,15 @@ var TimestampHeader = function (_React$Component) {
 
       var niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
       return niceTime.toUTCString();
+    }
+  }, {
+    key: 'getShortUTCDateFormat',
+    value: function getShortUTCDateFormat(date) {
+      var year = parseInt(date.substring(0, 4), 10);
+      var month = parseInt(date.substring(4, 6), 10) - 1;
+      var day = parseInt(date.substring(6, 8), 10);
+      var niceTime = new Date(Date.UTC(year, month, day));
+      return niceTime.toDateString();
     }
   }, {
     key: 'getYear',
@@ -3138,6 +3173,45 @@ var TimestampHeader = function (_React$Component) {
       );
     }
   }, {
+    key: 'showInfo',
+    value: function showInfo() {
+      return react.createElement(
+        'div',
+        null,
+        this.state.headerInfo,
+        react.createElement(
+          'p',
+          { id: 'timestamp-p-left' },
+          'Please select a capture'
+        ),
+        react.createElement(
+          'p',
+          { id: 'timestamp-p-right' },
+          'Please select a capture'
+        ),
+        react.createElement('br', null)
+      );
+    }
+  }, {
+    key: 'showOpenLinks',
+    value: function showOpenLinks() {
+      return react.createElement(
+        'div',
+        null,
+        react.createElement(
+          'a',
+          { href: '/web/' + this.props.timestampA + '/' + this.props.site, id: 'timestamp-a-left', target: '_blank', rel: 'noopener' },
+          'Open in new window'
+        ),
+        react.createElement(
+          'a',
+          { href: '/web/' + this.props.timestampB + '/' + this.props.site, id: 'timestamp-a-right', target: '_blank', rel: 'noopener' },
+          'Open in new window'
+        ),
+        react.createElement('br', null)
+      );
+    }
+  }, {
     key: 'notFound',
     value: function notFound() {
       return react.createElement(
@@ -3158,6 +3232,26 @@ var TimestampHeader = function (_React$Component) {
     value: function selectValues() {
       document.getElementById('timestamp-select-left').value = this.props.timestampA;
       document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    }
+  }, {
+    key: 'getHeaderInfo',
+    value: function getHeaderInfo(data) {
+      if (data) {
+        var first = this.getShortUTCDateFormat(data[0][0]);
+        var last = this.getShortUTCDateFormat(data[data.length - 1][0]);
+
+        return react.createElement(
+          'p',
+          { id: 'explanation-middle' },
+          ' Compare any two captures from our collection of ',
+          data.length,
+          ', dating from ',
+          first,
+          ' to ',
+          last,
+          '.'
+        );
+      }
     }
   }]);
   return TimestampHeader;

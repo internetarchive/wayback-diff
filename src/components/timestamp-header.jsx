@@ -216,7 +216,6 @@ export default class TimestampHeader extends React.Component {
   showOpenLinks(){
     return (
       <div>
-        {this.state.headerInfo}
         <a href={'/web/'+this.props.timestampA+'/'+this.props.site} id="timestamp-a-left" target="_blank" rel="noopener">
           Open in new window</a>
         <a href={'/web/'+this.props.timestampB+'/'+this.props.site} id="timestamp-a-right" target="_blank" rel="noopener">
