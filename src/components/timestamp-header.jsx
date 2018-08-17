@@ -127,7 +127,8 @@ export default class TimestampHeader extends React.Component {
       leftSnaps : data,
       rightSnaps : data,
       leftSnapElements : this.prepareOptionElements(data),
-      rightSnapElements : this.prepareOptionElements(data)
+      rightSnapElements : this.prepareOptionElements(data),
+      headerInfo: this.getHeaderInfo(data)
     });
   }
 
@@ -137,7 +138,6 @@ export default class TimestampHeader extends React.Component {
       var yearGroup = this.getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
-
     for (let i = 0; i < data.length; i++){
       let utcTime = this.getUTCDateFormat(data[i][0]);
       var year = this.getYear(data[i][0]);
@@ -162,6 +162,14 @@ export default class TimestampHeader extends React.Component {
     return (niceTime.toUTCString());
   }
 
+  getShortUTCDateFormat (date){
+    let year = parseInt(date.substring(0,4), 10);
+    let month = parseInt(date.substring(4,6), 10) - 1;
+    let day = parseInt(date.substring(6,8), 10);
+    let niceTime = new Date(Date.UTC(year, month, day));
+    return (niceTime.toDateString());
+  }
+
   getYear (date) {
     return parseInt(date.substring(0,4), 10);
   }
@@ -178,15 +186,18 @@ export default class TimestampHeader extends React.Component {
 
   showTimestampSelector () {
     return (
-      <div className="timestamp-container-view">
-        <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
-          {this.state.leftSnapElements}
-        </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
-        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
-        <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
-          {this.state.rightSnapElements}
-        </select>
+      <div>
+        {this.state.headerInfo}
+        <div className="timestamp-container-view">
+          <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
+            {this.state.leftSnapElements}
+          </select>
+          <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
+          <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
+          <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
+            {this.state.rightSnapElements}
+          </select>
+        </div>
       </div>
     );
   }
@@ -202,5 +213,14 @@ export default class TimestampHeader extends React.Component {
   selectValues () {
     document.getElementById('timestamp-select-left').value = this.props.timestampA;
     document.getElementById('timestamp-select-right').value = this.props.timestampB;
+  }
+
+  getHeaderInfo (data) {
+    if (data) {
+      let first = this.getShortUTCDateFormat(data[0][0]);
+      let last = this.getShortUTCDateFormat(data[data.length-1][0]);
+
+      return (<p id='explanation-middle'> Compare any two captures from our collection of {data.length}, dating from {first} to {last}.</p>);
+    }
   }
 }
