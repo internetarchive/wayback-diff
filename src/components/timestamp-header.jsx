@@ -70,6 +70,7 @@ export default class TimestampHeader extends React.Component {
         <div className="timestamp-header-view">
           {this.showInfo()}
           {this.showTimestampSelector()}
+          {this.showOpenLinks()}
         </div>
       );
     }
@@ -207,6 +208,19 @@ export default class TimestampHeader extends React.Component {
         {this.state.headerInfo}
         <p id="timestamp-p-left">Please select a capture</p>
         <p id="timestamp-p-right">Please select a capture</p>
+        <br/>
+      </div>
+    );
+  }
+
+  showOpenLinks(){
+    return (
+      <div>
+        {this.state.headerInfo}
+        <a href={'/web/'+this.props.timestampA+'/'+this.props.site} id="timestamp-a-left" target="_blank" rel="noopener">
+          Open in new window</a>
+        <a href={'/web/'+this.props.timestampB+'/'+this.props.site} id="timestamp-a-right" target="_blank" rel="noopener">
+          Open in new window</a>
         <br/>
       </div>
     );

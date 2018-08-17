@@ -43,3 +43,15 @@ green-diff-footer{
     position: absolute;
     right: 1%;
 }
+
+#timestamp-a-left{
+    display: inline-block;
+    position: absolute;
+    left: 1%;
+}
+
+#timestamp-a-right{
+    display: inline-block;
+    position: absolute;
+    right: 1%;
+}
