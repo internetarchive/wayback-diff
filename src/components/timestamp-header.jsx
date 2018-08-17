@@ -59,6 +59,7 @@ export default class TimestampHeader extends React.Component {
     if (this.state.showDiff) {
       return(
         <div className="timestamp-header-view">
+          {this.showInfo()}
           {this.showTimestampSelector()}
           {this.exportParams()}
         </div>
@@ -67,6 +68,7 @@ export default class TimestampHeader extends React.Component {
     if (this.state.cdxData) {
       return (
         <div className="timestamp-header-view">
+          {this.showInfo()}
           {this.showTimestampSelector()}
         </div>
       );
@@ -186,18 +188,26 @@ export default class TimestampHeader extends React.Component {
 
   showTimestampSelector () {
     return (
+      <div className="timestamp-container-view">
+        <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
+          {this.state.leftSnapElements}
+        </select>
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
+        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
+        <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
+          {this.state.rightSnapElements}
+        </select>
+      </div>
+    );
+  }
+
+  showInfo(){
+    return (
       <div>
         {this.state.headerInfo}
-        <div className="timestamp-container-view">
-          <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
-            {this.state.leftSnapElements}
-          </select>
-          <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
-          <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
-          <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
-            {this.state.rightSnapElements}
-          </select>
-        </div>
+        <p id="timestamp-p-left">Please select a capture</p>
+        <p id="timestamp-p-right">Please select a capture</p>
+        <br/>
       </div>
     );
   }

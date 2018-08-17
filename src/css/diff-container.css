@@ -31,3 +31,15 @@ green-diff-footer{
 #explanation-middle{
     text-align: center;
 }
+
+#timestamp-p-left{
+    display: inline-block;
+    position: absolute;
+    left: 1%;
+}
+
+#timestamp-p-right{
+    display: inline-block;
+    position: absolute;
+    right: 1%;
+}
