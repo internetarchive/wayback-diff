@@ -5,6 +5,7 @@
 .timestamp-container-view{
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 #diff-footer{
