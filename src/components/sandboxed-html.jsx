@@ -24,6 +24,7 @@ export default class SandboxedHtml extends React.PureComponent {
 
   componentDidMount () {
     this._updateContent();
+    this.addLoaderImg();
   }
 
   componentDidUpdate () {
@@ -31,9 +32,10 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   render () {
-    return <iframe height={window.innerHeight} scrolling={'no'} onLoad={()=>{this.handleHeight();}}
-      sandbox="allow-same-origin allow-forms allow-scripts"
-      ref={frame => this._frame = frame}
+    return <iframe height={window.innerHeight} scrolling={'no'} onLoad={()=>{this.handleHeight();
+      this.removeLoaderImg();}}
+    sandbox="allow-same-origin allow-forms allow-scripts"
+    ref={frame => this._frame = frame}
     />;
   }
 
@@ -55,6 +57,25 @@ export default class SandboxedHtml extends React.PureComponent {
     } else {
       this._frame.height = 0.5 * this._frame.height;
     }
+  }
+
+  removeLoaderImg () {
+    this._frame.loaderImage.parentNode.removeChild(this._frame.loaderImage);
+  }
+
+  addLoaderImg () {
+    let width = this._frame.contentDocument.scrollingElement.offsetWidth;
+    let height = this._frame.contentDocument.scrollingElement.offsetHeight;
+
+    let centerX = this._frame.offsetLeft + width / 2;
+    let centerY = this._frame.offsetTop + height / 2;
+
+    var elem = document.createElement('img');
+    var cssText = 'position:absolute;left:'+centerX+'px;top:'+centerY+'px;';
+    elem.setAttribute('style', cssText);
+    elem.src='https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif';
+    document.body.appendChild(elem);
+    this._frame.loaderImage = elem;
   }
 }
 
