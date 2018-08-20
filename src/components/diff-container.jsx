@@ -5,7 +5,7 @@ import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import Loading from './loading.jsx';
 import { Redirect } from 'react-router-dom';
-
+import isStrUrl from '../js/utils.js';
 /**
  * Display a change between two versions of a page.
  *
@@ -197,8 +197,7 @@ export default class DiffContainer extends React.Component {
   }
 
   urlIsInvalid () {
-    const regex = /([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
-    return (!regex.test(this.props.site));
+    return (!isStrUrl(this.props.site));
   }
 
   invalidURL () {
