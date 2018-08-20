@@ -1,4 +1,7 @@
+/*eslint-disable no-useless-escape*/
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
+/*eslint-enable no-useless-escape*/
+
 
 function hasWhiteSpace(s) {
   return s.indexOf(' ') >= 0;
@@ -12,6 +15,7 @@ function startsWith(str, start) {
   return str.indexOf(start) === 0;
 }
 
+/*eslint-disable no-mixed-operators*/
 export default function isStrUrl(str = '') {
   const processedValue = str.toLocaleLowerCase();
   return (
@@ -21,3 +25,4 @@ export default function isStrUrl(str = '') {
     looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)
   ) && !startsWith(processedValue, 'site:');
 }
+/*eslint-enable no-mixed-operators*/

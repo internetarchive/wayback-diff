@@ -218,17 +218,23 @@ export default class TimestampHeader extends React.Component {
 
   showOpenLinks(){
     if(!this.props.isInitial) {
-      return (
+      if (this.props.timestampA) {
+        var aLeft = (<a href={'/web/' + this.props.timestampA + '/' + this.props.site}
+          id="timestamp-a-left" target="_blank" rel="noopener"> Open in new window</a>);
+      }
+      if (this.props.timestampB) {
+        var aRight = (<a href={'/web/' + this.props.timestampB + '/' + this.props.site}
+          id="timestamp-a-right" target="_blank" rel="noopener">
+          Open in new window</a>);
+      }
+      let div = (
         <div>
-          <a href={'/web/' + this.props.timestampA + '/' + this.props.site} id="timestamp-a-left" target="_blank"
-            rel="noopener">
-            Open in new window</a>
-          <a href={'/web/' + this.props.timestampB + '/' + this.props.site} id="timestamp-a-right" target="_blank"
-            rel="noopener">
-            Open in new window</a>
+          {aLeft}
+          {aRight}
           <br/>
         </div>
       );
+      return div;
     }
   }
 
