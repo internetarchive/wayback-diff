@@ -169,8 +169,11 @@ export default class TimestampHeader extends React.Component {
     let year = parseInt(date.substring(0,4), 10);
     let month = parseInt(date.substring(4,6), 10) - 1;
     let day = parseInt(date.substring(6,8), 10);
-    let niceTime = new Date(Date.UTC(year, month, day));
-    return (niceTime.toDateString());
+    var shortTime = new Date(Date.UTC(year, month, day));
+    shortTime = shortTime.toUTCString();
+    shortTime = shortTime.split(' ');
+    let retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2];
+    return (retTime);
   }
 
   getYear (date) {
