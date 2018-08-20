@@ -7,29 +7,25 @@ import React from 'react';
 // import DiffContainer from './components/diff-container.jsx';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 //
-// let webMonitoringProcessingURL= 'http://localhost';
-// let webMonitoringProcessingPort= '8888';
+// let webMonitoringProcessingURL= 'http://localhost:8888';
 //
 // ReactDOM.render(<Router>
 //   <Switch>
 //     <Route path="/diff/([^/]*)/([^/]*)/(.+)" render={({match}) =>
 //       <DiffContainer site={match.params[2]} timestampA={match.params[0]}
 //         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
-//         webMonitoringProcessingPort={webMonitoringProcessingPort}
 //         waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}
 //         timestampB={match.params[1]} fetchCallback = {null} />
 //     }/>
 //     <Route path="/diff/:timestampA//:site" render={({match}) =>
 //       <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
 //         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
-//         webMonitoringProcessingPort={webMonitoringProcessingPort}
 //         noSnapshotURL={'https://users.it.teithe.gr/~it133996/noSnapshot.html'}
 //         waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>
 //     }/>
 //     <Route path="/diff//:timestampB/:site" render={({match}) =>
 //       <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
 //         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
-//         webMonitoringProcessingPort={webMonitoringProcessingPort}
 //         noSnapshotURL={'https://users.it.teithe.gr/~it133996/noSnapshot.html'}
 //         waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>
 //     }/>
@@ -37,7 +33,6 @@ import React from 'react';
 //       <DiffContainer site={match.params.site} fetchCallback = {null}
 //         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
 //         waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}
-//         webMonitoringProcessingPort={webMonitoringProcessingPort}
 //       />} />
 //   </Switch>
 // </Router>, document.getElementById('wayback-diff'));

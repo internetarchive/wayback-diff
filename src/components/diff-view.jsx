@@ -181,8 +181,8 @@ export default class DiffView extends React.Component {
         .then(data => this.setState({diffData: data}));
     }
     let url;
-    if (this.props.webMonitoringProcessingURL && this.props.webMonitoringProcessingPort) {
-      url = `${this.props.webMonitoringProcessingURL}:${this.props.webMonitoringProcessingPort}/`;
+    if (this.props.webMonitoringProcessingURL) {
+      url = `${this.props.webMonitoringProcessingURL}/`;
     } else {
       url = 'http://localhost:8888/';
     }

@@ -119,8 +119,8 @@ export default class DiffContainer extends React.Component {
       let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
       return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
-        webMonitoringProcessingPort={this.props.webMonitoringProcessingPort} page={{url: this.props.site}}
-        diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB} waybackLoaderPath={this.props.waybackLoaderPath}/>);
+        page={{url: this.props.site}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
+        waybackLoaderPath={this.props.waybackLoaderPath}/>);
     }
   }
 
