@@ -2911,8 +2911,8 @@ var DiffView = function (_React$Component) {
         });
       }
       var url = void 0;
-      if (this.props.webMonitoringProcessingURL && this.props.webMonitoringProcessingPort) {
-        url = this.props.webMonitoringProcessingURL + ':' + this.props.webMonitoringProcessingPort + '/';
+      if (this.props.webMonitoringProcessingURL) {
+        url = this.props.webMonitoringProcessingURL + '/';
       } else {
         url = 'http://localhost:8888/';
       }
@@ -3125,8 +3125,11 @@ var TimestampHeader = function (_React$Component) {
       var year = parseInt(date.substring(0, 4), 10);
       var month = parseInt(date.substring(4, 6), 10) - 1;
       var day = parseInt(date.substring(6, 8), 10);
-      var niceTime = new Date(Date.UTC(year, month, day));
-      return niceTime.toDateString();
+      var shortTime = new Date(Date.UTC(year, month, day));
+      shortTime = shortTime.toUTCString();
+      shortTime = shortTime.split(' ');
+      var retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
+      return retTime;
     }
   }, {
     key: 'getYear',
@@ -3195,21 +3198,32 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: 'showOpenLinks',
     value: function showOpenLinks() {
-      return react.createElement(
-        'div',
-        null,
-        react.createElement(
-          'a',
-          { href: '/web/' + this.props.timestampA + '/' + this.props.site, id: 'timestamp-a-left', target: '_blank', rel: 'noopener' },
-          'Open in new window'
-        ),
-        react.createElement(
-          'a',
-          { href: '/web/' + this.props.timestampB + '/' + this.props.site, id: 'timestamp-a-right', target: '_blank', rel: 'noopener' },
-          'Open in new window'
-        ),
-        react.createElement('br', null)
-      );
+      if (!this.props.isInitial) {
+        if (this.props.timestampA) {
+          var aLeft = react.createElement(
+            'a',
+            { href: '/web/' + this.props.timestampA + '/' + this.props.site,
+              id: 'timestamp-a-left', target: '_blank', rel: 'noopener' },
+            ' Open in new window'
+          );
+        }
+        if (this.props.timestampB) {
+          var aRight = react.createElement(
+            'a',
+            { href: '/web/' + this.props.timestampB + '/' + this.props.site,
+              id: 'timestamp-a-right', target: '_blank', rel: 'noopener' },
+            'Open in new window'
+          );
+        }
+        var div = react.createElement(
+          'div',
+          null,
+          aLeft,
+          aRight,
+          react.createElement('br', null)
+        );
+        return div;
+      }
     }
   }, {
     key: 'notFound',
@@ -6559,6 +6573,31 @@ Switch.propTypes = {
 
 // Written in this round about way for babel-transform-imports
 
+/*eslint-disable no-useless-escape*/
+var urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
+/*eslint-enable no-useless-escape*/
+
+function hasWhiteSpace(s) {
+  return s.indexOf(' ') >= 0;
+}
+
+function looksLikeUrl(str) {
+  return !!str.match(urlRegex);
+}
+
+function startsWith(str, start) {
+  return str.indexOf(start) === 0;
+}
+
+/*eslint-disable no-mixed-operators*/
+function isStrUrl() {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+  var processedValue = str.toLocaleLowerCase();
+  return (startsWith(processedValue, 'ftp://') || startsWith(processedValue, 'http://') || startsWith(processedValue, 'https://') || looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)) && !startsWith(processedValue, 'site:');
+}
+/*eslint-enable no-mixed-operators*/
+
 /**
  * Display a change between two versions of a page.
  *
@@ -6696,8 +6735,8 @@ var DiffContainer = function (_React$Component) {
         var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
-          webMonitoringProcessingPort: this.props.webMonitoringProcessingPort, page: { url: this.props.site },
-          diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB, waybackLoaderPath: this.props.waybackLoaderPath });
+          page: { url: this.props.site }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
+          waybackLoaderPath: this.props.waybackLoaderPath });
       }
     }
   }, {
@@ -6784,8 +6823,7 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: 'urlIsInvalid',
     value: function urlIsInvalid() {
-      var regex = /([a-z][a-z0-9+\-.]*)\.([a-z0-9+\-/.]+)/;
-      return !regex.test(this.props.site);
+      return !isStrUrl(this.props.site);
     }
   }, {
     key: 'invalidURL',
