@@ -172,7 +172,7 @@ export default class TimestampHeader extends React.Component {
     var shortTime = new Date(Date.UTC(year, month, day));
     shortTime = shortTime.toUTCString();
     shortTime = shortTime.split(' ');
-    let retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2];
+    let retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
     return (retTime);
   }
 
