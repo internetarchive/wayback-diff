@@ -255,8 +255,10 @@ export default class TimestampHeader extends React.Component {
     if (data) {
       let first = this.getShortUTCDateFormat(data[0][0]);
       let last = this.getShortUTCDateFormat(data[data.length-1][0]);
-
-      return (<p id='explanation-middle'> Compare any two captures from our collection of {data.length}, dating from {first} to {last}.</p>);
+      const numberWithCommas = (x) => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      };
+      return (<p id='explanation-middle'> Compare any two captures from our collection of {numberWithCommas(data.length)} dating from {first} to {last}.</p>);
     }
   }
 }
