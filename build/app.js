@@ -1986,6 +1986,20 @@ var createClass = function () {
   };
 }();
 
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
@@ -2047,27 +2061,6 @@ var slicedToArray = function () {
     }
   };
 }();
-
-var Loading = function (_React$Component) {
-  inherits(Loading, _React$Component);
-
-  function Loading() {
-    classCallCheck(this, Loading);
-    return possibleConstructorReturn(this, (Loading.__proto__ || Object.getPrototypeOf(Loading)).apply(this, arguments));
-  }
-
-  createClass(Loading, [{
-    key: "render",
-    value: function render() {
-      return react.createElement(
-        "div",
-        { className: "loading" },
-        react.createElement("img", { src: this.props.waybackLoaderPath })
-      );
-    }
-  }]);
-  return Loading;
-}(react.Component);
 
 /**
  * Display a single deleted/added/unchanged element within a diff
@@ -2781,8 +2774,13 @@ var DiffView = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       if (!this.state.diffData) {
-        return react.createElement(Loading, { waybackLoaderPath: this.props.waybackLoaderPath });
+        var Loader = function Loader() {
+          return _this2.props.loader;
+        };
+        return react.createElement(Loader, null);
       }
       return react.createElement(
         'div',
@@ -2890,7 +2888,7 @@ var DiffView = function (_React$Component) {
   }, {
     key: '_loadDiffData',
     value: function _loadDiffData(page, a, b, diffType) {
-      var _this2 = this;
+      var _this3 = this;
 
       // TODO - this seems to be some sort of caching mechanism, would be smart to have this for diffs
       // const fromList = this.props.pages && this.props.pages.find(
@@ -2907,7 +2905,7 @@ var DiffView = function (_React$Component) {
         }).catch(function (error) {
           return error;
         }).then(function (data) {
-          return _this2.setState({ diffData: data });
+          return _this3.setState({ diffData: data });
         });
       }
       var url = void 0;
@@ -2920,7 +2918,7 @@ var DiffView = function (_React$Component) {
       fetch(url).then(function (response) {
         return response.json();
       }).then(function (data) {
-        _this2.setState({
+        _this3.setState({
           diffData: data
         });
       });
@@ -2993,6 +2991,12 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
+      var Loader = function Loader() {
+        return _this2.props.loader;
+      };
+
       if (this.state.showNotFound) {
         return react.createElement(
           'div',
@@ -3021,8 +3025,8 @@ var TimestampHeader = function (_React$Component) {
       return react.createElement(
         'div',
         null,
-        react.createElement(Loading, { waybackLoaderPath: this.props.waybackLoaderPath }),
-        this.widgetRender()
+        this.widgetRender(),
+        react.createElement(Loader, null)
       );
     }
   }, {
@@ -3035,13 +3039,13 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: 'widgetRender',
     value: function widgetRender() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.props.fetchCallback) {
         this.props.fetchCallback().then(function (data) {
-          _this2.prepareData(data);
-          if (!_this2.props.isInitial) {
-            _this2.selectValues();
+          _this3.prepareData(data);
+          if (!_this3.props.isInitial) {
+            _this3.selectValues();
           }
         });
       } else {
@@ -3057,15 +3061,15 @@ var TimestampHeader = function (_React$Component) {
           if (data && data.length > 0) {
             if (data.length === 2) {
               var timestamp = data[1][0];
-              window.location.href = '/diff/' + timestamp + '//' + _this2.props.site;
+              window.location.href = '/diff/' + timestamp + '//' + _this3.props.site;
             }
-            _this2.prepareData(data);
-            if (!_this2.props.isInitial) {
-              _this2.selectValues();
+            _this3.prepareData(data);
+            if (!_this3.props.isInitial) {
+              _this3.selectValues();
             }
           } else {
-            _this2.props.snapshotsNotFoundCallback();
-            _this2.setState({ showNotFound: true });
+            _this3.props.snapshotsNotFoundCallback();
+            _this3.setState({ showNotFound: true });
           }
         });
       }
@@ -3253,13 +3257,15 @@ var TimestampHeader = function (_React$Component) {
       if (data) {
         var first = this.getShortUTCDateFormat(data[0][0]);
         var last = this.getShortUTCDateFormat(data[data.length - 1][0]);
-
+        var numberWithCommas = function numberWithCommas(x) {
+          return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        };
         return react.createElement(
           'p',
           { id: 'explanation-middle' },
           ' Compare any two captures from our collection of ',
-          data.length,
-          ', dating from ',
+          numberWithCommas(data.length),
+          ' dating from ',
           first,
           ' to ',
           last,
@@ -6598,6 +6604,17 @@ function isStrUrl() {
 }
 /*eslint-enable no-mixed-operators*/
 
+function loadJSON(path) {
+
+  var xobj = new XMLHttpRequest();
+  xobj.overrideMimeType('application/json');
+  xobj.open('GET', path, false);
+  xobj.send(null);
+  if (xobj.readyState === 4 && xobj.status === '200') {
+    return xobj.responseText;
+  }
+}
+
 /**
  * Display a change between two versions of a page.
  *
@@ -6632,6 +6649,12 @@ var DiffContainer = function (_React$Component) {
       this.setState({ showNotFound: true });
     }
   }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.conf = loadJSON(this.props.pathToConf);
+      console.log(this.conf);
+    }
+  }, {
     key: 'render',
     value: function render() {
       if (this.urlIsInvalid()) {
@@ -6649,11 +6672,9 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
-            timestampB: this.props.timestampB, isInitial: false,
-            waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback,
-            snapshotsNotFoundCallback: this.snapshotsNotFound }),
+          react.createElement(TimestampHeader, _extends({ isInitial: false
+          }, this.props, {
+            snapshotsNotFoundCallback: this.snapshotsNotFound })),
           this.prepareDiffView(),
           react.createElement(DiffFooter, null)
         );
@@ -6662,9 +6683,8 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, { site: this.props.site, timestampA: this.props.timestampA, limit: this.props.limit,
-            isInitial: false, waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound }),
+          react.createElement(TimestampHeader, _extends({}, this.props, {
+            isInitial: false, snapshotsNotFoundCallback: this.snapshotsNotFound })),
           this.showLeftSnapshot()
         );
       }
@@ -6672,19 +6692,16 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, { site: this.props.site, limit: this.props.limit,
-            timestampB: this.props.timestampB, isInitial: false,
-            waybackLoaderPath: this.props.waybackLoaderPath,
-            fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound }),
+          react.createElement(TimestampHeader, _extends({ isInitial: false }, this.props, {
+            snapshotsNotFoundCallback: this.snapshotsNotFound })),
           this.showRightSnapshot()
         );
       }
       return react.createElement(
         'div',
         { className: 'diffcontainer-view' },
-        react.createElement(TimestampHeader, { isInitial: true, limit: this.props.limit,
-          site: this.props.site, waybackLoaderPath: this.props.waybackLoaderPath,
-          fetchCallback: this.props.fetchCallback, snapshotsNotFoundCallback: this.snapshotsNotFound })
+        react.createElement(TimestampHeader, _extends({ isInitial: true }, this.props, {
+          snapshotsNotFoundCallback: this.snapshotsNotFound }))
       );
     }
   }, {
@@ -6725,7 +6742,10 @@ var DiffContainer = function (_React$Component) {
       }).then(function (responseText) {
         _this2.setState({ fetchedRaw: responseText });
       });
-      return react.createElement(Loading, null);
+      var Loader = function Loader() {
+        return _this2.props.loader;
+      };
+      return react.createElement(Loader, null);
     }
   }, {
     key: 'prepareDiffView',
@@ -6736,7 +6756,7 @@ var DiffContainer = function (_React$Component) {
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
           page: { url: this.props.site }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
-          waybackLoaderPath: this.props.waybackLoaderPath });
+          loader: this.props.loader });
       }
     }
   }, {
@@ -6772,11 +6792,6 @@ var DiffContainer = function (_React$Component) {
       });
     }
   }, {
-    key: 'redirectToValTimestamps',
-    value: function redirectToValTimestamps() {
-      return react.createElement(Redirect, { push: true, to: '/target' });
-    }
-  }, {
     key: 'showRightSnapshot',
     value: function showRightSnapshot() {
       var _this4 = this;
@@ -6808,7 +6823,10 @@ var DiffContainer = function (_React$Component) {
       }).then(function (responseText) {
         _this4.setState({ fetchedRaw: responseText });
       });
-      return react.createElement(Loading, null);
+      var Loader = function Loader() {
+        return _this4.props.loader;
+      };
+      return react.createElement(Loader, null);
     }
   }, {
     key: 'handleHeight',
