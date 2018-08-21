@@ -4,7 +4,8 @@ import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
-import isStrUrl from '../js/utils.js';
+import {isStrUrl} from '../js/utils.js';
+import {loadJSON} from '../js/utils.js';
 /**
  * Display a change between two versions of a page.
  *
@@ -14,6 +15,7 @@ import isStrUrl from '../js/utils.js';
 export default class DiffContainer extends React.Component {
   timestampsValidated = false;
   redirectToValidatedTimestamps = false;
+  conf;
   constructor (props) {
     super(props);
     this.state = {
@@ -27,6 +29,11 @@ export default class DiffContainer extends React.Component {
 
   snapshotsNotFound () {
     this.setState({showNotFound: true});
+  }
+
+  componentDidMount() {
+    this.conf = loadJSON(this.props.pathToConf);
+    console.log(this.conf);
   }
 
   render () {

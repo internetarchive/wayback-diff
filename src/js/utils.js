@@ -16,7 +16,7 @@ function startsWith(str, start) {
 }
 
 /*eslint-disable no-mixed-operators*/
-export default function isStrUrl(str = '') {
+export function isStrUrl(str = '') {
   const processedValue = str.toLocaleLowerCase();
   return (
     startsWith(processedValue, 'ftp://') ||
@@ -26,3 +26,17 @@ export default function isStrUrl(str = '') {
   ) && !startsWith(processedValue, 'site:');
 }
 /*eslint-enable no-mixed-operators*/
+
+
+export function loadJSON(path) {
+
+  var xobj = new XMLHttpRequest();
+  xobj.overrideMimeType('application/json');
+  xobj.open('GET', path, false);
+  xobj.send(null);
+  if (xobj.readyState === 4 && xobj.status === '200') {
+    return(xobj.responseText);
+  }
+
+
+}

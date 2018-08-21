@@ -34,7 +34,8 @@ import React from 'react';
 //       <DiffContainer site={match.params.site} fetchCallback = {null}
 //         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
 //         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>}
-//       />} />
+//         pathToConf={'../conf.json'}/>}
+//     />
 //   </Switch>
 // </Router>, document.getElementById('wayback-diff'));
 
