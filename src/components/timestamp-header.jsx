@@ -1,5 +1,4 @@
 import React from 'react';
-import Loading from './loading.jsx';
 import '../css/diff-container.css';
 
 /**
@@ -50,6 +49,8 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
+    const Loader = () => this.props.loader;
+
     if (this.state.showNotFound){
       return(
         <div>
@@ -75,8 +76,8 @@ export default class TimestampHeader extends React.Component {
       );
     }
     return (<div>
-      <Loading waybackLoaderPath={this.props.waybackLoaderPath}/>
       {this.widgetRender()}
+      <Loader/>
     </div>
     );
   }

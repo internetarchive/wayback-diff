@@ -3,7 +3,6 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import Loading from './loading.jsx';
 import { Redirect } from 'react-router-dom';
 import isStrUrl from '../js/utils.js';
 /**
@@ -43,10 +42,8 @@ export default class DiffContainer extends React.Component {
     if (this.props.timestampA && this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site={this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
-            timestampB={this.props.timestampB} isInitial={false}
-            waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback={this.props.fetchCallback}
+          <TimestampHeader isInitial={false}
+            {...this.props}
             snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.prepareDiffView()}
           <DiffFooter/>
@@ -55,27 +52,23 @@ export default class DiffContainer extends React.Component {
     if (this.props.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site={this.props.site} timestampA={this.props.timestampA} limit={this.props.limit}
-            isInitial={false} waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          <TimestampHeader {...this.props}
+            isInitial={false} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showLeftSnapshot()}
         </div>);
     }
     if (this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader site={this.props.site} limit={this.props.limit}
-            timestampB={this.props.timestampB} isInitial={false}
-            waybackLoaderPath={this.props.waybackLoaderPath}
-            fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+          <TimestampHeader isInitial={false} {...this.props}
+            snapshotsNotFoundCallback={this.snapshotsNotFound}/>
           {this.showRightSnapshot()}
         </div>);
     }
     return (
       <div className="diffcontainer-view">
-        <TimestampHeader isInitial={true} limit={this.props.limit}
-          site={this.props.site} waybackLoaderPath={this.props.waybackLoaderPath}
-          fetchCallback={this.props.fetchCallback} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+        <TimestampHeader isInitial={true} {...this.props}
+          snapshotsNotFoundCallback={this.snapshotsNotFound}/>
       </div>
     );
   }
@@ -110,7 +103,8 @@ export default class DiffContainer extends React.Component {
       }).then((responseText) => {
         this.setState({fetchedRaw: responseText});
       });
-    return(<Loading/>);
+    const Loader = () => this.props.loader;
+    return <Loader/>;
   }
 
   prepareDiffView(){
@@ -120,7 +114,7 @@ export default class DiffContainer extends React.Component {
 
       return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
         page={{url: this.props.site}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        waybackLoaderPath={this.props.waybackLoaderPath}/>);
+        loader={this.props.loader}/>);
     }
   }
 
@@ -155,10 +149,6 @@ export default class DiffContainer extends React.Component {
       });
   }
 
-  redirectToValTimestamps(){
-    return (<Redirect push to='/target' />);
-  }
-
   showRightSnapshot () {
     if(this.state.fetchedRaw){
       var urlA;
@@ -184,7 +174,8 @@ export default class DiffContainer extends React.Component {
       }).then((responseText) => {
         this.setState({fetchedRaw: responseText});
       });
-    return(<Loading/>);
+    const Loader = () => this.props.loader;
+    return <Loader/>;
   }
 
   handleHeight () {

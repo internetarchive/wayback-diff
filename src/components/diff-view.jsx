@@ -1,7 +1,6 @@
 import React from 'react';
 import '../css/diff.css';
 import {diffTypes} from '../js/constants/diff-types';
-import Loading from './loading.jsx';
 
 import HighlightedTextDiff from './highlighted-text-diff.jsx';
 import InlineRenderedDiff from './inline-rendered-diff.jsx';
@@ -50,7 +49,8 @@ export default class DiffView extends React.Component {
 
   render () {
     if (!this.state.diffData) {
-      return <Loading waybackLoaderPath={this.props.waybackLoaderPath}/>;
+      const Loader = () => this.props.loader;
+      return <Loader/>;
     }
     return (
       <div className="diff-view">
