@@ -2301,7 +2301,7 @@ var SandboxedHtml = function (_React$PureComponent) {
       var elem = document.createElement('img');
       var cssText = 'position:absolute;left:' + centerX + 'px;top:' + centerY + 'px;';
       elem.setAttribute('style', cssText);
-      elem.src = 'https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif';
+      elem.src = this.props.iframeLoader;
       document.body.appendChild(elem);
       this._frame.loaderImage = elem;
     }
@@ -2427,11 +2427,13 @@ var SideBySideRenderedDiff = function (_React$Component) {
         'div',
         { className: 'side-by-side-render' },
         react.createElement(SandboxedHtml, {
+          iframeLoader: this.props.iframeLoader,
           html: this.props.diffData.deletions || this.props.diffData.diff,
           baseUrl: this.props.page.url,
           transform: transformDeletions
         }),
         react.createElement(SandboxedHtml, {
+          iframeLoader: this.props.iframeLoader,
           html: this.props.diffData.insertions || this.props.diffData.diff,
           baseUrl: this.props.page.url,
           transform: transformInsertions
@@ -2840,7 +2842,8 @@ var DiffView = function (_React$Component) {
         case diffTypes.HIGHLIGHTED_RENDERED.value:
           return react.createElement(InlineRenderedDiff, { diffData: this.state.diffData, page: this.props.page });
         case diffTypes.SIDE_BY_SIDE_RENDERED.value:
-          return react.createElement(SideBySideRenderedDiff, { diffData: this.state.diffData, page: this.props.page });
+          return react.createElement(SideBySideRenderedDiff, { diffData: this.state.diffData, page: this.props.page,
+            iframeLoader: this.props.iframeLoader });
         case diffTypes.OUTGOING_LINKS.value:
           return react.createElement(InlineRenderedDiff, { diffData: this.state.diffData, page: this.props.page });
         case diffTypes.HIGHLIGHTED_TEXT.value:
@@ -2908,12 +2911,7 @@ var DiffView = function (_React$Component) {
           return _this3.setState({ diffData: data });
         });
       }
-      var url = void 0;
-      if (this.props.webMonitoringProcessingURL) {
-        url = this.props.webMonitoringProcessingURL + '/';
-      } else {
-        url = 'http://localhost:8888/';
-      }
+      var url = this.props.webMonitoringProcessingURL + '/';
       url += diffTypes[diffType].diffService + '?format=json&include=all&a=' + a + '&b=' + b;
       fetch(url).then(function (response) {
         return response.json();
@@ -2951,20 +2949,20 @@ var TimestampHeader = function (_React$Component) {
       showNotFound: false
     };
 
-    _this.handleLeftTimestampChange = _this.handleLeftTimestampChange.bind(_this);
+    _this._handleLeftTimestampChange = _this._handleLeftTimestampChange.bind(_this);
 
-    _this.handleRightTimestampChange = _this.handleRightTimestampChange.bind(_this);
+    _this._handleRightTimestampChange = _this._handleRightTimestampChange.bind(_this);
 
-    _this.restartPressed = _this.restartPressed.bind(_this);
+    _this._restartPressed = _this._restartPressed.bind(_this);
 
-    _this.showDiffs = _this.showDiffs.bind(_this);
+    _this._showDiffs = _this._showDiffs.bind(_this);
 
     return _this;
   }
 
   createClass(TimestampHeader, [{
-    key: 'handleRightTimestampChange',
-    value: function handleRightTimestampChange() {
+    key: '_handleRightTimestampChange',
+    value: function _handleRightTimestampChange() {
       var selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
       var allowedSnapshots = this.state.cdxData;
       allowedSnapshots = allowedSnapshots.filter(function (hash) {
@@ -2972,12 +2970,12 @@ var TimestampHeader = function (_React$Component) {
       });
       this.setState({
         leftSnaps: allowedSnapshots,
-        leftSnapElements: this.prepareOptionElements(allowedSnapshots)
+        leftSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
   }, {
-    key: 'handleLeftTimestampChange',
-    value: function handleLeftTimestampChange() {
+    key: '_handleLeftTimestampChange',
+    value: function _handleLeftTimestampChange() {
       var selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
       var allowedSnapshots = this.state.cdxData;
       allowedSnapshots = allowedSnapshots.filter(function (hash) {
@@ -2985,7 +2983,7 @@ var TimestampHeader = function (_React$Component) {
       });
       this.setState({
         rightSnaps: allowedSnapshots,
-        rightSnapElements: this.prepareOptionElements(allowedSnapshots)
+        rightSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
   }, {
@@ -3001,59 +2999,59 @@ var TimestampHeader = function (_React$Component) {
         return react.createElement(
           'div',
           null,
-          this.notFound()
+          this._notFound()
         );
       }
       if (this.state.showDiff) {
         return react.createElement(
           'div',
           { className: 'timestamp-header-view' },
-          this.showInfo(),
-          this.showTimestampSelector(),
-          this.exportParams()
+          this._showInfo(),
+          this._showTimestampSelector(),
+          this._exportParams()
         );
       }
       if (this.state.cdxData) {
         return react.createElement(
           'div',
           { className: 'timestamp-header-view' },
-          this.showInfo(),
-          this.showTimestampSelector(),
-          this.showOpenLinks()
+          this._showInfo(),
+          this._showTimestampSelector(),
+          this._showOpenLinks()
         );
       }
       return react.createElement(
         'div',
         null,
-        this.widgetRender(),
+        this._widgetRender(),
         react.createElement(Loader, null)
       );
     }
   }, {
-    key: 'exportParams',
-    value: function exportParams() {
+    key: '_exportParams',
+    value: function _exportParams() {
       var timestampA = document.getElementById('timestamp-select-left').value;
       var timestampB = document.getElementById('timestamp-select-right').value;
-      window.location.href = '/diff/' + timestampA + '/' + timestampB + '/' + this.props.site;
+      window.location.href = '' + this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.site;
     }
   }, {
-    key: 'widgetRender',
-    value: function widgetRender() {
+    key: '_widgetRender',
+    value: function _widgetRender() {
       var _this3 = this;
 
       if (this.props.fetchCallback) {
         this.props.fetchCallback().then(function (data) {
-          _this3.prepareData(data);
+          _this3._prepareData(data);
           if (!_this3.props.isInitial) {
-            _this3.selectValues();
+            _this3._selectValues();
           }
         });
       } else {
         var url;
         if (this.props.limit) {
-          url = 'http://web.archive.org/cdx/search?url=' + this.props.site + '/&status=200&limit=' + this.props.limit + '&fl=timestamp,digest&output=json';
+          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&limit=' + this.props.limit + '&fl=timestamp,digest&output=json';
         } else {
-          url = 'http://web.archive.org/cdx/search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
+          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
         }
         fetch(url).then(function (response) {
           return response.json();
@@ -3061,11 +3059,11 @@ var TimestampHeader = function (_React$Component) {
           if (data && data.length > 0) {
             if (data.length === 2) {
               var timestamp = data[1][0];
-              window.location.href = '/diff/' + timestamp + '//' + _this3.props.site;
+              window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
             }
-            _this3.prepareData(data);
+            _this3._prepareData(data);
             if (!_this3.props.isInitial) {
-              _this3.selectValues();
+              _this3._selectValues();
             }
           } else {
             _this3.props.snapshotsNotFoundCallback();
@@ -3075,29 +3073,29 @@ var TimestampHeader = function (_React$Component) {
       }
     }
   }, {
-    key: 'prepareData',
-    value: function prepareData(data) {
+    key: '_prepareData',
+    value: function _prepareData(data) {
       data.shift();
       this.setState({
         cdxData: data,
         leftSnaps: data,
         rightSnaps: data,
-        leftSnapElements: this.prepareOptionElements(data),
-        rightSnapElements: this.prepareOptionElements(data),
-        headerInfo: this.getHeaderInfo(data)
+        leftSnapElements: this._prepareOptionElements(data),
+        rightSnapElements: this._prepareOptionElements(data),
+        headerInfo: this._getHeaderInfo(data)
       });
     }
   }, {
-    key: 'prepareOptionElements',
-    value: function prepareOptionElements(data) {
+    key: '_prepareOptionElements',
+    value: function _prepareOptionElements(data) {
       var initialSnapshots = [];
       if (data.length > 0) {
-        var yearGroup = this.getYear(data[0][0]);
+        var yearGroup = this._getYear(data[0][0]);
         initialSnapshots.push(react.createElement('optgroup', { key: -1, label: yearGroup }));
       }
       for (var i = 0; i < data.length; i++) {
-        var utcTime = this.getUTCDateFormat(data[i][0]);
-        var year = this.getYear(data[i][0]);
+        var utcTime = this._getUTCDateFormat(data[i][0]);
+        var year = this._getYear(data[i][0]);
         if (year > yearGroup) {
           yearGroup = year;
           initialSnapshots.push(react.createElement('optgroup', { key: -i + 2, label: yearGroup }));
@@ -3111,8 +3109,8 @@ var TimestampHeader = function (_React$Component) {
       return initialSnapshots;
     }
   }, {
-    key: 'getUTCDateFormat',
-    value: function getUTCDateFormat(date) {
+    key: '_getUTCDateFormat',
+    value: function _getUTCDateFormat(date) {
       var year = parseInt(date.substring(0, 4), 10);
       var month = parseInt(date.substring(4, 6), 10) - 1;
       var day = parseInt(date.substring(6, 8), 10);
@@ -3124,8 +3122,8 @@ var TimestampHeader = function (_React$Component) {
       return niceTime.toUTCString();
     }
   }, {
-    key: 'getShortUTCDateFormat',
-    value: function getShortUTCDateFormat(date) {
+    key: '_getShortUTCDateFormat',
+    value: function _getShortUTCDateFormat(date) {
       var year = parseInt(date.substring(0, 4), 10);
       var month = parseInt(date.substring(4, 6), 10) - 1;
       var day = parseInt(date.substring(6, 8), 10);
@@ -3136,52 +3134,52 @@ var TimestampHeader = function (_React$Component) {
       return retTime;
     }
   }, {
-    key: 'getYear',
-    value: function getYear(date) {
+    key: '_getYear',
+    value: function _getYear(date) {
       return parseInt(date.substring(0, 4), 10);
     }
   }, {
-    key: 'restartPressed',
-    value: function restartPressed() {
+    key: '_restartPressed',
+    value: function _restartPressed() {
       var initialData = this.state.cdxData;
       this.setState({
         leftSnaps: initialData,
         rightSnaps: initialData,
-        leftSnapElements: this.prepareOptionElements(initialData),
-        rightSnapElements: this.prepareOptionElements(initialData)
+        leftSnapElements: this._prepareOptionElements(initialData),
+        rightSnapElements: this._prepareOptionElements(initialData)
       });
     }
   }, {
-    key: 'showTimestampSelector',
-    value: function showTimestampSelector() {
+    key: '_showTimestampSelector',
+    value: function _showTimestampSelector() {
       return react.createElement(
         'div',
         { className: 'timestamp-container-view' },
         react.createElement(
           'select',
-          { className: 'form-control', id: 'timestamp-select-left', onChange: this.handleLeftTimestampChange },
+          { className: 'form-control', id: 'timestamp-select-left', onChange: this._handleLeftTimestampChange },
           this.state.leftSnapElements
         ),
         react.createElement(
           'button',
-          { className: 'btn btn-default navbar-btn', id: 'show-diff-btn', onClick: this.showDiffs },
+          { className: 'btn btn-default navbar-btn', id: 'show-diff-btn', onClick: this._showDiffs },
           'Show differences'
         ),
         react.createElement(
           'button',
-          { className: 'btn btn-default navbar-btn', id: 'restart-btn', onClick: this.restartPressed },
+          { className: 'btn btn-default navbar-btn', id: 'restart-btn', onClick: this._restartPressed },
           'Restart'
         ),
         react.createElement(
           'select',
-          { className: 'form-control', id: 'timestamp-select-right', onChange: this.handleRightTimestampChange },
+          { className: 'form-control', id: 'timestamp-select-right', onChange: this._handleRightTimestampChange },
           this.state.rightSnapElements
         )
       );
     }
   }, {
-    key: 'showInfo',
-    value: function showInfo() {
+    key: '_showInfo',
+    value: function _showInfo() {
       return react.createElement(
         'div',
         null,
@@ -3200,13 +3198,13 @@ var TimestampHeader = function (_React$Component) {
       );
     }
   }, {
-    key: 'showOpenLinks',
-    value: function showOpenLinks() {
+    key: '_showOpenLinks',
+    value: function _showOpenLinks() {
       if (!this.props.isInitial) {
         if (this.props.timestampA) {
           var aLeft = react.createElement(
             'a',
-            { href: '/web/' + this.props.timestampA + '/' + this.props.site,
+            { href: this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site,
               id: 'timestamp-a-left', target: '_blank', rel: 'noopener' },
             ' Open in new window'
           );
@@ -3214,7 +3212,7 @@ var TimestampHeader = function (_React$Component) {
         if (this.props.timestampB) {
           var aRight = react.createElement(
             'a',
-            { href: '/web/' + this.props.timestampB + '/' + this.props.site,
+            { href: this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site,
               id: 'timestamp-a-right', target: '_blank', rel: 'noopener' },
             'Open in new window'
           );
@@ -3230,8 +3228,8 @@ var TimestampHeader = function (_React$Component) {
       }
     }
   }, {
-    key: 'notFound',
-    value: function notFound() {
+    key: '_notFound',
+    value: function _notFound() {
       return react.createElement(
         'div',
         { className: 'alert alert-warning', role: 'alert' },
@@ -3241,22 +3239,22 @@ var TimestampHeader = function (_React$Component) {
       );
     }
   }, {
-    key: 'showDiffs',
-    value: function showDiffs() {
+    key: '_showDiffs',
+    value: function _showDiffs() {
       this.setState({ showDiff: true });
     }
   }, {
-    key: 'selectValues',
-    value: function selectValues() {
+    key: '_selectValues',
+    value: function _selectValues() {
       document.getElementById('timestamp-select-left').value = this.props.timestampA;
       document.getElementById('timestamp-select-right').value = this.props.timestampB;
     }
   }, {
-    key: 'getHeaderInfo',
-    value: function getHeaderInfo(data) {
+    key: '_getHeaderInfo',
+    value: function _getHeaderInfo(data) {
       if (data) {
-        var first = this.getShortUTCDateFormat(data[0][0]);
-        var last = this.getShortUTCDateFormat(data[data.length - 1][0]);
+        var first = this._getShortUTCDateFormat(data[0][0]);
+        var last = this._getShortUTCDateFormat(data[data.length - 1][0]);
         var numberWithCommas = function numberWithCommas(x) {
           return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         };
@@ -6604,17 +6602,6 @@ function isStrUrl() {
 }
 /*eslint-enable no-mixed-operators*/
 
-function loadJSON(path) {
-
-  var xobj = new XMLHttpRequest();
-  xobj.overrideMimeType('application/json');
-  xobj.open('GET', path, false);
-  xobj.send(null);
-  if (xobj.readyState === 4 && xobj.status === '200') {
-    return xobj.responseText;
-  }
-}
-
 /**
  * Display a change between two versions of a page.
  *
@@ -6630,8 +6617,8 @@ var DiffContainer = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (DiffContainer.__proto__ || Object.getPrototypeOf(DiffContainer)).call(this, props));
 
-    _this.timestampsValidated = false;
-    _this.redirectToValidatedTimestamps = false;
+    _this._timestampsValidated = false;
+    _this._redirectToValidatedTimestamps = false;
 
     _this.state = {
       fetchedRaw: null,
@@ -6649,23 +6636,17 @@ var DiffContainer = function (_React$Component) {
       this.setState({ showNotFound: true });
     }
   }, {
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.conf = loadJSON(this.props.pathToConf);
-      console.log(this.conf);
-    }
-  }, {
     key: 'render',
     value: function render() {
-      if (this.urlIsInvalid()) {
-        return this.invalidURL();
+      if (this._urlIsInvalid()) {
+        return this._invalidURL();
       }
-      if (this.redirectToValidatedTimestamps) {
-        return this.renderRedirect();
+      if (this._redirectToValidatedTimestamps) {
+        return this._renderRedirect();
       }
-      if (!this.timestampsValidated) {
+      if (!this._timestampsValidated) {
         {
-          this.checkTimestamps(this.props.timestampA, this.props.timestampB);
+          this._checkTimestamps(this.props.timestampA, this.props.timestampB);
         }
       }
       if (this.props.timestampA && this.props.timestampB) {
@@ -6685,7 +6666,7 @@ var DiffContainer = function (_React$Component) {
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, _extends({}, this.props, {
             isInitial: false, snapshotsNotFoundCallback: this.snapshotsNotFound })),
-          this.showLeftSnapshot()
+          this._showLeftSnapshot()
         );
       }
       if (this.props.timestampB) {
@@ -6694,7 +6675,7 @@ var DiffContainer = function (_React$Component) {
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, _extends({ isInitial: false }, this.props, {
             snapshotsNotFoundCallback: this.snapshotsNotFound })),
-          this.showRightSnapshot()
+          this._showRightSnapshot()
         );
       }
       return react.createElement(
@@ -6705,28 +6686,23 @@ var DiffContainer = function (_React$Component) {
       );
     }
   }, {
-    key: 'renderRedirect',
-    value: function renderRedirect() {
-      this.redirectToValidatedTimestamps = false;
+    key: '_renderRedirect',
+    value: function _renderRedirect() {
+      this._redirectToValidatedTimestamps = false;
       return react.createElement(Redirect, { to: this.state.newURL });
     }
   }, {
-    key: 'showLeftSnapshot',
-    value: function showLeftSnapshot() {
+    key: '_showLeftSnapshot',
+    value: function _showLeftSnapshot() {
       var _this2 = this;
 
       if (this.state.fetchedRaw) {
-        var urlB;
-        if (this.props.noSnapshotURL) {
-          urlB = this.props.noSnapshotURL;
-        } else {
-          urlB = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
-        }
+        var urlB = this.props.conf.noSnapshotURL;
         return react.createElement(
           'div',
           { className: 'side-by-side-render' },
           react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
-              _this2.handleHeight();
+              _this2._handleHeight();
             },
             srcDoc: this.state.fetchedRaw, scrolling: 'no',
             ref: function ref(frame) {
@@ -6736,7 +6712,7 @@ var DiffContainer = function (_React$Component) {
           react.createElement('iframe', { src: urlB })
         );
       }
-      var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+      var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
       fetch(urlA).then(function (response) {
         return response.text();
       }).then(function (responseText) {
@@ -6751,27 +6727,27 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showNotFound) {
-        var urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-        var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
+        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
 
-        return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.webMonitoringProcessingURL,
+        return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.conf.webMonitoringProcessingURL,
           page: { url: this.props.site }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
-          loader: this.props.loader });
+          loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader });
       }
     }
   }, {
-    key: 'checkTimestamps',
-    value: function checkTimestamps(urlA, urlB) {
+    key: '_checkTimestamps',
+    value: function _checkTimestamps(urlA, urlB) {
       var _this3 = this;
 
       if (urlA) {
-        urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+        urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
       }
       fetch(urlA, { redirect: 'follow' }).then(function (response) {
         urlA = response.url;
         var fetchedTimestampA = urlA.split('/')[4];
         if (urlB) {
-          urlB = 'http://web.archive.org/web/' + _this3.props.timestampB + '/' + _this3.props.site;
+          urlB = _this3.props.conf.snapshotsPrefix + _this3.props.timestampB + '/' + _this3.props.site;
           fetch(urlB, { redirect: 'follow' }).then(function (response) {
             urlB = response.url;
             var fetchedTimestampB = urlB.split('/')[4];
@@ -6782,33 +6758,28 @@ var DiffContainer = function (_React$Component) {
               for (var i = 7; i <= tempURL.length - 1; i++) {
                 url = url + tempURL[i];
               }
-              _this3.timestampsValidated = true;
-              _this3.redirectToValidatedTimestamps = true;
-              _this3.setState({ newURL: '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + _this3.props.site });
+              _this3._timestampsValidated = true;
+              _this3._redirectToValidatedTimestamps = true;
+              _this3.setState({ newURL: _this3.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + _this3.props.site });
             }
           });
         }
-        _this3.timestampsValidated = true;
+        _this3._timestampsValidated = true;
       });
     }
   }, {
-    key: 'showRightSnapshot',
-    value: function showRightSnapshot() {
+    key: '_showRightSnapshot',
+    value: function _showRightSnapshot() {
       var _this4 = this;
 
       if (this.state.fetchedRaw) {
-        var urlA;
-        if (this.props.noSnapshotURL) {
-          urlA = this.props.noSnapshotURL;
-        } else {
-          urlA = 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
-        }
+        var urlA = this.props.conf.noSnapshotURL;
         return react.createElement(
           'div',
           { className: 'side-by-side-render' },
           react.createElement('iframe', { src: urlA }),
           react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
-              _this4.handleHeight();
+              _this4._handleHeight();
             },
             srcDoc: this.state.fetchedRaw, scrolling: 'no',
             ref: function ref(frame) {
@@ -6817,7 +6788,7 @@ var DiffContainer = function (_React$Component) {
           })
         );
       }
-      var urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+      var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
       fetch(urlB).then(function (response) {
         return response.text();
       }).then(function (responseText) {
@@ -6829,8 +6800,8 @@ var DiffContainer = function (_React$Component) {
       return react.createElement(Loader, null);
     }
   }, {
-    key: 'handleHeight',
-    value: function handleHeight() {
+    key: '_handleHeight',
+    value: function _handleHeight() {
       var offsetHeight = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
       if (offsetHeight > 0.1 * this._oneFrame.height) {
         this._oneFrame.height = offsetHeight;
@@ -6839,13 +6810,13 @@ var DiffContainer = function (_React$Component) {
       }
     }
   }, {
-    key: 'urlIsInvalid',
-    value: function urlIsInvalid() {
+    key: '_urlIsInvalid',
+    value: function _urlIsInvalid() {
       return !isStrUrl(this.props.site);
     }
   }, {
-    key: 'invalidURL',
-    value: function invalidURL() {
+    key: '_invalidURL',
+    value: function _invalidURL() {
       return react.createElement(
         'div',
         { className: 'alert alert-danger', role: 'alert' },

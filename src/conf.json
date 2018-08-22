@@ -1,5 +1,5 @@
 {
-  "webMonitoringProcessingURL": "http://vbanos-dev.us.archive.org:8888",
+  "webMonitoringProcessingURL": "http://localhost:8888",
   "limit": "1000",
   "noSnapshotURL": "https://users.it.teithe.gr/~it133996/noSnapshot.html",
   "snapshotsPrefix": "http://web.archive.org/web/",
