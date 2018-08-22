@@ -110,7 +110,8 @@ export default class DiffView extends React.Component {
       );
     case diffTypes.SIDE_BY_SIDE_RENDERED.value:
       return (
-        <SideBySideRenderedDiff diffData={this.state.diffData} page={this.props.page} />
+        <SideBySideRenderedDiff diffData={this.state.diffData} page={this.props.page}
+          iframeLoader={this.props.iframeLoader}/>
       );
     case diffTypes.OUTGOING_LINKS.value:
       return (
@@ -180,12 +181,7 @@ export default class DiffView extends React.Component {
         .catch(error => error)
         .then(data => this.setState({diffData: data}));
     }
-    let url;
-    if (this.props.webMonitoringProcessingURL) {
-      url = `${this.props.webMonitoringProcessingURL}/`;
-    } else {
-      url = 'http://localhost:8888/';
-    }
+    var url = `${this.props.webMonitoringProcessingURL}/`;
     url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
     fetch(url)
       .then(response => response.json())

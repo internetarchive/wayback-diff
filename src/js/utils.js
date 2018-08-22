@@ -26,17 +26,3 @@ export function isStrUrl(str = '') {
   ) && !startsWith(processedValue, 'site:');
 }
 /*eslint-enable no-mixed-operators*/
-
-
-export function loadJSON(path) {
-
-  var xobj = new XMLHttpRequest();
-  xobj.overrideMimeType('application/json');
-  xobj.open('GET', path, false);
-  xobj.send(null);
-  if (xobj.readyState === 4 && xobj.status === '200') {
-    return(xobj.responseText);
-  }
-
-
-}

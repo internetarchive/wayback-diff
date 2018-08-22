@@ -8,33 +8,31 @@ import React from 'react';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import Loading from './components/loading.jsx';
 //
-// let webMonitoringProcessingURL= 'http://localhost:8888';
+//
+// var conf = require('./conf.json');
 //
 // ReactDOM.render(<Router>
 //   <Switch>
 //     <Route path="/diff/([^/]*)/([^/]*)/(.+)" render={({match}) =>
 //       <DiffContainer site={match.params[2]} timestampA={match.params[0]}
-//         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
 //         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>}
-//         timestampB={match.params[1]} fetchCallback = {null} />
+//         timestampB={match.params[1]} fetchCallback = {null} conf={conf}/>
 //     }/>
 //     <Route path="/diff/:timestampA//:site" render={({match}) =>
 //       <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
-//         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
-//         noSnapshotURL={'https://users.it.teithe.gr/~it133996/noSnapshot.html'}
+//         conf={conf}
 //         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>}/>
 //     }/>
 //     <Route path="/diff//:timestampB/:site" render={({match}) =>
 //       <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
-//         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
-//         noSnapshotURL={'https://users.it.teithe.gr/~it133996/noSnapshot.html'}
+//         conf={conf}
 //         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>}/>
 //     }/>
 //     <Route path="/diff/:site" render={({match}) =>
 //       <DiffContainer site={match.params.site} fetchCallback = {null}
-//         webMonitoringProcessingURL={webMonitoringProcessingURL} limit={'1000'}
+//         conf={conf}
 //         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'}/>}
-//         pathToConf={'../conf.json'}/>}
+//         conf={conf}/>}
 //     />
 //   </Switch>
 // </Router>, document.getElementById('wayback-diff'));

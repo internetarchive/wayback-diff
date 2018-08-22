@@ -85,7 +85,7 @@ export default class TimestampHeader extends React.Component {
   exportParams(){
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
-    window.location.href = `/diff/${timestampA}/${timestampB}/${this.props.site}`;
+    window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.site}`;
   }
 
   widgetRender () {
@@ -99,9 +99,9 @@ export default class TimestampHeader extends React.Component {
     } else {
       var url;
       if (this.props.limit){
-        url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&limit=${this.props.limit}&fl=timestamp,digest&output=json`;
+        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&limit=${this.props.limit}&fl=timestamp,digest&output=json`;
       } else {
-        url = `http://web.archive.org/cdx/search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
+        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
       fetch(url)
         .then(response => response.json())
@@ -109,7 +109,7 @@ export default class TimestampHeader extends React.Component {
           if (data && data.length > 0 ){
             if (data.length === 2) {
               let timestamp = data[1][0];
-              window.location.href = `/diff/${timestamp}//${this.props.site}`;
+              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
             }
             this.prepareData(data);
             if (!this.props.isInitial) {
@@ -220,11 +220,11 @@ export default class TimestampHeader extends React.Component {
   showOpenLinks(){
     if(!this.props.isInitial) {
       if (this.props.timestampA) {
-        var aLeft = (<a href={'/web/' + this.props.timestampA + '/' + this.props.site}
+        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site}
           id="timestamp-a-left" target="_blank" rel="noopener"> Open in new window</a>);
       }
       if (this.props.timestampB) {
-        var aRight = (<a href={'/web/' + this.props.timestampB + '/' + this.props.site}
+        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site}
           id="timestamp-a-right" target="_blank" rel="noopener">
           Open in new window</a>);
       }

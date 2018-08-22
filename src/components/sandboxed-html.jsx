@@ -73,7 +73,7 @@ export default class SandboxedHtml extends React.PureComponent {
     var elem = document.createElement('img');
     var cssText = 'position:absolute;left:'+centerX+'px;top:'+centerY+'px;';
     elem.setAttribute('style', cssText);
-    elem.src='https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif';
+    elem.src = this.props.iframeLoader;
     document.body.appendChild(elem);
     this._frame.loaderImage = elem;
   }

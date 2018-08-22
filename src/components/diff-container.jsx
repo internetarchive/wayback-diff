@@ -5,7 +5,6 @@ import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
 import {isStrUrl} from '../js/utils.js';
-import {loadJSON} from '../js/utils.js';
 /**
  * Display a change between two versions of a page.
  *
@@ -15,7 +14,6 @@ import {loadJSON} from '../js/utils.js';
 export default class DiffContainer extends React.Component {
   timestampsValidated = false;
   redirectToValidatedTimestamps = false;
-  conf;
   constructor (props) {
     super(props);
     this.state = {
@@ -31,10 +29,6 @@ export default class DiffContainer extends React.Component {
     this.setState({showNotFound: true});
   }
 
-  componentDidMount() {
-    this.conf = loadJSON(this.props.pathToConf);
-    console.log(this.conf);
-  }
 
   render () {
     if (this.urlIsInvalid()) {
@@ -87,12 +81,7 @@ export default class DiffContainer extends React.Component {
 
   showLeftSnapshot () {
     if(this.state.fetchedRaw){
-      var urlB;
-      if(this.props.noSnapshotURL) {
-        urlB = this.props.noSnapshotURL;
-      } else {
-        urlB= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
-      }
+      let urlB = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
           <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
@@ -103,7 +92,7 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+    let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
     fetch(urlA)
       .then(response => {
         return response.text();
@@ -116,25 +105,25 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showNotFound){
-      let urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
-      let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+      let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
+      let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
 
-      return(<DiffView webMonitoringProcessingURL={this.props.webMonitoringProcessingURL}
+      return(<DiffView webMonitoringProcessingURL={this.props.conf.webMonitoringProcessingURL}
         page={{url: this.props.site}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        loader={this.props.loader}/>);
+        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader}/>);
     }
   }
 
   checkTimestamps (urlA, urlB) {
     if (urlA){
-      urlA = 'http://web.archive.org/web/' + this.props.timestampA + '/' + this.props.site;
+      urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
     }
     fetch(urlA, {redirect: 'follow'})
       .then(response => {
         urlA = response.url;
         let fetchedTimestampA = urlA.split('/')[4];
         if (urlB) {
-          urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+          urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
           fetch(urlB, {redirect: 'follow'})
             .then(response => {
               urlB = response.url;
@@ -148,7 +137,7 @@ export default class DiffContainer extends React.Component {
                 }
                 this.timestampsValidated = true;
                 this.redirectToValidatedTimestamps = true;
-                this.setState({newURL: '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
+                this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
               }
             });
         }
@@ -158,12 +147,7 @@ export default class DiffContainer extends React.Component {
 
   showRightSnapshot () {
     if(this.state.fetchedRaw){
-      var urlA;
-      if(this.props.noSnapshotURL) {
-        urlA = this.props.noSnapshotURL;
-      } else {
-        urlA= 'https://users.it.teithe.gr/~it133996/noSnapshot.html';
-      }
+      let urlA = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
           {React.createElement('iframe', { src: urlA})}
@@ -174,7 +158,7 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    let urlB = 'http://web.archive.org/web/' + this.props.timestampB + '/' + this.props.site;
+    let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
     fetch(urlB)
       .then(response => {
         return response.text();
