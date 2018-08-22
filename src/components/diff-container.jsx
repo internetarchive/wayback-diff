@@ -12,8 +12,8 @@ import {isStrUrl} from '../js/utils.js';
  * @extends {React.Component}
  */
 export default class DiffContainer extends React.Component {
-  timestampsValidated = false;
-  redirectToValidatedTimestamps = false;
+  _timestampsValidated = false;
+  _redirectToValidatedTimestamps = false;
   constructor (props) {
     super(props);
     this.state = {
@@ -31,14 +31,14 @@ export default class DiffContainer extends React.Component {
 
 
   render () {
-    if (this.urlIsInvalid()) {
-      return this.invalidURL();
+    if (this._urlIsInvalid()) {
+      return this._invalidURL();
     }
-    if (this.redirectToValidatedTimestamps) {
-      return(this.renderRedirect());
+    if (this._redirectToValidatedTimestamps) {
+      return(this._renderRedirect());
     }
-    if (!this.timestampsValidated) {
-      {this.checkTimestamps(this.props.timestampA, this.props.timestampB);}
+    if (!this._timestampsValidated) {
+      {this._checkTimestamps(this.props.timestampA, this.props.timestampB);}
     }
     if (this.props.timestampA && this.props.timestampB) {
       return (
@@ -55,7 +55,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader {...this.props}
             isInitial={false} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
-          {this.showLeftSnapshot()}
+          {this._showLeftSnapshot()}
         </div>);
     }
     if (this.props.timestampB) {
@@ -63,7 +63,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false} {...this.props}
             snapshotsNotFoundCallback={this.snapshotsNotFound}/>
-          {this.showRightSnapshot()}
+          {this._showRightSnapshot()}
         </div>);
     }
     return (
@@ -74,17 +74,17 @@ export default class DiffContainer extends React.Component {
     );
   }
 
-  renderRedirect () {
-    this.redirectToValidatedTimestamps = false;
+  _renderRedirect () {
+    this._redirectToValidatedTimestamps = false;
     return (<Redirect to={this.state.newURL} />);
   }
 
-  showLeftSnapshot () {
+  _showLeftSnapshot () {
     if(this.state.fetchedRaw){
       let urlB = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
-          <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
+          <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
             srcDoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
@@ -114,7 +114,7 @@ export default class DiffContainer extends React.Component {
     }
   }
 
-  checkTimestamps (urlA, urlB) {
+  _checkTimestamps (urlA, urlB) {
     if (urlA){
       urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
     }
@@ -135,23 +135,23 @@ export default class DiffContainer extends React.Component {
                 for (var i = 7; i <= (tempURL.length - 1); i++) {
                   url = url + tempURL[i];
                 }
-                this.timestampsValidated = true;
-                this.redirectToValidatedTimestamps = true;
+                this._timestampsValidated = true;
+                this._redirectToValidatedTimestamps = true;
                 this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
               }
             });
         }
-        this.timestampsValidated = true;
+        this._timestampsValidated = true;
       });
   }
 
-  showRightSnapshot () {
+  _showRightSnapshot () {
     if(this.state.fetchedRaw){
       let urlA = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
           {React.createElement('iframe', { src: urlA})}
-          <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();}}
+          <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
             srcDoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
@@ -169,7 +169,7 @@ export default class DiffContainer extends React.Component {
     return <Loader/>;
   }
 
-  handleHeight () {
+  _handleHeight () {
     let offsetHeight = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
     if (offsetHeight > 0.1 * this._oneFrame.height) {
       this._oneFrame.height = offsetHeight;
@@ -178,11 +178,11 @@ export default class DiffContainer extends React.Component {
     }
   }
 
-  urlIsInvalid () {
+  _urlIsInvalid () {
     return (!isStrUrl(this.props.site));
   }
 
-  invalidURL () {
+  _invalidURL () {
     return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.site}</div>);
   }
 }

@@ -18,33 +18,33 @@ export default class TimestampHeader extends React.Component {
       showNotFound: false
     };
 
-    this.handleLeftTimestampChange = this.handleLeftTimestampChange.bind(this);
+    this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
 
-    this.handleRightTimestampChange = this.handleRightTimestampChange.bind(this);
+    this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
 
-    this.restartPressed = this.restartPressed.bind(this);
+    this._restartPressed = this._restartPressed.bind(this);
 
-    this.showDiffs = this.showDiffs.bind(this);
+    this._showDiffs = this._showDiffs.bind(this);
 
   }
 
-  handleRightTimestampChange(){
+  _handleRightTimestampChange(){
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
     let allowedSnapshots = this.state.cdxData;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
       leftSnaps: allowedSnapshots,
-      leftSnapElements : this.prepareOptionElements(allowedSnapshots)
+      leftSnapElements : this._prepareOptionElements(allowedSnapshots)
     });
   }
 
-  handleLeftTimestampChange(){
+  _handleLeftTimestampChange(){
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
     let allowedSnapshots = this.state.cdxData;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
       rightSnaps: allowedSnapshots,
-      rightSnapElements : this.prepareOptionElements(allowedSnapshots)
+      rightSnapElements : this._prepareOptionElements(allowedSnapshots)
     });
   }
 
@@ -54,46 +54,46 @@ export default class TimestampHeader extends React.Component {
     if (this.state.showNotFound){
       return(
         <div>
-          {this.notFound()}
+          {this._notFound()}
         </div>);
     }
     if (this.state.showDiff) {
       return(
         <div className="timestamp-header-view">
-          {this.showInfo()}
-          {this.showTimestampSelector()}
-          {this.exportParams()}
+          {this._showInfo()}
+          {this._showTimestampSelector()}
+          {this._exportParams()}
         </div>
       );
     }
     if (this.state.cdxData) {
       return (
         <div className="timestamp-header-view">
-          {this.showInfo()}
-          {this.showTimestampSelector()}
-          {this.showOpenLinks()}
+          {this._showInfo()}
+          {this._showTimestampSelector()}
+          {this._showOpenLinks()}
         </div>
       );
     }
     return (<div>
-      {this.widgetRender()}
+      {this._widgetRender()}
       <Loader/>
     </div>
     );
   }
 
-  exportParams(){
+  _exportParams(){
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
     window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.site}`;
   }
 
-  widgetRender () {
+  _widgetRender () {
     if (this.props.fetchCallback) {
       this.props.fetchCallback().then((data => {
-        this.prepareData(data);
+        this._prepareData(data);
         if (!this.props.isInitial) {
-          this.selectValues();
+          this._selectValues();
         }
       }));
     } else {
@@ -111,9 +111,9 @@ export default class TimestampHeader extends React.Component {
               let timestamp = data[1][0];
               window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
             }
-            this.prepareData(data);
+            this._prepareData(data);
             if (!this.props.isInitial) {
-              this.selectValues();
+              this._selectValues();
             }
           } else {
             this.props.snapshotsNotFoundCallback();
@@ -124,27 +124,27 @@ export default class TimestampHeader extends React.Component {
     }
   }
 
-  prepareData(data){
+  _prepareData(data){
     data.shift();
     this.setState({
       cdxData: data,
       leftSnaps : data,
       rightSnaps : data,
-      leftSnapElements : this.prepareOptionElements(data),
-      rightSnapElements : this.prepareOptionElements(data),
-      headerInfo: this.getHeaderInfo(data)
+      leftSnapElements : this._prepareOptionElements(data),
+      rightSnapElements : this._prepareOptionElements(data),
+      headerInfo: this._getHeaderInfo(data)
     });
   }
 
-  prepareOptionElements(data){
+  _prepareOptionElements(data){
     var initialSnapshots = [];
     if (data.length > 0) {
-      var yearGroup = this.getYear(data[0][0]);
+      var yearGroup = this._getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
     for (let i = 0; i < data.length; i++){
-      let utcTime = this.getUTCDateFormat(data[i][0]);
-      var year = this.getYear(data[i][0]);
+      let utcTime = this._getUTCDateFormat(data[i][0]);
+      var year = this._getYear(data[i][0]);
       if (year > yearGroup) {
         yearGroup = year;
         initialSnapshots.push(<optgroup key={-i+2} label={yearGroup}/>);
@@ -154,7 +154,7 @@ export default class TimestampHeader extends React.Component {
     return initialSnapshots;
   }
 
-  getUTCDateFormat (date){
+  _getUTCDateFormat (date){
     let year = parseInt(date.substring(0,4), 10);
     let month = parseInt(date.substring(4,6), 10) - 1;
     let day = parseInt(date.substring(6,8), 10);
@@ -166,7 +166,7 @@ export default class TimestampHeader extends React.Component {
     return (niceTime.toUTCString());
   }
 
-  getShortUTCDateFormat (date){
+  _getShortUTCDateFormat (date){
     let year = parseInt(date.substring(0,4), 10);
     let month = parseInt(date.substring(4,6), 10) - 1;
     let day = parseInt(date.substring(6,8), 10);
@@ -177,36 +177,36 @@ export default class TimestampHeader extends React.Component {
     return (retTime);
   }
 
-  getYear (date) {
+  _getYear (date) {
     return parseInt(date.substring(0,4), 10);
   }
 
-  restartPressed () {
+  _restartPressed () {
     let initialData = this.state.cdxData;
     this.setState({
       leftSnaps : initialData,
       rightSnaps : initialData,
-      leftSnapElements : this.prepareOptionElements(initialData),
-      rightSnapElements : this.prepareOptionElements(initialData)
+      leftSnapElements : this._prepareOptionElements(initialData),
+      rightSnapElements : this._prepareOptionElements(initialData)
     });
   }
 
-  showTimestampSelector () {
+  _showTimestampSelector () {
     return (
       <div className="timestamp-container-view">
-        <select className="form-control" id="timestamp-select-left" onChange={this.handleLeftTimestampChange}>
+        <select className="form-control" id="timestamp-select-left" onChange={this._handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this.showDiffs}>Show differences</button>
-        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this.restartPressed}>Restart</button>
-        <select className="form-control" id="timestamp-select-right" onChange={this.handleRightTimestampChange}>
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showDiffs}>Show differences</button>
+        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this._restartPressed}>Restart</button>
+        <select className="form-control" id="timestamp-select-right" onChange={this._handleRightTimestampChange}>
           {this.state.rightSnapElements}
         </select>
       </div>
     );
   }
 
-  showInfo(){
+  _showInfo(){
     return (
       <div>
         {this.state.headerInfo}
@@ -217,7 +217,7 @@ export default class TimestampHeader extends React.Component {
     );
   }
 
-  showOpenLinks(){
+  _showOpenLinks(){
     if(!this.props.isInitial) {
       if (this.props.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site}
@@ -239,23 +239,23 @@ export default class TimestampHeader extends React.Component {
     }
   }
 
-  notFound () {
+  _notFound () {
     return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.site} archived.</div>);
   }
 
-  showDiffs () {
+  _showDiffs () {
     this.setState({showDiff: true});
   }
 
-  selectValues () {
+  _selectValues () {
     document.getElementById('timestamp-select-left').value = this.props.timestampA;
     document.getElementById('timestamp-select-right').value = this.props.timestampB;
   }
 
-  getHeaderInfo (data) {
+  _getHeaderInfo (data) {
     if (data) {
-      let first = this.getShortUTCDateFormat(data[0][0]);
-      let last = this.getShortUTCDateFormat(data[data.length-1][0]);
+      let first = this._getShortUTCDateFormat(data[0][0]);
+      let last = this._getShortUTCDateFormat(data[data.length-1][0]);
       const numberWithCommas = (x) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       };
