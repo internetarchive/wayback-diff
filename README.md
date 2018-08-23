@@ -39,23 +39,37 @@ In the **index.js** file the following code should be included:
 ```Javascript
 import ReactDOM from 'react-dom';
 import DiffContainer from './components/diff-container.jsx';
-var path = window.location.pathname;
-let webMonitoringProcessingURL= 'http://localhost';
-let webMonitoringProcessingPort= '8888';
-path = path.split('/');
-let site = path[path.length-1];
-if (path.length === 3) {
-  ReactDOM.render(<DiffContainer site={site} fetchCallback = {null}
-    webMonitoringProcessingURL={webMonitoringProcessingURL}
-    webMonitoringProcessingPort={webMonitoringProcessingPort}/>, document.getElementById('wayback-diff'));
-} else {
-  let timestampA = path[path.length-3];
-  let timestampB = path[path.length-2];
-  ReactDOM.render(<DiffContainer site={site} timestampA={timestampA} timestampB={timestampB}
-    webMonitoringProcessingURL={webMonitoringProcessingURL}
-    webMonitoringProcessingPort={webMonitoringProcessingPort}
-    fetchCallback = {null} />, document.getElementById('wayback-diff'));
-}
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Loading from './components/loading.jsx';
+
+
+var conf = require('./conf.json');
+
+ReactDOM.render(<Router>
+  <Switch>
+    <Route path="/diff/([^/]*)/([^/]*)/(.+)" render={({match}) =>
+      <DiffContainer site={match.params[2]} timestampA={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
+        timestampB={match.params[1]} fetchCallback = {null} conf={conf}/>
+    }/>
+    <Route path="/diff/:timestampA//:site" render={({match}) =>
+      <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
+        conf={conf}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}/>
+    }/>
+    <Route path="/diff//:timestampB/:site" render={({match}) =>
+      <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
+        conf={conf}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}/>
+    }/>
+    <Route path="/diff/:site" render={({match}) =>
+      <DiffContainer site={match.params.site} fetchCallback = {null}
+        conf={conf}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
+        conf={conf}/>}
+    />
+  </Switch>
+</Router>, document.getElementById('wayback-diff'));
 ```
 
 # Use it as a component in an other project
@@ -71,21 +85,37 @@ export DiffContainer from './components/diff-container.jsx';
 # Props 
 DiffContainer can receive up to seven props. All of them are optional. 
 
+The **conf** prop that receives a JSON file that contains the configuration of the wayback-diff component.
+
 The **fetchCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
 
 - If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
 
 - The callback function should return a fetch Promise.
 
-  If you use this prop, the **limit** prop does not have any effect.
+  If you use this prop, the **limit** conf option does not have any effect.
 
-The **waybackLoaderPath** which indicates the URL where the image that will be shown when loading is.
+The **loader** which is a React Component that will be shown when loading is.
 
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
-The **webMonitoringProcessingURL** and **webMonitoringProcessingPort** which contain the URL and the port of the wm-diffing-server that will be used from this component.
+The **site** which is the webpage for which the snapshots are shown.
 
-The **limit** which sets a limit on how many snapshots the CDX server should reply with.
+# conf.json
+
+The configuration file should have the following format:
+
+```
+{
+  "webMonitoringProcessingURL": "http://localhost:8888",
+  "limit": "1000",
+  "noSnapshotURL": "URL_TO_noSnapshotURL",
+  "snapshotsPrefix": "http://web.archive.org/web/",
+  "urlPrefix": "/diff/",
+  "cdxServer": "http://web.archive.org/cdx/",
+  "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif"
+}
+```
 
 ## Build the project
 
@@ -123,11 +153,10 @@ import {DiffContainer} from 'wayback-diff';
 After importing the component you might use it like any other React component:
 
 ```Javascript
-<DiffContainer site={site} timestampA={timestampA}
-                      webMonitoringProcessingURL={this.webMonitoringProcessingURL}
-                      webMonitoringProcessingPort={this.webMonitoringProcessingPort}
-                      timestampB={timestampB} fetchCallback = {null} limit={'1000'}
-                      waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />
+ <DiffContainer site={match.params[2]} timestampA={match.params[0]}
+                    loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
+                    timestampB={match.params[1]} fetchCallback = {null} conf={this.conf}/>
+}/>
 ```
 
 # Example project
