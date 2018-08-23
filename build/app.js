@@ -2925,7 +2925,7 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-p-left{\n    display: inline-block;\n    position: relative;\n    left: 1%;\n}\n\n#timestamp-p-right{\n    display: inline-block;\n    position: absolute;\n    right: 1%;\n}\n\n#timestamp-a-left{\n    display: inline-block;\n    position: absolute;\n    left: 1%;\n}\n\n#timestamp-a-right{\n    display: inline-block;\n    position: absolute;\n    right: 1%;\n}";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
 styleInject(css$1);
 
 /**
@@ -3185,13 +3185,13 @@ var TimestampHeader = function (_React$Component) {
         null,
         this.state.headerInfo,
         react.createElement(
-          'p',
-          { id: 'timestamp-p-left' },
+          'div',
+          { id: 'timestamp-left' },
           'Please select a capture'
         ),
         react.createElement(
-          'p',
-          { id: 'timestamp-p-right' },
+          'div',
+          { id: 'timestamp-right' },
           'Please select a capture'
         ),
         react.createElement('br', null)
@@ -3205,7 +3205,7 @@ var TimestampHeader = function (_React$Component) {
           var aLeft = react.createElement(
             'a',
             { href: this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site,
-              id: 'timestamp-a-left', target: '_blank', rel: 'noopener' },
+              id: 'timestamp-left', target: '_blank', rel: 'noopener' },
             ' Open in new window'
           );
         }
@@ -3213,7 +3213,7 @@ var TimestampHeader = function (_React$Component) {
           var aRight = react.createElement(
             'a',
             { href: this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site,
-              id: 'timestamp-a-right', target: '_blank', rel: 'noopener' },
+              id: 'timestamp-right', target: '_blank', rel: 'noopener' },
             'Open in new window'
           );
         }
@@ -6727,11 +6727,11 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showNotFound) {
-        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
-        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
+        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.site);
+        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.site);
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.conf.webMonitoringProcessingURL,
-          page: { url: this.props.site }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
+          page: { url: encodeURIComponent(this.props.site) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
           loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader });
       }
     }
