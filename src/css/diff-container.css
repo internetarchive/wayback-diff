@@ -32,26 +32,12 @@ green-diff-footer{
     text-align: center;
 }
 
-#timestamp-p-left{
+#timestamp-left{
     display: inline-block;
-    position: relative;
-    left: 1%;
+    float: left;
 }
 
-#timestamp-p-right{
+#timestamp-right{
     display: inline-block;
-    position: absolute;
-    right: 1%;
-}
-
-#timestamp-a-left{
-    display: inline-block;
-    position: absolute;
-    left: 1%;
-}
-
-#timestamp-a-right{
-    display: inline-block;
-    position: absolute;
-    right: 1%;
+    float: right;
 }

@@ -210,8 +210,8 @@ export default class TimestampHeader extends React.Component {
     return (
       <div>
         {this.state.headerInfo}
-        <p id="timestamp-p-left">Please select a capture</p>
-        <p id="timestamp-p-right">Please select a capture</p>
+        <div id="timestamp-left">Please select a capture</div>
+        <div id="timestamp-right">Please select a capture</div>
         <br/>
       </div>
     );
@@ -221,11 +221,11 @@ export default class TimestampHeader extends React.Component {
     if(!this.props.isInitial) {
       if (this.props.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site}
-          id="timestamp-a-left" target="_blank" rel="noopener"> Open in new window</a>);
+          id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
       }
       if (this.props.timestampB) {
         var aRight = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site}
-          id="timestamp-a-right" target="_blank" rel="noopener">
+          id="timestamp-right" target="_blank" rel="noopener">
           Open in new window</a>);
       }
       let div = (
