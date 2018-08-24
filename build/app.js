@@ -3048,8 +3048,8 @@ var TimestampHeader = function (_React$Component) {
         });
       } else {
         var url;
-        if (this.props.limit) {
-          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&limit=' + this.props.limit + '&fl=timestamp,digest&output=json';
+        if (this.props.conf.limit) {
+          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json';
         } else {
           url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
         }
@@ -3261,7 +3261,9 @@ var TimestampHeader = function (_React$Component) {
         return react.createElement(
           'p',
           { id: 'explanation-middle' },
-          ' Compare any two captures from our collection of ',
+          ' Compare any two captures of ',
+          this.props.site,
+          ' from our collection of ',
           numberWithCommas(data.length),
           ' dating from ',
           first,
