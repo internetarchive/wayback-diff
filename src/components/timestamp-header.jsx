@@ -259,7 +259,7 @@ export default class TimestampHeader extends React.Component {
       const numberWithCommas = (x) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       };
-      return (<p id='explanation-middle'> Compare any two captures from our collection of {numberWithCommas(data.length)} dating from {first} to {last}.</p>);
+      return (<p id='explanation-middle'> Compare any two captures of {this.props.site} from our collection of {numberWithCommas(data.length)} dating from {first} to {last}.</p>);
     }
   }
 }
