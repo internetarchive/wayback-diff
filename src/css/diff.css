@@ -5,6 +5,7 @@
 }
 
 .side-by-side-render > iframe,
+.side-by-side-render > div,
 .inline-render > iframe {
     border: 1px solid #ccc;
     border-radius: 2px;
