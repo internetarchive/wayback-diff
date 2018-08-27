@@ -5,6 +5,7 @@ import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
 import {isStrUrl} from '../js/utils.js';
+import NoSnapshotURL from './no-snapshot-url.jsx';
 /**
  * Display a change between two versions of a page.
  *
@@ -81,14 +82,13 @@ export default class DiffContainer extends React.Component {
 
   _showLeftSnapshot () {
     if(this.state.fetchedRaw){
-      let urlB = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
           <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
             srcDoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
-          {React.createElement('iframe', { src: urlB})}
+          <NoSnapshotURL/>
         </div>
       );
     }
@@ -147,10 +147,9 @@ export default class DiffContainer extends React.Component {
 
   _showRightSnapshot () {
     if(this.state.fetchedRaw){
-      let urlA = this.props.conf.noSnapshotURL;
       return(
         <div className={'side-by-side-render'}>
-          {React.createElement('iframe', { src: urlA})}
+          <NoSnapshotURL/>
           <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
             srcDoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
