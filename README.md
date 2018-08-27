@@ -109,7 +109,6 @@ The configuration file should have the following format:
 {
   "webMonitoringProcessingURL": "http://localhost:8888",
   "limit": "1000",
-  "noSnapshotURL": "URL_TO_noSnapshotURL",
   "snapshotsPrefix": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",
   "cdxServer": "http://web.archive.org/cdx/",
