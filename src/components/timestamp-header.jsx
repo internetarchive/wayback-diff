@@ -15,7 +15,7 @@ export default class TimestampHeader extends React.Component {
     this.state = {
       cdxData: false,
       showDiff: false,
-      showNotFound: false
+      showError: false
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -49,37 +49,34 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
+    console.log('TimestampHeader render');
     const Loader = () => this.props.loader;
 
-    if (this.state.showNotFound){
-      return(
-        <div>
-          {this._notFound()}
-        </div>);
-    }
-    if (this.state.showDiff) {
-      return(
-        <div className="timestamp-header-view">
-          {this._showInfo()}
-          {this._showTimestampSelector()}
-          {this._exportParams()}
-        </div>
+    if (!this.state.showError) {
+      if (this.state.showDiff) {
+        return (
+          <div className="timestamp-header-view">
+            {this._showInfo()}
+            {this._showTimestampSelector()}
+            {this._exportParams()}
+          </div>
+        );
+      }
+      if (this.state.cdxData) {
+        return (
+          <div className="timestamp-header-view">
+            {this._showInfo()}
+            {this._showTimestampSelector()}
+            {this._showOpenLinks()}
+          </div>
+        );
+      }
+      return (<div>
+        {this._widgetRender()}
+        <Loader/>
+      </div>
       );
     }
-    if (this.state.cdxData) {
-      return (
-        <div className="timestamp-header-view">
-          {this._showInfo()}
-          {this._showTimestampSelector()}
-          {this._showOpenLinks()}
-        </div>
-      );
-    }
-    return (<div>
-      {this._widgetRender()}
-      <Loader/>
-    </div>
-    );
   }
 
   _exportParams(){
@@ -104,22 +101,36 @@ export default class TimestampHeader extends React.Component {
         url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
       fetch(url)
-        .then(response => response.json())
+        .then(function(response) {
+          if (response) {
+            if (!response.ok) {
+              throw Error(response.status);
+            }
+            return response.json();
+          }
+        })
         .then((data) => {
           if (data && data.length > 0 ){
             if (data.length === 2) {
               let timestamp = data[1][0];
-              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+              if (this.props.timestampA !== timestamp) {
+                window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+              }
             }
             this._prepareData(data);
             if (!this.props.isInitial) {
               this._selectValues();
             }
           } else {
-            this.props.snapshotsNotFoundCallback();
-            this.setState({showNotFound:true});
+            this.props.errorHandledCallback('404');
+            this.setState({showError:true});
 
           }
+        })
+        .catch(function(error) {
+          this.props.errorHandledCallback(error.message);
+          console.log('widgetRender--setState');
+          this.setState({showError:true});
         });
     }
   }
