@@ -43,7 +43,7 @@ export default class DiffContainer extends React.Component {
     }
     if (this.state.showError){
       return(
-        <ErrorMessage site ={this.props.site} code ={'404'}/>);
+        <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
       return (

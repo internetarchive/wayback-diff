@@ -9,6 +9,9 @@ import '../css/diff-container.css';
  */
 export default class TimestampHeader extends React.Component {
 
+  ABORT_CONTROLLER = new window.AbortController();
+  isMountedNow = false;
+
   constructor(props) {
     super(props);
 
@@ -26,6 +29,17 @@ export default class TimestampHeader extends React.Component {
 
     this._showDiffs = this._showDiffs.bind(this);
 
+    this._errorHandled = this._errorHandled.bind(this);
+
+  }
+
+  componentDidMount() {
+    this.isMountedNow = true;
+  }
+
+  componentWillUnmount(){
+    this.isMountedNow = false;
+    this.ABORT_CONTROLLER.abort();
   }
 
   _handleRightTimestampChange(){
@@ -100,7 +114,7 @@ export default class TimestampHeader extends React.Component {
       } else {
         url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
-      fetch(url)
+      fetch(url, { signal: this.ABORT_CONTROLLER.signal })
         .then(function(response) {
           if (response) {
             if (!response.ok) {
@@ -127,14 +141,17 @@ export default class TimestampHeader extends React.Component {
 
           }
         })
-        .catch(function(error) {
-          this.props.errorHandledCallback(error.message);
-          console.log('widgetRender--setState');
-          this.setState({showError:true});
-        });
+        .catch(error => {this._errorHandled(error.message);});
     }
   }
 
+  _errorHandled(error) {
+    if (this.isMountedNow) {
+      this.props.errorHandledCallback(error);
+      console.log('widgetRender--setState');
+      this.setState({showError: true});
+    }
+  }
   _prepareData(data){
     data.shift();
     this.setState({
