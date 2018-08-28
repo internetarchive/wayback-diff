@@ -49,7 +49,7 @@ ReactDOM.render(<Router>
   <Switch>
     <Route path="/diff/([^/]*)/([^/]*)/(.+)" render={({match}) =>
       <DiffContainer site={match.params[2]} timestampA={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>} url={match.url}
         timestampB={match.params[1]} fetchCallback = {null} conf={conf}/>
     }/>
     <Route path="/diff/:timestampA//:site" render={({match}) =>
@@ -100,6 +100,8 @@ The **loader** which is a React Component that will be shown when loading is.
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
 The **site** which is the webpage for which the snapshots are shown.
+
+The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
 
 # conf.json
 
@@ -152,7 +154,7 @@ import {DiffContainer} from 'wayback-diff';
 After importing the component you might use it like any other React component:
 
 ```Javascript
- <DiffContainer site={match.params[2]} timestampA={match.params[0]}
+ <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
                     loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
                     timestampB={match.params[1]} fetchCallback = {null} conf={this.conf}/>
 }/>
