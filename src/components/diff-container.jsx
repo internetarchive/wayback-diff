@@ -147,7 +147,7 @@ export default class DiffContainer extends React.Component {
           urlA = response.url;
           let fetchedTimestampA = urlA.split('/')[4];
           if (this.props.timestampA !== fetchedTimestampA) {
-            this.redirectToValidatedTimestamps = true;
+            this._redirectToValidatedTimestamps = true;
           }
           if (this.props.timestampB) {
             urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
@@ -157,13 +157,15 @@ export default class DiffContainer extends React.Component {
                 urlB = response.url;
                 fetchedTimestampB = urlB.split('/')[4];
                 if (this.props.timestampB !== fetchedTimestampB) {
-                  this.redirectToValidatedTimestamps = true;
+                  this._redirectToValidatedTimestamps = true;
+                }
+                if (this._redirectToValidatedTimestamps){
+                  console.log('checkTimestamps--setState');
+                  this.setState({newURL: '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
                 }
               });
           }
           this.timestampsValidated = true;
-          console.log('checkTimestamps--setState');
-          this.setState({newURL: '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
         }
       })
       .catch(error => {this.errorHandled(error.message);});
