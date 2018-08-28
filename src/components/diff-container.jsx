@@ -47,6 +47,15 @@ export default class DiffContainer extends React.Component {
         <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
+      let noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
+      if (this.props.url === noTimestampsStr){
+        return (
+          <div className="diffcontainer-view">
+            <TimestampHeader {...this.props}
+              isInitial={false} errorHandledCallback={this.errorHandled}/>
+            {this._showNoTimestamps()}
+          </div>);
+      }
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={true} {...this.props}
@@ -88,6 +97,15 @@ export default class DiffContainer extends React.Component {
   _renderRedirect () {
     this._redirectToValidatedTimestamps = false;
     return (<Redirect to={this.state.newURL} />);
+  }
+
+  _showNoTimestamps() {
+    return(
+      <div className={'side-by-side-render'}>
+        <NoSnapshotURL/>
+        <NoSnapshotURL/>
+      </div>
+    );
   }
 
   _showOneSnapshot (isLeft, timestamp) {

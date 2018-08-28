@@ -10,30 +10,31 @@ import React from 'react';
 //
 // let conf = require('./conf.json');
 //
-// ReactDOM.render(<Router>
-//   <Switch>
-//     <Route path='/diff/([^/]*)/([^/]*)/(.+)' render={({match}) =>
-//       <DiffContainer site={match.params[2]} timestampA={match.params[0]}
-//         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
-//         timestampB={match.params[1]} fetchCallback={null} conf={conf} />
-//     } />
-//     <Route path='/diff/:timestampA//:site' render={({match}) =>
-//       <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
-//         conf={conf}
-//         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />
-//     } />
-//     <Route path='/diff//:timestampB/:site' render={({match}) =>
-//       <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
-//         conf={conf}
-//         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />
-//     } />
-//     <Route path='/diff/:site' render={({match}) =>
-//       <DiffContainer site={match.params.site} fetchCallback={null}
-//         conf={conf}
-//         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />}
-//     />
-//   </Switch>
-// </Router>, document.getElementById('wayback-diff'))
+// ReactDOM.render(
+//   <Router>
+//     <Switch>
+//       <Route path='/diff/([^/]*)/([^/]*)/(.+)' render={({match}) =>
+//         <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
+//           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
+//           timestampB={match.params[1]} fetchCallback={null} conf={conf} />
+//       } />
+//       <Route path='/diff/:timestampA//:site' render={({match}) =>
+//         <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
+//           conf={conf}
+//           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />
+//       } />
+//       <Route path='/diff//:timestampB/:site' render={({match}) =>
+//         <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
+//           conf={conf}
+//           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />
+//       } />
+//       <Route path='/diff/:site' render={({match}) =>
+//         <DiffContainer site={match.params.site} fetchCallback={null}
+//           conf={conf}
+//           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />}
+//       />
+//     </Switch>
+//   </Router>, document.getElementById('wayback-diff'));
 
 // function fetchData () {
 //   var pathname = window.location.pathname
