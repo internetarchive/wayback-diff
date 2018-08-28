@@ -6812,7 +6812,7 @@ var DiffContainer = function (_React$Component) {
       }
       if (!this._timestampsValidated) {
         {
-          this._checkTimestamps(this.props.timestampA, this.props.timestampB);
+          this._checkTimestamps();
         }
       }
       if (this.props.timestampA && this.props.timestampB) {
@@ -6928,42 +6928,52 @@ var DiffContainer = function (_React$Component) {
     value: function _checkTimestamps() {
       var _this3 = this;
 
-      var urlA, urlB, fetchedTimestampB;
-      if (this.props.timestampA) {
-        urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
+      var fetchedTimestamps = { a: '', b: '' };
+      if (this.props.timestampA && this.props.timestampB) {
+        this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b').then(function () {
+          if (_this3._redirectToValidatedTimestamps) {
+            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        }));
+      } else if (this.props.timestampA) {
+        this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(function () {
+          if (_this3._redirectToValidatedTimestamps) {
+            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
+      } else if (this.props.timestampB) {
+        this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b').then(function () {
+          if (_this3._redirectToValidatedTimestamps) {
+            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
       }
-      fetch(urlA, { redirect: 'follow' }).then(function (response) {
-        return _this3._checkResponse(response);
+    }
+  }, {
+    key: '_validateTimestamp',
+    value: function _validateTimestamp(timestamp, fetchedTimestamps, position) {
+      var _this4 = this;
+
+      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      return fetch(url, { redirect: 'follow' }).then(function (response) {
+        return _this4._checkResponse(response);
       }).then(function (response) {
-        if (response) {
-          urlA = response.url;
-          var fetchedTimestampA = urlA.split('/')[4];
-          if (_this3.props.timestampA !== fetchedTimestampA) {
-            _this3._redirectToValidatedTimestamps = true;
-          }
-          if (_this3.props.timestampB) {
-            urlB = _this3.props.conf.snapshotsPrefix + _this3.props.timestampB + '/' + _this3.props.site;
-            fetch(urlB, { redirect: 'follow' }).then(function (response) {
-              return _this3._checkResponse(response);
-            }).then(function (response) {
-              urlB = response.url;
-              fetchedTimestampB = urlB.split('/')[4];
-              if (_this3.props.timestampB !== fetchedTimestampB) {
-                _this3._redirectToValidatedTimestamps = true;
-              }
-              if (_this3._redirectToValidatedTimestamps) {
-                // console.log('checkTimestamps--setState');
-                _this3.setState({ newURL: _this3.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + _this3.props.site });
-              }
-            }).catch(function (error) {
-              _this3.errorHandled(error.message);
-            });
-          }
-          _this3.timestampsValidated = true;
+        url = response.url;
+        fetchedTimestamps[position] = url.split('/')[4];
+        if (timestamp !== fetchedTimestamps[position]) {
+          _this4._redirectToValidatedTimestamps = true;
         }
       }).catch(function (error) {
-        _this3.errorHandled(error.message);
+        _this4.errorHandled(error.message);
       });
+    }
+  }, {
+    key: '_setNewURL',
+    value: function _setNewURL(fetchedTimestampA, fetchedTimestampB) {
+      if (this._redirectToValidatedTimestamps) {
+        // console.log('checkTimestamps--setState');
+        this.setState({ newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site });
+      }
     }
   }, {
     key: '_handleHeight',
