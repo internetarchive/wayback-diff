@@ -360,7 +360,7 @@ var checkPropTypes = checkPropTypes_1;
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.4.1';
+var ReactVersion = '16.4.2';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -1834,7 +1834,7 @@ function styleInject(css, ref) {
   }
 }
 
-var css = ".side-by-side-render,\n.inline-render {\n    display: flex;\n    flex: 1 0 auto;\n}\n\n.side-by-side-render > iframe,\n.inline-render > iframe {\n    border: 1px solid #ccc;\n    border-radius: 2px;\n    width: 100%;\n}\n\n.side-by-side-render > iframe:first-of-type {\n    margin-right: 0.5em;\n}\n\n.diff-view__alert.alert.alert-warning{\n    text-align: center;\n}\n\n.loading {\n    align-items: center;\n    background: transparent;\n    display: flex;\n    justify-content: center;\n}";
+var css = ".side-by-side-render,\n.inline-render {\n    display: flex;\n    flex: 1 0 auto;\n}\n\n.side-by-side-render > iframe,\n.side-by-side-render > div,\n.inline-render > iframe {\n    border: 1px solid #ccc;\n    border-radius: 2px;\n    width: 100%;\n}\n\n.side-by-side-render > iframe:first-of-type {\n    margin-right: 0.5em;\n}\n\n.diff-view__alert.alert.alert-warning{\n    text-align: center;\n}\n\n.loading {\n    align-items: center;\n    background: transparent;\n    display: flex;\n    justify-content: center;\n}";
 styleInject(css);
 
 /**
@@ -6605,6 +6605,38 @@ function isStrUrl() {
 /*eslint-enable no-mixed-operators*/
 
 /**
+ * Display a message that no url is given so no snapshot is displayed
+ *
+ * @class NoSnapshotURL
+ * @extends {React.Component}
+ */
+
+var NoSnapshotURL = function (_React$Component) {
+  inherits(NoSnapshotURL, _React$Component);
+
+  function NoSnapshotURL() {
+    classCallCheck(this, NoSnapshotURL);
+    return possibleConstructorReturn(this, (NoSnapshotURL.__proto__ || Object.getPrototypeOf(NoSnapshotURL)).apply(this, arguments));
+  }
+
+  createClass(NoSnapshotURL, [{
+    key: 'render',
+    value: function render() {
+      return react.createElement(
+        'div',
+        null,
+        react.createElement(
+          'h1',
+          null,
+          'No capture is selected, please pick one from the list.'
+        )
+      );
+    }
+  }]);
+  return NoSnapshotURL;
+}(react.Component);
+
+/**
  * Display a change between two versions of a page.
  *
  * @class DiffContainer
@@ -6699,7 +6731,6 @@ var DiffContainer = function (_React$Component) {
       var _this2 = this;
 
       if (this.state.fetchedRaw) {
-        var urlB = this.props.conf.noSnapshotURL;
         return react.createElement(
           'div',
           { className: 'side-by-side-render' },
@@ -6711,7 +6742,7 @@ var DiffContainer = function (_React$Component) {
               return _this2._oneFrame = frame;
             }
           }),
-          react.createElement('iframe', { src: urlB })
+          react.createElement(NoSnapshotURL, null)
         );
       }
       var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
@@ -6775,11 +6806,10 @@ var DiffContainer = function (_React$Component) {
       var _this4 = this;
 
       if (this.state.fetchedRaw) {
-        var urlA = this.props.conf.noSnapshotURL;
         return react.createElement(
           'div',
           { className: 'side-by-side-render' },
-          react.createElement('iframe', { src: urlA }),
+          react.createElement(NoSnapshotURL, null),
           react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
               _this4._handleHeight();
             },
@@ -6835,7 +6865,7 @@ var DiffContainer = function (_React$Component) {
   return DiffContainer;
 }(react.Component);
 
-/*eslint-disable no-unused-vars*/
+/* eslint-disable no-unused-vars */
 
 export { DiffContainer };
 //# sourceMappingURL=app.js.map
