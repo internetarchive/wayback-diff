@@ -276,8 +276,11 @@ export default class TimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    document.getElementById('timestamp-select-left').value = this.props.timestampA;
-    document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    if (!(!this.props.timestampA && !this.props.timestampB && !this.props.isInitial)){
+      document.getElementById('timestamp-select-left').value = this.props.timestampA;
+      document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    }
+
   }
 
   _getHeaderInfo (data) {
