@@ -63,7 +63,7 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
-    console.log('TimestampHeader render');
+    // console.log('TimestampHeader render');
     const Loader = () => this.props.loader;
 
     if (!this.state.showError) {
@@ -148,7 +148,7 @@ export default class TimestampHeader extends React.Component {
   _errorHandled(error) {
     if (this.isMountedNow) {
       this.props.errorHandledCallback(error);
-      console.log('widgetRender--setState');
+      // console.log('widgetRender--setState');
       this.setState({showError: true});
     }
   }

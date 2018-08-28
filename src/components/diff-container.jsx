@@ -30,6 +30,7 @@ export default class DiffContainer extends React.Component {
   }
 
   errorHandled (errorCode) {
+    // console.log('I am handling this error: ' + errorCode);
     this.errorCode = errorCode;
     this.setState({showError: true});
   }
@@ -131,7 +132,7 @@ export default class DiffContainer extends React.Component {
 
       return(<DiffView webMonitoringProcessingURL={this.props.conf.webMonitoringProcessingURL}
         page={{url: encodeURIComponent(this.props.site)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader}/>);
+        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
     }
   }
 
@@ -160,10 +161,11 @@ export default class DiffContainer extends React.Component {
                   this._redirectToValidatedTimestamps = true;
                 }
                 if (this._redirectToValidatedTimestamps){
-                  console.log('checkTimestamps--setState');
-                  this.setState({newURL: '/diff/' + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
+                  // console.log('checkTimestamps--setState');
+                  this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
                 }
-              });
+              })
+              .catch(error => {this.errorHandled(error.message);});
           }
           this.timestampsValidated = true;
         }
