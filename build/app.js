@@ -2748,6 +2748,9 @@ var DiffView = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (DiffView.__proto__ || Object.getPrototypeOf(DiffView)).call(this, props));
 
+    _this.ABORT_CONTROLLER = new window.AbortController();
+    _this.isMountedNow = false;
+
     _this.state = { diffData: null };
     return _this;
   }
@@ -2760,6 +2763,17 @@ var DiffView = function (_React$Component) {
       if (this._canFetch(props)) {
         this._loadDiffData(props.page, props.a, props.b, props.diffType);
       }
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.isMountedNow = true;
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.isMountedNow = false;
+      this.ABORT_CONTROLLER.abort();
     }
 
     /**
@@ -2914,12 +2928,35 @@ var DiffView = function (_React$Component) {
       var url = this.props.webMonitoringProcessingURL + '/';
       url += diffTypes[diffType].diffService + '?format=json&include=all&a=' + a + '&b=' + b;
       fetch(url).then(function (response) {
+        return _this3._checkResponse(response);
+      }).then(function (response) {
         return response.json();
       }).then(function (data) {
         _this3.setState({
           diffData: data
         });
+      }).catch(function (error) {
+        _this3._errorHandled(error.message);
       });
+    }
+  }, {
+    key: '_checkResponse',
+    value: function _checkResponse(response) {
+      if (response) {
+        if (!response.ok) {
+          throw Error(response.status);
+        }
+        return response;
+      }
+    }
+  }, {
+    key: '_errorHandled',
+    value: function _errorHandled(error) {
+      if (this.isMountedNow) {
+        this.props.errorHandledCallback(error);
+        // console.log('diffview--setState');
+        this.setState({ showError: true });
+      }
     }
   }]);
   return DiffView;
@@ -2943,10 +2980,14 @@ var TimestampHeader = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (TimestampHeader.__proto__ || Object.getPrototypeOf(TimestampHeader)).call(this, props));
 
+    _this.ABORT_CONTROLLER = new window.AbortController();
+    _this.isMountedNow = false;
+
+
     _this.state = {
       cdxData: false,
       showDiff: false,
-      showNotFound: false
+      showError: false
     };
 
     _this._handleLeftTimestampChange = _this._handleLeftTimestampChange.bind(_this);
@@ -2957,10 +2998,23 @@ var TimestampHeader = function (_React$Component) {
 
     _this._showDiffs = _this._showDiffs.bind(_this);
 
+    _this._errorHandled = _this._errorHandled.bind(_this);
+
     return _this;
   }
 
   createClass(TimestampHeader, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.isMountedNow = true;
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.isMountedNow = false;
+      this.ABORT_CONTROLLER.abort();
+    }
+  }, {
     key: '_handleRightTimestampChange',
     value: function _handleRightTimestampChange() {
       var selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
@@ -2991,41 +3045,37 @@ var TimestampHeader = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
+      // console.log('TimestampHeader render');
       var Loader = function Loader() {
         return _this2.props.loader;
       };
 
-      if (this.state.showNotFound) {
+      if (!this.state.showError) {
+        if (this.state.showDiff) {
+          return react.createElement(
+            'div',
+            { className: 'timestamp-header-view' },
+            this._showInfo(),
+            this._showTimestampSelector(),
+            this._exportParams()
+          );
+        }
+        if (this.state.cdxData) {
+          return react.createElement(
+            'div',
+            { className: 'timestamp-header-view' },
+            this._showInfo(),
+            this._showTimestampSelector(),
+            this._showOpenLinks()
+          );
+        }
         return react.createElement(
           'div',
           null,
-          this._notFound()
+          this._widgetRender(),
+          react.createElement(Loader, null)
         );
       }
-      if (this.state.showDiff) {
-        return react.createElement(
-          'div',
-          { className: 'timestamp-header-view' },
-          this._showInfo(),
-          this._showTimestampSelector(),
-          this._exportParams()
-        );
-      }
-      if (this.state.cdxData) {
-        return react.createElement(
-          'div',
-          { className: 'timestamp-header-view' },
-          this._showInfo(),
-          this._showTimestampSelector(),
-          this._showOpenLinks()
-        );
-      }
-      return react.createElement(
-        'div',
-        null,
-        this._widgetRender(),
-        react.createElement(Loader, null)
-      );
     }
   }, {
     key: '_exportParams',
@@ -3053,23 +3103,41 @@ var TimestampHeader = function (_React$Component) {
         } else {
           url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
         }
-        fetch(url).then(function (response) {
-          return response.json();
+        fetch(url, { signal: this.ABORT_CONTROLLER.signal }).then(function (response) {
+          if (response) {
+            if (!response.ok) {
+              throw Error(response.status);
+            }
+            return response.json();
+          }
         }).then(function (data) {
           if (data && data.length > 0) {
             if (data.length === 2) {
               var timestamp = data[1][0];
-              window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
+              if (_this3.props.timestampA !== timestamp) {
+                window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
+              }
             }
             _this3._prepareData(data);
             if (!_this3.props.isInitial) {
               _this3._selectValues();
             }
           } else {
-            _this3.props.snapshotsNotFoundCallback();
-            _this3.setState({ showNotFound: true });
+            _this3.props.errorHandledCallback('404');
+            _this3.setState({ showError: true });
           }
+        }).catch(function (error) {
+          _this3._errorHandled(error.message);
         });
+      }
+    }
+  }, {
+    key: '_errorHandled',
+    value: function _errorHandled(error) {
+      if (this.isMountedNow) {
+        this.props.errorHandledCallback(error);
+        // console.log('widgetRender--setState');
+        this.setState({ showError: true });
       }
     }
   }, {
@@ -3246,8 +3314,10 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_selectValues',
     value: function _selectValues() {
-      document.getElementById('timestamp-select-left').value = this.props.timestampA;
-      document.getElementById('timestamp-select-right').value = this.props.timestampB;
+      if (!(!this.props.timestampA && !this.props.timestampB && !this.props.isInitial)) {
+        document.getElementById('timestamp-select-left').value = this.props.timestampA;
+        document.getElementById('timestamp-select-right').value = this.props.timestampB;
+      }
     }
   }, {
     key: '_getHeaderInfo',
@@ -3295,6 +3365,7 @@ var DiffFooter = function (_React$Component) {
   createClass(DiffFooter, [{
     key: 'render',
     value: function render() {
+      // console.log('diff-Footer render');
       return react.createElement(
         'div',
         null,
@@ -6637,6 +6708,43 @@ var NoSnapshotURL = function (_React$Component) {
 }(react.Component);
 
 /**
+ * Display an error message depending on props
+ *
+ * @class ErrorMessage
+ * @extends {React.Component}
+ */
+
+var ErrorMessage = function (_React$Component) {
+  inherits(ErrorMessage, _React$Component);
+
+  function ErrorMessage() {
+    classCallCheck(this, ErrorMessage);
+    return possibleConstructorReturn(this, (ErrorMessage.__proto__ || Object.getPrototypeOf(ErrorMessage)).apply(this, arguments));
+  }
+
+  createClass(ErrorMessage, [{
+    key: 'render',
+    value: function render() {
+      if (this.props.code === '404') {
+        return react.createElement(
+          'div',
+          { className: 'alert alert-warning', role: 'alert' },
+          'The Wayback Machine doesn\'t have ',
+          this.props.site,
+          ' archived.'
+        );
+      }
+      return react.createElement(
+        'div',
+        { className: 'alert alert-warning', role: 'alert' },
+        'Communication with the Wayback Machine is not possible at the moment. Please try again later.'
+      );
+    }
+  }]);
+  return ErrorMessage;
+}(react.Component);
+
+/**
  * Display a change between two versions of a page.
  *
  * @class DiffContainer
@@ -6653,21 +6761,24 @@ var DiffContainer = function (_React$Component) {
 
     _this._timestampsValidated = false;
     _this._redirectToValidatedTimestamps = false;
+    _this._errorCode = '';
 
     _this.state = {
       fetchedRaw: null,
-      showNotFound: false
+      showError: false
     };
     _this._oneFrame = null;
-    _this.snapshotsNotFound = _this.snapshotsNotFound.bind(_this);
+    _this.errorHandled = _this.errorHandled.bind(_this);
     _this.prepareDiffView = _this.prepareDiffView.bind(_this);
     return _this;
   }
 
   createClass(DiffContainer, [{
-    key: 'snapshotsNotFound',
-    value: function snapshotsNotFound() {
-      this.setState({ showNotFound: true });
+    key: 'errorHandled',
+    value: function errorHandled(errorCode) {
+      // console.log('I am handling this error: ' + errorCode);
+      this.errorCode = errorCode;
+      this.setState({ showError: true });
     }
   }, {
     key: 'render',
@@ -6677,6 +6788,27 @@ var DiffContainer = function (_React$Component) {
       }
       if (this._redirectToValidatedTimestamps) {
         return this._renderRedirect();
+      }
+      if (this.state.showError) {
+        return react.createElement(ErrorMessage, { site: this.props.site, code: this.errorCode });
+      }
+      if (!this.props.timestampA && !this.props.timestampB) {
+        var noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
+        if (this.props.url === noTimestampsStr) {
+          return react.createElement(
+            'div',
+            { className: 'diffcontainer-view' },
+            react.createElement(TimestampHeader, _extends({}, this.props, {
+              isInitial: false, errorHandledCallback: this.errorHandled })),
+            this._showNoTimestamps()
+          );
+        }
+        return react.createElement(
+          'div',
+          { className: 'diffcontainer-view' },
+          react.createElement(TimestampHeader, _extends({ isInitial: true }, this.props, {
+            errorHandledCallback: this.errorHandled }))
+        );
       }
       if (!this._timestampsValidated) {
         {
@@ -6689,7 +6821,7 @@ var DiffContainer = function (_React$Component) {
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, _extends({ isInitial: false
           }, this.props, {
-            snapshotsNotFoundCallback: this.snapshotsNotFound })),
+            errorHandledCallback: this.errorHandled })),
           this.prepareDiffView(),
           react.createElement(DiffFooter, null)
         );
@@ -6699,8 +6831,8 @@ var DiffContainer = function (_React$Component) {
           'div',
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, _extends({}, this.props, {
-            isInitial: false, snapshotsNotFoundCallback: this.snapshotsNotFound })),
-          this._showLeftSnapshot()
+            isInitial: false, errorHandledCallback: this.errorHandled })),
+          this._showOneSnapshot(true, this.props.timestampA)
         );
       }
       if (this.props.timestampB) {
@@ -6708,16 +6840,10 @@ var DiffContainer = function (_React$Component) {
           'div',
           { className: 'diffcontainer-view' },
           react.createElement(TimestampHeader, _extends({ isInitial: false }, this.props, {
-            snapshotsNotFoundCallback: this.snapshotsNotFound })),
-          this._showRightSnapshot()
+            errorHandledCallback: this.errorHandled })),
+          this._showOneSnapshot(false, this.props.timestampB)
         );
       }
-      return react.createElement(
-        'div',
-        { className: 'diffcontainer-view' },
-        react.createElement(TimestampHeader, _extends({ isInitial: true }, this.props, {
-          snapshotsNotFoundCallback: this.snapshotsNotFound }))
-      );
     }
   }, {
     key: '_renderRedirect',
@@ -6726,14 +6852,40 @@ var DiffContainer = function (_React$Component) {
       return react.createElement(Redirect, { to: this.state.newURL });
     }
   }, {
-    key: '_showLeftSnapshot',
-    value: function _showLeftSnapshot() {
+    key: '_showNoTimestamps',
+    value: function _showNoTimestamps() {
+      return react.createElement(
+        'div',
+        { className: 'side-by-side-render' },
+        react.createElement(NoSnapshotURL, null),
+        react.createElement(NoSnapshotURL, null)
+      );
+    }
+  }, {
+    key: '_showOneSnapshot',
+    value: function _showOneSnapshot(isLeft, timestamp) {
       var _this2 = this;
 
       if (this.state.fetchedRaw) {
+        if (isLeft) {
+          return react.createElement(
+            'div',
+            { className: 'side-by-side-render' },
+            react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
+                _this2._handleHeight();
+              },
+              srcDoc: this.state.fetchedRaw, scrolling: 'no',
+              ref: function ref(frame) {
+                return _this2._oneFrame = frame;
+              }
+            }),
+            react.createElement(NoSnapshotURL, null)
+          );
+        }
         return react.createElement(
           'div',
           { className: 'side-by-side-render' },
+          react.createElement(NoSnapshotURL, null),
           react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
               _this2._handleHeight();
             },
@@ -6741,15 +6893,18 @@ var DiffContainer = function (_React$Component) {
             ref: function ref(frame) {
               return _this2._oneFrame = frame;
             }
-          }),
-          react.createElement(NoSnapshotURL, null)
+          })
         );
       }
-      var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
-      fetch(urlA).then(function (response) {
+      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      fetch(url).then(function (response) {
+        return _this2._checkResponse(response);
+      }).then(function (response) {
         return response.text();
       }).then(function (responseText) {
         _this2.setState({ fetchedRaw: responseText });
+      }).catch(function (error) {
+        _this2.errorHandled(error.message);
       });
       var Loader = function Loader() {
         return _this2.props.loader;
@@ -6759,77 +6914,56 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
-      if (!this.state.showNotFound) {
+      if (!this.state.showError) {
         var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.site);
         var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.site);
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.conf.webMonitoringProcessingURL,
           page: { url: encodeURIComponent(this.props.site) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
-          loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader });
+          loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader, errorHandledCallback: this.errorHandled });
       }
     }
   }, {
     key: '_checkTimestamps',
-    value: function _checkTimestamps(urlA, urlB) {
+    value: function _checkTimestamps() {
       var _this3 = this;
 
-      if (urlA) {
+      var urlA, urlB, fetchedTimestampB;
+      if (this.props.timestampA) {
         urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
       }
       fetch(urlA, { redirect: 'follow' }).then(function (response) {
-        urlA = response.url;
-        var fetchedTimestampA = urlA.split('/')[4];
-        if (urlB) {
-          urlB = _this3.props.conf.snapshotsPrefix + _this3.props.timestampB + '/' + _this3.props.site;
-          fetch(urlB, { redirect: 'follow' }).then(function (response) {
-            urlB = response.url;
-            var fetchedTimestampB = urlB.split('/')[4];
-
-            if (_this3.props.timestampA !== fetchedTimestampA || _this3.props.timestampB !== fetchedTimestampB) {
-              var tempURL = urlA.split('/');
-              var url = '';
-              for (var i = 7; i <= tempURL.length - 1; i++) {
-                url = url + tempURL[i];
+        return _this3._checkResponse(response);
+      }).then(function (response) {
+        if (response) {
+          urlA = response.url;
+          var fetchedTimestampA = urlA.split('/')[4];
+          if (_this3.props.timestampA !== fetchedTimestampA) {
+            _this3._redirectToValidatedTimestamps = true;
+          }
+          if (_this3.props.timestampB) {
+            urlB = _this3.props.conf.snapshotsPrefix + _this3.props.timestampB + '/' + _this3.props.site;
+            fetch(urlB, { redirect: 'follow' }).then(function (response) {
+              return _this3._checkResponse(response);
+            }).then(function (response) {
+              urlB = response.url;
+              fetchedTimestampB = urlB.split('/')[4];
+              if (_this3.props.timestampB !== fetchedTimestampB) {
+                _this3._redirectToValidatedTimestamps = true;
               }
-              _this3._timestampsValidated = true;
-              _this3._redirectToValidatedTimestamps = true;
-              _this3.setState({ newURL: _this3.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + _this3.props.site });
-            }
-          });
+              if (_this3._redirectToValidatedTimestamps) {
+                // console.log('checkTimestamps--setState');
+                _this3.setState({ newURL: _this3.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + _this3.props.site });
+              }
+            }).catch(function (error) {
+              _this3.errorHandled(error.message);
+            });
+          }
+          _this3.timestampsValidated = true;
         }
-        _this3._timestampsValidated = true;
+      }).catch(function (error) {
+        _this3.errorHandled(error.message);
       });
-    }
-  }, {
-    key: '_showRightSnapshot',
-    value: function _showRightSnapshot() {
-      var _this4 = this;
-
-      if (this.state.fetchedRaw) {
-        return react.createElement(
-          'div',
-          { className: 'side-by-side-render' },
-          react.createElement(NoSnapshotURL, null),
-          react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
-              _this4._handleHeight();
-            },
-            srcDoc: this.state.fetchedRaw, scrolling: 'no',
-            ref: function ref(frame) {
-              return _this4._oneFrame = frame;
-            }
-          })
-        );
-      }
-      var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
-      fetch(urlB).then(function (response) {
-        return response.text();
-      }).then(function (responseText) {
-        _this4.setState({ fetchedRaw: responseText });
-      });
-      var Loader = function Loader() {
-        return _this4.props.loader;
-      };
-      return react.createElement(Loader, null);
     }
   }, {
     key: '_handleHeight',
@@ -6860,6 +6994,16 @@ var DiffContainer = function (_React$Component) {
         ' Invalid URL ',
         this.props.site
       );
+    }
+  }, {
+    key: '_checkResponse',
+    value: function _checkResponse(response) {
+      if (response) {
+        if (!response.ok) {
+          throw Error(response.status);
+        }
+        return response;
+      }
     }
   }]);
   return DiffContainer;

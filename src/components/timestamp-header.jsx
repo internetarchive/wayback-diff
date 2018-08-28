@@ -9,13 +9,16 @@ import '../css/diff-container.css';
  */
 export default class TimestampHeader extends React.Component {
 
+  ABORT_CONTROLLER = new window.AbortController();
+  isMountedNow = false;
+
   constructor(props) {
     super(props);
 
     this.state = {
       cdxData: false,
       showDiff: false,
-      showNotFound: false
+      showError: false
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -26,6 +29,17 @@ export default class TimestampHeader extends React.Component {
 
     this._showDiffs = this._showDiffs.bind(this);
 
+    this._errorHandled = this._errorHandled.bind(this);
+
+  }
+
+  componentDidMount() {
+    this.isMountedNow = true;
+  }
+
+  componentWillUnmount(){
+    this.isMountedNow = false;
+    this.ABORT_CONTROLLER.abort();
   }
 
   _handleRightTimestampChange(){
@@ -49,37 +63,34 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
+    // console.log('TimestampHeader render');
     const Loader = () => this.props.loader;
 
-    if (this.state.showNotFound){
-      return(
-        <div>
-          {this._notFound()}
-        </div>);
-    }
-    if (this.state.showDiff) {
-      return(
-        <div className="timestamp-header-view">
-          {this._showInfo()}
-          {this._showTimestampSelector()}
-          {this._exportParams()}
-        </div>
+    if (!this.state.showError) {
+      if (this.state.showDiff) {
+        return (
+          <div className="timestamp-header-view">
+            {this._showInfo()}
+            {this._showTimestampSelector()}
+            {this._exportParams()}
+          </div>
+        );
+      }
+      if (this.state.cdxData) {
+        return (
+          <div className="timestamp-header-view">
+            {this._showInfo()}
+            {this._showTimestampSelector()}
+            {this._showOpenLinks()}
+          </div>
+        );
+      }
+      return (<div>
+        {this._widgetRender()}
+        <Loader/>
+      </div>
       );
     }
-    if (this.state.cdxData) {
-      return (
-        <div className="timestamp-header-view">
-          {this._showInfo()}
-          {this._showTimestampSelector()}
-          {this._showOpenLinks()}
-        </div>
-      );
-    }
-    return (<div>
-      {this._widgetRender()}
-      <Loader/>
-    </div>
-    );
   }
 
   _exportParams(){
@@ -103,27 +114,44 @@ export default class TimestampHeader extends React.Component {
       } else {
         url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
-      fetch(url)
-        .then(response => response.json())
+      fetch(url, { signal: this.ABORT_CONTROLLER.signal })
+        .then(function(response) {
+          if (response) {
+            if (!response.ok) {
+              throw Error(response.status);
+            }
+            return response.json();
+          }
+        })
         .then((data) => {
           if (data && data.length > 0 ){
             if (data.length === 2) {
               let timestamp = data[1][0];
-              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+              if (this.props.timestampA !== timestamp) {
+                window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+              }
             }
             this._prepareData(data);
             if (!this.props.isInitial) {
               this._selectValues();
             }
           } else {
-            this.props.snapshotsNotFoundCallback();
-            this.setState({showNotFound:true});
+            this.props.errorHandledCallback('404');
+            this.setState({showError:true});
 
           }
-        });
+        })
+        .catch(error => {this._errorHandled(error.message);});
     }
   }
 
+  _errorHandled(error) {
+    if (this.isMountedNow) {
+      this.props.errorHandledCallback(error);
+      // console.log('widgetRender--setState');
+      this.setState({showError: true});
+    }
+  }
   _prepareData(data){
     data.shift();
     this.setState({
@@ -248,8 +276,11 @@ export default class TimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    document.getElementById('timestamp-select-left').value = this.props.timestampA;
-    document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    if (!(!this.props.timestampA && !this.props.timestampB && !this.props.isInitial)){
+      document.getElementById('timestamp-select-left').value = this.props.timestampA;
+      document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    }
+
   }
 
   _getHeaderInfo (data) {

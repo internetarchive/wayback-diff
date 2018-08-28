@@ -26,6 +26,10 @@ import SideBySideRawVersions from './side-by-side-raw-versions.jsx';
  */
 
 export default class DiffView extends React.Component {
+
+  ABORT_CONTROLLER = new window.AbortController();
+  isMountedNow = false;
+
   constructor (props) {
     super(props);
     this.state = {diffData: null};
@@ -36,6 +40,15 @@ export default class DiffView extends React.Component {
     if (this._canFetch(props)) {
       this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
+  }
+
+  componentDidMount() {
+    this.isMountedNow = true;
+  }
+
+  componentWillUnmount(){
+    this.isMountedNow = false;
+    this.ABORT_CONTROLLER.abort();
   }
 
   /**
@@ -184,11 +197,30 @@ export default class DiffView extends React.Component {
     var url = `${this.props.webMonitoringProcessingURL}/`;
     url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
     fetch(url)
+      .then(response => {return this._checkResponse(response);})
       .then(response => response.json())
       .then((data) => {
         this.setState({
           diffData: data
         });
-      });
+      })
+      .catch(error => {this._errorHandled(error.message);});
+  }
+
+  _checkResponse(response) {
+    if (response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      return response;
+    }
+  }
+
+  _errorHandled(error) {
+    if (this.isMountedNow) {
+      this.props.errorHandledCallback(error);
+      // console.log('diffview--setState');
+      this.setState({showError: true});
+    }
   }
 }

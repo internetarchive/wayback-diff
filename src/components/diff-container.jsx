@@ -6,6 +6,8 @@ import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
 import {isStrUrl} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
+import ErrorMessage from './errors.jsx';
+
 /**
  * Display a change between two versions of a page.
  *
@@ -15,21 +17,23 @@ import NoSnapshotURL from './no-snapshot-url.jsx';
 export default class DiffContainer extends React.Component {
   _timestampsValidated = false;
   _redirectToValidatedTimestamps = false;
+  _errorCode = '';
   constructor (props) {
     super(props);
     this.state = {
       fetchedRaw: null,
-      showNotFound: false
+      showError: false
     };
     this._oneFrame = null;
-    this.snapshotsNotFound = this.snapshotsNotFound.bind(this);
+    this.errorHandled = this.errorHandled.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
   }
 
-  snapshotsNotFound () {
-    this.setState({showNotFound: true});
+  errorHandled (errorCode) {
+    // console.log('I am handling this error: ' + errorCode);
+    this.errorCode = errorCode;
+    this.setState({showError: true});
   }
-
 
   render () {
     if (this._urlIsInvalid()) {
@@ -37,6 +41,27 @@ export default class DiffContainer extends React.Component {
     }
     if (this._redirectToValidatedTimestamps) {
       return(this._renderRedirect());
+    }
+    if (this.state.showError){
+      return(
+        <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
+    }
+    if (!this.props.timestampA && !this.props.timestampB) {
+      let noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
+      if (this.props.url === noTimestampsStr){
+        return (
+          <div className="diffcontainer-view">
+            <TimestampHeader {...this.props}
+              isInitial={false} errorHandledCallback={this.errorHandled}/>
+            {this._showNoTimestamps()}
+          </div>);
+      }
+      return (
+        <div className="diffcontainer-view">
+          <TimestampHeader isInitial={true} {...this.props}
+            errorHandledCallback={this.errorHandled}/>
+        </div>
+      );
     }
     if (!this._timestampsValidated) {
       {this._checkTimestamps(this.props.timestampA, this.props.timestampB);}
@@ -46,7 +71,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false}
             {...this.props}
-            snapshotsNotFoundCallback={this.snapshotsNotFound}/>
+            errorHandledCallback={this.errorHandled}/>
           {this.prepareDiffView()}
           <DiffFooter/>
         </div>);
@@ -55,24 +80,18 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader {...this.props}
-            isInitial={false} snapshotsNotFoundCallback={this.snapshotsNotFound}/>
-          {this._showLeftSnapshot()}
+            isInitial={false} errorHandledCallback={this.errorHandled}/>
+          {this._showOneSnapshot(true, this.props.timestampA)}
         </div>);
     }
     if (this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false} {...this.props}
-            snapshotsNotFoundCallback={this.snapshotsNotFound}/>
-          {this._showRightSnapshot()}
+            errorHandledCallback={this.errorHandled}/>
+          {this._showOneSnapshot(false, this.props.timestampB)}
         </div>);
     }
-    return (
-      <div className="diffcontainer-view">
-        <TimestampHeader isInitial={true} {...this.props}
-          snapshotsNotFoundCallback={this.snapshotsNotFound}/>
-      </div>
-    );
   }
 
   _renderRedirect () {
@@ -80,92 +99,96 @@ export default class DiffContainer extends React.Component {
     return (<Redirect to={this.state.newURL} />);
   }
 
-  _showLeftSnapshot () {
+  _showNoTimestamps() {
+    return(
+      <div className={'side-by-side-render'}>
+        <NoSnapshotURL/>
+        <NoSnapshotURL/>
+      </div>
+    );
+  }
+
+  _showOneSnapshot (isLeft, timestamp) {
     if(this.state.fetchedRaw){
+      if (isLeft){
+        return(
+          <div className={'side-by-side-render'}>
+            <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
+              srcDoc={this.state.fetchedRaw} scrolling={'no'}
+              ref={frame => this._oneFrame = frame}
+            />
+            <NoSnapshotURL/>
+          </div>
+        );
+      }
       return(
         <div className={'side-by-side-render'}>
+          <NoSnapshotURL/>
           <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
             srcDoc={this.state.fetchedRaw} scrolling={'no'}
             ref={frame => this._oneFrame = frame}
           />
-          <NoSnapshotURL/>
         </div>
       );
     }
-    let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
-    fetch(urlA)
-      .then(response => {
-        return response.text();
-      }).then((responseText) => {
+    let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+    fetch(url)
+      .then(response => {return this._checkResponse(response);})
+      .then(response => {return response.text();})
+      .then((responseText) => {
         this.setState({fetchedRaw: responseText});
-      });
+      })
+      .catch(error => {this.errorHandled(error.message);});
     const Loader = () => this.props.loader;
     return <Loader/>;
   }
 
   prepareDiffView(){
-    if (!this.state.showNotFound){
+    if (!this.state.showError){
       let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.site);
       let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.site);
 
       return(<DiffView webMonitoringProcessingURL={this.props.conf.webMonitoringProcessingURL}
         page={{url: encodeURIComponent(this.props.site)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader}/>);
+        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
     }
   }
 
-  _checkTimestamps (urlA, urlB) {
-    if (urlA){
+  _checkTimestamps () {
+    var urlA, urlB, fetchedTimestampB;
+    if (this.props.timestampA){
       urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
     }
     fetch(urlA, {redirect: 'follow'})
+      .then(response => {return this._checkResponse(response);})
       .then(response => {
-        urlA = response.url;
-        let fetchedTimestampA = urlA.split('/')[4];
-        if (urlB) {
-          urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
-          fetch(urlB, {redirect: 'follow'})
-            .then(response => {
-              urlB = response.url;
-              let fetchedTimestampB = urlB.split('/')[4];
-
-              if (this.props.timestampA !== fetchedTimestampA || this.props.timestampB !== fetchedTimestampB) {
-                let tempURL = urlA.split('/');
-                var url = '';
-                for (var i = 7; i <= (tempURL.length - 1); i++) {
-                  url = url + tempURL[i];
+        if (response) {
+          urlA = response.url;
+          let fetchedTimestampA = urlA.split('/')[4];
+          if (this.props.timestampA !== fetchedTimestampA) {
+            this._redirectToValidatedTimestamps = true;
+          }
+          if (this.props.timestampB) {
+            urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
+            fetch(urlB, {redirect: 'follow'})
+              .then(response => {return this._checkResponse(response);})
+              .then(response => {
+                urlB = response.url;
+                fetchedTimestampB = urlB.split('/')[4];
+                if (this.props.timestampB !== fetchedTimestampB) {
+                  this._redirectToValidatedTimestamps = true;
                 }
-                this._timestampsValidated = true;
-                this._redirectToValidatedTimestamps = true;
-                this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
-              }
-            });
+                if (this._redirectToValidatedTimestamps){
+                  // console.log('checkTimestamps--setState');
+                  this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
+                }
+              })
+              .catch(error => {this.errorHandled(error.message);});
+          }
+          this.timestampsValidated = true;
         }
-        this._timestampsValidated = true;
-      });
-  }
-
-  _showRightSnapshot () {
-    if(this.state.fetchedRaw){
-      return(
-        <div className={'side-by-side-render'}>
-          <NoSnapshotURL/>
-          <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
-            srcDoc={this.state.fetchedRaw} scrolling={'no'}
-            ref={frame => this._oneFrame = frame}
-          />
-        </div>
-      );
-    }
-    let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
-    fetch(urlB)
-      .then(response => {
-        return response.text();
-      }).then((responseText) => {
-        this.setState({fetchedRaw: responseText});
-      });
-    const Loader = () => this.props.loader;
-    return <Loader/>;
+      })
+      .catch(error => {this.errorHandled(error.message);});
   }
 
   _handleHeight () {
@@ -183,5 +206,14 @@ export default class DiffContainer extends React.Component {
 
   _invalidURL () {
     return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.site}</div>);
+  }
+
+  _checkResponse(response) {
+    if (response) {
+      if (!response.ok) {
+        throw Error(response.status);
+      }
+      return response;
+    }
   }
 }
