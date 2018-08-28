@@ -3314,8 +3314,10 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_selectValues',
     value: function _selectValues() {
-      document.getElementById('timestamp-select-left').value = this.props.timestampA;
-      document.getElementById('timestamp-select-right').value = this.props.timestampB;
+      if (!(!this.props.timestampA && !this.props.timestampB && !this.props.isInitial)) {
+        document.getElementById('timestamp-select-left').value = this.props.timestampA;
+        document.getElementById('timestamp-select-right').value = this.props.timestampB;
+      }
     }
   }, {
     key: '_getHeaderInfo',
@@ -6791,6 +6793,16 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(ErrorMessage, { site: this.props.site, code: this.errorCode });
       }
       if (!this.props.timestampA && !this.props.timestampB) {
+        var noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
+        if (this.props.url === noTimestampsStr) {
+          return react.createElement(
+            'div',
+            { className: 'diffcontainer-view' },
+            react.createElement(TimestampHeader, _extends({}, this.props, {
+              isInitial: false, errorHandledCallback: this.errorHandled })),
+            this._showNoTimestamps()
+          );
+        }
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
@@ -6838,6 +6850,16 @@ var DiffContainer = function (_React$Component) {
     value: function _renderRedirect() {
       this._redirectToValidatedTimestamps = false;
       return react.createElement(Redirect, { to: this.state.newURL });
+    }
+  }, {
+    key: '_showNoTimestamps',
+    value: function _showNoTimestamps() {
+      return react.createElement(
+        'div',
+        { className: 'side-by-side-render' },
+        react.createElement(NoSnapshotURL, null),
+        react.createElement(NoSnapshotURL, null)
+      );
     }
   }, {
     key: '_showOneSnapshot',
