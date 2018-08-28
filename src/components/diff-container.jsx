@@ -64,7 +64,7 @@ export default class DiffContainer extends React.Component {
       );
     }
     if (!this._timestampsValidated) {
-      {this._checkTimestamps(this.props.timestampA, this.props.timestampB);}
+      {this._checkTimestamps();}
     }
     if (this.props.timestampA && this.props.timestampB) {
       return (
@@ -155,40 +155,51 @@ export default class DiffContainer extends React.Component {
   }
 
   _checkTimestamps () {
-    var urlA, urlB, fetchedTimestampB;
-    if (this.props.timestampA){
-      urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site;
+    var fetchedTimestamps = { a: '', b: '' };
+    if (this.props.timestampA && this.props.timestampB) {
+      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
+        .then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
+          .then(()=> {
+            if (this._redirectToValidatedTimestamps){
+              this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+            }
+          }));
+    } else if (this.props.timestampA) {
+      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
+    } else if (this.props.timestampB) {
+      this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
     }
-    fetch(urlA, {redirect: 'follow'})
+  }
+
+  _validateTimestamp(timestamp, fetchedTimestamps, position){
+    var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+    return  fetch(url, {redirect: 'follow'})
       .then(response => {return this._checkResponse(response);})
       .then(response => {
-        if (response) {
-          urlA = response.url;
-          let fetchedTimestampA = urlA.split('/')[4];
-          if (this.props.timestampA !== fetchedTimestampA) {
-            this._redirectToValidatedTimestamps = true;
-          }
-          if (this.props.timestampB) {
-            urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site;
-            fetch(urlB, {redirect: 'follow'})
-              .then(response => {return this._checkResponse(response);})
-              .then(response => {
-                urlB = response.url;
-                fetchedTimestampB = urlB.split('/')[4];
-                if (this.props.timestampB !== fetchedTimestampB) {
-                  this._redirectToValidatedTimestamps = true;
-                }
-                if (this._redirectToValidatedTimestamps){
-                  // console.log('checkTimestamps--setState');
-                  this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
-                }
-              })
-              .catch(error => {this.errorHandled(error.message);});
-          }
-          this.timestampsValidated = true;
+        url = response.url;
+        fetchedTimestamps[position] = url.split('/')[4];
+        if (timestamp !== fetchedTimestamps[position]) {
+          this._redirectToValidatedTimestamps = true;
         }
       })
       .catch(error => {this.errorHandled(error.message);});
+  }
+
+  _setNewURL(fetchedTimestampA, fetchedTimestampB){
+    if (this._redirectToValidatedTimestamps){
+      // console.log('checkTimestamps--setState');
+      this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
+    }
   }
 
   _handleHeight () {
