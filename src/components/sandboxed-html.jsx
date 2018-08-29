@@ -51,7 +51,7 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   handleHeight () {
-    let offsetHeight = this._frame.contentDocument.scrollingElement.offsetHeight;
+    let offsetHeight = this._frame.contentDocument.documentElement.scrollHeight;
     if (offsetHeight > 0.1 * this._frame.height) {
       this._frame.height = offsetHeight;
     } else {
