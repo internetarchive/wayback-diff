@@ -2277,7 +2277,7 @@ var SandboxedHtml = function (_React$PureComponent) {
   }, {
     key: 'handleHeight',
     value: function handleHeight() {
-      var offsetHeight = this._frame.contentDocument.scrollingElement.offsetHeight;
+      var offsetHeight = this._frame.contentDocument.documentElement.scrollHeight;
       if (offsetHeight > 0.1 * this._frame.height) {
         this._frame.height = offsetHeight;
       } else {
