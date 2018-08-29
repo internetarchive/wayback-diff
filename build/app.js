@@ -2250,7 +2250,7 @@ var SandboxedHtml = function (_React$PureComponent) {
     value: function render() {
       var _this2 = this;
 
-      return react.createElement('iframe', { height: window.innerHeight, scrolling: 'no', onLoad: function onLoad() {
+      return react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
           _this2.handleHeight();
           _this2.removeLoaderImg();
         },
@@ -2278,10 +2278,14 @@ var SandboxedHtml = function (_React$PureComponent) {
     key: 'handleHeight',
     value: function handleHeight() {
       var offsetHeight = this._frame.contentDocument.documentElement.scrollHeight;
+      var offsetWidth = this._frame.contentDocument.documentElement.scrollWidth;
       if (offsetHeight > 0.1 * this._frame.height) {
-        this._frame.height = offsetHeight;
+        this._frame.height = offsetHeight + offsetHeight * 0.01;
       } else {
         this._frame.height = 0.5 * this._frame.height;
+      }
+      if (offsetWidth > this._frame.clientWidth) {
+        this._frame.width = offsetWidth;
       }
     }
   }, {
