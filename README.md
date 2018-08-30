@@ -50,27 +50,27 @@ ReactDOM.render(
     <Switch>
       <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
         <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
           timestampB={match.params[1]} fetchCallback={null} conf={conf} />
       } />
       <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
         <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
           fetchCallback={null} conf={conf} />
       } />
       <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
         <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
           fetchCallback={null} conf={conf} />
       } />
 
       <Route path='/diff///(.+)' render={({match}) =>
         <DiffContainer site={match.params[0]} conf={conf} noTimestamps={true}
-          loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />
       } />
       <Route path='/diff/(.+)' render={({match}) =>
         <DiffContainer site={match.params[0]} fetchCallback={null} conf={conf}
-          loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} />}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />}
       />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));
