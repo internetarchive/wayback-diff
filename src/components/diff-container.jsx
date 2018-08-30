@@ -47,8 +47,7 @@ export default class DiffContainer extends React.Component {
         <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
-      let noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
-      if (this.props.url === noTimestampsStr){
+      if (this.props.noTimestamps){
         return (
           <div className="diffcontainer-view">
             <TimestampHeader {...this.props}
