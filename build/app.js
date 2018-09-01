@@ -6797,8 +6797,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(ErrorMessage, { site: this.props.site, code: this.errorCode });
       }
       if (!this.props.timestampA && !this.props.timestampB) {
-        var noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
-        if (this.props.url === noTimestampsStr) {
+        if (this.props.noTimestamps) {
           return react.createElement(
             'div',
             { className: 'diffcontainer-view' },
@@ -6878,7 +6877,7 @@ var DiffContainer = function (_React$Component) {
             react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
                 _this2._handleHeight();
               },
-              srcDoc: this.state.fetchedRaw, scrolling: 'no',
+              srcDoc: this.state.fetchedRaw,
               ref: function ref(frame) {
                 return _this2._oneFrame = frame;
               }
@@ -6893,7 +6892,7 @@ var DiffContainer = function (_React$Component) {
           react.createElement('iframe', { height: window.innerHeight, onLoad: function onLoad() {
               _this2._handleHeight();
             },
-            srcDoc: this.state.fetchedRaw, scrolling: 'no',
+            srcDoc: this.state.fetchedRaw,
             ref: function ref(frame) {
               return _this2._oneFrame = frame;
             }
@@ -6904,7 +6903,12 @@ var DiffContainer = function (_React$Component) {
       fetch(url).then(function (response) {
         return _this2._checkResponse(response);
       }).then(function (response) {
-        return response.text();
+        var contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('text/html')) {
+          return response.text();
+        } else {
+          return '<iframe src=' + response.url + ' style="width: 98%; position: absolute; height: 98%;" />';
+        }
       }).then(function (responseText) {
         _this2.setState({ fetchedRaw: responseText });
       }).catch(function (error) {
@@ -6974,7 +6978,7 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: '_setNewURL',
     value: function _setNewURL(fetchedTimestampA, fetchedTimestampB) {
-      if (this._redirectToValidatedTimestamps) {
+      if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)) {
         // console.log('checkTimestamps--setState');
         this.setState({ newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site });
       }
@@ -6982,11 +6986,15 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: '_handleHeight',
     value: function _handleHeight() {
-      var offsetHeight = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+      var offsetHeight = this._oneFrame.contentDocument.documentElement.scrollHeight;
+      var offsetWidth = this._oneFrame.contentDocument.documentElement.scrollWidth;
       if (offsetHeight > 0.1 * this._oneFrame.height) {
-        this._oneFrame.height = offsetHeight;
+        this._oneFrame.height = offsetHeight + offsetHeight * 0.01;
       } else {
         this._oneFrame.height = 0.5 * this._oneFrame.height;
+      }
+      if (offsetWidth > this._oneFrame.clientWidth) {
+        this._oneFrame.width = offsetWidth;
       }
     }
   }, {

@@ -47,8 +47,7 @@ export default class DiffContainer extends React.Component {
         <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
-      let noTimestampsStr = this.props.conf.urlPrefix + '//' + this.props.site;
-      if (this.props.url === noTimestampsStr){
+      if (this.props.noTimestamps){
         return (
           <div className="diffcontainer-view">
             <TimestampHeader {...this.props}
@@ -114,7 +113,7 @@ export default class DiffContainer extends React.Component {
         return(
           <div className={'side-by-side-render'}>
             <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
-              srcDoc={this.state.fetchedRaw} scrolling={'no'}
+              srcDoc={this.state.fetchedRaw}
               ref={frame => this._oneFrame = frame}
             />
             <NoSnapshotURL/>
@@ -125,7 +124,7 @@ export default class DiffContainer extends React.Component {
         <div className={'side-by-side-render'}>
           <NoSnapshotURL/>
           <iframe height={window.innerHeight} onLoad={()=>{this._handleHeight();}}
-            srcDoc={this.state.fetchedRaw} scrolling={'no'}
+            srcDoc={this.state.fetchedRaw}
             ref={frame => this._oneFrame = frame}
           />
         </div>
@@ -134,7 +133,14 @@ export default class DiffContainer extends React.Component {
     let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
     fetch(url)
       .then(response => {return this._checkResponse(response);})
-      .then(response => {return response.text();})
+      .then(response => {
+        var contentType = response.headers.get('content-type');
+        if(contentType && contentType.includes('text/html')) {
+          return response.text();
+        } else {
+          return '<iframe src='+response.url+' style="width: 98%; position: absolute; height: 98%;" />';
+        }
+      })
       .then((responseText) => {
         this.setState({fetchedRaw: responseText});
       })
@@ -196,18 +202,22 @@ export default class DiffContainer extends React.Component {
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
-    if (this._redirectToValidatedTimestamps){
+    if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)){
       // console.log('checkTimestamps--setState');
       this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
     }
   }
 
   _handleHeight () {
-    let offsetHeight = this._oneFrame.contentDocument.scrollingElement.offsetHeight;
+    let offsetHeight = this._oneFrame.contentDocument.documentElement.scrollHeight;
+    let offsetWidth = this._oneFrame.contentDocument.documentElement.scrollWidth;
     if (offsetHeight > 0.1 * this._oneFrame.height) {
-      this._oneFrame.height = offsetHeight;
+      this._oneFrame.height = offsetHeight + (offsetHeight * 0.01);
     } else {
       this._oneFrame.height = 0.5 * this._oneFrame.height;
+    }
+    if (offsetWidth > this._oneFrame.clientWidth) {
+      this._oneFrame.width = offsetWidth;
     }
   }
 

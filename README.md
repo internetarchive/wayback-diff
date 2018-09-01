@@ -45,31 +45,35 @@ import Loading from './components/loading.jsx';
 
 var conf = require('./conf.json');
 
-ReactDOM.render(<Router>
-  <Switch>
-    <Route path="/diff/([^/]*)/([^/]*)/(.+)" render={({match}) =>
-      <DiffContainer site={match.params[2]} timestampA={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>} url={match.url}
-        timestampB={match.params[1]} fetchCallback = {null} conf={conf}/>
-    }/>
-    <Route path="/diff/:timestampA//:site" render={({match}) =>
-      <DiffContainer site={match.params.site} timestampA={match.params.timestampA}
-        conf={conf}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}/>
-    }/>
-    <Route path="/diff//:timestampB/:site" render={({match}) =>
-      <DiffContainer site={match.params.site} timestampB={match.params.timestampB}
-        conf={conf}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}/>
-    }/>
-    <Route path="/diff/:site" render={({match}) =>
-      <DiffContainer site={match.params.site} fetchCallback = {null}
-        conf={conf}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
-        conf={conf}/>}
-    />
-  </Switch>
-</Router>, document.getElementById('wayback-diff'));
+ReactDOM.render(
+  <Router>
+    <Switch>
+      <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
+        <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+          timestampB={match.params[1]} fetchCallback={null} conf={conf} />
+      } />
+      <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
+        <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+          fetchCallback={null} conf={conf} />
+      } />
+      <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
+        <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+          fetchCallback={null} conf={conf} />
+      } />
+
+      <Route path='/diff///(.+)' render={({match}) =>
+        <DiffContainer site={match.params[0]} conf={conf} noTimestamps={true}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />
+      } />
+      <Route path='/diff/(.+)' render={({match}) =>
+        <DiffContainer site={match.params[0]} fetchCallback={null} conf={conf}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />}
+      />
+    </Switch>
+  </Router>, document.getElementById('wayback-diff'));
 ```
 
 # Use it as a component in an other project
@@ -83,7 +87,7 @@ export DiffContainer from './components/diff-container.jsx';
 ```
 
 # Props 
-DiffContainer can receive up to seven props. All of them are optional. 
+DiffContainer can receive up to eight props. All of them are optional. 
 
 The **conf** prop that receives a JSON file that contains the configuration of the wayback-diff component.
 
@@ -100,6 +104,8 @@ The **loader** which is a React Component that will be shown when loading is.
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
 The **site** which is the webpage for which the snapshots are shown.
+
+The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
 The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
 
