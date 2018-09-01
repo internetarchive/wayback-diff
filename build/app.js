@@ -3091,15 +3091,8 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_widgetRender',
     value: function _widgetRender() {
-      var _this3 = this;
-
-      if (this.props.fetchCallback) {
-        this.props.fetchCallback().then(function (data) {
-          _this3._prepareData(data);
-          if (!_this3.props.isInitial) {
-            _this3._selectValues();
-          }
-        });
+      if (this.props.fetchCDXCallback) {
+        this._handleFetch(this.props.fetchCDXCallback());
       } else {
         var url;
         if (this.props.conf.limit) {
@@ -3107,33 +3100,40 @@ var TimestampHeader = function (_React$Component) {
         } else {
           url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
         }
-        fetch(url, { signal: this.ABORT_CONTROLLER.signal }).then(function (response) {
-          if (response) {
-            if (!response.ok) {
-              throw Error(response.status);
-            }
-            return response.json();
-          }
-        }).then(function (data) {
-          if (data && data.length > 0) {
-            if (data.length === 2) {
-              var timestamp = data[1][0];
-              if (_this3.props.timestampA !== timestamp) {
-                window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
-              }
-            }
-            _this3._prepareData(data);
-            if (!_this3.props.isInitial) {
-              _this3._selectValues();
-            }
-          } else {
-            _this3.props.errorHandledCallback('404');
-            _this3.setState({ showError: true });
-          }
-        }).catch(function (error) {
-          _this3._errorHandled(error.message);
-        });
+        this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
       }
+    }
+  }, {
+    key: '_handleFetch',
+    value: function _handleFetch(promise) {
+      var _this3 = this;
+
+      promise.then(function (response) {
+        if (response) {
+          if (!response.ok) {
+            throw Error(response.status);
+          }
+          return response.json();
+        }
+      }).then(function (data) {
+        if (data && data.length > 0) {
+          if (data.length === 2) {
+            var timestamp = data[1][0];
+            if (_this3.props.timestampA !== timestamp) {
+              window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
+            }
+          }
+          _this3._prepareData(data);
+          if (!_this3.props.isInitial) {
+            _this3._selectValues();
+          }
+        } else {
+          _this3.props.errorHandledCallback('404');
+          _this3.setState({ showError: true });
+        }
+      }).catch(function (error) {
+        _this3._errorHandled(error.message);
+      });
     }
   }, {
     key: '_errorHandled',
@@ -6899,9 +6899,25 @@ var DiffContainer = function (_React$Component) {
           })
         );
       }
-      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
-      fetch(url).then(function (response) {
-        return _this2._checkResponse(response);
+      if (this.props.fetchSnapshotCallback) {
+        this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
+      } else {
+        var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+        this._handleSnapshotFetch(fetch(url));
+      }
+
+      var Loader = function Loader() {
+        return _this2.props.loader;
+      };
+      return react.createElement(Loader, null);
+    }
+  }, {
+    key: '_handleSnapshotFetch',
+    value: function _handleSnapshotFetch(promise) {
+      var _this3 = this;
+
+      promise.then(function (response) {
+        return _this3._checkResponse(response);
       }).then(function (response) {
         var contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('text/html')) {
@@ -6910,14 +6926,10 @@ var DiffContainer = function (_React$Component) {
           return '<iframe src=' + response.url + ' style="width: 98%; position: absolute; height: 98%;" />';
         }
       }).then(function (responseText) {
-        _this2.setState({ fetchedRaw: responseText });
+        _this3.setState({ fetchedRaw: responseText });
       }).catch(function (error) {
-        _this2.errorHandled(error.message);
+        _this3.errorHandled(error.message);
       });
-      var Loader = function Loader() {
-        return _this2.props.loader;
-      };
-      return react.createElement(Loader, null);
     }
   }, {
     key: 'prepareDiffView',
@@ -6934,46 +6946,54 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: '_checkTimestamps',
     value: function _checkTimestamps() {
-      var _this3 = this;
+      var _this4 = this;
 
       var fetchedTimestamps = { a: '', b: '' };
       if (this.props.timestampA && this.props.timestampB) {
         this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b').then(function () {
-          if (_this3._redirectToValidatedTimestamps) {
-            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          if (_this4._redirectToValidatedTimestamps) {
+            _this4._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         }));
       } else if (this.props.timestampA) {
         this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(function () {
-          if (_this3._redirectToValidatedTimestamps) {
-            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          if (_this4._redirectToValidatedTimestamps) {
+            _this4._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         });
       } else if (this.props.timestampB) {
         this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b').then(function () {
-          if (_this3._redirectToValidatedTimestamps) {
-            _this3._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          if (_this4._redirectToValidatedTimestamps) {
+            _this4._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         });
       }
     }
   }, {
-    key: '_validateTimestamp',
-    value: function _validateTimestamp(timestamp, fetchedTimestamps, position) {
-      var _this4 = this;
+    key: '_handleTimestampValidationFetch',
+    value: function _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position) {
+      var _this5 = this;
 
-      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
-      return fetch(url, { redirect: 'follow' }).then(function (response) {
-        return _this4._checkResponse(response);
+      return promise.then(function (response) {
+        return _this5._checkResponse(response);
       }).then(function (response) {
-        url = response.url;
+        var url = response.url;
         fetchedTimestamps[position] = url.split('/')[4];
         if (timestamp !== fetchedTimestamps[position]) {
-          _this4._redirectToValidatedTimestamps = true;
+          _this5._redirectToValidatedTimestamps = true;
         }
       }).catch(function (error) {
-        _this4.errorHandled(error.message);
+        _this5.errorHandled(error.message);
       });
+    }
+  }, {
+    key: '_validateTimestamp',
+    value: function _validateTimestamp(timestamp, fetchedTimestamps, position) {
+      if (this.props.fetchSnapshotCallback) {
+        return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
+      }
+      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
     }
   }, {
     key: '_setNewURL',
