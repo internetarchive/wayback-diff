@@ -107,6 +107,8 @@ The **site** which is the webpage for which the snapshots are shown.
 
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
+The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
+
 # conf.json
 
 The configuration file should have the following format:
@@ -158,7 +160,7 @@ import {DiffContainer} from 'wayback-diff';
 After importing the component you might use it like any other React component:
 
 ```Javascript
- <DiffContainer site={match.params[2]} timestampA={match.params[0]}
+ <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
                     loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
                     timestampB={match.params[1]} fetchCallback = {null} conf={this.conf}/>
 }/>
