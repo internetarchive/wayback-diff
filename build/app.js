@@ -6950,11 +6950,13 @@ var DiffContainer = function (_React$Component) {
 
       var fetchedTimestamps = { a: '', b: '' };
       if (this.props.timestampA && this.props.timestampB) {
-        this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b').then(function () {
+        this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(function () {
+          return _this4._validateTimestamp(_this4.props.timestampB, fetchedTimestamps, 'b');
+        }).then(function () {
           if (_this4._redirectToValidatedTimestamps) {
             _this4._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
-        }));
+        });
       } else if (this.props.timestampA) {
         this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a').then(function () {
           if (_this4._redirectToValidatedTimestamps) {

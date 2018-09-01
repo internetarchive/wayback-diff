@@ -173,12 +173,12 @@ export default class DiffContainer extends React.Component {
     var fetchedTimestamps = { a: '', b: '' };
     if (this.props.timestampA && this.props.timestampB) {
       this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
-          .then(()=> {
-            if (this._redirectToValidatedTimestamps){
-              this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-            }
-          }));
+        .then(() => {return this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b');})
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
     } else if (this.props.timestampA) {
       this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
         .then(()=> {
