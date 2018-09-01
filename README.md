@@ -108,6 +108,8 @@ The **site** which is the webpage for which the snapshots are shown.
 
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
+The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
+
 # conf.json
 
 The configuration file should have the following format:
