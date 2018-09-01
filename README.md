@@ -51,26 +51,25 @@ ReactDOM.render(
       <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
         <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
           loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          timestampB={match.params[1]} fetchCallback={null} conf={conf} />
+          timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
       } />
       <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
         <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
           loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          fetchCallback={null} conf={conf} />
+          fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
       } />
       <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
         <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
           loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          fetchCallback={null} conf={conf} />
+          fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
       } />
-
       <Route path='/diff///(.+)' render={({match}) =>
-        <DiffContainer site={match.params[0]} conf={conf} noTimestamps={true}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />
+        <DiffContainer site={match.params[0]} conf={conf} noTimestamps={true} fetchCDXCallback={null}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
       } />
       <Route path='/diff/(.+)' render={({match}) =>
-        <DiffContainer site={match.params[0]} fetchCallback={null} conf={conf}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} />}
+        <DiffContainer site={match.params[0]} fetchCDXCallback={null}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
       />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));
@@ -91,9 +90,11 @@ DiffContainer can receive up to eight props. All of them are optional.
 
 The **conf** prop that receives a JSON file that contains the configuration of the wayback-diff component.
 
-The **fetchCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
+The **fetchCDXCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
 
-- If null is passed as the fetchCallback prop a default fallback method is going to be used instead.
+The **fetchSnapshotCallback** which is a callback function that will be used to fetch the snapshots from the Wayback Machine.
+
+- If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
 
 - The callback function should return a fetch Promise.
 
@@ -160,9 +161,33 @@ import {DiffContainer} from 'wayback-diff';
 After importing the component you might use it like any other React component:
 
 ```Javascript
- <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
-                    loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'}/>}
-                    timestampB={match.params[1]} fetchCallback = {null} conf={this.conf}/>
+ <Router>
+    <Switch>
+        <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
+            <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
+              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+              timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
+        } />
+        <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
+            <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
+              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+              fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+        } />
+        <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
+            <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
+              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+              fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+        } />
+        <Route path='/diff///(.+)' render={({match}) =>
+            <DiffContainer site={match.params[0]} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
+              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
+        } />
+        <Route path='/diff/(.+)' render={({match}) =>
+            <DiffContainer site={match.params[0]} fetchCDXCallback={null}
+              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
+        />
+    </Switch>
+</Router>
 }/>
 ```
 

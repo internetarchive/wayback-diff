@@ -100,13 +100,8 @@ export default class TimestampHeader extends React.Component {
   }
 
   _widgetRender () {
-    if (this.props.fetchCallback) {
-      this.props.fetchCallback().then((data => {
-        this._prepareData(data);
-        if (!this.props.isInitial) {
-          this._selectValues();
-        }
-      }));
+    if (this.props.fetchCDXCallback) {
+      this._handleFetch(this.props.fetchCDXCallback());
     } else {
       var url;
       if (this.props.conf.limit){
@@ -114,35 +109,40 @@ export default class TimestampHeader extends React.Component {
       } else {
         url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
-      fetch(url, { signal: this.ABORT_CONTROLLER.signal })
-        .then(function(response) {
-          if (response) {
-            if (!response.ok) {
-              throw Error(response.status);
-            }
-            return response.json();
-          }
-        })
-        .then((data) => {
-          if (data && data.length > 0 ){
-            if (data.length === 2) {
-              let timestamp = data[1][0];
-              if (this.props.timestampA !== timestamp) {
-                window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
-              }
-            }
-            this._prepareData(data);
-            if (!this.props.isInitial) {
-              this._selectValues();
-            }
-          } else {
-            this.props.errorHandledCallback('404');
-            this.setState({showError:true});
+      this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
 
-          }
-        })
-        .catch(error => {this._errorHandled(error.message);});
     }
+  }
+
+  _handleFetch(promise){
+    promise
+      .then(function(response) {
+        if (response) {
+          if (!response.ok) {
+            throw Error(response.status);
+          }
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data && data.length > 0 ){
+          if (data.length === 2) {
+            let timestamp = data[1][0];
+            if (this.props.timestampA !== timestamp) {
+              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+            }
+          }
+          this._prepareData(data);
+          if (!this.props.isInitial) {
+            this._selectValues();
+          }
+        } else {
+          this.props.errorHandledCallback('404');
+          this.setState({showError:true});
+
+        }
+      })
+      .catch(error => {this._errorHandled(error.message);});
   }
 
   _errorHandled(error) {

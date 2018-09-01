@@ -130,8 +130,19 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
-    fetch(url)
+    if (this.props.fetchSnapshotCallback){
+      this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
+    }else {
+      let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      this._handleSnapshotFetch(fetch(url));
+    }
+
+    const Loader = () => this.props.loader;
+    return <Loader/>;
+  }
+
+  _handleSnapshotFetch(promise){
+    promise
       .then(response => {return this._checkResponse(response);})
       .then(response => {
         var contentType = response.headers.get('content-type');
@@ -145,8 +156,6 @@ export default class DiffContainer extends React.Component {
         this.setState({fetchedRaw: responseText});
       })
       .catch(error => {this.errorHandled(error.message);});
-    const Loader = () => this.props.loader;
-    return <Loader/>;
   }
 
   prepareDiffView(){
@@ -164,12 +173,12 @@ export default class DiffContainer extends React.Component {
     var fetchedTimestamps = { a: '', b: '' };
     if (this.props.timestampA && this.props.timestampB) {
       this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
-          .then(()=> {
-            if (this._redirectToValidatedTimestamps){
-              this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-            }
-          }));
+        .then(() => {return this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b');})
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        });
     } else if (this.props.timestampA) {
       this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
         .then(()=> {
@@ -187,18 +196,25 @@ export default class DiffContainer extends React.Component {
     }
   }
 
-  _validateTimestamp(timestamp, fetchedTimestamps, position){
-    var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
-    return  fetch(url, {redirect: 'follow'})
+  _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
+    return promise
       .then(response => {return this._checkResponse(response);})
       .then(response => {
-        url = response.url;
+        let url = response.url;
         fetchedTimestamps[position] = url.split('/')[4];
         if (timestamp !== fetchedTimestamps[position]) {
           this._redirectToValidatedTimestamps = true;
         }
       })
       .catch(error => {this.errorHandled(error.message);});
+  }
+
+  _validateTimestamp(timestamp, fetchedTimestamps, position){
+    if (this.props.fetchSnapshotCallback) {
+      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
+    }
+    let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+    return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
