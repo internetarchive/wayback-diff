@@ -12,12 +12,12 @@
     text-align: center;
 }
 
-red-diff-footer{
-    background-color: #fbb6c2;
+yellow-diff-footer{
+    background-color: #f7f417;
 }
 
-green-diff-footer{
-    background-color: #d4fcbc;
+blue-diff-footer{
+    background-color: #1d9efd;
 }
 
 #timestamp-select-left{

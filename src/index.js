@@ -16,17 +16,17 @@ import React from 'react';
 //       <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
 //         <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
-//           timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={fetchSnapshot} />
+//           timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
 //       } />
 //       <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
 //         <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
-//           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={fetchSnapshot}/>
+//           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
 //       } />
 //       <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
 //         <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
-//           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={fetchSnapshot}/>
+//           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
 //       } />
 //
 //       <Route path='/diff///(.+)' render={({match}) =>

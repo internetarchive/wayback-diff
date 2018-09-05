@@ -15,7 +15,7 @@ export default class DiffFooter extends React.Component {
     // console.log('diff-Footer render');
     return (
       <div>
-        <p id={'diff-footer'}><red-diff-footer>Red</red-diff-footer> indicates content deletion. <green-diff-footer>Green</green-diff-footer> indicates content addition
+        <p id={'diff-footer'}><yellow-diff-footer>Yellow</yellow-diff-footer> indicates content deletion. <blue-diff-footer>Blue</blue-diff-footer> indicates content addition
         </p>
       </div>
     );
