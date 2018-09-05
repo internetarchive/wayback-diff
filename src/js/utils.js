@@ -32,5 +32,5 @@ export function handleRelativeURL (url) {
   if (url.match(regex)) {
     return url;
   }
-  return `${window.location.hostname}${url}`;
+  return `${window.location.protocol}//${window.location.hostname}${url}`;
 }
