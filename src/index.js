@@ -38,7 +38,7 @@ ReactDOM.render(
         <DiffContainer site={match.params[0]} fetchCDXCallback={null}
           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} conf={conf}/>}
       />
-      <Route path='/diagram' render={({match}) => <D3Sunburst url={match.url}
+      <Route path='/diagram/:site/:year' render={({match}) => <D3Sunburst site={match.params.site} year={match.params.year} wdd={conf['wayback-discover-diff']}
         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}/>} />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));

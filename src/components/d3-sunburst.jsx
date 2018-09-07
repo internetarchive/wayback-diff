@@ -42,14 +42,17 @@ export default class D3Sunburst extends React.Component {
   }
 
   _fetchSimhashData () {
-    const test = require('./d3/testsmall');
-    var json = this._decodeJson(test);
+    const url = `${this.props.wdd}/simhash?url=${this.props.site}&year=${this.props.year}`;
 
-    var timestamp = [['20171027121206','31392249196406395000']];
-
-    let data = this._calcDistance(json, timestamp);
-
-    this._createLevels(data, timestamp);
+    fetch(url)
+      .then(response => response.json())
+      .then((jsonResponse) => {
+        console.log(jsonResponse);
+        var json = this._decodeJson(jsonResponse);
+        var timestamp = [['20171027121206','31392249196406395000']];
+        let data = this._calcDistance(json, timestamp);
+        this._createLevels(data, timestamp);
+      });
   }
 
 
@@ -106,15 +109,15 @@ export default class D3Sunburst extends React.Component {
 
     for (var i = 0; i<json.length; i++){
       if(json[i][1] === 0) {
-        firstLevel.push({'title':json[i][0], 'size':json[i][1], 'color': colors[getRandomInt(1250)], 'children' : []});
+        firstLevel.push({'title':json[i][0], 'size':1, 'color': colors[getRandomInt(1250)], 'children' : []});
       } else if (json[i][1] === 0.2){
-        secondLevel.push({'title':json[i][0], 'size':json[i][1], 'color': colors[getRandomInt(1250)], 'children' : []});
+        secondLevel.push({'title':json[i][0], 'size':1, 'color': colors[getRandomInt(1250)], 'children' : []});
       } else if (json[i][1] === 0.25){
-        thirdLevel.push({'title':json[i][0], 'size':json[i][1], 'color': colors[getRandomInt(1250)], 'children' : []});
+        thirdLevel.push({'title':json[i][0], 'size':1, 'color': colors[getRandomInt(1250)], 'children' : []});
       } else if (json[i][1] === 0.3333333333333333){
-        fourthLevel.push({'title':json[i][0], 'size':json[i][1], 'color': colors[getRandomInt(1250)], 'children' : []});
+        fourthLevel.push({'title':json[i][0], 'size':1, 'color': colors[getRandomInt(1250)], 'children' : []});
       } else {
-        fifthLevel.push({'title':json[i][0], 'size':json[i][1], 'color': colors[getRandomInt(1250)], 'children' : []});
+        fifthLevel.push({'title':json[i][0], 'size':1, 'color': colors[getRandomInt(1250)], 'children' : []});
       }
     }
 
@@ -139,5 +142,5 @@ export default class D3Sunburst extends React.Component {
 
     this.setState({'simhashData': data});
   }
-  
+
 }
