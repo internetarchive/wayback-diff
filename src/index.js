@@ -8,6 +8,8 @@ import DiffContainer from './components/diff-container.jsx';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Loading from './components/loading.jsx';
 import D3Sunburst from './components/d3-sunburst';
+import SunburstWithTooltips from './components/d3example';
+import SunburstContainer from './components/sunburst-container';
 
 let conf = require('./conf.json');
 
@@ -38,7 +40,7 @@ ReactDOM.render(
         <DiffContainer site={match.params[0]} fetchCDXCallback={null}
           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} conf={conf}/>}
       />
-      <Route path='/diagram/:site/:year' render={({match}) => <D3Sunburst site={match.params.site} year={match.params.year} wdd={conf['wayback-discover-diff']}
+      <Route path='/diagram/:site/:year' render={({match}) => <SunburstContainer site={match.params.site} year={match.params.year} wdd={conf['wayback-discover-diff']}
         loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}/>} />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));
