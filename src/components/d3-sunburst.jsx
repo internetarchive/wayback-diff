@@ -26,17 +26,23 @@ export default class D3Sunburst extends React.Component {
 
   render () {
     const {hoveredCell} = this.state;
+    var w = window.innerWidth
+      || document.documentElement.clientWidth
+      || document.body.clientWidth;
+
+    var h = window.innerHeight
+      || document.documentElement.clientHeight
+      || document.body.clientHeight;
     return (
       <div style={{width: '250px'}}>
         <Sunburst
           style={{stroke: '#fff'}}
-          margin={{top: 50, bottom: 50, left: 50, right: 50}}
           onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
           onValueMouseOut={v => this.setState({hoveredCell: false})}
           data={this.props.simhashData}
           padAngle={() => 0.02}
-          width={250}
-          height={250}
+          width={w*0.5}
+          height={h*0.5}
           getSize={d => d.bigness}
           getColor={d => d.clr}>
           {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>

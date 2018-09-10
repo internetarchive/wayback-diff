@@ -26,20 +26,30 @@ export default class SunburstContainer extends React.Component {
     }
     const Loader = () => this.props.loader;
     return (<div>
-      {this._fetchSimhashData()}
+      {this._fetchTimestampSimhashData()}
       <Loader/>
     </div>
     );
   }
 
-  _fetchSimhashData () {
+  _fetchTimestampSimhashData () {
+    const url = `${this.props.wdd}/simhash?url=${this.props.site}&timestamp=${this.props.timestamp}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then((jsonResponse) => {
+        var json = this._decodeJson(jsonResponse);
+        this._fetchSimhashData(json);
+      });
+  }
+
+  _fetchSimhashData (timestamp) {
     const url = `${this.props.wdd}/simhash?url=${this.props.site}&year=${this.props.year}`;
 
     fetch(url)
       .then(response => response.json())
       .then((jsonResponse) => {
         var json = this._decodeJson(jsonResponse);
-        var timestamp = [['20171027121206','31392249196406395000']];
         let data = this._calcDistance(json, timestamp);
         this._createLevels(data, timestamp);
       });
@@ -73,11 +83,18 @@ export default class SunburstContainer extends React.Component {
 
     })();
     let base64 = new Base64();
-    for(var i=0; i<json.length; i++) {
-      json[i][1] = json[i][1].toString().replace(/=/, '');
-      json[i][1] = base64.decode(json[i][1]);
+    if(json.length) {
+      for (var i = 0; i < json.length; i++) {
+        json[i][1] = json[i][1].toString().replace(/=/, '');
+        json[i][1] = base64.decode(json[i][1]);
+      }
+      return json;
     }
-    return json;
+
+    json.simhash = json.simhash.toString().replace(/=/, '');
+    json.simhash = base64.decode(json.simhash);
+
+    return [this.props.timestamp, json.simhash];
   }
 
   _calcDistance(json, timestamp){
