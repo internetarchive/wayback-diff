@@ -1,6 +1,6 @@
 import React from 'react';
 import {getRandomInt} from '../js/utils';
-import D3Sunburst from './d3-sunburst';
+import D3Sunburst from './d3-sunburst.jsx';
 var sjs = require('simhash-js');
 
 /**
