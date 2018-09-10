@@ -19,7 +19,7 @@ You also need to have a CORS-enabled browser for this component to work.
 
 Run the server with the command `yarn start`
 
-There are two types of URL calls:
+There are three types of URL calls:
  
 **1)**
 > http://localhost:port(default 3000)/diff/WEBSITE
@@ -30,6 +30,11 @@ Example request: http://localhost:3000/diff/iskme.org
 > http://localhost:port(default 3000)/diff/TIMESTAMP_A/TIMESTAMP_B/WEBSITE
 
 Example request: http://localhost:3000/diff/20170223193029/20171212125810/archive.org
+
+**3)**
+> http://localhost:port(default 3000)/diagram/WEBPAGE/YEAR/TIMESTAMP/
+
+Example request: http://localhost:3000/diagram/iskme.org/2018/20180813072115
 
 # Running as a React app
 You must render a DiffContainer component. It can receive up to seven props. See props for more info.
@@ -71,6 +76,9 @@ ReactDOM.render(
         <DiffContainer site={match.params[0]} fetchCDXCallback={null}
           loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
       />
+      <Route path='/diagram/:site/:year/:timestamp' render={({match}) =>
+        <SunburstContainer site={match.params.site} year={match.params.year} wdd={conf['wayback-discover-diff']} timestamp={match.params.timestamp}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));
 ```
@@ -86,7 +94,7 @@ export DiffContainer from './components/diff-container.jsx';
 ```
 
 # Props 
-DiffContainer can receive up to eight props. All of them are optional. 
+### DiffContainer can receive up to eight props. All of them are optional. 
 
 The **conf** prop that receives a JSON file that contains the configuration of the wayback-diff component.
 
@@ -100,7 +108,7 @@ The **fetchSnapshotCallback** which is a callback function that will be used to 
 
   If you use this prop, the **limit** conf option does not have any effect.
 
-The **loader** which is a React Component that will be shown when loading is.
+The **loader** which is a React Component that will be shown when loading.
 
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
@@ -109,6 +117,18 @@ The **site** which is the webpage for which the snapshots are shown.
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
 The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
+
+### SunburstContainer can receive up to five props. All of them are optional. 
+
+The **loader** which is a React Component that will be shown when loading.
+
+The **timestamp** which is the timestamp whose simhash will be compared with the others.
+
+The **site** which is the webpage for which the the simhashes will be compared.
+
+The **year** which is the year from which the webpages simhashes are going to be compared with the selected timestamp's simhash.
+
+The **wdd** which is the wayback-discover-diff server's address.
 
 # conf.json
 
@@ -186,6 +206,9 @@ After importing the component you might use it like any other React component:
             <DiffContainer site={match.params[0]} fetchCDXCallback={null}
               loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
         />
+        Route path='/diagram/:site/:year/:timestamp' render={({match}) =>
+        <SunburstContainer site={match.params.site} year={match.params.year} wdd={this.conf['wayback-discover-diff']} timestamp={match.params.timestamp}
+          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
     </Switch>
 </Router>
 }/>
