@@ -2966,7 +2966,7 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nred-diff-footer{\n    background-color: #fbb6c2;\n}\n\ngreen-diff-footer{\n    background-color: #d4fcbc;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
 styleInject(css$1);
 
 /*eslint-disable no-useless-escape*/
@@ -3413,15 +3413,15 @@ var DiffFooter = function (_React$Component) {
           'p',
           { id: 'diff-footer' },
           react.createElement(
-            'red-diff-footer',
+            'yellow-diff-footer',
             null,
-            'Red'
+            'Yellow'
           ),
           ' indicates content deletion. ',
           react.createElement(
-            'green-diff-footer',
+            'blue-diff-footer',
             null,
-            'Green'
+            'Blue'
           ),
           ' indicates content addition'
         )
