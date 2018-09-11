@@ -96,7 +96,7 @@ export default class TimestampHeader extends React.Component {
   _exportParams(){
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
-    window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.site}`;
+    window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.url}`;
   }
 
   _widgetRender () {
@@ -105,9 +105,9 @@ export default class TimestampHeader extends React.Component {
     } else {
       var url;
       if (this.props.conf.limit){
-        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json`;
+        url = `${this.props.conf.cdxServer}search?url=${this.props.url}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json`;
       } else {
-        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
+        url = `${this.props.conf.cdxServer}search?url=${this.props.url}/&status=200&fl=timestamp,digest&output=json`;
       }
       this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
 
@@ -129,7 +129,7 @@ export default class TimestampHeader extends React.Component {
           if (data.length === 2) {
             let timestamp = data[1][0];
             if (this.props.timestampA !== timestamp) {
-              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.site}`;
+              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.url}`;
             }
           }
           this._prepareData(data);
@@ -248,11 +248,11 @@ export default class TimestampHeader extends React.Component {
   _showOpenLinks(){
     if(!this.props.isInitial) {
       if (this.props.timestampA) {
-        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site}
+        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.url}
           id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
       }
       if (this.props.timestampB) {
-        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site}
+        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.url}
           id="timestamp-right" target="_blank" rel="noopener">
           Open in new window</a>);
       }
@@ -268,7 +268,7 @@ export default class TimestampHeader extends React.Component {
   }
 
   _notFound () {
-    return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.site} archived.</div>);
+    return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.url} archived.</div>);
   }
 
   _showDiffs () {
@@ -290,7 +290,7 @@ export default class TimestampHeader extends React.Component {
       const numberWithCommas = (x) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       };
-      return (<p id='explanation-middle'> Compare any two captures of {this.props.site} from our collection of {numberWithCommas(data.length)} dating from {first} to {last}.</p>);
+      return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection of {numberWithCommas(data.length)} dating from {first} to {last}.</p>);
     }
   }
 }

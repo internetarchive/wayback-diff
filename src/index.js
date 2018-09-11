@@ -20,12 +20,12 @@ import React from 'react';
 //           timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
 //       } />
 //       <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
-//         <DiffContainer url={match.params[1]} timestampA={match.params[0]} url={match.url}
+//         <DiffContainer url={match.params[1]} timestampA={match.params[0]}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
 //           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
 //       } />
 //       <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
-//         <DiffContainer url={match.params[1]} timestampB={match.params[0]} url={match.url}
+//         <DiffContainer url={match.params[1]} timestampB={match.params[0]}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
 //           fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
 //       } />

@@ -44,7 +44,7 @@ export default class DiffContainer extends React.Component {
     }
     if (this.state.showError){
       return(
-        <ErrorMessage site ={this.props.site} code ={this.errorCode}/>);
+        <ErrorMessage site ={this.props.url} code ={this.errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
       if (this.props.noTimestamps){
@@ -133,7 +133,7 @@ export default class DiffContainer extends React.Component {
     if (this.props.fetchSnapshotCallback){
       this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
     }else {
-      let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
       this._handleSnapshotFetch(fetch(url));
     }
 
@@ -160,11 +160,11 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showError){
-      let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.site);
-      let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.site);
+      let urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+      let urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
       return(<DiffView webMonitoringProcessingURL={this.props.conf.webMonitoringProcessingURL}
-        page={{url: encodeURIComponent(this.props.site)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
+        page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
         loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
     }
   }
@@ -213,14 +213,14 @@ export default class DiffContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+    let url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
     return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
     if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)){
       // console.log('checkTimestamps--setState');
-      this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site});
+      this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url});
     }
   }
 
@@ -238,11 +238,11 @@ export default class DiffContainer extends React.Component {
   }
 
   _urlIsInvalid () {
-    return (!isStrUrl(this.props.site));
+    return (!isStrUrl(this.props.url));
   }
 
   _invalidURL () {
-    return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.site}</div>);
+    return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.url}</div>);
   }
 
   _checkResponse(response) {

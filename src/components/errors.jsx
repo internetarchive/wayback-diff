@@ -11,7 +11,7 @@ export default class ErrorMessage extends React.Component {
   render () {
     if (this.props.code === '404') {
       return (
-        <div className='alert alert-warning' role='alert'>The Wayback Machine doesn't have {this.props.site} archived.</div>
+        <div className='alert alert-warning' role='alert'>The Wayback Machine doesn't have {this.props.url} archived.</div>
       );
     }
     return (
