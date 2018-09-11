@@ -2999,7 +2999,10 @@ function handleRelativeURL(url) {
   if (url.match(regex)) {
     return url;
   }
-  return window.location.protocol + '//' + window.location.hostname + url;
+  if (window.location.port === '80') {
+    return window.location.protocol + '//' + window.location.hostname + url;
+  }
+  return window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + url;
 }
 
 /**
