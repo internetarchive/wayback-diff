@@ -27609,7 +27609,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchTimestampSimhashData() {
       var _this3 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.site + '&timestamp=' + this.props.timestamp;
+      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
 
       fetch(url).then(function (response) {
         return response.json();
@@ -27623,7 +27623,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchSimhashData(timestamp) {
       var _this4 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.site + '&year=' + this.props.year;
+      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
 
       fetch(url).then(function (response) {
         return response.json();

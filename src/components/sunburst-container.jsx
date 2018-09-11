@@ -33,7 +33,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchTimestampSimhashData () {
-    const url = `${this.props.wdd}/simhash?url=${this.props.site}&timestamp=${this.props.timestamp}`;
+    const url = `${this.props.wdd}/simhash?url=${this.props.url}&timestamp=${this.props.timestamp}`;
 
     fetch(url)
       .then(response => response.json())
@@ -44,7 +44,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchSimhashData (timestamp) {
-    const url = `${this.props.wdd}/simhash?url=${this.props.site}&year=${this.props.year}`;
+    const url = `${this.props.wdd}/simhash?url=${this.props.url}&year=${this.props.timestamp.substring(0, 4)}`;
 
     fetch(url)
       .then(response => response.json())
