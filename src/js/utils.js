@@ -26,3 +26,14 @@ export function isStrUrl(str = '') {
   ) && !startsWith(processedValue, 'site:');
 }
 /*eslint-enable no-mixed-operators*/
+
+export function handleRelativeURL (url) {
+  const regex =  new RegExp(/^http.*/gm);
+  if (url.match(regex)) {
+    return url;
+  }
+  if (window.location.port === '80') {
+    return `${window.location.protocol}//${window.location.hostname}${url}`;
+  }
+  return `${window.location.protocol}//${window.location.hostname}:${window.location.port}${url}`;
+}

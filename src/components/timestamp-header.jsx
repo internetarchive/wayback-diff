@@ -1,5 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
+import {handleRelativeURL} from '../js/utils.js';
 
 /**
  * Display a timestamp selector
@@ -103,11 +104,11 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      var url;
+      var url = handleRelativeURL(this.props.conf.cdxServer);
       if (this.props.conf.limit){
-        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json`;
+        url += `search?url=${this.props.site}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json`;
       } else {
-        url = `${this.props.conf.cdxServer}search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
+        url += `search?url=${this.props.site}/&status=200&fl=timestamp,digest&output=json`;
       }
       this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
 
