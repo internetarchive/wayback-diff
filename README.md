@@ -52,34 +52,34 @@ var conf = require('./conf.json');
 
 ReactDOM.render(
   <Router>
-    <Switch>
-      <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
-        <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
-      } />
-      <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
-        <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
-      } />
-      <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
-        <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-          fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
-      } />
-      <Route path='/diff///(.+)' render={({match}) =>
-        <DiffContainer site={match.params[0]} conf={conf} noTimestamps={true} fetchCDXCallback={null}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
-      } />
-      <Route path='/diff/(.+)' render={({match}) =>
-        <DiffContainer site={match.params[0]} fetchCDXCallback={null}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
-      />
-      <Route path='/diagram/:site/:year/:timestamp' render={({match}) =>
-        <SunburstContainer site={match.params.site} year={match.params.year} wdd={conf['wayback-discover-diff']} timestamp={match.params.timestamp}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
-    </Switch>
+  <Switch>
+    <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
+      <DiffContainer url={match.params[2]} timestampA={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
+    } />
+    <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
+      <DiffContainer url={match.params[1]} timestampA={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
+    } />
+    <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
+      <DiffContainer url={match.params[1]} timestampB={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
+    } />
+    <Route path='/diff///(.+)' render={({match}) =>
+      <DiffContainer url={match.params[0]} conf={conf} noTimestamps={true} fetchCDXCallback={null}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
+    } />
+    <Route path='/diff/(.+)' render={({match}) =>
+      <DiffContainer url={match.params[0]} fetchCDXCallback={null}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
+    />
+    <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
+      <SunburstContainer url={match.params[1]} wdd={conf['wayback-discover-diff']} timestamp={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
+  </Switch>
   </Router>, document.getElementById('wayback-diff'));
 ```
 
@@ -91,6 +91,7 @@ In order to use this app as a component in an other React app you should include
 
 ```Javascript
 export DiffContainer from './components/diff-container.jsx';
+export SunburstContainer from './components/sunburst-container.jsx';
 ```
 
 # Props 
@@ -112,21 +113,18 @@ The **loader** which is a React Component that will be shown when loading.
 
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
-The **site** which is the webpage for which the snapshots are shown.
+The **url** which is the webpage for which the snapshots are shown.
 
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
-The **url** which is the url that is used to decide if this is an initial view or both timestamps are missing.
 
-### SunburstContainer can receive up to five props. All of them are optional. 
+### SunburstContainer can receive up to four props. All of them are optional. 
 
 The **loader** which is a React Component that will be shown when loading.
 
 The **timestamp** which is the timestamp whose simhash will be compared with the others.
 
-The **site** which is the webpage for which the the simhashes will be compared.
-
-The **year** which is the year from which the webpages simhashes are going to be compared with the selected timestamp's simhash.
+The **url** which is the webpage for which the the simhashes will be compared.
 
 The **wdd** which is the wayback-discover-diff server's address.
 
@@ -141,7 +139,8 @@ The configuration file should have the following format:
   "snapshotsPrefix": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",
   "cdxServer": "http://web.archive.org/cdx/",
-  "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif"
+  "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
+  "wayback-discover-diff": "http://localhost:4000"
 }
 ```
 
@@ -173,7 +172,7 @@ yarn add https://github.com/ftsalamp/wayback-diff
 In the file you want to use the wayback-diff component use the following code to import it:
 
 ```Javascript
-import {DiffContainer} from 'wayback-diff';
+import {DiffContainer, SunburstContainer} from 'wayback-diff';
 ```
 
 ## Use the component
@@ -182,35 +181,36 @@ After importing the component you might use it like any other React component:
 
 ```Javascript
  <Router>
-    <Switch>
-        <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
-            <DiffContainer site={match.params[2]} timestampA={match.params[0]} url={match.url}
-              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-              timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
-        } />
-        <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
-            <DiffContainer site={match.params[1]} timestampA={match.params[0]} url={match.url}
-              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-              fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
-        } />
-        <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
-            <DiffContainer site={match.params[1]} timestampB={match.params[0]} url={match.url}
-              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
-              fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
-        } />
-        <Route path='/diff///(.+)' render={({match}) =>
-            <DiffContainer site={match.params[0]} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
-              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
-        } />
-        <Route path='/diff/(.+)' render={({match}) =>
-            <DiffContainer site={match.params[0]} fetchCDXCallback={null}
-              loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
-        />
-        Route path='/diagram/:site/:year/:timestamp' render={({match}) =>
-        <SunburstContainer site={match.params.site} year={match.params.year} wdd={this.conf['wayback-discover-diff']} timestamp={match.params.timestamp}
-          loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
-    </Switch>
-</Router>
+          <Switch>
+            <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match}) =>
+              <DiffContainer url={match.params[2]} timestampA={match.params[0]}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
+            } />
+            <Route path='/diff/([0-9]{14})//(.+)' render={({match}) =>
+              <DiffContainer url={match.params[1]} timestampA={match.params[0]}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+            } />
+            <Route path='/diff//([0-9]{14})/(.+)' render={({match}) =>
+              <DiffContainer url={match.params[1]} timestampB={match.params[0]}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+            } />
+
+            <Route path='/diff///(.+)' render={({match}) =>
+              <DiffContainer url={match.params[0]} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
+            } />
+            <Route path='/diff/(.+)' render={({match}) =>
+              <DiffContainer url={match.params[0]} fetchCDXCallback={null}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
+            />
+            <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
+              <SunburstContainer url={match.params[1]} wdd={this.conf['wayback-discover-diff']} timestamp={match.params[0]}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
+          </Switch>
+        </Router>
 }/>
 ```
 
