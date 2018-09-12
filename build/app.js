@@ -6901,6 +6901,25 @@ function getRandomInt(max) {
 }
 
 /**
+ * Calculates binary hamming distance of two base 16 integers.
+ */
+function hammingDistance(x, y) {
+  var a1 = parseInt(x, 16);
+  var a2 = parseInt(y, 16);
+  var v1 = a1 ^ a2;
+  var v2 = (a1 ^ a2) >> 32;
+
+  v1 = v1 - (v1 >> 1 & 0x55555555);
+  v2 = v2 - (v2 >> 1 & 0x55555555);
+  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
+  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
+  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+
+  return c1 + c2;
+}
+
+/**
  * Display a message that no url is given so no snapshot is displayed
  *
  * @class NoSnapshotURL
@@ -27563,8 +27582,6 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var sjs = require('simhash-js');
-
 /**
  * Container of d3 Sunburst diagram
  *
@@ -27677,9 +27694,9 @@ var SunburstContainer = function (_React$Component) {
   }, {
     key: '_calcDistance',
     value: function _calcDistance(json, timestamp) {
-      this._minDistance = sjs.Comparator.hammingDistance(timestamp[0][1], json[0][1]);
+      this._minDistance = hammingDistance(timestamp[0][1], json[0][1]);
       for (var i = 0; i < json.length; i++) {
-        json[i][1] = sjs.Comparator.hammingDistance(timestamp[0][1], json[i][1]);
+        json[i][1] = hammingDistance(timestamp[0][1], json[i][1]);
         if (this._minDistance > json[i][1]) {
           this._minDistance = json[i][1];
         }
