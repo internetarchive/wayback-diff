@@ -1,7 +1,7 @@
 import React from 'react';
 import {getRandomInt} from '../js/utils';
 import D3Sunburst from './d3-sunburst.jsx';
-var sjs = require('simhash-js');
+import {hammingDistance} from '../js/utils.js';
 
 /**
  * Container of d3 Sunburst diagram
@@ -98,9 +98,9 @@ export default class SunburstContainer extends React.Component {
   }
 
   _calcDistance(json, timestamp){
-    this._minDistance = sjs.Comparator.hammingDistance(timestamp[0][1], json[0][1]);
+    this._minDistance = hammingDistance(timestamp[0][1], json[0][1]);
     for (var i = 0; i<json.length; i++){
-      json[i][1] = sjs.Comparator.hammingDistance(timestamp[0][1], json[i][1]);
+      json[i][1] = hammingDistance(timestamp[0][1], json[i][1]);
       if (this._minDistance > json[i][1]) {
         this._minDistance = json[i][1];
       }
