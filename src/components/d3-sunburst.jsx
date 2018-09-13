@@ -33,12 +33,15 @@ export default class D3Sunburst extends React.Component {
     var h = window.innerHeight
       || document.documentElement.clientHeight
       || document.body.clientHeight;
+
     return (
       <div style={{width: '250px'}}>
         <Sunburst
           style={{stroke: '#fff'}}
           onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
-          onValueMouseOut={v => this.setState({hoveredCell: false})}
+          onValueMouseOut={() => this.setState({hoveredCell: false})}
+          onValueClick={node => {let url = this.props.urlPrefix + node.name + '/' + this.props.simhashData.name + '/' + this.props.url;
+            window.open(url,'_blank');}}
           data={this.props.simhashData}
           padAngle={() => 0.02}
           width={w*0.7}

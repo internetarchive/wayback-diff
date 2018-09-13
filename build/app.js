@@ -7034,7 +7034,7 @@ var DiffContainer = function (_React$Component) {
         return this._renderRedirect();
       }
       if (this.state.showError) {
-        return react.createElement(ErrorMessage, { site: this.props.url, code: this.errorCode });
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this.errorCode });
       }
       if (!this.props.timestampA && !this.props.timestampB) {
         if (this.props.noTimestamps) {
@@ -27524,6 +27524,7 @@ var D3Sunburst = function (_React$Component) {
       var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
       var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
       return react.createElement(
         'div',
         { style: { width: '250px' } },
@@ -27534,8 +27535,12 @@ var D3Sunburst = function (_React$Component) {
             onValueMouseOver: function onValueMouseOver(v) {
               return _this2.setState({ hoveredCell: v.x && v.y ? v : false });
             },
-            onValueMouseOut: function onValueMouseOut(v) {
+            onValueMouseOut: function onValueMouseOut() {
               return _this2.setState({ hoveredCell: false });
+            },
+            onValueClick: function onValueClick(node) {
+              var url = _this2.props.urlPrefix + node.name + '/' + _this2.props.simhashData.name + '/' + _this2.props.url;
+              window.open(url, '_blank');
             },
             data: this.props.simhashData,
             padAngle: function padAngle() {
@@ -27609,7 +27614,7 @@ var SunburstContainer = function (_React$Component) {
       var _this2 = this;
 
       if (this.state.simhashData) {
-        return react.createElement(D3Sunburst, { simhashData: this.state.simhashData });
+        return react.createElement(D3Sunburst, { urlPrefix: this.props.urlPrefix, url: this.props.url, simhashData: this.state.simhashData });
       }
       var Loader = function Loader() {
         return _this2.props.loader;
@@ -27747,7 +27752,7 @@ var SunburstContainer = function (_React$Component) {
         firstLevel[_mod3].children.push(secondLevel[i]);
       }
 
-      var data = { 'name': timestamp[0][0], 'children': firstLevel };
+      var data = { 'name': timestamp[0], 'children': firstLevel };
       this.setState({ 'simhashData': data });
     }
   }]);

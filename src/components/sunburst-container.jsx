@@ -22,7 +22,7 @@ export default class SunburstContainer extends React.Component {
 
   render () {
     if (this.state.simhashData) {
-      return <D3Sunburst simhashData={this.state.simhashData}/>;
+      return <D3Sunburst urlPrefix={this.props.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>;
     }
     const Loader = () => this.props.loader;
     return (<div>
@@ -150,7 +150,7 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].children.push(secondLevel[i]);
     }
 
-    var data = {'name':timestamp[0][0], 'children':firstLevel};
+    var data = {'name':timestamp[0], 'children':firstLevel};
     this.setState({'simhashData': data});
   }
 
