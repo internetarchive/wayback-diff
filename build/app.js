@@ -3086,7 +3086,7 @@ var TimestampHeader = function (_React$Component) {
     value: function _exportParams() {
       var timestampA = document.getElementById('timestamp-select-left').value;
       var timestampB = document.getElementById('timestamp-select-right').value;
-      window.location.href = '' + this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.site;
+      window.location.href = '' + this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url;
     }
   }, {
     key: '_widgetRender',
@@ -3096,9 +3096,9 @@ var TimestampHeader = function (_React$Component) {
       } else {
         var url;
         if (this.props.conf.limit) {
-          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json';
+          url = this.props.conf.cdxServer + 'search?url=' + this.props.url + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json';
         } else {
-          url = this.props.conf.cdxServer + 'search?url=' + this.props.site + '/&status=200&fl=timestamp,digest&output=json';
+          url = this.props.conf.cdxServer + 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json';
         }
         this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
       }
@@ -3120,7 +3120,7 @@ var TimestampHeader = function (_React$Component) {
           if (data.length === 2) {
             var timestamp = data[1][0];
             if (_this3.props.timestampA !== timestamp) {
-              window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.site;
+              window.location.href = '' + _this3.props.conf.urlPrefix + timestamp + '//' + _this3.props.url;
             }
           }
           _this3._prepareData(data);
@@ -3162,13 +3162,13 @@ var TimestampHeader = function (_React$Component) {
     value: function _prepareOptionElements(data) {
       var initialSnapshots = [];
       if (data.length > 0) {
-        var yearGroup = this._getYear(data[0][0]);
+        var yearGroup = this._getYear(data[data.length - 1][0]);
         initialSnapshots.push(react.createElement('optgroup', { key: -1, label: yearGroup }));
       }
-      for (var i = 0; i < data.length; i++) {
+      for (var i = data.length - 1; i > 0; i--) {
         var utcTime = this._getUTCDateFormat(data[i][0]);
         var year = this._getYear(data[i][0]);
-        if (year > yearGroup) {
+        if (year < yearGroup) {
           yearGroup = year;
           initialSnapshots.push(react.createElement('optgroup', { key: -i + 2, label: yearGroup }));
         }
@@ -3276,7 +3276,7 @@ var TimestampHeader = function (_React$Component) {
         if (this.props.timestampA) {
           var aLeft = react.createElement(
             'a',
-            { href: this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.site,
+            { href: this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.url,
               id: 'timestamp-left', target: '_blank', rel: 'noopener' },
             ' Open in new window'
           );
@@ -3284,7 +3284,7 @@ var TimestampHeader = function (_React$Component) {
         if (this.props.timestampB) {
           var aRight = react.createElement(
             'a',
-            { href: this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.site,
+            { href: this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.url,
               id: 'timestamp-right', target: '_blank', rel: 'noopener' },
             'Open in new window'
           );
@@ -3306,7 +3306,7 @@ var TimestampHeader = function (_React$Component) {
         'div',
         { className: 'alert alert-warning', role: 'alert' },
         'The Wayback Machine doesn\'t have ',
-        this.props.site,
+        this.props.url,
         ' archived.'
       );
     }
@@ -3336,7 +3336,7 @@ var TimestampHeader = function (_React$Component) {
           'p',
           { id: 'explanation-middle' },
           ' Compare any two captures of ',
-          this.props.site,
+          this.props.url,
           ' from our collection of ',
           numberWithCommas(data.length),
           ' dating from ',
@@ -6734,7 +6734,7 @@ var ErrorMessage = function (_React$Component) {
           'div',
           { className: 'alert alert-warning', role: 'alert' },
           'The Wayback Machine doesn\'t have ',
-          this.props.site,
+          this.props.url,
           ' archived.'
         );
       }
@@ -6794,7 +6794,7 @@ var DiffContainer = function (_React$Component) {
         return this._renderRedirect();
       }
       if (this.state.showError) {
-        return react.createElement(ErrorMessage, { site: this.props.site, code: this.errorCode });
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this.errorCode });
       }
       if (!this.props.timestampA && !this.props.timestampB) {
         if (this.props.noTimestamps) {
@@ -6902,7 +6902,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
-        var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+        var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
         this._handleSnapshotFetch(fetch(url));
       }
 
@@ -6935,11 +6935,11 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showError) {
-        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.site);
-        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.site);
+        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.conf.webMonitoringProcessingURL,
-          page: { url: encodeURIComponent(this.props.site) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
+          page: { url: encodeURIComponent(this.props.url) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
           loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader, errorHandledCallback: this.errorHandled });
       }
     }
@@ -6994,7 +6994,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
-      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.site;
+      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
       return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
     }
   }, {
@@ -7002,7 +7002,7 @@ var DiffContainer = function (_React$Component) {
     value: function _setNewURL(fetchedTimestampA, fetchedTimestampB) {
       if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)) {
         // console.log('checkTimestamps--setState');
-        this.setState({ newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.site });
+        this.setState({ newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url });
       }
     }
   }, {
@@ -7022,7 +7022,7 @@ var DiffContainer = function (_React$Component) {
   }, {
     key: '_urlIsInvalid',
     value: function _urlIsInvalid() {
-      return !isStrUrl(this.props.site);
+      return !isStrUrl(this.props.url);
     }
   }, {
     key: '_invalidURL',
@@ -7036,7 +7036,7 @@ var DiffContainer = function (_React$Component) {
           'Oh snap!'
         ),
         ' Invalid URL ',
-        this.props.site
+        this.props.url
       );
     }
   }, {
