@@ -1,5 +1,6 @@
 import React from 'react';
 import {Sunburst, Hint} from 'react-vis';
+import '../../node_modules/react-vis/dist/style.css';
 
 /**
  * Display a d3 Sunburst diagram
@@ -35,28 +36,26 @@ export default class D3Sunburst extends React.Component {
       || document.body.clientHeight;
 
     return (
-      <div style={{width: '250px'}}>
-        <Sunburst
-          style={{stroke: '#fff'}}
-          onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
-          onValueMouseOut={() => this.setState({hoveredCell: false})}
-          onValueClick={node => {let url = this.props.urlPrefix + node.name + '/' + this.props.simhashData.name + '/' + this.props.url;
-            window.open(url,'_blank');}}
-          data={this.props.simhashData}
-          padAngle={() => 0.02}
-          width={w*0.7}
-          height={h*0.7}
-          getSize={d => d.bigness}
-          getColor={d => d.clr}>
-          {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>
-            <div style={tipStyle}>
-              <div style={{...boxStyle, background: hoveredCell.clr}}/>
-              {'Difference ' + hoveredCell.bigness}
-              {' Timestamp ' + hoveredCell.name}
-            </div>
-          </ Hint> : null}
-        </Sunburst>
-      </div>
+      <Sunburst
+        style={{stroke: '#fff'}}
+        onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
+        onValueMouseOut={() => this.setState({hoveredCell: false})}
+        onValueClick={node => {let url = this.props.urlPrefix + node.name + '/' + this.props.simhashData.name + '/' + this.props.url;
+          window.open(url,'_blank');}}
+        data={this.props.simhashData}
+        padAngle={() => 0.02}
+        width={w*0.7}
+        height={h*0.7}
+        getSize={d => d.bigness}
+        getColor={d => d.clr}>
+        {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>
+          <div style={tipStyle}>
+            <div style={{...boxStyle, background: hoveredCell.clr}}/>
+            {'Difference ' + hoveredCell.bigness}
+            {' Timestamp ' + hoveredCell.name}
+          </div>
+        </ Hint> : null}
+      </Sunburst>
     );
   }
 
