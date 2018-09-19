@@ -1,6 +1,6 @@
 {
   "webMonitoringProcessingURL": "http://localhost:8888",
-  "limit": "-1000",
+  "limit": "1000",
   "snapshotsPrefix": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",
   "cdxServer": "http://web.archive.org/cdx/",

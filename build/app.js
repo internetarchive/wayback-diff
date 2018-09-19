@@ -3186,6 +3186,61 @@ var DiffView = function (_React$Component) {
 var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
 styleInject(css$1);
 
+/*eslint-disable no-useless-escape*/
+var urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
+/*eslint-enable no-useless-escape*/
+
+function hasWhiteSpace(s) {
+  return s.indexOf(' ') >= 0;
+}
+
+function looksLikeUrl(str) {
+  return !!str.match(urlRegex);
+}
+
+function startsWith(str, start) {
+  return str.indexOf(start) === 0;
+}
+
+/*eslint-disable no-mixed-operators*/
+function isStrUrl() {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+  var processedValue = str.toLocaleLowerCase();
+  return (startsWith(processedValue, 'ftp://') || startsWith(processedValue, 'http://') || startsWith(processedValue, 'https://') || looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)) && !startsWith(processedValue, 'site:');
+}
+/*eslint-enable no-mixed-operators*/
+
+function handleRelativeURL(url) {
+  var regex = new RegExp(/^http.*/gm);
+  if (url.match(regex)) {
+    return url;
+  }
+  if (window.location.port === '80') {
+    return window.location.protocol + '//' + window.location.hostname + url;
+  }
+  return window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + url;
+}
+
+/**
+ * Calculates binary hamming distance of two base 16 integers.
+ */
+function hammingDistance(x, y) {
+  var a1 = parseInt(x, 16);
+  var a2 = parseInt(y, 16);
+  var v1 = a1 ^ a2;
+  var v2 = (a1 ^ a2) >> 32;
+
+  v1 = v1 - (v1 >> 1 & 0x55555555);
+  v2 = v2 - (v2 >> 1 & 0x55555555);
+  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
+  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
+  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+
+  return c1 + c2;
+}
+
 /**
  * Display a timestamp selector
  *
@@ -3311,11 +3366,11 @@ var TimestampHeader = function (_React$Component) {
       if (this.props.fetchCDXCallback) {
         this._handleFetch(this.props.fetchCDXCallback());
       } else {
-        var url;
+        var url = handleRelativeURL(this.props.conf.cdxServer);
         if (this.props.conf.limit) {
-          url = this.props.conf.cdxServer + 'search?url=' + this.props.url + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json';
+          url += 'search?url=' + this.props.url + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json&sort=reverse';
         } else {
-          url = this.props.conf.cdxServer + 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json';
+          url += 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json&sort=reverse';
         }
         this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
       }
@@ -3385,7 +3440,7 @@ var TimestampHeader = function (_React$Component) {
       for (var i = 0; i < data.length; i++) {
         var utcTime = this._getUTCDateFormat(data[i][0]);
         var year = this._getYear(data[i][0]);
-        if (year > yearGroup) {
+        if (year < yearGroup) {
           yearGroup = year;
           initialSnapshots.push(react.createElement('optgroup', { key: -i + 2, label: yearGroup }));
         }
@@ -6871,50 +6926,6 @@ Switch.propTypes = {
 
 // Written in this round about way for babel-transform-imports
 
-/*eslint-disable no-useless-escape*/
-var urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
-/*eslint-enable no-useless-escape*/
-
-function hasWhiteSpace(s) {
-  return s.indexOf(' ') >= 0;
-}
-
-function looksLikeUrl(str) {
-  return !!str.match(urlRegex);
-}
-
-function startsWith(str, start) {
-  return str.indexOf(start) === 0;
-}
-
-/*eslint-disable no-mixed-operators*/
-function isStrUrl() {
-  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-  var processedValue = str.toLocaleLowerCase();
-  return (startsWith(processedValue, 'ftp://') || startsWith(processedValue, 'http://') || startsWith(processedValue, 'https://') || looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)) && !startsWith(processedValue, 'site:');
-}
-/*eslint-enable no-mixed-operators*/
-
-/**
- * Calculates binary hamming distance of two base 16 integers.
- */
-function hammingDistance(x, y) {
-  var a1 = parseInt(x, 16);
-  var a2 = parseInt(y, 16);
-  var v1 = a1 ^ a2;
-  var v2 = (a1 ^ a2) >> 32;
-
-  v1 = v1 - (v1 >> 1 & 0x55555555);
-  v2 = v2 - (v2 >> 1 & 0x55555555);
-  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
-  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
-  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-
-  return c1 + c2;
-}
-
 /**
  * Display a message that no url is given so no snapshot is displayed
  *
@@ -7138,7 +7149,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
-        var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
+        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
         this._handleSnapshotFetch(fetch(url));
       }
 
@@ -7171,10 +7182,10 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showError) {
-        var urlA = this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-        var urlB = this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+        var urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+        var urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
-        return react.createElement(DiffView, { webMonitoringProcessingURL: this.props.conf.webMonitoringProcessingURL,
+        return react.createElement(DiffView, { webMonitoringProcessingURL: handleRelativeURL(this.props.conf.webMonitoringProcessingURL),
           page: { url: encodeURIComponent(this.props.url) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
           loader: this.props.loader, iframeLoader: this.props.conf.iframeLoader, errorHandledCallback: this.errorHandled });
       }
@@ -7230,7 +7241,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
-      var url = this.props.conf.snapshotsPrefix + timestamp + '/' + this.props.url;
+      var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
       return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
     }
   }, {
