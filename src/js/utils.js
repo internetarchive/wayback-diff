@@ -27,10 +27,6 @@ export function isStrUrl(str = '') {
 }
 /*eslint-enable no-mixed-operators*/
 
-export function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
-
 /**
  * Calculates binary hamming distance of two base 16 integers.
  */

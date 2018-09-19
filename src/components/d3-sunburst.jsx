@@ -27,13 +27,6 @@ export default class D3Sunburst extends React.Component {
 
   render () {
     const {hoveredCell} = this.state;
-    var w = window.innerWidth
-      || document.documentElement.clientWidth
-      || document.body.clientWidth;
-
-    var h = window.innerHeight
-      || document.documentElement.clientHeight
-      || document.body.clientHeight;
 
     return (
       <Sunburst
@@ -44,15 +37,15 @@ export default class D3Sunburst extends React.Component {
           window.open(url,'_blank');}}
         data={this.props.simhashData}
         padAngle={() => 0.02}
-        width={w*0.7}
-        height={h*0.7}
+        width={this._getSize()}
+        height={this._getSize()}
         getSize={d => d.bigness}
         getColor={d => d.clr}>
         {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>
           <div style={tipStyle}>
             <div style={{...boxStyle, background: hoveredCell.clr}}/>
-            {'Difference ' + hoveredCell.bigness}
-            {' Timestamp ' + hoveredCell.name}
+            {this.getDistance(hoveredCell)}
+            {' Timestamp: ' + hoveredCell.name}
           </div>
         </ Hint> : null}
       </Sunburst>
@@ -70,4 +63,24 @@ export default class D3Sunburst extends React.Component {
     return temp;
   }
 
+  _getSize () {
+    var w = window.innerWidth
+      || document.documentElement.clientWidth
+      || document.body.clientWidth;
+
+    var h = window.innerHeight
+      || document.documentElement.clientHeight
+      || document.body.clientHeight;
+
+    if (h<w){
+      return h*0.85;
+    }
+    return w*0.85;
+  }
+
+  getDistance (hoveredCell) {
+    if (hoveredCell.bigness){
+      return ('Hamming Distance: ' + hoveredCell.bigness);
+    }
+  }
 }
