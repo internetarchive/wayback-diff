@@ -106,9 +106,9 @@ export default class TimestampHeader extends React.Component {
     } else {
       var url = handleRelativeURL(this.props.conf.cdxServer);
       if (this.props.conf.limit){
-        url += `search?url=${this.props.url}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json`;
+        url += `search?url=${this.props.url}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json&sort=reverse`;
       } else {
-        url += `search?url=${this.props.url}/&status=200&fl=timestamp,digest&output=json`;
+        url += `search?url=${this.props.url}/&status=200&fl=timestamp,digest&output=json&sort=reverse`;
       }
       this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
 
@@ -168,10 +168,10 @@ export default class TimestampHeader extends React.Component {
   _prepareOptionElements(data){
     var initialSnapshots = [];
     if (data.length > 0) {
-      var yearGroup = this._getYear(data[data.length-1][0]);
+      var yearGroup = this._getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
-    for (let i = data.length-1; i > 0; i--){
+    for (let i = 0; i < data.length; i++){
       let utcTime = this._getUTCDateFormat(data[i][0]);
       var year = this._getYear(data[i][0]);
       if (year < yearGroup) {
