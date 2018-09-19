@@ -34,7 +34,10 @@ export default {
       exclude: 'node_modules/process-es6/**',
       include: [
         'node_modules/**'
-      ]
+      ],
+      namedExports: {
+        'node_modules/react/index.js': ['PureComponent', 'Component']
+      }
     }),
     globals(),
     replace({ 'process.env.NODE_ENV': JSON.stringify('development'),

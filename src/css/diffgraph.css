@@ -1,0 +1,34 @@
+.heat-map-legend-bar {
+    width: 10px;
+    margin: 0 1px;
+    transition: height .2s;
+}
+
+.heat-map-legend-summary {
+    display: flex;
+    align-items: center;
+    height: 20px
+}
+
+.heat-map-legend {
+    align-self: flex-end;
+    display: flex;
+    align-items: baseline;
+    font-size: 12px;
+    float: right;
+}
+
+.heat-map-legend-summary-min-caption {
+    width: 32px;
+    text-align: right;
+}
+
+.heat-map-legend-caption {
+    margin: 0 8px;
+}
+
+.heat-map-legend-summary-graphics {
+    display: flex;
+    margin: 0 8px;
+    height: 20px;
+}
