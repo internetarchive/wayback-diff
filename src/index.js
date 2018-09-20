@@ -7,6 +7,7 @@ import React from 'react';
 // import DiffContainer from './components/diff-container.jsx';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import Loading from './components/loading.jsx';
+// import SunburstContainer from './components/sunburst-container.jsx';
 //
 // let conf = require('./conf.json');
 //
@@ -37,6 +38,11 @@ import React from 'react';
 //         <DiffContainer url={match.params[0]} fetchCDXCallback={null}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} conf={conf}/>}
 //       />
+//       <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
+//         <SunburstContainer url={match.params[1]} wdd={conf['wayback-discover-diff']} timestamp={match.params[0]}
+//           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
+//           urlPrefix={conf.urlPrefix}/>}
+//       />
 //     </Switch>
 //   </Router>, document.getElementById('wayback-diff'));
 
@@ -64,3 +70,4 @@ import React from 'react';
 
 //  If using as a component in an other project uncomment the following line
 export DiffContainer from './components/diff-container.jsx';
+export SunburstContainer from './components/sunburst-container.jsx';
