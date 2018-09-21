@@ -32,7 +32,7 @@ export function handleRelativeURL (url) {
   if (url.match(regex)) {
     return url;
   }
-  if (window.location.port === '80') {
+  if (window.location.port === '80' || window.location.port === '') {
     return `${window.location.protocol}//${window.location.hostname}${url}`;
   }
   return `${window.location.protocol}//${window.location.hostname}:${window.location.port}${url}`;
