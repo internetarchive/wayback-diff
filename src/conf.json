@@ -5,5 +5,6 @@
   "urlPrefix": "/diff/",
   "cdxServer": "http://web.archive.org/cdx/",
   "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
-  "wayback-discover-diff": "http://localhost:4000"
+  "wayback-discover-diff": "http://localhost:4000",
+  "max-sunburst-level-length": "70"
 }
