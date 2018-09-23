@@ -41,7 +41,7 @@ import React from 'react';
 //       <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
 //         <SunburstContainer url={match.params[1]} wdd={conf['wayback-discover-diff']} timestamp={match.params[0]}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
-//           urlPrefix={conf.urlPrefix} levelLength={conf['max-sunburst-level-length']}/>}
+//           conf={conf} fetchSnapshotCallback={null}/>}
 //       />
 //     </Switch>
 //   </Router>, document.getElementById('wayback-diff'));

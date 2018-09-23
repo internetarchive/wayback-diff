@@ -56,3 +56,12 @@ export function hammingDistance(x, y) {
 
   return c1 + c2;
 }
+
+export function checkResponse(response) {
+  if (response) {
+    if (!response.ok) {
+      throw Error(response.status);
+    }
+    return response;
+  }
+}
