@@ -145,6 +145,7 @@ The configuration file should have the following format:
   "webMonitoringProcessingURL": "http://localhost:8888",
   "limit": "1000",
   "snapshotsPrefix": "http://web.archive.org/web/",
+  "snapshotsPrefixIframe": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",
   "diffgraphPrefix": "/diffgraph/",
   "cdxServer": "http://web.archive.org/cdx/",
