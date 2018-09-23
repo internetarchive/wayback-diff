@@ -39,7 +39,7 @@ import React from 'react';
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />} conf={conf}/>}
 //       />
 //       <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
-//         <SunburstContainer url={match.params[1]} wdd={conf['wayback-discover-diff']} timestamp={match.params[0]}
+//         <SunburstContainer url={match.params[1]} timestamp={match.params[0]}
 //           loader={<Loading waybackLoaderPath={'https://users.it.teithe.gr/~it133996/wayback-loader.svg'} />}
 //           conf={conf} fetchSnapshotCallback={null}/>}
 //       />

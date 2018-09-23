@@ -27726,7 +27726,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchTimestampSimhashData() {
       var _this4 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
+      var url = this.props.conf['wayback-discover-diff'] + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
       fetch(url).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
@@ -27743,7 +27743,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchSimhashData(timestamp) {
       var _this5 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
+      var url = this.props.conf['wayback-discover-diff'] + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
 
       fetch(url).then(function (response) {
         return checkResponse(response);
