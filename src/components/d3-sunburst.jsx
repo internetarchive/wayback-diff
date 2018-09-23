@@ -79,8 +79,8 @@ export default class D3Sunburst extends React.Component {
   }
 
   getDistance (hoveredCell) {
-    if (hoveredCell.bigness){
-      return ('Hamming Distance: ' + hoveredCell.bigness);
+    if (hoveredCell.hamDist){
+      return ('Hamming Distance: ' + hoveredCell.hamDist);
     }
   }
 }

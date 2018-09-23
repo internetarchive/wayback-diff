@@ -27601,8 +27601,8 @@ var D3Sunburst = function (_React$Component) {
   }, {
     key: 'getDistance',
     value: function getDistance(hoveredCell) {
-      if (hoveredCell.bigness) {
-        return 'Hamming Distance: ' + hoveredCell.bigness;
+      if (hoveredCell.hamDist) {
+        return 'Hamming Distance: ' + hoveredCell.hamDist;
       }
     }
   }]);
@@ -27783,34 +27783,54 @@ var SunburstContainer = function (_React$Component) {
       for (var i = 0; i < json.length; i++) {
         if (json[i][1] !== 0) {
           if (json[i][1] <= this._minDistance) {
-            firstLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[1], children: [] });
+            firstLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[1], children: [] });
           } else if (json[i][1] <= this._minDistance + 2) {
-            secondLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[2], children: [] });
+            secondLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[2], children: [] });
           } else if (json[i][1] <= this._minDistance + 4) {
-            thirdLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[3], children: [] });
+            thirdLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[3], children: [] });
           } else if (json[i][1] <= this._minDistance + 6) {
-            fourthLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[4], children: [] });
+            fourthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[4], children: [] });
           } else {
-            fifthLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[5], children: [] });
+            fifthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[5], children: [] });
           }
         }
+      }
+
+      if (firstLevel.length > this.props.levelLength) {
+        firstLevel.length = this.props.levelLength;
+      }
+      if (secondLevel.length > this.props.levelLength) {
+        secondLevel.length = this.props.levelLength;
+      }
+      if (thirdLevel.length > this.props.levelLength) {
+        thirdLevel.length = this.props.levelLength;
+      }
+      if (fourthLevel.length > this.props.levelLength) {
+        fourthLevel.length = this.props.levelLength;
+      }
+      if (fifthLevel.length > this.props.levelLength) {
+        fifthLevel.length = this.props.levelLength;
       }
 
       for (i = 0; i < fifthLevel.length; i++) {
         var mod = i % fourthLevel.length;
         fourthLevel[mod].children.push(fifthLevel[i]);
+        fourthLevel[mod].bigness = '';
       }
       for (i = 0; i < fourthLevel.length; i++) {
         var _mod = i % thirdLevel.length;
         thirdLevel[_mod].children.push(fourthLevel[i]);
+        thirdLevel[_mod].bigness = '';
       }
       for (i = 0; i < thirdLevel.length; i++) {
         var _mod2 = i % secondLevel.length;
         secondLevel[_mod2].children.push(thirdLevel[i]);
+        secondLevel[_mod2].bigness = '';
       }
       for (i = 0; i < secondLevel.length; i++) {
         var _mod3 = i % firstLevel.length;
         firstLevel[_mod3].children.push(secondLevel[i]);
+        firstLevel[_mod3].bigness = '';
       }
 
       var data = { name: timestamp[0], clr: colors[0], children: firstLevel };
