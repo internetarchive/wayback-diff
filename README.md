@@ -135,6 +135,7 @@ The **fetchSnapshotCallback** which is a callback function that will be used to 
 
 - The callback function should return a fetch Promise.
 
+
 # conf.json
 
 The configuration file should have the following format:
@@ -148,7 +149,8 @@ The configuration file should have the following format:
   "diffgraphPrefix": "/diffgraph/",
   "cdxServer": "http://web.archive.org/cdx/",
   "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
-  "wayback-discover-diff": "http://localhost:4000"
+  "wayback-discover-diff": "http://localhost:4000",
+  "max-sunburst-level-length": "70"
 }
 ```
 
