@@ -7181,8 +7181,8 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showError) {
-        var urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-        var urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+        var urlA = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+        var urlB = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: handleRelativeURL(this.props.conf.webMonitoringProcessingURL),
           page: { url: encodeURIComponent(this.props.url) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
@@ -27726,7 +27726,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchTimestampSimhashData() {
       var _this4 = this;
 
-      var url = this.props.conf['wayback-discover-diff'] + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
       fetch(url).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
@@ -27743,7 +27743,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchSimhashData(timestamp) {
       var _this5 = this;
 
-      var url = this.props.conf['wayback-discover-diff'] + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
 
       fetch(url).then(function (response) {
         return checkResponse(response);
@@ -27837,20 +27837,20 @@ var SunburstContainer = function (_React$Component) {
         }
       }
 
-      if (firstLevel.length > this.props.conf['max-sunburst-level-length']) {
-        firstLevel.length = this.props.conf['max-sunburst-level-length'];
+      if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+        firstLevel.length = this.props.conf.maxSunburstLevelLength;
       }
-      if (secondLevel.length > this.props.conf['max-sunburst-level-length']) {
-        secondLevel.length = this.props.conf['max-sunburst-level-length'];
+      if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+        secondLevel.length = this.props.conf.maxSunburstLevelLength;
       }
-      if (thirdLevel.length > this.props.conf['max-sunburst-level-length']) {
-        thirdLevel.length = this.props.conf['max-sunburst-level-length'];
+      if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+        thirdLevel.length = this.props.conf.maxSunburstLevelLength;
       }
-      if (fourthLevel.length > this.props.conf['max-sunburst-level-length']) {
-        fourthLevel.length = this.props.conf['max-sunburst-level-length'];
+      if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fourthLevel.length = this.props.conf.maxSunburstLevelLength;
       }
-      if (fifthLevel.length > this.props.conf['max-sunburst-level-length']) {
-        fifthLevel.length = this.props.conf['max-sunburst-level-length'];
+      if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fifthLevel.length = this.props.conf.maxSunburstLevelLength;
       }
 
       for (i = 0; i < fifthLevel.length; i++) {

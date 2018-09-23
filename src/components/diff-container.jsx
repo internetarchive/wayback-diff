@@ -160,8 +160,8 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showError){
-      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
