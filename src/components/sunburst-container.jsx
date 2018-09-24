@@ -94,7 +94,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchTimestampSimhashData () {
-    const url = `${this.props.conf['wayback-discover-diff']}/simhash?url=${this.props.url}&timestamp=${this.props.timestamp}`;
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${this.props.url}&timestamp=${this.props.timestamp}`;
     fetch(url).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
@@ -105,7 +105,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchSimhashData (timestamp) {
-    const url = `${this.props.conf['wayback-discover-diff']}/simhash?url=${this.props.url}&year=${this.props.timestamp.substring(0, 4)}`;
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${this.props.url}&year=${this.props.timestamp.substring(0, 4)}`;
 
     fetch(url).then(response => {return checkResponse(response);})
       .then(response => response.json())
@@ -195,20 +195,20 @@ export default class SunburstContainer extends React.Component {
       }
     }
 
-    if (firstLevel.length > this.props.conf['max-sunburst-level-length']) {
-      firstLevel.length = this.props.conf['max-sunburst-level-length'];
+    if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+      firstLevel.length = this.props.conf.maxSunburstLevelLength;
     }
-    if (secondLevel.length > this.props.conf['max-sunburst-level-length']) {
-      secondLevel.length = this.props.conf['max-sunburst-level-length'];
+    if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+      secondLevel.length = this.props.conf.maxSunburstLevelLength;
     }
-    if (thirdLevel.length > this.props.conf['max-sunburst-level-length']) {
-      thirdLevel.length = this.props.conf['max-sunburst-level-length'];
+    if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+      thirdLevel.length = this.props.conf.maxSunburstLevelLength;
     }
-    if (fourthLevel.length > this.props.conf['max-sunburst-level-length']) {
-      fourthLevel.length = this.props.conf['max-sunburst-level-length'];
+    if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fourthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
-    if (fifthLevel.length > this.props.conf['max-sunburst-level-length']) {
-      fifthLevel.length = this.props.conf['max-sunburst-level-length'];
+    if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fifthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
 
 
