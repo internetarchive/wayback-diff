@@ -196,8 +196,11 @@ export default class DiffView extends React.Component {
         .then(data => this.setState({diffData: data}));
     }
     var url = `${this.props.webMonitoringProcessingURL}/`;
-    url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
-    fetch(url)
+    url += `${diffTypes[diffType].diffService}?format=json&include=all&pass_header=cookie&a=${a}&b=${b}`;
+    // pass credentials (HTTP cookies, TLS client certificates and
+    // authentication entries for HTTP authentication)
+    // https://fetch.spec.whatwg.org/#cors-protocol-and-credentials
+    fetch(url, {credentials: 'include'})
       .then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((data) => {
