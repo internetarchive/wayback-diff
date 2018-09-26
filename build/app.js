@@ -3285,7 +3285,7 @@ var DiffView = function (_React$Component) {
       // Promise.resolve(fromList || this.context.api.getDiff(pageId, aId, bId, changeDiffTypes[diffType]))
       this.setState({ diffData: null });
       if (!diffTypes[diffType].diffService) {
-        return Promise.all([fetch(a.uri, { mode: 'cors' }), fetch(b.uri, { mode: 'cors' })]).then(function (_ref) {
+        return Promise.all([fetch(a.uri, { mode: 'cors', credentials: 'include' }), fetch(b.uri, { mode: 'cors', credentials: 'include' })]).then(function (_ref) {
           var _ref2 = slicedToArray(_ref, 2),
               rawA = _ref2[0],
               rawB = _ref2[1];
