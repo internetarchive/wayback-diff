@@ -134,7 +134,7 @@ export default class DiffContainer extends React.Component {
       this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
     }else {
       let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      this._handleSnapshotFetch(fetch(url));
+      this._handleSnapshotFetch(fetch(url, {credentials: 'include'}));
     }
 
     const Loader = () => this.props.loader;
@@ -214,7 +214,7 @@ export default class DiffContainer extends React.Component {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
     let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-    return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow', credentials: 'include'}), timestamp, fetchedTimestamps, position);
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
