@@ -7239,7 +7239,7 @@ var DiffContainer = function (_React$Component) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
         var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-        this._handleSnapshotFetch(fetch(url));
+        this._handleSnapshotFetch(fetch(url, { credentials: 'include' }));
       }
 
       var Loader = function Loader() {
@@ -7331,7 +7331,7 @@ var DiffContainer = function (_React$Component) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
       var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
+      return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow', credentials: 'include' }), timestamp, fetchedTimestamps, position);
     }
   }, {
     key: '_setNewURL',
