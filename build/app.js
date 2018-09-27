@@ -2945,6 +2945,79 @@ function renderVersion(page, version, content) {
   return react.createElement('iframe', { src: version });
 }
 
+/*eslint-disable no-useless-escape*/
+var urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
+/*eslint-enable no-useless-escape*/
+
+function hasWhiteSpace(s) {
+  return s.indexOf(' ') >= 0;
+}
+
+function looksLikeUrl(str) {
+  return !!str.match(urlRegex);
+}
+
+function startsWith(str, start) {
+  return str.indexOf(start) === 0;
+}
+
+/*eslint-disable no-mixed-operators*/
+function isStrUrl() {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+  var processedValue = str.toLocaleLowerCase();
+  return (startsWith(processedValue, 'ftp://') || startsWith(processedValue, 'http://') || startsWith(processedValue, 'https://') || looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)) && !startsWith(processedValue, 'site:');
+}
+/*eslint-enable no-mixed-operators*/
+
+function handleRelativeURL(url) {
+  var regex = new RegExp(/^http.*/gm);
+  if (url.match(regex)) {
+    return url;
+  }
+  if (window.location.port === '80' || window.location.port === '') {
+    return window.location.protocol + '//' + window.location.hostname + url;
+  }
+  return window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + url;
+}
+
+/**
+ * Calculates binary hamming distance of two base 16 integers.
+ */
+function hammingDistance(x, y) {
+  var a1 = parseInt(x, 16);
+  var a2 = parseInt(y, 16);
+  var v1 = a1 ^ a2;
+  var v2 = (a1 ^ a2) >> 32;
+
+  v1 = v1 - (v1 >> 1 & 0x55555555);
+  v2 = v2 - (v2 >> 1 & 0x55555555);
+  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
+  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
+  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
+
+  return c1 + c2;
+}
+
+function checkResponse(response) {
+  if (response) {
+    if (!response.ok) {
+      throw Error(response.status);
+    }
+    return response;
+  }
+}
+
+function fetch_with_timeout(promise) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      reject(new Error('timeout'));
+    }, 45000);
+    promise.then(resolve, reject);
+  });
+}
+
 /**
  * @typedef DiffViewProps
  * @property {Page} page
@@ -3134,7 +3207,7 @@ var DiffView = function (_React$Component) {
       // Promise.resolve(fromList || this.context.api.getDiff(pageId, aId, bId, changeDiffTypes[diffType]))
       this.setState({ diffData: null });
       if (!diffTypes[diffType].diffService) {
-        return Promise.all([fetch(a.uri, { mode: 'cors' }), fetch(b.uri, { mode: 'cors' })]).then(function (_ref) {
+        return Promise.all([fetch_with_timeout(fetch(a.uri, { mode: 'cors' })), fetch_with_timeout(fetch(b.uri, { mode: 'cors' }))]).then(function (_ref) {
           var _ref2 = slicedToArray(_ref, 2),
               rawA = _ref2[0],
               rawB = _ref2[1];
@@ -3148,8 +3221,8 @@ var DiffView = function (_React$Component) {
       }
       var url = this.props.webMonitoringProcessingURL + '/';
       url += diffTypes[diffType].diffService + '?format=json&include=all&a=' + a + '&b=' + b;
-      fetch(url).then(function (response) {
-        return _this3._checkResponse(response);
+      fetch_with_timeout(fetch(url)).then(function (response) {
+        return checkResponse(response);
       }).then(function (response) {
         return response.json();
       }).then(function (data) {
@@ -3159,16 +3232,6 @@ var DiffView = function (_React$Component) {
       }).catch(function (error) {
         _this3._errorHandled(error.message);
       });
-    }
-  }, {
-    key: '_checkResponse',
-    value: function _checkResponse(response) {
-      if (response) {
-        if (!response.ok) {
-          throw Error(response.status);
-        }
-        return response;
-      }
     }
   }, {
     key: '_errorHandled',
@@ -3185,61 +3248,6 @@ var DiffView = function (_React$Component) {
 
 var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
 styleInject(css$1);
-
-/*eslint-disable no-useless-escape*/
-var urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
-/*eslint-enable no-useless-escape*/
-
-function hasWhiteSpace(s) {
-  return s.indexOf(' ') >= 0;
-}
-
-function looksLikeUrl(str) {
-  return !!str.match(urlRegex);
-}
-
-function startsWith(str, start) {
-  return str.indexOf(start) === 0;
-}
-
-/*eslint-disable no-mixed-operators*/
-function isStrUrl() {
-  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-  var processedValue = str.toLocaleLowerCase();
-  return (startsWith(processedValue, 'ftp://') || startsWith(processedValue, 'http://') || startsWith(processedValue, 'https://') || looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)) && !startsWith(processedValue, 'site:');
-}
-/*eslint-enable no-mixed-operators*/
-
-function handleRelativeURL(url) {
-  var regex = new RegExp(/^http.*/gm);
-  if (url.match(regex)) {
-    return url;
-  }
-  if (window.location.port === '80' || window.location.port === '') {
-    return window.location.protocol + '//' + window.location.hostname + url;
-  }
-  return window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + url;
-}
-
-/**
- * Calculates binary hamming distance of two base 16 integers.
- */
-function hammingDistance(x, y) {
-  var a1 = parseInt(x, 16);
-  var a2 = parseInt(y, 16);
-  var v1 = a1 ^ a2;
-  var v2 = (a1 ^ a2) >> 32;
-
-  v1 = v1 - (v1 >> 1 & 0x55555555);
-  v2 = v2 - (v2 >> 1 & 0x55555555);
-  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
-  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
-  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-
-  return c1 + c2;
-}
 
 /**
  * Display a timestamp selector
@@ -3372,7 +3380,7 @@ var TimestampHeader = function (_React$Component) {
         } else {
           url += 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json&sort=reverse';
         }
-        this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
+        this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
       }
     }
   }, {
@@ -7027,8 +7035,8 @@ var DiffContainer = function (_React$Component) {
   createClass(DiffContainer, [{
     key: 'errorHandled',
     value: function errorHandled(errorCode) {
-      // console.log('I am handling this error: ' + errorCode);
-      this.errorCode = errorCode;
+      // console.log('I am handling this error: ' + _errorCode);
+      this._errorCode = errorCode;
       this.setState({ showError: true });
     }
   }, {
@@ -7041,7 +7049,7 @@ var DiffContainer = function (_React$Component) {
         return this._renderRedirect();
       }
       if (this.state.showError) {
-        return react.createElement(ErrorMessage, { url: this.props.url, code: this.errorCode });
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this._errorCode });
       }
       if (!this.props.timestampA && !this.props.timestampB) {
         if (this.props.noTimestamps) {
@@ -7150,7 +7158,7 @@ var DiffContainer = function (_React$Component) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
         var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-        this._handleSnapshotFetch(fetch(url));
+        this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
       }
 
       var Loader = function Loader() {
@@ -7164,7 +7172,7 @@ var DiffContainer = function (_React$Component) {
       var _this3 = this;
 
       promise.then(function (response) {
-        return _this3._checkResponse(response);
+        return checkResponse(response);
       }).then(function (response) {
         var contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('text/html')) {
@@ -7224,7 +7232,7 @@ var DiffContainer = function (_React$Component) {
       var _this5 = this;
 
       return promise.then(function (response) {
-        return _this5._checkResponse(response);
+        return checkResponse(response);
       }).then(function (response) {
         var url = response.url;
         fetchedTimestamps[position] = url.split('/')[4];
@@ -7242,7 +7250,7 @@ var DiffContainer = function (_React$Component) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
       var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
+      return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { redirect: 'follow' })), timestamp, fetchedTimestamps, position);
     }
   }, {
     key: '_setNewURL',
@@ -7285,16 +7293,6 @@ var DiffContainer = function (_React$Component) {
         ' Invalid URL ',
         this.props.url
       );
-    }
-  }, {
-    key: '_checkResponse',
-    value: function _checkResponse(response) {
-      if (response) {
-        if (!response.ok) {
-          throw Error(response.status);
-        }
-        return response;
-      }
     }
   }]);
   return DiffContainer;
@@ -27601,15 +27599,15 @@ var D3Sunburst = function (_React$Component) {
   }, {
     key: 'getDistance',
     value: function getDistance(hoveredCell) {
-      if (hoveredCell.bigness) {
-        return 'Hamming Distance: ' + hoveredCell.bigness;
+      if (hoveredCell.hamDist) {
+        return 'Hamming Distance: ' + hoveredCell.hamDist;
       }
     }
   }]);
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n#sunburst-container{\n    position: relative;\n    transform: translateX(50%);\n    display: inline-block;\n}\n";
 styleInject(css$3);
 
 /**
@@ -27638,11 +27636,17 @@ var SunburstContainer = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
+      if (this.state.showError) {
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this._errorCode });
+      }
+      if (this._redirectToValidatedTimestamp) {
+        return this._renderRedirect();
+      }
       if (this.state.simhashData) {
         return react.createElement(
           'div',
           { style: { display: 'inline-block' } },
-          react.createElement(D3Sunburst, { urlPrefix: this.props.urlPrefix, url: this.props.url, simhashData: this.state.simhashData }),
+          react.createElement(D3Sunburst, { urlPrefix: this.props.conf.urlPrefix, url: this.props.url, simhashData: this.state.simhashData }),
           react.createElement(
             'div',
             { className: 'heat-map-legend' },
@@ -27680,40 +27684,86 @@ var SunburstContainer = function (_React$Component) {
       var Loader = function Loader() {
         return _this2.props.loader;
       };
-      return react.createElement(
-        'div',
-        null,
-        this._fetchTimestampSimhashData(),
-        react.createElement(Loader, null)
-      );
+      if (this.state.timestampValidated) {
+        this._fetchTimestampSimhashData();
+      } else {
+        this._validateTimestamp();
+      }
+      return react.createElement(Loader, null);
+    }
+  }, {
+    key: '_renderRedirect',
+    value: function _renderRedirect() {
+      this._redirectToValidatedTimestamp = false;
+      return react.createElement(Redirect, { to: this.state.newURL });
+    }
+  }, {
+    key: '_validateTimestamp',
+    value: function _validateTimestamp() {
+      var _this3 = this;
+
+      var promise = void 0;
+      if (this.props.fetchSnapshotCallback) {
+        promise = this.props.fetchSnapshotCallback(this.props.timestamp);
+      } else {
+        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + this.props.url;
+        promise = fetch_with_timeout(fetch(url, { redirect: 'follow' }));
+      }
+      promise.then(function (response) {
+        return checkResponse(response);
+      }).then(function (response) {
+        var url = response.url;
+        var fetchedTimestamp = url.split('/')[4];
+        if (_this3.props.timestamp !== fetchedTimestamp) {
+          _this3._redirectToValidatedTimestamp = true;
+          _this3.setState({ newURL: _this3.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + _this3.props.url,
+            timestampValidated: true });
+        }
+        _this3.setState({ timestampValidated: true });
+      }).catch(function (error) {
+        _this3.errorHandled(error.message);
+      });
+    }
+  }, {
+    key: 'errorHandled',
+    value: function errorHandled(errorCode) {
+      this._errorCode = errorCode;
+      this.setState({ showError: true });
     }
   }, {
     key: '_fetchTimestampSimhashData',
     value: function _fetchTimestampSimhashData() {
-      var _this3 = this;
+      var _this4 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
-
-      fetch(url).then(function (response) {
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
+      fetch_with_timeout(fetch(url)).then(function (response) {
+        return checkResponse(response);
+      }).then(function (response) {
         return response.json();
       }).then(function (jsonResponse) {
-        var json = _this3._decodeJson(jsonResponse);
-        _this3._fetchSimhashData(json);
+        var json = _this4._decodeJson(jsonResponse);
+        _this4._fetchSimhashData(json);
+      }).catch(function (error) {
+        _this4.errorHandled(error.message);
       });
     }
   }, {
     key: '_fetchSimhashData',
     value: function _fetchSimhashData(timestamp) {
-      var _this4 = this;
+      var _this5 = this;
 
-      var url = this.props.wdd + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
 
-      fetch(url).then(function (response) {
+      fetch_with_timeout(fetch(url)).then(function (response) {
+        return checkResponse(response);
+      }).then(function (response) {
         return response.json();
       }).then(function (jsonResponse) {
-        var json = _this4._decodeJson(jsonResponse);
-        var data = _this4._calcDistance(json, timestamp);
-        _this4._createLevels(data, timestamp);
+        var json = _this5._decodeJson(jsonResponse);
+        var data = _this5._calcDistance(json, timestamp);
+        _this5._createLevels(data, timestamp);
+      }).catch(function (error) {
+        _this5.errorHandled(error.message);
       });
     }
   }, {
@@ -27783,34 +27833,54 @@ var SunburstContainer = function (_React$Component) {
       for (var i = 0; i < json.length; i++) {
         if (json[i][1] !== 0) {
           if (json[i][1] <= this._minDistance) {
-            firstLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[1], children: [] });
+            firstLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[1], children: [] });
           } else if (json[i][1] <= this._minDistance + 2) {
-            secondLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[2], children: [] });
+            secondLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[2], children: [] });
           } else if (json[i][1] <= this._minDistance + 4) {
-            thirdLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[3], children: [] });
+            thirdLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[3], children: [] });
           } else if (json[i][1] <= this._minDistance + 6) {
-            fourthLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[4], children: [] });
+            fourthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[4], children: [] });
           } else {
-            fifthLevel.push({ name: json[i][0], bigness: json[i][1], clr: colors[5], children: [] });
+            fifthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[5], children: [] });
           }
         }
+      }
+
+      if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+        firstLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+        secondLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+        thirdLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fourthLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fifthLevel.length = this.props.conf.maxSunburstLevelLength;
       }
 
       for (i = 0; i < fifthLevel.length; i++) {
         var mod = i % fourthLevel.length;
         fourthLevel[mod].children.push(fifthLevel[i]);
+        fourthLevel[mod].bigness = '';
       }
       for (i = 0; i < fourthLevel.length; i++) {
         var _mod = i % thirdLevel.length;
         thirdLevel[_mod].children.push(fourthLevel[i]);
+        thirdLevel[_mod].bigness = '';
       }
       for (i = 0; i < thirdLevel.length; i++) {
         var _mod2 = i % secondLevel.length;
         secondLevel[_mod2].children.push(thirdLevel[i]);
+        secondLevel[_mod2].bigness = '';
       }
       for (i = 0; i < secondLevel.length; i++) {
         var _mod3 = i % firstLevel.length;
         firstLevel[_mod3].children.push(secondLevel[i]);
+        firstLevel[_mod3].bigness = '';
       }
 
       var data = { name: timestamp[0], clr: colors[0], children: firstLevel };
