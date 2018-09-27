@@ -56,3 +56,21 @@ export function hammingDistance(x, y) {
 
   return c1 + c2;
 }
+
+export function checkResponse(response) {
+  if (response) {
+    if (!response.ok) {
+      throw Error(response.status);
+    }
+    return response;
+  }
+}
+
+export function fetch_with_timeout(promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      reject(new Error('timeout'));
+    }, 45000);
+    promise.then(resolve, reject);
+  });
+}

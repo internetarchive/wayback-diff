@@ -32,3 +32,9 @@
     margin: 0 8px;
     height: 20px;
 }
+
+#sunburst-container{
+    position: relative;
+    transform: translateX(50%);
+    display: inline-block;
+}

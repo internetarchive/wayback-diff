@@ -1,7 +1,10 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import D3Sunburst from './d3-sunburst.jsx';
 import {hammingDistance} from '../js/utils.js';
 import '../css/diffgraph.css';
+import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
+import ErrorMessage from './errors.jsx';
 
 /**
  * Container of d3 Sunburst diagram
@@ -21,10 +24,17 @@ export default class SunburstContainer extends React.Component {
   }
 
   render () {
+    if (this.state.showError){
+      return(
+        <ErrorMessage url={this.props.url} code={this._errorCode}/>);
+    }
+    if (this._redirectToValidatedTimestamp){
+      return this._renderRedirect();
+    }
     if (this.state.simhashData) {
       return (
         <div style={{display: 'inline-block'}}>
-          <D3Sunburst urlPrefix={this.props.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
+          <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
             <div className="heat-map-legend-caption">Variation</div>
             <div className="heat-map-legend-summary">
@@ -43,34 +53,68 @@ export default class SunburstContainer extends React.Component {
       );
     }
     const Loader = () => this.props.loader;
-    return (<div>
-      {this._fetchTimestampSimhashData()}
-      <Loader/>
-    </div>
-    );
+    if (this.state.timestampValidated) {
+      this._fetchTimestampSimhashData();
+    } else {
+      this._validateTimestamp();
+    }
+    return (<Loader/>);
+  }
+
+  _renderRedirect () {
+    this._redirectToValidatedTimestamp = false;
+    return (<Redirect to={this.state.newURL} />);
+  }
+
+  _validateTimestamp() {
+    let promise;
+    if (this.props.fetchSnapshotCallback) {
+      promise = this.props.fetchSnapshotCallback(this.props.timestamp);
+    } else {
+      let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + this.props.url;
+      promise = fetch_with_timeout(fetch(url, {redirect: 'follow'}));
+    }
+    promise.then(response => {return checkResponse(response);})
+      .then(response => {
+        let url = response.url;
+        let fetchedTimestamp = url.split('/')[4];
+        if (this.props.timestamp !== fetchedTimestamp) {
+          this._redirectToValidatedTimestamp = true;
+          this.setState({newURL: this.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + this.props.url,
+            timestampValidated: true});
+        }
+        this.setState({timestampValidated: true});
+      })
+      .catch(error => {this.errorHandled(error.message);});
+  }
+
+  errorHandled (errorCode) {
+    this._errorCode = errorCode;
+    this.setState({showError: true});
   }
 
   _fetchTimestampSimhashData () {
-    const url = `${this.props.wdd}/simhash?url=${this.props.url}&timestamp=${this.props.timestamp}`;
-
-    fetch(url)
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${this.props.url}&timestamp=${this.props.timestamp}`;
+    fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         var json = this._decodeJson(jsonResponse);
         this._fetchSimhashData(json);
-      });
+      })
+      .catch(error => {this.errorHandled(error.message);});
   }
 
   _fetchSimhashData (timestamp) {
-    const url = `${this.props.wdd}/simhash?url=${this.props.url}&year=${this.props.timestamp.substring(0, 4)}`;
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${this.props.url}&year=${this.props.timestamp.substring(0, 4)}`;
 
-    fetch(url)
+    fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         var json = this._decodeJson(jsonResponse);
         let data = this._calcDistance(json, timestamp);
         this._createLevels(data, timestamp);
-      });
+      })
+      .catch(error => {this.errorHandled(error.message);});
   }
 
 
@@ -138,34 +182,55 @@ export default class SunburstContainer extends React.Component {
     for (var i = 0; i<json.length; i++){
       if (json[i][1] !== 0) {
         if (json[i][1] <= this._minDistance) {
-          firstLevel.push({name: json[i][0], bigness: json[i][1], clr: colors[1], children: []});
+          firstLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[1], children: []});
         } else if (json[i][1] <= this._minDistance + 2) {
-          secondLevel.push({name: json[i][0], bigness: json[i][1], clr: colors[2], children: []});
+          secondLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[2], children: []});
         } else if (json[i][1] <= this._minDistance + 4) {
-          thirdLevel.push({name: json[i][0], bigness: json[i][1], clr: colors[3], children: []});
+          thirdLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[3], children: []});
         } else if (json[i][1] <= this._minDistance + 6) {
-          fourthLevel.push({name: json[i][0], bigness: json[i][1], clr: colors[4], children: []});
+          fourthLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[4], children: []});
         } else {
-          fifthLevel.push({name: json[i][0], bigness: json[i][1], clr: colors[5], children: []});
+          fifthLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[5], children: []});
         }
       }
     }
 
+    if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+      firstLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+      secondLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+      thirdLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fourthLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fifthLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+
+
     for (i = 0; i<fifthLevel.length; i++) {
       let mod = i % fourthLevel.length;
       fourthLevel[mod].children.push(fifthLevel[i]);
+      fourthLevel[mod].bigness = '';
     }
     for (i = 0; i<fourthLevel.length; i++) {
       let mod = i%thirdLevel.length;
       thirdLevel[mod].children.push(fourthLevel[i]);
+      thirdLevel[mod].bigness = '';
     }
     for (i = 0; i<thirdLevel.length; i++) {
       let mod = i%secondLevel.length;
       secondLevel[mod].children.push(thirdLevel[i]);
+      secondLevel[mod].bigness = '';
     }
     for (i = 0; i<secondLevel.length; i++) {
       let mod = i%firstLevel.length;
       firstLevel[mod].children.push(secondLevel[i]);
+      firstLevel[mod].bigness = '';
     }
 
     var data = {name:timestamp[0], clr: colors[0], children:firstLevel};

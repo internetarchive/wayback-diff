@@ -4,7 +4,7 @@ import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
-import {isStrUrl, handleRelativeURL} from '../js/utils.js';
+import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 
@@ -30,8 +30,8 @@ export default class DiffContainer extends React.Component {
   }
 
   errorHandled (errorCode) {
-    // console.log('I am handling this error: ' + errorCode);
-    this.errorCode = errorCode;
+    // console.log('I am handling this error: ' + _errorCode);
+    this._errorCode = errorCode;
     this.setState({showError: true});
   }
 
@@ -44,7 +44,7 @@ export default class DiffContainer extends React.Component {
     }
     if (this.state.showError){
       return(
-        <ErrorMessage url ={this.props.url} code ={this.errorCode}/>);
+        <ErrorMessage url={this.props.url} code={this._errorCode}/>);
     }
     if (!this.props.timestampA && !this.props.timestampB) {
       if (this.props.noTimestamps){
@@ -134,7 +134,7 @@ export default class DiffContainer extends React.Component {
       this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
     }else {
       let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      this._handleSnapshotFetch(fetch(url));
+      this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
     }
 
     const Loader = () => this.props.loader;
@@ -143,7 +143,7 @@ export default class DiffContainer extends React.Component {
 
   _handleSnapshotFetch(promise){
     promise
-      .then(response => {return this._checkResponse(response);})
+      .then(response => {return checkResponse(response);})
       .then(response => {
         var contentType = response.headers.get('content-type');
         if(contentType && contentType.includes('text/html')) {
@@ -198,7 +198,7 @@ export default class DiffContainer extends React.Component {
 
   _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
     return promise
-      .then(response => {return this._checkResponse(response);})
+      .then(response => {return checkResponse(response);})
       .then(response => {
         let url = response.url;
         fetchedTimestamps[position] = url.split('/')[4];
@@ -214,7 +214,7 @@ export default class DiffContainer extends React.Component {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
     let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-    return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
@@ -245,12 +245,4 @@ export default class DiffContainer extends React.Component {
     return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.url}</div>);
   }
 
-  _checkResponse(response) {
-    if (response) {
-      if (!response.ok) {
-        throw Error(response.status);
-      }
-      return response;
-    }
-  }
 }
