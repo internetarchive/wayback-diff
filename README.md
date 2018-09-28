@@ -77,9 +77,10 @@ ReactDOM.render(
         loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
     />
     <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
-      <SunburstContainer url={match.params[1]} wdd={conf['wayback-discover-diff']} timestamp={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
-  </Switch>
+      <SunburstContainer url={match.params[1]} timestamp={match.params[0]}
+        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        conf={conf} fetchSnapshotCallback={null}/>} />
+    </Switch>
   </Router>, document.getElementById('wayback-diff'));
 ```
 
@@ -118,7 +119,7 @@ The **url** which is the webpage for which the snapshots are shown.
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
 
-### SunburstContainer can receive up to four props. All of them are optional. 
+### SunburstContainer can receive up to five props. All of them are optional. 
 
 The **loader** which is a React Component that will be shown when loading.
 
@@ -126,7 +127,14 @@ The **timestamp** which is the timestamp whose simhash will be compared with the
 
 The **url** which is the webpage for which the the simhashes will be compared.
 
-The **wdd** which is the wayback-discover-diff server's address.
+The **conf** which is a JSON file that contains the configuration of the wayback-diff component.
+
+The **fetchSnapshotCallback** which is a callback function that will be used to fetch the snapshots from the Wayback Machine. This is used to validate the timestamp in the URL.
+
+- If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
+
+- The callback function should return a fetch Promise.
+
 
 # conf.json
 
@@ -137,10 +145,13 @@ The configuration file should have the following format:
   "webMonitoringProcessingURL": "http://localhost:8888",
   "limit": "1000",
   "snapshotsPrefix": "http://web.archive.org/web/",
+  "snapshotsPrefixIframe": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",
+  "diffgraphPrefix": "/diffgraph/",
   "cdxServer": "http://web.archive.org/cdx/",
   "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
-  "wayback-discover-diff": "http://localhost:4000"
+  "wayback-discover-diff": "http://localhost:4000",
+  "max-sunburst-level-length": "70"
 }
 ```
 
@@ -207,8 +218,10 @@ After importing the component you might use it like any other React component:
                 loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
             />
             <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match}) =>
-              <SunburstContainer url={match.params[1]} wdd={this.conf['wayback-discover-diff']} timestamp={match.params[0]}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>} />
+              <SunburstContainer url={match.params[1]} timestamp={match.params[0]}
+                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                conf={this.conf} fetchSnapshotCallback={null}/>} 
+            />
           </Switch>
         </Router>
 }/>
