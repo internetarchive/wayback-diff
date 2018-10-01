@@ -65,3 +65,12 @@ export function checkResponse(response) {
     return response;
   }
 }
+
+export function fetch_with_timeout(promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      reject(new Error('timeout'));
+    }, 45000);
+    promise.then(resolve, reject);
+  });
+}

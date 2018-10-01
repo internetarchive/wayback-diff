@@ -4,7 +4,7 @@ import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import { Redirect } from 'react-router-dom';
-import {isStrUrl, handleRelativeURL, checkResponse} from '../js/utils.js';
+import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 
@@ -134,7 +134,7 @@ export default class DiffContainer extends React.Component {
       this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
     }else {
       let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      this._handleSnapshotFetch(fetch(url));
+      this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
     }
 
     const Loader = () => this.props.loader;
@@ -160,8 +160,8 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showError){
-      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
@@ -214,7 +214,7 @@ export default class DiffContainer extends React.Component {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
     let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-    return this._handleTimestampValidationFetch(fetch(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){

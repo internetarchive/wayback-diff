@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import {handleRelativeURL} from '../js/utils.js';
+import {handleRelativeURL, fetch_with_timeout} from '../js/utils.js';
 
 /**
  * Display a timestamp selector
@@ -110,7 +110,7 @@ export default class TimestampHeader extends React.Component {
       } else {
         url += `search?url=${this.props.url}/&status=200&fl=timestamp,digest&output=json&sort=reverse`;
       }
-      this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
+      this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
 
     }
   }

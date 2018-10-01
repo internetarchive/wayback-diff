@@ -3009,6 +3009,15 @@ function checkResponse(response) {
   }
 }
 
+function fetch_with_timeout(promise) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      reject(new Error('timeout'));
+    }, 45000);
+    promise.then(resolve, reject);
+  });
+}
+
 /**
  * @typedef DiffViewProps
  * @property {Page} page
@@ -3198,7 +3207,7 @@ var DiffView = function (_React$Component) {
       // Promise.resolve(fromList || this.context.api.getDiff(pageId, aId, bId, changeDiffTypes[diffType]))
       this.setState({ diffData: null });
       if (!diffTypes[diffType].diffService) {
-        return Promise.all([fetch(a.uri, { mode: 'cors' }), fetch(b.uri, { mode: 'cors' })]).then(function (_ref) {
+        return Promise.all([fetch_with_timeout(fetch(a.uri, { mode: 'cors' })), fetch_with_timeout(fetch(b.uri, { mode: 'cors' }))]).then(function (_ref) {
           var _ref2 = slicedToArray(_ref, 2),
               rawA = _ref2[0],
               rawB = _ref2[1];
@@ -3212,7 +3221,7 @@ var DiffView = function (_React$Component) {
       }
       var url = this.props.webMonitoringProcessingURL + '/';
       url += diffTypes[diffType].diffService + '?format=json&include=all&a=' + a + '&b=' + b;
-      fetch(url).then(function (response) {
+      fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
         return response.json();
@@ -3371,7 +3380,7 @@ var TimestampHeader = function (_React$Component) {
         } else {
           url += 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json&sort=reverse';
         }
-        this._handleFetch(fetch(url, { signal: this.ABORT_CONTROLLER.signal }));
+        this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
       }
     }
   }, {
@@ -7149,7 +7158,7 @@ var DiffContainer = function (_React$Component) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
         var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-        this._handleSnapshotFetch(fetch(url));
+        this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
       }
 
       var Loader = function Loader() {
@@ -7181,8 +7190,8 @@ var DiffContainer = function (_React$Component) {
     key: 'prepareDiffView',
     value: function prepareDiffView() {
       if (!this.state.showError) {
-        var urlA = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-        var urlB = handleRelativeURL(this.props.conf.snapshotsPrefixIframe) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+        var urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
+        var urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
 
         return react.createElement(DiffView, { webMonitoringProcessingURL: handleRelativeURL(this.props.conf.webMonitoringProcessingURL),
           page: { url: encodeURIComponent(this.props.url) }, diffType: 'SIDE_BY_SIDE_RENDERED', a: urlA, b: urlB,
@@ -7241,7 +7250,7 @@ var DiffContainer = function (_React$Component) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
       var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
-      return this._handleTimestampValidationFetch(fetch(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
+      return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { redirect: 'follow' })), timestamp, fetchedTimestamps, position);
     }
   }, {
     key: '_setNewURL',
@@ -27598,7 +27607,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n#sunburst-container{\n    position: relative;\n    transform: translateX(50%);\n    display: inline-block;\n}\n";
 styleInject(css$3);
 
 /**
@@ -27698,7 +27707,7 @@ var SunburstContainer = function (_React$Component) {
         promise = this.props.fetchSnapshotCallback(this.props.timestamp);
       } else {
         var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + this.props.url;
-        promise = fetch(url, { redirect: 'follow' });
+        promise = fetch_with_timeout(fetch(url, { redirect: 'follow' }));
       }
       promise.then(function (response) {
         return checkResponse(response);
@@ -27727,7 +27736,7 @@ var SunburstContainer = function (_React$Component) {
       var _this4 = this;
 
       var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
-      fetch(url).then(function (response) {
+      fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
         return response.json();
@@ -27745,7 +27754,7 @@ var SunburstContainer = function (_React$Component) {
 
       var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
 
-      fetch(url).then(function (response) {
+      fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
         return response.json();
