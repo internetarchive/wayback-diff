@@ -73,9 +73,9 @@ export default class D3Sunburst extends React.Component {
       || document.body.clientHeight;
 
     if (h<w){
-      return h*0.85;
+      return h*0.45;
     }
-    return w*0.85;
+    return w*0.45;
   }
 
   getDistance (hoveredCell) {

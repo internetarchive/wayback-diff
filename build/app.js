@@ -27592,9 +27592,9 @@ var D3Sunburst = function (_React$Component) {
       var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
       if (h < w) {
-        return h * 0.85;
+        return h * 0.45;
       }
-      return w * 0.85;
+      return w * 0.45;
     }
   }, {
     key: 'getDistance',
