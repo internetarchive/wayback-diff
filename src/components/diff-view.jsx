@@ -196,8 +196,8 @@ export default class DiffView extends React.Component {
         .then(data => this.setState({diffData: data}));
     }
     var url = `${this.props.webMonitoringProcessingURL}/`;
-    url += `${diffTypes[diffType].diffService}?format=json&include=all&a=${a}&b=${b}`;
-    fetch_with_timeout(fetch(url))
+    url += `${diffTypes[diffType].diffService}?format=json&pass_headers=cookie&include=all&a=${a}&b=${b}`;
+    fetch_with_timeout(fetch(url, {credentials: 'include'}))
       .then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((data) => {
