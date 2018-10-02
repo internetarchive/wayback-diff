@@ -33,8 +33,7 @@
     height: 20px;
 }
 
-#sunburst-container{
-    position: relative;
-    transform: translateX(50%);
-    display: inline-block;
+.sunburst-container{
+    margin: auto;
+    width: 50%;
 }
