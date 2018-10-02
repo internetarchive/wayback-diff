@@ -27607,7 +27607,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n#sunburst-container{\n    position: relative;\n    transform: translateX(50%);\n    display: inline-block;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n";
 styleInject(css$3);
 
 /**
@@ -27645,7 +27645,7 @@ var SunburstContainer = function (_React$Component) {
       if (this.state.simhashData) {
         return react.createElement(
           'div',
-          { style: { display: 'inline-block' } },
+          { className: 'sunburst-container' },
           react.createElement(D3Sunburst, { urlPrefix: this.props.conf.urlPrefix, url: this.props.url, simhashData: this.state.simhashData }),
           react.createElement(
             'div',
