@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
@@ -62,9 +63,7 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    if (!this._timestampsValidated) {
-      {this._checkTimestamps();}
-    }
+    if (!this._timestampsValidated) {this._checkTimestamps();}
     if (this.props.timestampA && this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
@@ -246,3 +245,21 @@ export default class DiffContainer extends React.Component {
   }
 
 }
+
+DiffContainer.propTypes = {
+  url: PropTypes.string.isRequired,
+  timestampA: PropTypes.string,
+  timestampB: PropTypes.string,
+  conf: PropTypes.element.isRequired,
+  loader: PropTypes.element,
+  fetchCDXCallback: PropTypes.func,
+  fetchSnapshotCallback: PropTypes.func,
+
+  noTimestamps: (props, propName, componentName) => {
+    if (props.noTimestamps && !props.noTimestamps.isPrototypeOf(Boolean)){
+      return new Error(`noTimestamps specified in '${componentName} should be boolean'.`);
+    } else if (!props.noTimestamps || !props.timestampA || !props.timestampB) {
+      return new Error(`At least one of props 'timestampA' or 'timestampB' or noTimestamps must be specified in '${componentName}'.`);
+    }
+  }
+};

@@ -5,6 +5,7 @@ import {hammingDistance} from '../js/utils.js';
 import '../css/diffgraph.css';
 import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
 import ErrorMessage from './errors.jsx';
+import PropTypes from 'prop-types';
 
 /**
  * Container of d3 Sunburst diagram
@@ -238,3 +239,12 @@ export default class SunburstContainer extends React.Component {
   }
 
 }
+
+SunburstContainer.propTypes = {
+
+  timestamp: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  conf: PropTypes.element.isRequired,
+  fetchSnapshotCallback: PropTypes.func,
+  loader: PropTypes.element
+};
