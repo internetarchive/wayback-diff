@@ -227,7 +227,7 @@ var process = {
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function unwrapExports (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
 }
 
 function createCommonjsModule(fn, module) {
@@ -10792,7 +10792,10 @@ var Animation = function (_PureComponent) {
       if (data && child.props._data) {
         data = data.map(function (row, index) {
           var correspondingCell = child.props._data[index];
-          return _extends$c({}, row, { parent: correspondingCell.parent, children: correspondingCell.children });
+          return _extends$c({}, row, {
+            parent: correspondingCell.parent,
+            children: correspondingCell.children
+          });
         });
       }
 
@@ -13519,7 +13522,8 @@ function _createScaleObjectForValue(attr, value, type, accessor, accessor0) {
       attr: attr,
       baseValue: undefined,
       isValue: true,
-      accessor: accessor
+      accessor: accessor,
+      accessor0: accessor0
     };
   }
   if (typeof value === 'undefined') {
@@ -13533,7 +13537,8 @@ function _createScaleObjectForValue(attr, value, type, accessor, accessor0) {
     attr: attr,
     baseValue: undefined,
     isValue: true,
-    accessor: accessor
+    accessor: accessor,
+    accessor0: accessor0
   };
 }
 
@@ -13935,16 +13940,13 @@ function getAttributeFunctor(props, attr) {
 function getAttr0Functor(props, attr) {
   var scaleObject = getScaleObjectFromProps(props, attr);
   if (scaleObject) {
-    var attr0 = attr + '0';
     var domain = scaleObject.domain;
     var _scaleObject$baseValu = scaleObject.baseValue,
         baseValue = _scaleObject$baseValu === undefined ? domain[0] : _scaleObject$baseValu;
 
     var scaleFn = getScaleFnFromScaleObject(scaleObject);
     return function (d) {
-      var value = _getAttrValue(d, function (el) {
-        return el[attr0];
-      });
+      var value = _getAttrValue(d, scaleObject.accessor0);
       return scaleFn(_isDefined(value) ? value : baseValue);
     };
   }
@@ -14346,10 +14348,10 @@ var AbstractSeries = function (_PureComponent) {
     }
 
     /**
-    * Right Click handler for the entire series.
-    * @param {Object} event Event.
-    * @protected
-    */
+     * Right Click handler for the entire series.
+     * @param {Object} event Event.
+     * @protected
+     */
 
   }, {
     key: '_seriesRightClickHandler',
@@ -17137,8 +17139,10 @@ var BarSeries = function (_AbstractSeries) {
 
       return react.createElement(
         'g',
-        { className: predefinedClassName$1 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$1 + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         data.map(function (d, i) {
           var _attrs;
 
@@ -17563,8 +17567,10 @@ var RectSeries = function (_AbstractSeries) {
 
       return react.createElement(
         'g',
-        { className: predefinedClassName$2 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$2 + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         data.map(function (d, i) {
           var _attrs;
 
@@ -18470,7 +18476,9 @@ var renderWhiskerMark = function renderWhiskerMark(whiskerMarkProps) {
 
     return react.createElement(
       'g',
-      { className: 'mark-whiskers', key: i,
+      {
+        className: 'mark-whiskers',
+        key: i,
         onClick: function onClick(e) {
           return valueClickHandler(d, e);
         },
@@ -18554,8 +18562,10 @@ var WhiskerSeries = function (_AbstractSeries) {
 
       return react.createElement(
         'g',
-        { className: predefinedClassName$6 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$6 + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         data.map(renderWhiskerMark(whiskerMarkProps))
       );
     }
@@ -18633,7 +18643,8 @@ var HeatmapSeries = function (_AbstractSeries) {
         'g',
         {
           className: predefinedClassName$7 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         data.map(function (d, i) {
           var attrs = _extends$z({
             style: _extends$z({
@@ -18877,7 +18888,8 @@ var HexbinSeries = function (_AbstractSeries) {
         'g',
         {
           className: predefinedClassName$8 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         hexes.map(function (d, i) {
           var attrs = {
             style: style,
@@ -19910,8 +19922,10 @@ var ContourSeries = function (_AbstractSeries) {
       var colorScale = linear$1().domain([min, max]).range(colorRange || CONTINUOUS_COLOR_RANGE);
       return react.createElement(
         'g',
-        { className: predefinedClassName$9 + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$9 + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         contouredData.map(function (polygon, index) {
           return react.createElement('path', {
             className: 'rv-xy-plot__series--contour-line',
@@ -19970,7 +19984,8 @@ function predefinedComponents(type) {
     case 'diamond':
       return react.createElement('polygon', {
         style: style,
-        points: '0 0 ' + size / 2 + ' ' + size / 2 + ' 0 ' + size + ' ' + -size / 2 + ' ' + size / 2 + ' 0 0' });
+        points: '0 0 ' + size / 2 + ' ' + size / 2 + ' 0 ' + size + ' ' + -size / 2 + ' ' + size / 2 + ' 0 0'
+      });
     case 'star':
       var starPoints = [].concat(_toConsumableArray$2(new Array(5))).map(function (c, index) {
         var angle = index / 5 * Math.PI * 2;
@@ -19982,9 +19997,20 @@ function predefinedComponents(type) {
       }).join(' ');
       return react.createElement('polygon', {
         points: starPoints,
-        x: '0', y: '0', height: size, width: size, style: style });
+        x: '0',
+        y: '0',
+        height: size,
+        width: size,
+        style: style
+      });
     case 'square':
-      return react.createElement('rect', { x: '' + -size / 2, y: '' + -size / 2, height: size, width: size, style: style });
+      return react.createElement('rect', {
+        x: '' + -size / 2,
+        y: '' + -size / 2,
+        height: size,
+        width: size,
+        style: style
+      });
     default:
     case 'circle':
       return react.createElement('circle', { cx: '0', cy: '0', r: size / 2, style: style });
@@ -20077,8 +20103,10 @@ var CustomSVGSeries = function (_AbstractSeries) {
       });
       return react.createElement(
         'g',
-        { className: predefinedClassName$a + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$a + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         contents
       );
     }
@@ -20344,10 +20372,21 @@ var ArcSeries = function (_AbstractSeries) {
           { className: 'rv-xy-plot__series--arc__animation-wrapper' },
           react.createElement(
             Animation,
-            _extends$E({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS, data: cloneData }),
-            react.createElement(ArcSeries, _extends$E({}, this.props, { animation: null, disableSeries: true, data: cloneData }))
+            _extends$E({}, this.props, {
+              animatedProps: ANIMATED_SERIES_PROPS,
+              data: cloneData
+            }),
+            react.createElement(ArcSeries, _extends$E({}, this.props, {
+              animation: null,
+              disableSeries: true,
+              data: cloneData
+            }))
           ),
-          react.createElement(ArcSeries, _extends$E({}, this.props, { animation: null, hideSeries: true, style: { stroke: 'red' } }))
+          react.createElement(ArcSeries, _extends$E({}, this.props, {
+            animation: null,
+            hideSeries: true,
+            style: { stroke: 'red' }
+          }))
         );
       }
 
@@ -20368,14 +20407,16 @@ var ArcSeries = function (_AbstractSeries) {
 
       return react.createElement(
         'g',
-        { className: predefinedClassName$c + ' ' + className,
+        {
+          className: predefinedClassName$c + ' ' + className,
           onMouseOver: this._seriesMouseOverHandler,
           onMouseOut: this._seriesMouseOutHandler,
           onClick: this._seriesClickHandler,
           onContextMenu: this._seriesRightClickHandler,
           opacity: hideSeries ? 0 : 1,
           pointerEvents: disableSeries ? 'none' : 'all',
-          transform: 'translate(' + (marginLeft + x(center)) + ',' + (marginTop + y(center)) + ')' },
+          transform: 'translate(' + (marginLeft + x(center)) + ',' + (marginTop + y(center)) + ')'
+        },
         data.map(function (row, i) {
           var noRadius = radiusDomain[1] === radiusDomain[0];
           var arcArg = {
@@ -20882,7 +20923,8 @@ var Hint = function (_PureComponent) {
           className: 'rv-hint ' + className,
           style: _extends$H({}, style, position, {
             position: 'absolute'
-          }) },
+          })
+        },
         children ? children : react.createElement(
           'div',
           { className: 'rv-hint__content', style: style.content },
@@ -21014,28 +21056,32 @@ var Borders = function (_PureComponent) {
           x: 0,
           y: height - marginBottom,
           width: width,
-          height: marginBottom }),
+          height: marginBottom
+        }),
         react.createElement('rect', {
           className: CLASSES.left + ' ' + className + '-left',
           style: _extends$I({}, style.all, style.left),
           x: 0,
           y: 0,
           width: marginLeft,
-          height: height }),
+          height: height
+        }),
         react.createElement('rect', {
           className: CLASSES.right + ' ' + className + '-right',
           style: _extends$I({}, style.all, style.right),
           x: width - marginRight,
           y: 0,
           width: marginRight,
-          height: height }),
+          height: height
+        }),
         react.createElement('rect', {
           className: CLASSES.top + ' ' + className + '-top',
           style: _extends$I({}, style.all, style.top),
           x: 0,
           y: 0,
           width: width,
-          height: marginTop })
+          height: marginTop
+        })
       );
     }
   }]);
@@ -21219,10 +21265,12 @@ var Crosshair = function (_PureComponent) {
         'div',
         {
           className: 'rv-crosshair ' + className,
-          style: { left: left + 'px', top: top + 'px' } },
+          style: { left: left + 'px', top: top + 'px' }
+        },
         react.createElement('div', {
           className: 'rv-crosshair__line',
-          style: _extends$J({ height: innerHeight + 'px' }, style.line) }),
+          style: _extends$J({ height: innerHeight + 'px' }, style.line)
+        }),
         react.createElement(
           'div',
           { className: innerClassName },
@@ -22288,7 +22336,8 @@ var XYPlot = function (_React$Component) {
           style: _extends$M({
             width: width + 'px',
             height: height + 'px'
-          }, this.props.style) });
+          }, this.props.style)
+        });
       }
       var components = this._getClonedChildComponents();
       return react.createElement(
@@ -22298,7 +22347,8 @@ var XYPlot = function (_React$Component) {
             width: width + 'px',
             height: height + 'px'
           },
-          className: 'rv-xy-plot ' + className },
+          className: 'rv-xy-plot ' + className
+        },
         react.createElement(
           'svg',
           {
@@ -22317,7 +22367,8 @@ var XYPlot = function (_React$Component) {
             onTouchMove: this._touchMoveHandler,
             onTouchEnd: this._touchEndHandler,
             onTouchCancel: this._touchCancelHandler,
-            onWheel: this._wheelHandler },
+            onWheel: this._wheelHandler
+          },
           components.filter(function (c) {
             return c && c.type.requiresSVG;
           })
@@ -22487,7 +22538,12 @@ function decorativeAxisTick(props) {
       tickSize = props.tickSize,
       style = props.style;
 
-  var _generatePoints = generatePoints({ axisStart: axisStart, axisEnd: axisEnd, numberOfTicks: numberOfTicks, axisDomain: axisDomain }),
+  var _generatePoints = generatePoints({
+    axisStart: axisStart,
+    axisEnd: axisEnd,
+    numberOfTicks: numberOfTicks,
+    axisDomain: axisDomain
+  }),
       points = _generatePoints.points;
   // add a quarter rotation to make ticks orthogonal to axis
 
@@ -22508,7 +22564,11 @@ function decorativeAxisTick(props) {
     }, style.text);
     return react.createElement(
       'g',
-      { key: index, transform: 'translate(' + point.x + ', ' + point.y + ')', className: 'rv-xy-plot__axis__tick' },
+      {
+        key: index,
+        transform: 'translate(' + point.x + ', ' + point.y + ')',
+        className: 'rv-xy-plot__axis__tick'
+      },
       react.createElement('line', _extends$N({}, tickProps, { className: 'rv-xy-plot__axis__tick__line' })),
       react.createElement(
         'text',
@@ -22572,14 +22632,18 @@ var DecorativeAxis = function (_AbstractSeries) {
 
       return react.createElement(
         'g',
-        { className: predefinedClassName$d + ' ' + className,
-          transform: 'translate(' + marginLeft + ',' + marginTop + ')' },
+        {
+          className: predefinedClassName$d + ' ' + className,
+          transform: 'translate(' + marginLeft + ',' + marginTop + ')'
+        },
         react.createElement('line', _extends$O({}, _extends$O({
           x1: x({ x: axisStart.x }),
           x2: x({ x: axisEnd.x }),
           y1: y({ y: axisStart.y }),
           y2: y({ y: axisEnd.y })
-        }, style.line), { className: 'rv-xy-plot__axis__line' })),
+        }, style.line), {
+          className: 'rv-xy-plot__axis__line'
+        })),
         react.createElement(
           'g',
           { className: 'rv-xy-manipulable-axis__ticks' },
@@ -22750,7 +22814,6 @@ var AxisTicks = function (_React$Component) {
   _createClass$z(AxisTicks, [{
     key: '_isAxisVertical',
 
-
     /**
      * Gets if the axis is vertical.
      * @returns {boolean} True if vertical.
@@ -22892,9 +22955,12 @@ var AxisTicks = function (_React$Component) {
 
         return react.createElement(
           'g',
-          _extends$Q({ key: i }, translateFn(pos, 0), {
+          _extends$Q({
+            key: i
+          }, translateFn(pos, 0), {
             className: 'rv-xy-plot__axis__tick',
-            style: style }),
+            style: style
+          }),
           react.createElement('line', _extends$Q({}, pathProps, {
             className: 'rv-xy-plot__axis__tick__line',
             style: _extends$Q({}, style, style.line)
@@ -22914,7 +22980,8 @@ var AxisTicks = function (_React$Component) {
         'g',
         {
           transform: 'translate(' + x + ', ' + y + ')',
-          className: 'rv-xy-plot__axis__ticks' },
+          className: 'rv-xy-plot__axis__ticks'
+        },
         ticks
       );
     }
@@ -23156,7 +23223,6 @@ var Axis = function (_PureComponent) {
   _createClass$A(Axis, [{
     key: '_getDefaultAxisProps',
 
-
     /**
      * Define the default values depending on the data passed from the outside.
      * @returns {*} Object of default properties.
@@ -23259,7 +23325,8 @@ var Axis = function (_PureComponent) {
         {
           transform: 'translate(' + leftPos + ',' + topPos + ')',
           className: predefinedClassName$e + ' ' + axisClassName + ' ' + className,
-          style: style },
+          style: style
+        },
         !hideLine && react.createElement(AxisLine, {
           height: height,
           width: width,
@@ -23273,7 +23340,8 @@ var Axis = function (_PureComponent) {
           height: height,
           width: width,
           style: _extends$S({}, style, style.title),
-          orientation: orientation }) : null
+          orientation: orientation
+        }) : null
       );
     }
   }]);
@@ -23378,7 +23446,8 @@ var CircularGridLines = function (_PureComponent) {
         'g',
         {
           transform: 'translate(' + (xScale(centerX) + marginLeft) + ',' + (yScale(centerY) + marginTop) + ')',
-          className: 'rv-xy-plot__circular-grid-lines' },
+          className: 'rv-xy-plot__circular-grid-lines'
+        },
         values.reduce(function (res, value, index) {
           var radius = xScale(value);
           if (rRange && (radius < rRange[0] || radius > rRange[1])) {
@@ -23387,7 +23456,8 @@ var CircularGridLines = function (_PureComponent) {
           return res.concat([react.createElement('circle', _extends$V({ cx: 0, cy: 0, r: radius }, {
             key: index,
             className: 'rv-xy-plot__circular-grid-lines__line',
-            style: style }))]);
+            style: style
+          }))]);
         }, [])
       );
     }
@@ -23536,7 +23606,8 @@ var GridLines = function (_PureComponent) {
         'g',
         {
           transform: 'translate(' + left + ',' + top + ')',
-          className: 'rv-xy-plot__grid-lines' },
+          className: 'rv-xy-plot__grid-lines'
+        },
         values.map(function (v, i) {
           var _pathProps;
 
@@ -23545,7 +23616,8 @@ var GridLines = function (_PureComponent) {
           return react.createElement('line', _extends$W({}, pathProps, {
             key: i,
             className: 'rv-xy-plot__grid-lines__line',
-            style: style }));
+            style: style
+          }));
         })
       );
     }
@@ -23718,7 +23790,8 @@ function Voronoi(props) {
         style: _extends$Z({
           pointerEvents: 'all'
         }, polygonStyle, d.data && d.data.style),
-        key: i });
+        key: i
+      });
     })
   );
 }
@@ -24173,7 +24246,8 @@ function DiscreteColorLegendItem(_ref) {
     { className: className, onClick: onClick, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave },
     react.createElement('span', {
       className: 'rv-discrete-color-legend-item__color',
-      style: disabled ? null : { background: color } }),
+      style: disabled ? null : { background: color }
+    }),
     react.createElement(
       'span',
       { className: 'rv-discrete-color-legend-item__title' },
@@ -24211,7 +24285,10 @@ function DiscreteColorLegend(_ref) {
 
   return react.createElement(
     'div',
-    { className: 'rv-discrete-color-legend ' + orientation + ' ' + className, style: { width: width, height: height } },
+    {
+      className: 'rv-discrete-color-legend ' + orientation + ' ' + className,
+      style: { width: width, height: height }
+    },
     items.map(function (item, i) {
       return react.createElement(DiscreteColorLegendItem, {
         title: item.title ? item.title : item,
@@ -25236,7 +25313,8 @@ var TreemapLeaf = function (_React$Component) {
           onClick: function onClick(event) {
             return onLeafClick(node, event);
           },
-          style: leafStyle },
+          style: leafStyle
+        },
         react.createElement(
           'div',
           { className: 'rv-treemap__leaf__content' },
@@ -25307,7 +25385,8 @@ var TreemapDOM = function (_React$Component) {
         'div',
         {
           className: 'rv-treemap ' + (useCirclePacking ? 'rv-treemap-circle-packed' : '') + ' ' + className,
-          style: { height: height, width: width } },
+          style: { height: height, width: width }
+        },
         nodes.map(function (node, index) {
           // throw out the rootest node
           if (hideRootNode && !index) {
@@ -25421,7 +25500,8 @@ var TreemapSVG = function (_React$Component) {
           getSize: function getSize(d) {
             return d.size;
           },
-          style: style }),
+          style: style
+        }),
         minY: minY,
         maxY: maxY,
         minX: minX,
@@ -25858,7 +25938,13 @@ var RadialChart = function (_Component) {
           style = _props.style,
           width = _props.width;
 
-      var mappedData = getWedgesToRender({ data: data, height: height, hideRootNode: hideRootNode, width: width, getAngle: getAngle });
+      var mappedData = getWedgesToRender({
+        data: data,
+        height: height,
+        hideRootNode: hideRootNode,
+        width: width,
+        getAngle: getAngle
+      });
       var radialDomain = getRadialDomain(mappedData);
       var arcProps = _extends$14({
         colorType: colorType
@@ -26007,7 +26093,10 @@ function getAxes(props) {
       animation: animation,
       key: index + '-axis',
       axisStart: { x: 0, y: 0 },
-      axisEnd: { x: getCoordinate(Math.cos(angle)), y: getCoordinate(Math.sin(angle)) },
+      axisEnd: {
+        x: getCoordinate(Math.cos(angle)),
+        y: getCoordinate(Math.sin(angle))
+      },
       axisDomain: sortedDomain,
       numberOfTicks: 5,
       tickValue: domainTickFormat,
@@ -26169,7 +26258,8 @@ var RadarChart = function (_Component) {
         animation: animation,
         key: className,
         className: predefinedClassName$h + '-label',
-        data: getLabels({ domains: domains, style: style.labels, startingAngle: startingAngle }) });
+        data: getLabels({ domains: domains, style: style.labels, startingAngle: startingAngle })
+      });
       return react.createElement(
         XYPlot,
         {
@@ -26181,7 +26271,8 @@ var RadarChart = function (_Component) {
           onMouseLeave: onMouseLeave,
           onMouseEnter: onMouseEnter,
           xDomain: [-1, 1],
-          yDomain: [-1, 1] },
+          yDomain: [-1, 1]
+        },
         children,
         axes.concat(polygons).concat(labelSeries)
       );
@@ -26437,7 +26528,8 @@ var ParallelCoordinates = function (_Component) {
         animation: true,
         key: className,
         className: predefinedClassName$i + '-label',
-        data: getLabels$1({ domains: domains, style: style.labels }) });
+        data: getLabels$1({ domains: domains, style: style.labels })
+      });
 
       var _getInnerDimensions = getInnerDimensions(this.props, DEFAULT_MARGINS),
           marginLeft = _getInnerDimensions.marginLeft,
@@ -26454,7 +26546,8 @@ var ParallelCoordinates = function (_Component) {
           onMouseLeave: onMouseLeave,
           onMouseEnter: onMouseEnter,
           xType: 'ordinal',
-          yDomain: [0, 1] },
+          yDomain: [0, 1]
+        },
         children,
         axes.concat(lines).concat(labelSeries),
         brushing && domains.map(function (d) {
@@ -26470,7 +26563,8 @@ var ParallelCoordinates = function (_Component) {
             onBrushEnd: trigger,
             onDragEnd: trigger,
             highlightWidth: (width - marginLeft - marginRight) / domains.length,
-            enableX: false });
+            enableX: false
+          });
         })
       );
     }
@@ -26909,7 +27003,8 @@ var SankeyLink = function (_PureComponent) {
           return onLinkMouseOut(node, e);
         },
         strokeWidth: strokeWidth,
-        fill: 'none' }));
+        fill: 'none'
+      }));
     }
   }]);
 
@@ -26993,7 +27088,9 @@ var Sankey = function (_Component) {
       });
 
       var _getInnerDimensions = getInnerDimensions({
-        margin: margin, height: height, width: width
+        margin: margin,
+        height: height,
+        width: width
       }, DEFAULT_MARGINS$2),
           marginLeft = _getInnerDimensions.marginLeft,
           marginTop = _getInnerDimensions.marginTop,
@@ -27010,7 +27107,8 @@ var Sankey = function (_Component) {
         XYPlot,
         _extends$18({}, this.props, {
           yType: 'literal',
-          className: 'rv-sankey ' + className }),
+          className: 'rv-sankey ' + className
+        }),
         linksCopy.map(function (link, i) {
           return react.createElement(SankeyLink, {
             style: style.links,
@@ -27023,7 +27121,8 @@ var Sankey = function (_Component) {
             strokeWidth: Math.max(link.width, 1),
             node: link,
             nWidth: nWidth,
-            key: 'link-' + i });
+            key: 'link-' + i
+          });
         }),
         react.createElement(VerticalRectSeries, {
           animation: animation,
@@ -27043,14 +27142,14 @@ var Sankey = function (_Component) {
           onValueClick: onValueClick,
           onValueMouseOver: onValueMouseOver,
           onValueMouseOut: onValueMouseOut,
-          colorType: 'literal' }),
+          colorType: 'literal'
+        }),
         !hideLabels && react.createElement(LabelSeries, {
           animation: animation,
           className: className,
           rotation: labelRotation,
           labelAnchorY: 'text-before-edge',
           data: nodesCopy.map(function (node, i) {
-
             return _extends$18({
               x: node.x0 + (node.x0 < width / 2 ? nWidth + 10 : -10),
               y: (node.y0 + node.y1) / 2 - marginTop,
@@ -27255,7 +27354,13 @@ var Sunburst = function (_React$Component) {
           getSize = _props.getSize,
           colorType = _props.colorType;
 
-      var mappedData = getNodesToRender({ data: data, height: height, hideRootNode: hideRootNode, width: width, getSize: getSize });
+      var mappedData = getNodesToRender({
+        data: data,
+        height: height,
+        hideRootNode: hideRootNode,
+        width: width,
+        getSize: getSize
+      });
       var radialDomain = getRadialDomain(mappedData);
       var margin = getRadialLayoutMargin(width, height, radialDomain);
 
@@ -27282,7 +27387,8 @@ var Sunburst = function (_React$Component) {
           className: predefinedClassName$j + ' ' + className,
           margin: margin,
           xDomain: [-radialDomain, radialDomain],
-          yDomain: [-radialDomain, radialDomain] },
+          yDomain: [-radialDomain, radialDomain]
+        },
         react.createElement(ArcSeries, _extends$19({
           colorType: colorType
         }, this.props, {
@@ -27290,7 +27396,11 @@ var Sunburst = function (_React$Component) {
           radiusDomain: [0, radialDomain],
           // need to present a stripped down version for interpolation
           data: animation ? mappedData.map(function (row, index) {
-            return _extends$19({}, row, { parent: null, children: null, index: index });
+            return _extends$19({}, row, {
+              parent: null,
+              children: null,
+              index: index
+            });
           }) : mappedData,
           _data: animation ? mappedData : null,
           arcClassName: predefinedClassName$j + '__series--radial__arc'
@@ -27453,7 +27563,6 @@ function getDisplayName(Component) {
  */
 
 function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
-
   var ResultClass = function (_React$Component) {
     _inherits$Z(ResultClass, _React$Component);
 
@@ -27528,7 +27637,9 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             height = _state.height,
             width = _state.width;
 
-        var props = _extends$1a({}, this.props, { animation: height === 0 && width === 0 ? null : this.props.animation });
+        var props = _extends$1a({}, this.props, {
+          animation: height === 0 && width === 0 ? null : this.props.animation
+        });
 
         var updatedDimensions = _extends$1a({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
 
@@ -27538,7 +27649,8 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             ref: function ref(_ref) {
               return _this2[CONTAINER_REF] = _ref;
             },
-            style: { width: '100%', height: '100%' } },
+            style: { width: '100%', height: '100%' }
+          },
           react.createElement(Component, _extends$1a({}, updatedDimensions, props))
         );
       }
