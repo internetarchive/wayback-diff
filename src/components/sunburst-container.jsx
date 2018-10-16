@@ -244,7 +244,7 @@ SunburstContainer.propTypes = {
 
   timestamp: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  conf: PropTypes.element.isRequired,
+  conf: PropTypes.object.isRequired,
   fetchSnapshotCallback: PropTypes.func,
   loader: PropTypes.element
 };

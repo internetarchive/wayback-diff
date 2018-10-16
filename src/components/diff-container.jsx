@@ -250,7 +250,7 @@ DiffContainer.propTypes = {
   url: PropTypes.string.isRequired,
   timestampA: PropTypes.string,
   timestampB: PropTypes.string,
-  conf: PropTypes.element.isRequired,
+  conf: PropTypes.object.isRequired,
   loader: PropTypes.element,
   fetchCDXCallback: PropTypes.func,
   fetchSnapshotCallback: PropTypes.func,
@@ -258,7 +258,7 @@ DiffContainer.propTypes = {
   noTimestamps: (props, propName, componentName) => {
     if (props.noTimestamps && !props.noTimestamps.isPrototypeOf(Boolean)){
       return new Error(`noTimestamps specified in '${componentName} should be boolean'.`);
-    } else if (!props.noTimestamps || !props.timestampA || !props.timestampB) {
+    } else if (!(props.noTimestamps in window || props.timestampA in window || props.timestampB in window)) {
       return new Error(`At least one of props 'timestampA' or 'timestampB' or noTimestamps must be specified in '${componentName}'.`);
     }
   }
