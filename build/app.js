@@ -3463,9 +3463,9 @@ var TimestampHeader = function (_React$Component) {
       } else {
         var url = handleRelativeURL(this.props.conf.cdxServer);
         if (this.props.conf.limit) {
-          url += 'search?url=' + this.props.url + '/&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json&sort=reverse';
+          url += 'search?url=' + encodeURIComponent(this.props.url) + '&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json&sort=reverse';
         } else {
-          url += 'search?url=' + this.props.url + '/&status=200&fl=timestamp,digest&output=json&sort=reverse';
+          url += 'search?url=' + encodeURIComponent(this.props.url) + '&status=200&fl=timestamp,digest&output=json&sort=reverse';
         }
         this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
       }
@@ -7244,7 +7244,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
       } else {
-        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
+        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
         this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
       }
 
@@ -7336,7 +7336,7 @@ var DiffContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
-      var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + this.props.url;
+      var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
       return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { redirect: 'follow' })), timestamp, fetchedTimestamps, position);
     }
   }, {
@@ -27905,7 +27905,7 @@ var SunburstContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         promise = this.props.fetchSnapshotCallback(this.props.timestamp);
       } else {
-        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + this.props.url;
+        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + encodeURIComponent(this.props.url);
         promise = fetch_with_timeout(fetch(url, { redirect: 'follow' }));
       }
       promise.then(function (response) {
@@ -27934,7 +27934,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchTimestampSimhashData() {
       var _this4 = this;
 
-      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&timestamp=' + this.props.timestamp;
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.props.timestamp;
       fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
@@ -27951,8 +27951,7 @@ var SunburstContainer = function (_React$Component) {
     value: function _fetchSimhashData(timestamp) {
       var _this5 = this;
 
-      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + this.props.url + '&year=' + this.props.timestamp.substring(0, 4);
-
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.props.timestamp.substring(0, 4);
       fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
