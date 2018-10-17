@@ -104,11 +104,11 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      var url = handleRelativeURL(this.props.conf.cdxServer);
+      let url = handleRelativeURL(this.props.conf.cdxServer);
       if (this.props.conf.limit){
-        url += `search?url=${this.props.url}/&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json&sort=reverse`;
+        url += `search?url=${encodeURIComponent(this.props.url)}&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json&sort=reverse`;
       } else {
-        url += `search?url=${this.props.url}/&status=200&fl=timestamp,digest&output=json&sort=reverse`;
+        url += `search?url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&sort=reverse`;
       }
       this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
 
