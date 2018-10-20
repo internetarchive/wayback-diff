@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 /**
  * Display a message that no url is given so no snapshot is displayed
