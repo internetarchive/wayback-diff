@@ -4,7 +4,6 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import { Redirect } from 'react-router-dom';
 import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
@@ -17,7 +16,6 @@ import ErrorMessage from './errors.jsx';
  */
 export default class DiffContainer extends React.Component {
   _timestampsValidated = false;
-  _redirectToValidatedTimestamps = false;
   _errorCode = '';
   constructor (props) {
     super(props);
@@ -31,7 +29,6 @@ export default class DiffContainer extends React.Component {
   }
 
   errorHandled (errorCode) {
-    // console.log('I am handling this error: ' + _errorCode);
     this._errorCode = errorCode;
     this.setState({showError: true});
   }
@@ -39,9 +36,6 @@ export default class DiffContainer extends React.Component {
   render () {
     if (this._urlIsInvalid()) {
       return this._invalidURL();
-    }
-    if (this._redirectToValidatedTimestamps) {
-      return(this._renderRedirect());
     }
     if (this.state.showError){
       return(
@@ -92,11 +86,6 @@ export default class DiffContainer extends React.Component {
     }
   }
 
-  _renderRedirect () {
-    this._redirectToValidatedTimestamps = false;
-    return (<Redirect to={this.state.newURL} />);
-  }
-
   _showNoTimestamps() {
     return(
       <div className={'side-by-side-render'}>
@@ -107,6 +96,7 @@ export default class DiffContainer extends React.Component {
   }
 
   _showOneSnapshot (isLeft, timestamp) {
+    this._timestampsValidated = true;
     if(this.state.fetchedRaw){
       if (isLeft){
         return(
@@ -177,21 +167,21 @@ export default class DiffContainer extends React.Component {
           if (this._redirectToValidatedTimestamps){
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
-        });
+        }).catch(error => {this.errorHandled(error.message);});
     } else if (this.props.timestampA) {
       this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
         .then(()=> {
           if (this._redirectToValidatedTimestamps){
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
-        });
+        }).catch(error => {this.errorHandled(error.message);});
     } else if (this.props.timestampB) {
       this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
         .then(()=> {
           if (this._redirectToValidatedTimestamps){
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
-        });
+        }).catch(error => {this.errorHandled(error.message);});
     }
   }
 
@@ -217,9 +207,12 @@ export default class DiffContainer extends React.Component {
   }
 
   _setNewURL(fetchedTimestampA, fetchedTimestampB){
-    if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)){
-      // console.log('checkTimestamps--setState');
-      this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url});
+    this._timestampsValidated = true;
+    this._redirectToValidatedTimestamps = false;
+    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    if (fetchedTimestampA && fetchedTimestampB){
+      document.getElementById('timestamp-select-left').value = fetchedTimestampA;
+      document.getElementById('timestamp-select-right').value = fetchedTimestampB;
     }
   }
 

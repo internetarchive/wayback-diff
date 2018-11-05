@@ -64,7 +64,6 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
-    // console.log('TimestampHeader render');
     const Loader = () => this.props.loader;
 
     if (!this.state.showError) {
@@ -97,7 +96,7 @@ export default class TimestampHeader extends React.Component {
   _exportParams(){
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
-    window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.url}`;
+    window.history.pushState({}, '', `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.url}`);
   }
 
   _widgetRender () {
@@ -127,12 +126,6 @@ export default class TimestampHeader extends React.Component {
       })
       .then((data) => {
         if (data && data.length > 0 ){
-          if (data.length === 2) {
-            let timestamp = data[1][0];
-            if (this.props.timestampA !== timestamp) {
-              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.url}`;
-            }
-          }
           this._prepareData(data);
           if (!this.props.isInitial) {
             this._selectValues();
@@ -149,7 +142,6 @@ export default class TimestampHeader extends React.Component {
   _errorHandled(error) {
     if (this.isMountedNow) {
       this.props.errorHandledCallback(error);
-      // console.log('widgetRender--setState');
       this.setState({showError: true});
     }
   }
