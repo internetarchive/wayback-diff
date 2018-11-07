@@ -15,7 +15,6 @@ import ErrorMessage from './errors.jsx';
  * @extends {React.Component}
  */
 export default class DiffContainer extends React.Component {
-  _timestampsValidated = false;
   _errorCode = '';
   constructor (props) {
     super(props);
@@ -57,7 +56,6 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    if (!this._timestampsValidated) {this._checkTimestamps();}
     if (this.props.timestampA && this.props.timestampB) {
       return (
         <div className="diffcontainer-view">
@@ -155,64 +153,6 @@ export default class DiffContainer extends React.Component {
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
         loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
-    }
-  }
-
-  _checkTimestamps () {
-    var fetchedTimestamps = { a: '', b: '' };
-    if (this.props.timestampA && this.props.timestampB) {
-      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(() => {return this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b');})
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        }).catch(error => {this.errorHandled(error.message);});
-    } else if (this.props.timestampA) {
-      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        }).catch(error => {this.errorHandled(error.message);});
-    } else if (this.props.timestampB) {
-      this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        }).catch(error => {this.errorHandled(error.message);});
-    }
-  }
-
-  _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
-    return promise
-      .then(response => {return checkResponse(response);})
-      .then(response => {
-        let url = response.url;
-        fetchedTimestamps[position] = url.split('/')[4];
-        if (timestamp !== fetchedTimestamps[position]) {
-          this._redirectToValidatedTimestamps = true;
-        }
-      })
-      .catch(error => {this.errorHandled(error.message);});
-  }
-
-  _validateTimestamp(timestamp, fetchedTimestamps, position){
-    if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
-    }
-    const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
-  }
-
-  _setNewURL(fetchedTimestampA, fetchedTimestampB){
-    this._timestampsValidated = true;
-    this._redirectToValidatedTimestamps = false;
-    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
-    if (fetchedTimestampA && fetchedTimestampB){
-      document.getElementById('timestamp-select-left').value = fetchedTimestampA;
-      document.getElementById('timestamp-select-right').value = fetchedTimestampB;
     }
   }
 
