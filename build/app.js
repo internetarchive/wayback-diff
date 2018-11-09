@@ -3186,6 +3186,7 @@ var SandboxedHtml = function (_React$PureComponent) {
       var centerX = this._frame.offsetLeft + width / 2;
 
       var elem = document.createElement('img');
+      elem.className = 'waybackDiffIframeLoader';
       var cssText = 'position:absolute;left:' + centerX + 'px;top:50%;';
       elem.setAttribute('style', cssText);
       elem.src = this.props.iframeLoader;
@@ -3847,7 +3848,7 @@ var DiffView = function (_React$Component) {
     key: '_propsSpecifySameDiff',
     value: function _propsSpecifySameDiff(newProps, props) {
       props = props || this.props;
-      return props.a.uuid === newProps.a.uuid && props.b.uuid === newProps.b.uuid && props.diffType === newProps.diffType;
+      return props.a === newProps.a && props.b === newProps.b && props.diffType === newProps.diffType;
     }
 
     /**
@@ -4316,6 +4317,13 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_showDiffs',
     value: function _showDiffs() {
+
+      var loaders = document.getElementsByClassName('waybackDiffIframeLoader');
+
+      while (loaders.length > 0) {
+        loaders[0].parentNode.removeChild(loaders[0]);
+      }
+
       var timestampA = document.getElementById('timestamp-select-left').value;
       var timestampB = document.getElementById('timestamp-select-right').value;
       this.props.changeTimestampsCallback(timestampA, timestampB);

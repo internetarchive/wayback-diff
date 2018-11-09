@@ -321,8 +321,8 @@ export default class TimestampHeader extends React.Component {
 
     let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
 
-    for (var i = 0; i < loaders.length; i++) {
-      loaders[i].parentNode.removeChild(loaders[i]);
+    while(loaders.length > 0) {
+      loaders[0].parentNode.removeChild(loaders[0]);
     }
 
     let timestampA = document.getElementById('timestamp-select-left').value;
