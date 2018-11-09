@@ -22,6 +22,12 @@ export default class SandboxedHtml extends React.PureComponent {
     this._frame = null;
   }
 
+
+  shouldComponentUpdate(){
+    this.addLoaderImg();
+    return true;
+  }
+
   componentDidMount () {
     this._updateContent();
     this.addLoaderImg();
@@ -69,13 +75,11 @@ export default class SandboxedHtml extends React.PureComponent {
 
   addLoaderImg () {
     let width = this._frame.contentDocument.scrollingElement.offsetWidth;
-    let height = this._frame.contentDocument.scrollingElement.offsetHeight;
 
     let centerX = this._frame.offsetLeft + width / 2;
-    let centerY = this._frame.offsetTop + height / 2;
 
     var elem = document.createElement('img');
-    var cssText = 'position:absolute;left:'+centerX+'px;top:'+centerY+'px;';
+    var cssText = 'position:absolute;left:'+centerX+'px;top:50%;';
     elem.setAttribute('style', cssText);
     elem.src = this.props.iframeLoader;
     document.body.appendChild(elem);

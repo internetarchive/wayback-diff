@@ -82,7 +82,7 @@ export default class TimestampHeader extends React.Component {
         );
       }
       return (<div>
-        {this._widgetRender()}
+        {this._fetchCDXData()}
         <Loader/>
       </div>
       );
@@ -147,11 +147,12 @@ export default class TimestampHeader extends React.Component {
       fetchedTimestampB = '';
     }
     window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    this.setState({timestampA: fetchedTimestampA, timestampB: fetchedTimestampB});
     document.getElementById('timestamp-select-left').value = fetchedTimestampA;
     document.getElementById('timestamp-select-right').value = fetchedTimestampB;
   }
 
-  _widgetRender () {
+  _fetchCDXData () {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
@@ -317,6 +318,9 @@ export default class TimestampHeader extends React.Component {
   }
 
   _showDiffs () {
+    let timestampA = document.getElementById('timestamp-select-left').value;
+    let timestampB = document.getElementById('timestamp-select-right').value;
+    this.props.changeTimestampsCallback(timestampA, timestampB);
     this.setState({showDiff: true});
   }
 

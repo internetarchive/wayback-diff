@@ -211,7 +211,6 @@ export default class DiffView extends React.Component {
   _errorHandled(error) {
     if (this.isMountedNow) {
       this.props.errorHandledCallback(error);
-      // console.log('diffview--setState');
       this.setState({showError: true});
     }
   }

@@ -20,11 +20,23 @@ export default class DiffContainer extends React.Component {
     super(props);
     this.state = {
       fetchedRaw: null,
-      showError: false
+      showError: false,
+      timestampA: this.props.timestampA,
+      timestampB: this.props.timestampB
     };
     this._oneFrame = null;
     this.errorHandled = this.errorHandled.bind(this);
+    this.changeTimestamps = this.changeTimestamps.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
+  }
+
+  changeTimestamps(timestampA, timestampB){
+    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+    this.setState({
+      fetchedRaw: null,
+      showError: false,
+      timestampA: timestampA,
+      timestampB: timestampB});
   }
 
   errorHandled (errorCode) {
@@ -40,11 +52,11 @@ export default class DiffContainer extends React.Component {
       return(
         <ErrorMessage url={this.props.url} code={this._errorCode}/>);
     }
-    if (!this.props.timestampA && !this.props.timestampB) {
+    if (!this.state.timestampA && !this.state.timestampB) {
       if (this.props.noTimestamps){
         return (
           <div className="diffcontainer-view">
-            <TimestampHeader {...this.props}
+            <TimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
               isInitial={false} errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
@@ -52,34 +64,36 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={true} {...this.props}
-            errorHandledCallback={this.errorHandled}/>
+            errorHandledCallback={this.errorHandled}
+            changeTimestampsCallback={this.changeTimestamps}/>
         </div>
       );
     }
-    if (this.props.timestampA && this.props.timestampB) {
+    if (this.state.timestampA && this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false}
-            {...this.props}
+            {...this.props} changeTimestampsCallback={this.changeTimestamps}
             errorHandledCallback={this.errorHandled}/>
           {this.prepareDiffView()}
           <DiffFooter/>
         </div>);
     }
-    if (this.props.timestampA) {
+    if (this.state.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader {...this.props}
+          <TimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
             isInitial={false} errorHandledCallback={this.errorHandled}/>
-          {this._showOneSnapshot(true, this.props.timestampA)}
+          {this._showOneSnapshot(true, this.state.timestampA)}
         </div>);
     }
-    if (this.props.timestampB) {
+    if (this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false} {...this.props}
-            errorHandledCallback={this.errorHandled}/>
-          {this._showOneSnapshot(false, this.props.timestampB)}
+            errorHandledCallback={this.errorHandled}
+            changeTimestampsCallback={this.changeTimestamps}/>
+          {this._showOneSnapshot(false, this.state.timestampB)}
         </div>);
     }
   }
@@ -147,8 +161,8 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showError){
-      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampA + '/' + encodeURIComponent(this.props.url);
+      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampB + '/' + encodeURIComponent(this.props.url);
 
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
