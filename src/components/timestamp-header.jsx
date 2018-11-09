@@ -318,6 +318,13 @@ export default class TimestampHeader extends React.Component {
   }
 
   _showDiffs () {
+
+    let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
+
+    for (var i = 0; i < loaders.length; i++) {
+      loaders[i].parentNode.removeChild(loaders[i]);
+    }
+
     let timestampA = document.getElementById('timestamp-select-left').value;
     let timestampB = document.getElementById('timestamp-select-right').value;
     this.props.changeTimestampsCallback(timestampA, timestampB);

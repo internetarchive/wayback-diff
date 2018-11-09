@@ -79,6 +79,7 @@ export default class SandboxedHtml extends React.PureComponent {
     let centerX = this._frame.offsetLeft + width / 2;
 
     var elem = document.createElement('img');
+    elem.className = 'waybackDiffIframeLoader';
     var cssText = 'position:absolute;left:'+centerX+'px;top:50%;';
     elem.setAttribute('style', cssText);
     elem.src = this.props.iframeLoader;
