@@ -4729,2696 +4729,6 @@ DiffContainer.propTypes = {
   }
 };
 
-var warning = function() {};
-
-{
-  var printWarning$2 = function printWarning(format, args) {
-    var len = arguments.length;
-    args = new Array(len > 2 ? len - 2 : 0);
-    for (var key = 2; key < len; key++) {
-      args[key - 2] = arguments[key];
-    }
-    var argIndex = 0;
-    var message = 'Warning: ' +
-      format.replace(/%s/g, function() {
-        return args[argIndex++];
-      });
-    if (typeof console !== 'undefined') {
-      console.error(message);
-    }
-    try {
-      // --- Welcome to debugging React ---
-      // This error was thrown as a convenience so that you can use this stack
-      // to find the callsite that caused this warning to fire.
-      throw new Error(message);
-    } catch (x) {}
-  };
-
-  warning = function(condition, format, args) {
-    var len = arguments.length;
-    args = new Array(len > 2 ? len - 2 : 0);
-    for (var key = 2; key < len; key++) {
-      args[key - 2] = arguments[key];
-    }
-    if (format === undefined) {
-      throw new Error(
-          '`warning(condition, format, ...args)` requires a warning ' +
-          'message argument'
-      );
-    }
-    if (!condition) {
-      printWarning$2.apply(null, [format].concat(args));
-    }
-  };
-}
-
-var warning_1 = warning;
-
-/**
- * Similar to invariant but only logs a warning if the condition is not met.
- * This can be used to log issues in development environments in critical
- * paths. Removing the logging code for production environments will keep the
- * same logic and follow the same code paths.
- */
-
-var warning$1 = function() {};
-
-{
-  warning$1 = function(condition, format, args) {
-    var len = arguments.length;
-    args = new Array(len > 2 ? len - 2 : 0);
-    for (var key = 2; key < len; key++) {
-      args[key - 2] = arguments[key];
-    }
-    if (format === undefined) {
-      throw new Error(
-        '`warning(condition, format, ...args)` requires a warning ' +
-        'message argument'
-      );
-    }
-
-    if (format.length < 10 || (/^[s\W]*$/).test(format)) {
-      throw new Error(
-        'The warning format should be able to uniquely identify this ' +
-        'warning. Please, use a more descriptive format than: ' + format
-      );
-    }
-
-    if (!condition) {
-      var argIndex = 0;
-      var message = 'Warning: ' +
-        format.replace(/%s/g, function() {
-          return args[argIndex++];
-        });
-      if (typeof console !== 'undefined') {
-        console.error(message);
-      }
-      try {
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-      } catch(x) {}
-    }
-  };
-}
-
-var browser$1 = warning$1;
-
-/**
- * Use invariant() to assert state which your program assumes to be true.
- *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
- */
-
-var invariant = function(condition, format, a, b, c, d, e, f) {
-  {
-    if (format === undefined) {
-      throw new Error('invariant requires an error message argument');
-    }
-  }
-
-  if (!condition) {
-    var error;
-    if (format === undefined) {
-      error = new Error(
-        'Minified exception occurred; use the non-minified dev environment ' +
-        'for the full error message and additional helpful warnings.'
-      );
-    } else {
-      var args = [a, b, c, d, e, f];
-      var argIndex = 0;
-      error = new Error(
-        format.replace(/%s/g, function() { return args[argIndex++]; })
-      );
-      error.name = 'Invariant Violation';
-    }
-
-    error.framesToPop = 1; // we don't care about invariant's own frame
-    throw error;
-  }
-};
-
-var browser$2 = invariant;
-
-function isAbsolute(pathname) {
-  return pathname.charAt(0) === '/';
-}
-
-// About 1.5x faster than the two-arg version of Array#splice()
-function spliceOne(list, index) {
-  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1) {
-    list[i] = list[k];
-  }
-
-  list.pop();
-}
-
-// This implementation is based heavily on node's url.parse
-function resolvePathname(to) {
-  var from = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-  var toParts = to && to.split('/') || [];
-  var fromParts = from && from.split('/') || [];
-
-  var isToAbs = to && isAbsolute(to);
-  var isFromAbs = from && isAbsolute(from);
-  var mustEndAbs = isToAbs || isFromAbs;
-
-  if (to && isAbsolute(to)) {
-    // to is absolute
-    fromParts = toParts;
-  } else if (toParts.length) {
-    // to is relative, drop the filename
-    fromParts.pop();
-    fromParts = fromParts.concat(toParts);
-  }
-
-  if (!fromParts.length) return '/';
-
-  var hasTrailingSlash = void 0;
-  if (fromParts.length) {
-    var last = fromParts[fromParts.length - 1];
-    hasTrailingSlash = last === '.' || last === '..' || last === '';
-  } else {
-    hasTrailingSlash = false;
-  }
-
-  var up = 0;
-  for (var i = fromParts.length; i >= 0; i--) {
-    var part = fromParts[i];
-
-    if (part === '.') {
-      spliceOne(fromParts, i);
-    } else if (part === '..') {
-      spliceOne(fromParts, i);
-      up++;
-    } else if (up) {
-      spliceOne(fromParts, i);
-      up--;
-    }
-  }
-
-  if (!mustEndAbs) for (; up--; up) {
-    fromParts.unshift('..');
-  }if (mustEndAbs && fromParts[0] !== '' && (!fromParts[0] || !isAbsolute(fromParts[0]))) fromParts.unshift('');
-
-  var result = fromParts.join('/');
-
-  if (hasTrailingSlash && result.substr(-1) !== '/') result += '/';
-
-  return result;
-}
-
-var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function valueEqual(a, b) {
-  if (a === b) return true;
-
-  if (a == null || b == null) return false;
-
-  if (Array.isArray(a)) {
-    return Array.isArray(b) && a.length === b.length && a.every(function (item, index) {
-      return valueEqual(item, b[index]);
-    });
-  }
-
-  var aType = typeof a === 'undefined' ? 'undefined' : _typeof$1(a);
-  var bType = typeof b === 'undefined' ? 'undefined' : _typeof$1(b);
-
-  if (aType !== bType) return false;
-
-  if (aType === 'object') {
-    var aValue = a.valueOf();
-    var bValue = b.valueOf();
-
-    if (aValue !== a || bValue !== b) return valueEqual(aValue, bValue);
-
-    var aKeys = Object.keys(a);
-    var bKeys = Object.keys(b);
-
-    if (aKeys.length !== bKeys.length) return false;
-
-    return aKeys.every(function (key) {
-      return valueEqual(a[key], b[key]);
-    });
-  }
-
-  return false;
-}
-
-var addLeadingSlash = function addLeadingSlash(path) {
-  return path.charAt(0) === '/' ? path : '/' + path;
-};
-
-var stripLeadingSlash = function stripLeadingSlash(path) {
-  return path.charAt(0) === '/' ? path.substr(1) : path;
-};
-
-var hasBasename = function hasBasename(path, prefix) {
-  return new RegExp('^' + prefix + '(\\/|\\?|#|$)', 'i').test(path);
-};
-
-var stripBasename = function stripBasename(path, prefix) {
-  return hasBasename(path, prefix) ? path.substr(prefix.length) : path;
-};
-
-var stripTrailingSlash = function stripTrailingSlash(path) {
-  return path.charAt(path.length - 1) === '/' ? path.slice(0, -1) : path;
-};
-
-var parsePath = function parsePath(path) {
-  var pathname = path || '/';
-  var search = '';
-  var hash = '';
-
-  var hashIndex = pathname.indexOf('#');
-  if (hashIndex !== -1) {
-    hash = pathname.substr(hashIndex);
-    pathname = pathname.substr(0, hashIndex);
-  }
-
-  var searchIndex = pathname.indexOf('?');
-  if (searchIndex !== -1) {
-    search = pathname.substr(searchIndex);
-    pathname = pathname.substr(0, searchIndex);
-  }
-
-  return {
-    pathname: pathname,
-    search: search === '?' ? '' : search,
-    hash: hash === '#' ? '' : hash
-  };
-};
-
-var createPath = function createPath(location) {
-  var pathname = location.pathname,
-      search = location.search,
-      hash = location.hash;
-
-
-  var path = pathname || '/';
-
-  if (search && search !== '?') path += search.charAt(0) === '?' ? search : '?' + search;
-
-  if (hash && hash !== '#') path += hash.charAt(0) === '#' ? hash : '#' + hash;
-
-  return path;
-};
-
-var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var createLocation = function createLocation(path, state, key, currentLocation) {
-  var location = void 0;
-  if (typeof path === 'string') {
-    // Two-arg form: push(path, state)
-    location = parsePath(path);
-    location.state = state;
-  } else {
-    // One-arg form: push(location)
-    location = _extends$1({}, path);
-
-    if (location.pathname === undefined) location.pathname = '';
-
-    if (location.search) {
-      if (location.search.charAt(0) !== '?') location.search = '?' + location.search;
-    } else {
-      location.search = '';
-    }
-
-    if (location.hash) {
-      if (location.hash.charAt(0) !== '#') location.hash = '#' + location.hash;
-    } else {
-      location.hash = '';
-    }
-
-    if (state !== undefined && location.state === undefined) location.state = state;
-  }
-
-  try {
-    location.pathname = decodeURI(location.pathname);
-  } catch (e) {
-    if (e instanceof URIError) {
-      throw new URIError('Pathname "' + location.pathname + '" could not be decoded. ' + 'This is likely caused by an invalid percent-encoding.');
-    } else {
-      throw e;
-    }
-  }
-
-  if (key) location.key = key;
-
-  if (currentLocation) {
-    // Resolve incomplete/relative pathname relative to current location.
-    if (!location.pathname) {
-      location.pathname = currentLocation.pathname;
-    } else if (location.pathname.charAt(0) !== '/') {
-      location.pathname = resolvePathname(location.pathname, currentLocation.pathname);
-    }
-  } else {
-    // When there is no prior location and pathname is empty, set it to /
-    if (!location.pathname) {
-      location.pathname = '/';
-    }
-  }
-
-  return location;
-};
-
-var locationsAreEqual = function locationsAreEqual(a, b) {
-  return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash && a.key === b.key && valueEqual(a.state, b.state);
-};
-
-var createTransitionManager = function createTransitionManager() {
-  var prompt = null;
-
-  var setPrompt = function setPrompt(nextPrompt) {
-    browser$1(prompt == null, 'A history supports only one prompt at a time');
-
-    prompt = nextPrompt;
-
-    return function () {
-      if (prompt === nextPrompt) prompt = null;
-    };
-  };
-
-  var confirmTransitionTo = function confirmTransitionTo(location, action, getUserConfirmation, callback) {
-    // TODO: If another transition starts while we're still confirming
-    // the previous one, we may end up in a weird state. Figure out the
-    // best way to handle this.
-    if (prompt != null) {
-      var result = typeof prompt === 'function' ? prompt(location, action) : prompt;
-
-      if (typeof result === 'string') {
-        if (typeof getUserConfirmation === 'function') {
-          getUserConfirmation(result, callback);
-        } else {
-          browser$1(false, 'A history needs a getUserConfirmation function in order to use a prompt message');
-
-          callback(true);
-        }
-      } else {
-        // Return false from a transition hook to cancel the transition.
-        callback(result !== false);
-      }
-    } else {
-      callback(true);
-    }
-  };
-
-  var listeners = [];
-
-  var appendListener = function appendListener(fn) {
-    var isActive = true;
-
-    var listener = function listener() {
-      if (isActive) fn.apply(undefined, arguments);
-    };
-
-    listeners.push(listener);
-
-    return function () {
-      isActive = false;
-      listeners = listeners.filter(function (item) {
-        return item !== listener;
-      });
-    };
-  };
-
-  var notifyListeners = function notifyListeners() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    listeners.forEach(function (listener) {
-      return listener.apply(undefined, args);
-    });
-  };
-
-  return {
-    setPrompt: setPrompt,
-    confirmTransitionTo: confirmTransitionTo,
-    appendListener: appendListener,
-    notifyListeners: notifyListeners
-  };
-};
-
-var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
-
-var addEventListener = function addEventListener(node, event, listener) {
-  return node.addEventListener ? node.addEventListener(event, listener, false) : node.attachEvent('on' + event, listener);
-};
-
-var removeEventListener = function removeEventListener(node, event, listener) {
-  return node.removeEventListener ? node.removeEventListener(event, listener, false) : node.detachEvent('on' + event, listener);
-};
-
-var getConfirmation = function getConfirmation(message, callback) {
-  return callback(window.confirm(message));
-}; // eslint-disable-line no-alert
-
-/**
- * Returns true if the HTML5 history API is supported. Taken from Modernizr.
- *
- * https://github.com/Modernizr/Modernizr/blob/master/LICENSE
- * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/history.js
- * changed to avoid false negatives for Windows Phones: https://github.com/reactjs/react-router/issues/586
- */
-var supportsHistory = function supportsHistory() {
-  var ua = window.navigator.userAgent;
-
-  if ((ua.indexOf('Android 2.') !== -1 || ua.indexOf('Android 4.0') !== -1) && ua.indexOf('Mobile Safari') !== -1 && ua.indexOf('Chrome') === -1 && ua.indexOf('Windows Phone') === -1) return false;
-
-  return window.history && 'pushState' in window.history;
-};
-
-/**
- * Returns true if browser fires popstate on hash change.
- * IE10 and IE11 do not.
- */
-var supportsPopStateOnHashChange = function supportsPopStateOnHashChange() {
-  return window.navigator.userAgent.indexOf('Trident') === -1;
-};
-
-/**
- * Returns false if using go(n) with hash history causes a full page reload.
- */
-var supportsGoWithoutReloadUsingHash = function supportsGoWithoutReloadUsingHash() {
-  return window.navigator.userAgent.indexOf('Firefox') === -1;
-};
-
-/**
- * Returns true if a given popstate event is an extraneous WebKit event.
- * Accounts for the fact that Chrome on iOS fires real popstate events
- * containing undefined state when pressing the back button.
- */
-var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
-  return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
-};
-
-var _typeof$2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var PopStateEvent = 'popstate';
-var HashChangeEvent = 'hashchange';
-
-var getHistoryState = function getHistoryState() {
-  try {
-    return window.history.state || {};
-  } catch (e) {
-    // IE 11 sometimes throws when accessing window.history.state
-    // See https://github.com/ReactTraining/history/pull/289
-    return {};
-  }
-};
-
-/**
- * Creates a history object that uses the HTML5 history API including
- * pushState, replaceState, and the popstate event.
- */
-var createBrowserHistory = function createBrowserHistory() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  browser$2(canUseDOM, 'Browser history needs a DOM');
-
-  var globalHistory = window.history;
-  var canUseHistory = supportsHistory();
-  var needsHashChangeListener = !supportsPopStateOnHashChange();
-
-  var _props$forceRefresh = props.forceRefresh,
-      forceRefresh = _props$forceRefresh === undefined ? false : _props$forceRefresh,
-      _props$getUserConfirm = props.getUserConfirmation,
-      getUserConfirmation = _props$getUserConfirm === undefined ? getConfirmation : _props$getUserConfirm,
-      _props$keyLength = props.keyLength,
-      keyLength = _props$keyLength === undefined ? 6 : _props$keyLength;
-
-  var basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : '';
-
-  var getDOMLocation = function getDOMLocation(historyState) {
-    var _ref = historyState || {},
-        key = _ref.key,
-        state = _ref.state;
-
-    var _window$location = window.location,
-        pathname = _window$location.pathname,
-        search = _window$location.search,
-        hash = _window$location.hash;
-
-
-    var path = pathname + search + hash;
-
-    browser$1(!basename || hasBasename(path, basename), 'You are attempting to use a basename on a page whose URL path does not begin ' + 'with the basename. Expected path "' + path + '" to begin with "' + basename + '".');
-
-    if (basename) path = stripBasename(path, basename);
-
-    return createLocation(path, state, key);
-  };
-
-  var createKey = function createKey() {
-    return Math.random().toString(36).substr(2, keyLength);
-  };
-
-  var transitionManager = createTransitionManager();
-
-  var setState = function setState(nextState) {
-    _extends$2(history, nextState);
-
-    history.length = globalHistory.length;
-
-    transitionManager.notifyListeners(history.location, history.action);
-  };
-
-  var handlePopState = function handlePopState(event) {
-    // Ignore extraneous popstate events in WebKit.
-    if (isExtraneousPopstateEvent(event)) return;
-
-    handlePop(getDOMLocation(event.state));
-  };
-
-  var handleHashChange = function handleHashChange() {
-    handlePop(getDOMLocation(getHistoryState()));
-  };
-
-  var forceNextPop = false;
-
-  var handlePop = function handlePop(location) {
-    if (forceNextPop) {
-      forceNextPop = false;
-      setState();
-    } else {
-      var action = 'POP';
-
-      transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-        if (ok) {
-          setState({ action: action, location: location });
-        } else {
-          revertPop(location);
-        }
-      });
-    }
-  };
-
-  var revertPop = function revertPop(fromLocation) {
-    var toLocation = history.location;
-
-    // TODO: We could probably make this more reliable by
-    // keeping a list of keys we've seen in sessionStorage.
-    // Instead, we just default to 0 for keys we don't know.
-
-    var toIndex = allKeys.indexOf(toLocation.key);
-
-    if (toIndex === -1) toIndex = 0;
-
-    var fromIndex = allKeys.indexOf(fromLocation.key);
-
-    if (fromIndex === -1) fromIndex = 0;
-
-    var delta = toIndex - fromIndex;
-
-    if (delta) {
-      forceNextPop = true;
-      go(delta);
-    }
-  };
-
-  var initialLocation = getDOMLocation(getHistoryState());
-  var allKeys = [initialLocation.key];
-
-  // Public interface
-
-  var createHref = function createHref(location) {
-    return basename + createPath(location);
-  };
-
-  var push = function push(path, state) {
-    browser$1(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
-
-    var action = 'PUSH';
-    var location = createLocation(path, state, createKey(), history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      var href = createHref(location);
-      var key = location.key,
-          state = location.state;
-
-
-      if (canUseHistory) {
-        globalHistory.pushState({ key: key, state: state }, null, href);
-
-        if (forceRefresh) {
-          window.location.href = href;
-        } else {
-          var prevIndex = allKeys.indexOf(history.location.key);
-          var nextKeys = allKeys.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
-
-          nextKeys.push(location.key);
-          allKeys = nextKeys;
-
-          setState({ action: action, location: location });
-        }
-      } else {
-        browser$1(state === undefined, 'Browser history cannot push state in browsers that do not support HTML5 history');
-
-        window.location.href = href;
-      }
-    });
-  };
-
-  var replace = function replace(path, state) {
-    browser$1(!((typeof path === 'undefined' ? 'undefined' : _typeof$2(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
-
-    var action = 'REPLACE';
-    var location = createLocation(path, state, createKey(), history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      var href = createHref(location);
-      var key = location.key,
-          state = location.state;
-
-
-      if (canUseHistory) {
-        globalHistory.replaceState({ key: key, state: state }, null, href);
-
-        if (forceRefresh) {
-          window.location.replace(href);
-        } else {
-          var prevIndex = allKeys.indexOf(history.location.key);
-
-          if (prevIndex !== -1) allKeys[prevIndex] = location.key;
-
-          setState({ action: action, location: location });
-        }
-      } else {
-        browser$1(state === undefined, 'Browser history cannot replace state in browsers that do not support HTML5 history');
-
-        window.location.replace(href);
-      }
-    });
-  };
-
-  var go = function go(n) {
-    globalHistory.go(n);
-  };
-
-  var goBack = function goBack() {
-    return go(-1);
-  };
-
-  var goForward = function goForward() {
-    return go(1);
-  };
-
-  var listenerCount = 0;
-
-  var checkDOMListeners = function checkDOMListeners(delta) {
-    listenerCount += delta;
-
-    if (listenerCount === 1) {
-      addEventListener(window, PopStateEvent, handlePopState);
-
-      if (needsHashChangeListener) addEventListener(window, HashChangeEvent, handleHashChange);
-    } else if (listenerCount === 0) {
-      removeEventListener(window, PopStateEvent, handlePopState);
-
-      if (needsHashChangeListener) removeEventListener(window, HashChangeEvent, handleHashChange);
-    }
-  };
-
-  var isBlocked = false;
-
-  var block = function block() {
-    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    var unblock = transitionManager.setPrompt(prompt);
-
-    if (!isBlocked) {
-      checkDOMListeners(1);
-      isBlocked = true;
-    }
-
-    return function () {
-      if (isBlocked) {
-        isBlocked = false;
-        checkDOMListeners(-1);
-      }
-
-      return unblock();
-    };
-  };
-
-  var listen = function listen(listener) {
-    var unlisten = transitionManager.appendListener(listener);
-    checkDOMListeners(1);
-
-    return function () {
-      checkDOMListeners(-1);
-      unlisten();
-    };
-  };
-
-  var history = {
-    length: globalHistory.length,
-    action: 'POP',
-    location: initialLocation,
-    createHref: createHref,
-    push: push,
-    replace: replace,
-    go: go,
-    goBack: goBack,
-    goForward: goForward,
-    block: block,
-    listen: listen
-  };
-
-  return history;
-};
-
-var _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var HashChangeEvent$1 = 'hashchange';
-
-var HashPathCoders = {
-  hashbang: {
-    encodePath: function encodePath(path) {
-      return path.charAt(0) === '!' ? path : '!/' + stripLeadingSlash(path);
-    },
-    decodePath: function decodePath(path) {
-      return path.charAt(0) === '!' ? path.substr(1) : path;
-    }
-  },
-  noslash: {
-    encodePath: stripLeadingSlash,
-    decodePath: addLeadingSlash
-  },
-  slash: {
-    encodePath: addLeadingSlash,
-    decodePath: addLeadingSlash
-  }
-};
-
-var getHashPath = function getHashPath() {
-  // We can't use window.location.hash here because it's not
-  // consistent across browsers - Firefox will pre-decode it!
-  var href = window.location.href;
-  var hashIndex = href.indexOf('#');
-  return hashIndex === -1 ? '' : href.substring(hashIndex + 1);
-};
-
-var pushHashPath = function pushHashPath(path) {
-  return window.location.hash = path;
-};
-
-var replaceHashPath = function replaceHashPath(path) {
-  var hashIndex = window.location.href.indexOf('#');
-
-  window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
-};
-
-var createHashHistory = function createHashHistory() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  browser$2(canUseDOM, 'Hash history needs a DOM');
-
-  var globalHistory = window.history;
-  var canGoWithoutReload = supportsGoWithoutReloadUsingHash();
-
-  var _props$getUserConfirm = props.getUserConfirmation,
-      getUserConfirmation = _props$getUserConfirm === undefined ? getConfirmation : _props$getUserConfirm,
-      _props$hashType = props.hashType,
-      hashType = _props$hashType === undefined ? 'slash' : _props$hashType;
-
-  var basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : '';
-
-  var _HashPathCoders$hashT = HashPathCoders[hashType],
-      encodePath = _HashPathCoders$hashT.encodePath,
-      decodePath = _HashPathCoders$hashT.decodePath;
-
-
-  var getDOMLocation = function getDOMLocation() {
-    var path = decodePath(getHashPath());
-
-    browser$1(!basename || hasBasename(path, basename), 'You are attempting to use a basename on a page whose URL path does not begin ' + 'with the basename. Expected path "' + path + '" to begin with "' + basename + '".');
-
-    if (basename) path = stripBasename(path, basename);
-
-    return createLocation(path);
-  };
-
-  var transitionManager = createTransitionManager();
-
-  var setState = function setState(nextState) {
-    _extends$3(history, nextState);
-
-    history.length = globalHistory.length;
-
-    transitionManager.notifyListeners(history.location, history.action);
-  };
-
-  var forceNextPop = false;
-  var ignorePath = null;
-
-  var handleHashChange = function handleHashChange() {
-    var path = getHashPath();
-    var encodedPath = encodePath(path);
-
-    if (path !== encodedPath) {
-      // Ensure we always have a properly-encoded hash.
-      replaceHashPath(encodedPath);
-    } else {
-      var location = getDOMLocation();
-      var prevLocation = history.location;
-
-      if (!forceNextPop && locationsAreEqual(prevLocation, location)) return; // A hashchange doesn't always == location change.
-
-      if (ignorePath === createPath(location)) return; // Ignore this change; we already setState in push/replace.
-
-      ignorePath = null;
-
-      handlePop(location);
-    }
-  };
-
-  var handlePop = function handlePop(location) {
-    if (forceNextPop) {
-      forceNextPop = false;
-      setState();
-    } else {
-      var action = 'POP';
-
-      transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-        if (ok) {
-          setState({ action: action, location: location });
-        } else {
-          revertPop(location);
-        }
-      });
-    }
-  };
-
-  var revertPop = function revertPop(fromLocation) {
-    var toLocation = history.location;
-
-    // TODO: We could probably make this more reliable by
-    // keeping a list of paths we've seen in sessionStorage.
-    // Instead, we just default to 0 for paths we don't know.
-
-    var toIndex = allPaths.lastIndexOf(createPath(toLocation));
-
-    if (toIndex === -1) toIndex = 0;
-
-    var fromIndex = allPaths.lastIndexOf(createPath(fromLocation));
-
-    if (fromIndex === -1) fromIndex = 0;
-
-    var delta = toIndex - fromIndex;
-
-    if (delta) {
-      forceNextPop = true;
-      go(delta);
-    }
-  };
-
-  // Ensure the hash is encoded properly before doing anything else.
-  var path = getHashPath();
-  var encodedPath = encodePath(path);
-
-  if (path !== encodedPath) replaceHashPath(encodedPath);
-
-  var initialLocation = getDOMLocation();
-  var allPaths = [createPath(initialLocation)];
-
-  // Public interface
-
-  var createHref = function createHref(location) {
-    return '#' + encodePath(basename + createPath(location));
-  };
-
-  var push = function push(path, state) {
-    browser$1(state === undefined, 'Hash history cannot push state; it is ignored');
-
-    var action = 'PUSH';
-    var location = createLocation(path, undefined, undefined, history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      var path = createPath(location);
-      var encodedPath = encodePath(basename + path);
-      var hashChanged = getHashPath() !== encodedPath;
-
-      if (hashChanged) {
-        // We cannot tell if a hashchange was caused by a PUSH, so we'd
-        // rather setState here and ignore the hashchange. The caveat here
-        // is that other hash histories in the page will consider it a POP.
-        ignorePath = path;
-        pushHashPath(encodedPath);
-
-        var prevIndex = allPaths.lastIndexOf(createPath(history.location));
-        var nextPaths = allPaths.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
-
-        nextPaths.push(path);
-        allPaths = nextPaths;
-
-        setState({ action: action, location: location });
-      } else {
-        browser$1(false, 'Hash history cannot PUSH the same path; a new entry will not be added to the history stack');
-
-        setState();
-      }
-    });
-  };
-
-  var replace = function replace(path, state) {
-    browser$1(state === undefined, 'Hash history cannot replace state; it is ignored');
-
-    var action = 'REPLACE';
-    var location = createLocation(path, undefined, undefined, history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      var path = createPath(location);
-      var encodedPath = encodePath(basename + path);
-      var hashChanged = getHashPath() !== encodedPath;
-
-      if (hashChanged) {
-        // We cannot tell if a hashchange was caused by a REPLACE, so we'd
-        // rather setState here and ignore the hashchange. The caveat here
-        // is that other hash histories in the page will consider it a POP.
-        ignorePath = path;
-        replaceHashPath(encodedPath);
-      }
-
-      var prevIndex = allPaths.indexOf(createPath(history.location));
-
-      if (prevIndex !== -1) allPaths[prevIndex] = path;
-
-      setState({ action: action, location: location });
-    });
-  };
-
-  var go = function go(n) {
-    browser$1(canGoWithoutReload, 'Hash history go(n) causes a full page reload in this browser');
-
-    globalHistory.go(n);
-  };
-
-  var goBack = function goBack() {
-    return go(-1);
-  };
-
-  var goForward = function goForward() {
-    return go(1);
-  };
-
-  var listenerCount = 0;
-
-  var checkDOMListeners = function checkDOMListeners(delta) {
-    listenerCount += delta;
-
-    if (listenerCount === 1) {
-      addEventListener(window, HashChangeEvent$1, handleHashChange);
-    } else if (listenerCount === 0) {
-      removeEventListener(window, HashChangeEvent$1, handleHashChange);
-    }
-  };
-
-  var isBlocked = false;
-
-  var block = function block() {
-    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    var unblock = transitionManager.setPrompt(prompt);
-
-    if (!isBlocked) {
-      checkDOMListeners(1);
-      isBlocked = true;
-    }
-
-    return function () {
-      if (isBlocked) {
-        isBlocked = false;
-        checkDOMListeners(-1);
-      }
-
-      return unblock();
-    };
-  };
-
-  var listen = function listen(listener) {
-    var unlisten = transitionManager.appendListener(listener);
-    checkDOMListeners(1);
-
-    return function () {
-      checkDOMListeners(-1);
-      unlisten();
-    };
-  };
-
-  var history = {
-    length: globalHistory.length,
-    action: 'POP',
-    location: initialLocation,
-    createHref: createHref,
-    push: push,
-    replace: replace,
-    go: go,
-    goBack: goBack,
-    goForward: goForward,
-    block: block,
-    listen: listen
-  };
-
-  return history;
-};
-
-var _typeof$3 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var clamp = function clamp(n, lowerBound, upperBound) {
-  return Math.min(Math.max(n, lowerBound), upperBound);
-};
-
-/**
- * Creates a history object that stores locations in memory.
- */
-var createMemoryHistory = function createMemoryHistory() {
-  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var getUserConfirmation = props.getUserConfirmation,
-      _props$initialEntries = props.initialEntries,
-      initialEntries = _props$initialEntries === undefined ? ['/'] : _props$initialEntries,
-      _props$initialIndex = props.initialIndex,
-      initialIndex = _props$initialIndex === undefined ? 0 : _props$initialIndex,
-      _props$keyLength = props.keyLength,
-      keyLength = _props$keyLength === undefined ? 6 : _props$keyLength;
-
-
-  var transitionManager = createTransitionManager();
-
-  var setState = function setState(nextState) {
-    _extends$4(history, nextState);
-
-    history.length = history.entries.length;
-
-    transitionManager.notifyListeners(history.location, history.action);
-  };
-
-  var createKey = function createKey() {
-    return Math.random().toString(36).substr(2, keyLength);
-  };
-
-  var index = clamp(initialIndex, 0, initialEntries.length - 1);
-  var entries = initialEntries.map(function (entry) {
-    return typeof entry === 'string' ? createLocation(entry, undefined, createKey()) : createLocation(entry, undefined, entry.key || createKey());
-  });
-
-  // Public interface
-
-  var createHref = createPath;
-
-  var push = function push(path, state) {
-    browser$1(!((typeof path === 'undefined' ? 'undefined' : _typeof$3(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to push when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
-
-    var action = 'PUSH';
-    var location = createLocation(path, state, createKey(), history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      var prevIndex = history.index;
-      var nextIndex = prevIndex + 1;
-
-      var nextEntries = history.entries.slice(0);
-      if (nextEntries.length > nextIndex) {
-        nextEntries.splice(nextIndex, nextEntries.length - nextIndex, location);
-      } else {
-        nextEntries.push(location);
-      }
-
-      setState({
-        action: action,
-        location: location,
-        index: nextIndex,
-        entries: nextEntries
-      });
-    });
-  };
-
-  var replace = function replace(path, state) {
-    browser$1(!((typeof path === 'undefined' ? 'undefined' : _typeof$3(path)) === 'object' && path.state !== undefined && state !== undefined), 'You should avoid providing a 2nd state argument to replace when the 1st ' + 'argument is a location-like object that already has state; it is ignored');
-
-    var action = 'REPLACE';
-    var location = createLocation(path, state, createKey(), history.location);
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (!ok) return;
-
-      history.entries[history.index] = location;
-
-      setState({ action: action, location: location });
-    });
-  };
-
-  var go = function go(n) {
-    var nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
-
-    var action = 'POP';
-    var location = history.entries[nextIndex];
-
-    transitionManager.confirmTransitionTo(location, action, getUserConfirmation, function (ok) {
-      if (ok) {
-        setState({
-          action: action,
-          location: location,
-          index: nextIndex
-        });
-      } else {
-        // Mimic the behavior of DOM histories by
-        // causing a render after a cancelled POP.
-        setState();
-      }
-    });
-  };
-
-  var goBack = function goBack() {
-    return go(-1);
-  };
-
-  var goForward = function goForward() {
-    return go(1);
-  };
-
-  var canGo = function canGo(n) {
-    var nextIndex = history.index + n;
-    return nextIndex >= 0 && nextIndex < history.entries.length;
-  };
-
-  var block = function block() {
-    var prompt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    return transitionManager.setPrompt(prompt);
-  };
-
-  var listen = function listen(listener) {
-    return transitionManager.appendListener(listener);
-  };
-
-  var history = {
-    length: entries.length,
-    action: 'POP',
-    location: entries[index],
-    index: index,
-    entries: entries,
-    createHref: createHref,
-    push: push,
-    replace: replace,
-    go: go,
-    goBack: goBack,
-    goForward: goForward,
-    canGo: canGo,
-    block: block,
-    listen: listen
-  };
-
-  return history;
-};
-
-var _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for putting history on context.
- */
-
-var Router = function (_React$Component) {
-  _inherits(Router, _React$Component);
-
-  function Router() {
-    var _temp, _this, _ret;
-
-    _classCallCheck(this, Router);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.state = {
-      match: _this.computeMatch(_this.props.history.location.pathname)
-    }, _temp), _possibleConstructorReturn(_this, _ret);
-  }
-
-  Router.prototype.getChildContext = function getChildContext() {
-    return {
-      router: _extends$5({}, this.context.router, {
-        history: this.props.history,
-        route: {
-          location: this.props.history.location,
-          match: this.state.match
-        }
-      })
-    };
-  };
-
-  Router.prototype.computeMatch = function computeMatch(pathname) {
-    return {
-      path: "/",
-      url: "/",
-      params: {},
-      isExact: pathname === "/"
-    };
-  };
-
-  Router.prototype.componentWillMount = function componentWillMount() {
-    var _this2 = this;
-
-    var _props = this.props,
-        children = _props.children,
-        history = _props.history;
-
-
-    browser$2(children == null || react.Children.count(children) === 1, "A <Router> may have only one child element");
-
-    // Do this here so we can setState when a <Redirect> changes the
-    // location in componentWillMount. This happens e.g. when doing
-    // server rendering using a <StaticRouter>.
-    this.unlisten = history.listen(function () {
-      _this2.setState({
-        match: _this2.computeMatch(history.location.pathname)
-      });
-    });
-  };
-
-  Router.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps) {
-    warning_1(this.props.history === nextProps.history, "You cannot change <Router history>");
-  };
-
-  Router.prototype.componentWillUnmount = function componentWillUnmount() {
-    this.unlisten();
-  };
-
-  Router.prototype.render = function render() {
-    var children = this.props.children;
-
-    return children ? react.Children.only(children) : null;
-  };
-
-  return Router;
-}(react.Component);
-
-Router.propTypes = {
-  history: propTypes.object.isRequired,
-  children: propTypes.node
-};
-Router.contextTypes = {
-  router: propTypes.object
-};
-Router.childContextTypes = {
-  router: propTypes.object.isRequired
-};
-
-// Written in this round about way for babel-transform-imports
-
-function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for a <Router> that uses HTML5 history.
- */
-
-var BrowserRouter = function (_React$Component) {
-  _inherits$1(BrowserRouter, _React$Component);
-
-  function BrowserRouter() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$1(this, BrowserRouter);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$1(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.history = createBrowserHistory(_this.props), _temp), _possibleConstructorReturn$1(_this, _ret);
-  }
-
-  BrowserRouter.prototype.componentWillMount = function componentWillMount() {
-    warning_1(!this.props.history, "<BrowserRouter> ignores the history prop. To use a custom history, " + "use `import { Router }` instead of `import { BrowserRouter as Router }`.");
-  };
-
-  BrowserRouter.prototype.render = function render() {
-    return react.createElement(Router, { history: this.history, children: this.props.children });
-  };
-
-  return BrowserRouter;
-}(react.Component);
-
-BrowserRouter.propTypes = {
-  basename: propTypes.string,
-  forceRefresh: propTypes.bool,
-  getUserConfirmation: propTypes.func,
-  keyLength: propTypes.number,
-  children: propTypes.node
-};
-
-function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$2(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$2(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for a <Router> that uses window.location.hash.
- */
-
-var HashRouter = function (_React$Component) {
-  _inherits$2(HashRouter, _React$Component);
-
-  function HashRouter() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$2(this, HashRouter);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$2(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.history = createHashHistory(_this.props), _temp), _possibleConstructorReturn$2(_this, _ret);
-  }
-
-  HashRouter.prototype.componentWillMount = function componentWillMount() {
-    warning_1(!this.props.history, "<HashRouter> ignores the history prop. To use a custom history, " + "use `import { Router }` instead of `import { HashRouter as Router }`.");
-  };
-
-  HashRouter.prototype.render = function render() {
-    return react.createElement(Router, { history: this.history, children: this.props.children });
-  };
-
-  return HashRouter;
-}(react.Component);
-
-HashRouter.propTypes = {
-  basename: propTypes.string,
-  getUserConfirmation: propTypes.func,
-  hashType: propTypes.oneOf(["hashbang", "noslash", "slash"]),
-  children: propTypes.node
-};
-
-var _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$3(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$3(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var isModifiedEvent = function isModifiedEvent(event) {
-  return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-};
-
-/**
- * The public API for rendering a history-aware <a>.
- */
-
-var Link = function (_React$Component) {
-  _inherits$3(Link, _React$Component);
-
-  function Link() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$3(this, Link);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$3(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.handleClick = function (event) {
-      if (_this.props.onClick) _this.props.onClick(event);
-
-      if (!event.defaultPrevented && // onClick prevented default
-      event.button === 0 && // ignore everything but left clicks
-      !_this.props.target && // let browser handle "target=_blank" etc.
-      !isModifiedEvent(event) // ignore clicks with modifier keys
-      ) {
-          event.preventDefault();
-
-          var history = _this.context.router.history;
-          var _this$props = _this.props,
-              replace = _this$props.replace,
-              to = _this$props.to;
-
-
-          if (replace) {
-            history.replace(to);
-          } else {
-            history.push(to);
-          }
-        }
-    }, _temp), _possibleConstructorReturn$3(_this, _ret);
-  }
-
-  Link.prototype.render = function render() {
-    var _props = this.props,
-        replace = _props.replace,
-        to = _props.to,
-        innerRef = _props.innerRef,
-        props = _objectWithoutProperties(_props, ["replace", "to", "innerRef"]); // eslint-disable-line no-unused-vars
-
-    browser$2(this.context.router, "You should not use <Link> outside a <Router>");
-
-    browser$2(to !== undefined, 'You must specify the "to" property');
-
-    var history = this.context.router.history;
-
-    var location = typeof to === "string" ? createLocation(to, null, null, history.location) : to;
-
-    var href = history.createHref(location);
-    return react.createElement("a", _extends$6({}, props, { onClick: this.handleClick, href: href, ref: innerRef }));
-  };
-
-  return Link;
-}(react.Component);
-
-Link.propTypes = {
-  onClick: propTypes.func,
-  target: propTypes.string,
-  replace: propTypes.bool,
-  to: propTypes.oneOfType([propTypes.string, propTypes.object]).isRequired,
-  innerRef: propTypes.oneOfType([propTypes.string, propTypes.func])
-};
-Link.defaultProps = {
-  replace: false
-};
-Link.contextTypes = {
-  router: propTypes.shape({
-    history: propTypes.shape({
-      push: propTypes.func.isRequired,
-      replace: propTypes.func.isRequired,
-      createHref: propTypes.func.isRequired
-    }).isRequired
-  }).isRequired
-};
-
-function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$4(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$4(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for a <Router> that stores location in memory.
- */
-
-var MemoryRouter = function (_React$Component) {
-  _inherits$4(MemoryRouter, _React$Component);
-
-  function MemoryRouter() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$4(this, MemoryRouter);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$4(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.history = createMemoryHistory(_this.props), _temp), _possibleConstructorReturn$4(_this, _ret);
-  }
-
-  MemoryRouter.prototype.componentWillMount = function componentWillMount() {
-    warning_1(!this.props.history, "<MemoryRouter> ignores the history prop. To use a custom history, " + "use `import { Router }` instead of `import { MemoryRouter as Router }`.");
-  };
-
-  MemoryRouter.prototype.render = function render() {
-    return react.createElement(Router, { history: this.history, children: this.props.children });
-  };
-
-  return MemoryRouter;
-}(react.Component);
-
-MemoryRouter.propTypes = {
-  initialEntries: propTypes.array,
-  initialIndex: propTypes.number,
-  getUserConfirmation: propTypes.func,
-  keyLength: propTypes.number,
-  children: propTypes.node
-};
-
-// Written in this round about way for babel-transform-imports
-
-var isarray = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
-
-/**
- * Expose `pathToRegexp`.
- */
-var pathToRegexp_1 = pathToRegexp;
-var parse_1 = parse;
-var compile_1 = compile;
-var tokensToFunction_1 = tokensToFunction;
-var tokensToRegExp_1 = tokensToRegExp;
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
-  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
-  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
-  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))'
-].join('|'), 'g');
-
-/**
- * Parse a string for the raw tokens.
- *
- * @param  {string}  str
- * @param  {Object=} options
- * @return {!Array}
- */
-function parse (str, options) {
-  var tokens = [];
-  var key = 0;
-  var index = 0;
-  var path = '';
-  var defaultDelimiter = options && options.delimiter || '/';
-  var res;
-
-  while ((res = PATH_REGEXP.exec(str)) != null) {
-    var m = res[0];
-    var escaped = res[1];
-    var offset = res.index;
-    path += str.slice(index, offset);
-    index = offset + m.length;
-
-    // Ignore already escaped sequences.
-    if (escaped) {
-      path += escaped[1];
-      continue
-    }
-
-    var next = str[index];
-    var prefix = res[2];
-    var name = res[3];
-    var capture = res[4];
-    var group = res[5];
-    var modifier = res[6];
-    var asterisk = res[7];
-
-    // Push the current path onto the tokens.
-    if (path) {
-      tokens.push(path);
-      path = '';
-    }
-
-    var partial = prefix != null && next != null && next !== prefix;
-    var repeat = modifier === '+' || modifier === '*';
-    var optional = modifier === '?' || modifier === '*';
-    var delimiter = res[2] || defaultDelimiter;
-    var pattern = capture || group;
-
-    tokens.push({
-      name: name || key++,
-      prefix: prefix || '',
-      delimiter: delimiter,
-      optional: optional,
-      repeat: repeat,
-      partial: partial,
-      asterisk: !!asterisk,
-      pattern: pattern ? escapeGroup(pattern) : (asterisk ? '.*' : '[^' + escapeString(delimiter) + ']+?')
-    });
-  }
-
-  // Match any characters still remaining.
-  if (index < str.length) {
-    path += str.substr(index);
-  }
-
-  // If the path exists, push it onto the end.
-  if (path) {
-    tokens.push(path);
-  }
-
-  return tokens
-}
-
-/**
- * Compile a string to a template function for the path.
- *
- * @param  {string}             str
- * @param  {Object=}            options
- * @return {!function(Object=, Object=)}
- */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options))
-}
-
-/**
- * Prettier encoding of URI path segments.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeURIComponentPretty (str) {
-  return encodeURI(str).replace(/[\/?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
- *
- * @param  {string}
- * @return {string}
- */
-function encodeAsterisk (str) {
-  return encodeURI(str).replace(/[?#]/g, function (c) {
-    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
-  })
-}
-
-/**
- * Expose a method for transforming tokens into the path function.
- */
-function tokensToFunction (tokens) {
-  // Compile all the tokens into regexps.
-  var matches = new Array(tokens.length);
-
-  // Compile all the patterns before compilation.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
-    }
-  }
-
-  return function (obj, opts) {
-    var path = '';
-    var data = obj || {};
-    var options = opts || {};
-    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent;
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i];
-
-      if (typeof token === 'string') {
-        path += token;
-
-        continue
-      }
-
-      var value = data[token.name];
-      var segment;
-
-      if (value == null) {
-        if (token.optional) {
-          // Prepend partial segment prefixes.
-          if (token.partial) {
-            path += token.prefix;
-          }
-
-          continue
-        } else {
-          throw new TypeError('Expected "' + token.name + '" to be defined')
-        }
-      }
-
-      if (isarray(value)) {
-        if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
-        }
-
-        if (value.length === 0) {
-          if (token.optional) {
-            continue
-          } else {
-            throw new TypeError('Expected "' + token.name + '" to not be empty')
-          }
-        }
-
-        for (var j = 0; j < value.length; j++) {
-          segment = encode(value[j]);
-
-          if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
-          }
-
-          path += (j === 0 ? token.prefix : token.delimiter) + segment;
-        }
-
-        continue
-      }
-
-      segment = token.asterisk ? encodeAsterisk(value) : encode(value);
-
-      if (!matches[i].test(segment)) {
-        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
-      }
-
-      path += token.prefix + segment;
-    }
-
-    return path
-  }
-}
-
-/**
- * Escape a regular expression string.
- *
- * @param  {string} str
- * @return {string}
- */
-function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|\/\\])/g, '\\$1')
-}
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {string} group
- * @return {string}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1')
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {!RegExp} re
- * @param  {Array}   keys
- * @return {!RegExp}
- */
-function attachKeys (re, keys) {
-  re.keys = keys;
-  return re
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {string}
- */
-function flags (options) {
-  return options.sensitive ? '' : 'i'
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {!RegExp} path
- * @param  {!Array}  keys
- * @return {!RegExp}
- */
-function regexpToRegexp (path, keys) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name: i,
-        prefix: null,
-        delimiter: null,
-        optional: false,
-        repeat: false,
-        partial: false,
-        asterisk: false,
-        pattern: null
-      });
-    }
-  }
-
-  return attachKeys(path, keys)
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {!Array}  path
- * @param  {Array}   keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function arrayToRegexp (path, keys, options) {
-  var parts = [];
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source);
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-
-  return attachKeys(regexp, keys)
-}
-
-/**
- * Create a path regexp from string input.
- *
- * @param  {string}  path
- * @param  {!Array}  keys
- * @param  {!Object} options
- * @return {!RegExp}
- */
-function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
-}
-
-/**
- * Expose a function for taking tokens and returning a RegExp.
- *
- * @param  {!Array}          tokens
- * @param  {(Array|Object)=} keys
- * @param  {Object=}         options
- * @return {!RegExp}
- */
-function tokensToRegExp (tokens, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options);
-    keys = [];
-  }
-
-  options = options || {};
-
-  var strict = options.strict;
-  var end = options.end !== false;
-  var route = '';
-
-  // Iterate over the tokens and create our regexp string.
-  for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i];
-
-    if (typeof token === 'string') {
-      route += escapeString(token);
-    } else {
-      var prefix = escapeString(token.prefix);
-      var capture = '(?:' + token.pattern + ')';
-
-      keys.push(token);
-
-      if (token.repeat) {
-        capture += '(?:' + prefix + capture + ')*';
-      }
-
-      if (token.optional) {
-        if (!token.partial) {
-          capture = '(?:' + prefix + '(' + capture + '))?';
-        } else {
-          capture = prefix + '(' + capture + ')?';
-        }
-      } else {
-        capture = prefix + '(' + capture + ')';
-      }
-
-      route += capture;
-    }
-  }
-
-  var delimiter = escapeString(options.delimiter || '/');
-  var endsWithDelimiter = route.slice(-delimiter.length) === delimiter;
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithDelimiter ? route.slice(0, -delimiter.length) : route) + '(?:' + delimiter + '(?=$))?';
-  }
-
-  if (end) {
-    route += '$';
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithDelimiter ? '' : '(?=' + delimiter + '|$)';
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys)
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(string|RegExp|Array)} path
- * @param  {(Array|Object)=}       keys
- * @param  {Object=}               options
- * @return {!RegExp}
- */
-function pathToRegexp (path, keys, options) {
-  if (!isarray(keys)) {
-    options = /** @type {!Object} */ (keys || options);
-    keys = [];
-  }
-
-  options = options || {};
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, /** @type {!Array} */ (keys))
-  }
-
-  if (isarray(path)) {
-    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
-  }
-
-  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
-}
-pathToRegexp_1.parse = parse_1;
-pathToRegexp_1.compile = compile_1;
-pathToRegexp_1.tokensToFunction = tokensToFunction_1;
-pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
-
-var patternCache = {};
-var cacheLimit = 10000;
-var cacheCount = 0;
-
-var compilePath = function compilePath(pattern, options) {
-  var cacheKey = "" + options.end + options.strict + options.sensitive;
-  var cache = patternCache[cacheKey] || (patternCache[cacheKey] = {});
-
-  if (cache[pattern]) return cache[pattern];
-
-  var keys = [];
-  var re = pathToRegexp_1(pattern, keys, options);
-  var compiledPattern = { re: re, keys: keys };
-
-  if (cacheCount < cacheLimit) {
-    cache[pattern] = compiledPattern;
-    cacheCount++;
-  }
-
-  return compiledPattern;
-};
-
-/**
- * Public API for matching a URL pathname to a path pattern.
- */
-var matchPath = function matchPath(pathname) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var parent = arguments[2];
-
-  if (typeof options === "string") options = { path: options };
-
-  var _options = options,
-      path = _options.path,
-      _options$exact = _options.exact,
-      exact = _options$exact === undefined ? false : _options$exact,
-      _options$strict = _options.strict,
-      strict = _options$strict === undefined ? false : _options$strict,
-      _options$sensitive = _options.sensitive,
-      sensitive = _options$sensitive === undefined ? false : _options$sensitive;
-
-
-  if (path == null) return parent;
-
-  var _compilePath = compilePath(path, { end: exact, strict: strict, sensitive: sensitive }),
-      re = _compilePath.re,
-      keys = _compilePath.keys;
-
-  var match = re.exec(pathname);
-
-  if (!match) return null;
-
-  var url = match[0],
-      values = match.slice(1);
-
-  var isExact = pathname === url;
-
-  if (exact && !isExact) return null;
-
-  return {
-    path: path, // the path pattern used to match
-    url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
-    isExact: isExact, // whether or not we matched exactly
-    params: keys.reduce(function (memo, key, index) {
-      memo[key.name] = values[index];
-      return memo;
-    }, {})
-  };
-};
-
-var _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$5(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$5(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var isEmptyChildren = function isEmptyChildren(children) {
-  return react.Children.count(children) === 0;
-};
-
-/**
- * The public API for matching a single path and rendering.
- */
-
-var Route = function (_React$Component) {
-  _inherits$5(Route, _React$Component);
-
-  function Route() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$5(this, Route);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$5(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.state = {
-      match: _this.computeMatch(_this.props, _this.context.router)
-    }, _temp), _possibleConstructorReturn$5(_this, _ret);
-  }
-
-  Route.prototype.getChildContext = function getChildContext() {
-    return {
-      router: _extends$7({}, this.context.router, {
-        route: {
-          location: this.props.location || this.context.router.route.location,
-          match: this.state.match
-        }
-      })
-    };
-  };
-
-  Route.prototype.computeMatch = function computeMatch(_ref, router) {
-    var computedMatch = _ref.computedMatch,
-        location = _ref.location,
-        path = _ref.path,
-        strict = _ref.strict,
-        exact = _ref.exact,
-        sensitive = _ref.sensitive;
-
-    if (computedMatch) return computedMatch; // <Switch> already computed the match for us
-
-    browser$2(router, "You should not use <Route> or withRouter() outside a <Router>");
-
-    var route = router.route;
-
-    var pathname = (location || route.location).pathname;
-
-    return matchPath(pathname, { path: path, strict: strict, exact: exact, sensitive: sensitive }, route.match);
-  };
-
-  Route.prototype.componentWillMount = function componentWillMount() {
-    warning_1(!(this.props.component && this.props.render), "You should not use <Route component> and <Route render> in the same route; <Route render> will be ignored");
-
-    warning_1(!(this.props.component && this.props.children && !isEmptyChildren(this.props.children)), "You should not use <Route component> and <Route children> in the same route; <Route children> will be ignored");
-
-    warning_1(!(this.props.render && this.props.children && !isEmptyChildren(this.props.children)), "You should not use <Route render> and <Route children> in the same route; <Route children> will be ignored");
-  };
-
-  Route.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps, nextContext) {
-    warning_1(!(nextProps.location && !this.props.location), '<Route> elements should not change from uncontrolled to controlled (or vice versa). You initially used no "location" prop and then provided one on a subsequent render.');
-
-    warning_1(!(!nextProps.location && this.props.location), '<Route> elements should not change from controlled to uncontrolled (or vice versa). You provided a "location" prop initially but omitted it on a subsequent render.');
-
-    this.setState({
-      match: this.computeMatch(nextProps, nextContext.router)
-    });
-  };
-
-  Route.prototype.render = function render() {
-    var match = this.state.match;
-    var _props = this.props,
-        children = _props.children,
-        component = _props.component,
-        render = _props.render;
-    var _context$router = this.context.router,
-        history = _context$router.history,
-        route = _context$router.route,
-        staticContext = _context$router.staticContext;
-
-    var location = this.props.location || route.location;
-    var props = { match: match, location: location, history: history, staticContext: staticContext };
-
-    if (component) return match ? react.createElement(component, props) : null;
-
-    if (render) return match ? render(props) : null;
-
-    if (typeof children === "function") return children(props);
-
-    if (children && !isEmptyChildren(children)) return react.Children.only(children);
-
-    return null;
-  };
-
-  return Route;
-}(react.Component);
-
-Route.propTypes = {
-  computedMatch: propTypes.object, // private, from <Switch>
-  path: propTypes.string,
-  exact: propTypes.bool,
-  strict: propTypes.bool,
-  sensitive: propTypes.bool,
-  component: propTypes.func,
-  render: propTypes.func,
-  children: propTypes.oneOfType([propTypes.func, propTypes.node]),
-  location: propTypes.object
-};
-Route.contextTypes = {
-  router: propTypes.shape({
-    history: propTypes.object.isRequired,
-    route: propTypes.object.isRequired,
-    staticContext: propTypes.object
-  })
-};
-Route.childContextTypes = {
-  router: propTypes.object.isRequired
-};
-
-// Written in this round about way for babel-transform-imports
-
-var _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _typeof$4 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _objectWithoutProperties$1(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-/**
- * A <Link> wrapper that knows if it's "active" or not.
- */
-var NavLink = function NavLink(_ref) {
-  var to = _ref.to,
-      exact = _ref.exact,
-      strict = _ref.strict,
-      location = _ref.location,
-      activeClassName = _ref.activeClassName,
-      className = _ref.className,
-      activeStyle = _ref.activeStyle,
-      style = _ref.style,
-      getIsActive = _ref.isActive,
-      ariaCurrent = _ref["aria-current"],
-      rest = _objectWithoutProperties$1(_ref, ["to", "exact", "strict", "location", "activeClassName", "className", "activeStyle", "style", "isActive", "aria-current"]);
-
-  var path = (typeof to === "undefined" ? "undefined" : _typeof$4(to)) === "object" ? to.pathname : to;
-
-  // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
-  var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
-
-  return react.createElement(Route, {
-    path: escapedPath,
-    exact: exact,
-    strict: strict,
-    location: location,
-    children: function children(_ref2) {
-      var location = _ref2.location,
-          match = _ref2.match;
-
-      var isActive = !!(getIsActive ? getIsActive(match, location) : match);
-
-      return react.createElement(Link, _extends$8({
-        to: to,
-        className: isActive ? [className, activeClassName].filter(function (i) {
-          return i;
-        }).join(" ") : className,
-        style: isActive ? _extends$8({}, style, activeStyle) : style,
-        "aria-current": isActive && ariaCurrent || null
-      }, rest));
-    }
-  });
-};
-
-NavLink.propTypes = {
-  to: Link.propTypes.to,
-  exact: propTypes.bool,
-  strict: propTypes.bool,
-  location: propTypes.object,
-  activeClassName: propTypes.string,
-  className: propTypes.string,
-  activeStyle: propTypes.object,
-  style: propTypes.object,
-  isActive: propTypes.func,
-  "aria-current": propTypes.oneOf(["page", "step", "location", "date", "time", "true"])
-};
-
-NavLink.defaultProps = {
-  activeClassName: "active",
-  "aria-current": "page"
-};
-
-function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$6(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$6(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for prompting the user before navigating away
- * from a screen with a component.
- */
-
-var Prompt = function (_React$Component) {
-  _inherits$6(Prompt, _React$Component);
-
-  function Prompt() {
-    _classCallCheck$6(this, Prompt);
-
-    return _possibleConstructorReturn$6(this, _React$Component.apply(this, arguments));
-  }
-
-  Prompt.prototype.enable = function enable(message) {
-    if (this.unblock) this.unblock();
-
-    this.unblock = this.context.router.history.block(message);
-  };
-
-  Prompt.prototype.disable = function disable() {
-    if (this.unblock) {
-      this.unblock();
-      this.unblock = null;
-    }
-  };
-
-  Prompt.prototype.componentWillMount = function componentWillMount() {
-    browser$2(this.context.router, "You should not use <Prompt> outside a <Router>");
-
-    if (this.props.when) this.enable(this.props.message);
-  };
-
-  Prompt.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps) {
-    if (nextProps.when) {
-      if (!this.props.when || this.props.message !== nextProps.message) this.enable(nextProps.message);
-    } else {
-      this.disable();
-    }
-  };
-
-  Prompt.prototype.componentWillUnmount = function componentWillUnmount() {
-    this.disable();
-  };
-
-  Prompt.prototype.render = function render() {
-    return null;
-  };
-
-  return Prompt;
-}(react.Component);
-
-Prompt.propTypes = {
-  when: propTypes.bool,
-  message: propTypes.oneOfType([propTypes.func, propTypes.string]).isRequired
-};
-Prompt.defaultProps = {
-  when: true
-};
-Prompt.contextTypes = {
-  router: propTypes.shape({
-    history: propTypes.shape({
-      block: propTypes.func.isRequired
-    }).isRequired
-  }).isRequired
-};
-
-// Written in this round about way for babel-transform-imports
-
-var patternCache$1 = {};
-var cacheLimit$1 = 10000;
-var cacheCount$1 = 0;
-
-var compileGenerator = function compileGenerator(pattern) {
-  var cacheKey = pattern;
-  var cache = patternCache$1[cacheKey] || (patternCache$1[cacheKey] = {});
-
-  if (cache[pattern]) return cache[pattern];
-
-  var compiledGenerator = pathToRegexp_1.compile(pattern);
-
-  if (cacheCount$1 < cacheLimit$1) {
-    cache[pattern] = compiledGenerator;
-    cacheCount$1++;
-  }
-
-  return compiledGenerator;
-};
-
-/**
- * Public API for generating a URL pathname from a pattern and parameters.
- */
-var generatePath = function generatePath() {
-  var pattern = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
-  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  if (pattern === "/") {
-    return pattern;
-  }
-  var generator = compileGenerator(pattern);
-  return generator(params, { pretty: true });
-};
-
-var _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$7(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$7(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for updating the location programmatically
- * with a component.
- */
-
-var Redirect = function (_React$Component) {
-  _inherits$7(Redirect, _React$Component);
-
-  function Redirect() {
-    _classCallCheck$7(this, Redirect);
-
-    return _possibleConstructorReturn$7(this, _React$Component.apply(this, arguments));
-  }
-
-  Redirect.prototype.isStatic = function isStatic() {
-    return this.context.router && this.context.router.staticContext;
-  };
-
-  Redirect.prototype.componentWillMount = function componentWillMount() {
-    browser$2(this.context.router, "You should not use <Redirect> outside a <Router>");
-
-    if (this.isStatic()) this.perform();
-  };
-
-  Redirect.prototype.componentDidMount = function componentDidMount() {
-    if (!this.isStatic()) this.perform();
-  };
-
-  Redirect.prototype.componentDidUpdate = function componentDidUpdate(prevProps) {
-    var prevTo = createLocation(prevProps.to);
-    var nextTo = createLocation(this.props.to);
-
-    if (locationsAreEqual(prevTo, nextTo)) {
-      warning_1(false, "You tried to redirect to the same route you're currently on: " + ("\"" + nextTo.pathname + nextTo.search + "\""));
-      return;
-    }
-
-    this.perform();
-  };
-
-  Redirect.prototype.computeTo = function computeTo(_ref) {
-    var computedMatch = _ref.computedMatch,
-        to = _ref.to;
-
-    if (computedMatch) {
-      if (typeof to === "string") {
-        return generatePath(to, computedMatch.params);
-      } else {
-        return _extends$9({}, to, {
-          pathname: generatePath(to.pathname, computedMatch.params)
-        });
-      }
-    }
-
-    return to;
-  };
-
-  Redirect.prototype.perform = function perform() {
-    var history = this.context.router.history;
-    var push = this.props.push;
-
-    var to = this.computeTo(this.props);
-
-    if (push) {
-      history.push(to);
-    } else {
-      history.replace(to);
-    }
-  };
-
-  Redirect.prototype.render = function render() {
-    return null;
-  };
-
-  return Redirect;
-}(react.Component);
-
-Redirect.propTypes = {
-  computedMatch: propTypes.object, // private, from <Switch>
-  push: propTypes.bool,
-  from: propTypes.string,
-  to: propTypes.oneOfType([propTypes.string, propTypes.object]).isRequired
-};
-Redirect.defaultProps = {
-  push: false
-};
-Redirect.contextTypes = {
-  router: propTypes.shape({
-    history: propTypes.shape({
-      push: propTypes.func.isRequired,
-      replace: propTypes.func.isRequired
-    }).isRequired,
-    staticContext: propTypes.object
-  }).isRequired
-};
-
-// Written in this round about way for babel-transform-imports
-
-var _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _objectWithoutProperties$2(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$8(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$8(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var addLeadingSlash$1 = function addLeadingSlash(path) {
-  return path.charAt(0) === "/" ? path : "/" + path;
-};
-
-var addBasename = function addBasename(basename, location) {
-  if (!basename) return location;
-
-  return _extends$a({}, location, {
-    pathname: addLeadingSlash$1(basename) + location.pathname
-  });
-};
-
-var stripBasename$1 = function stripBasename(basename, location) {
-  if (!basename) return location;
-
-  var base = addLeadingSlash$1(basename);
-
-  if (location.pathname.indexOf(base) !== 0) return location;
-
-  return _extends$a({}, location, {
-    pathname: location.pathname.substr(base.length)
-  });
-};
-
-var createURL = function createURL(location) {
-  return typeof location === "string" ? location : createPath(location);
-};
-
-var staticHandler = function staticHandler(methodName) {
-  return function () {
-    browser$2(false, "You cannot %s with <StaticRouter>", methodName);
-  };
-};
-
-var noop$1 = function noop() {};
-
-/**
- * The public top-level API for a "static" <Router>, so-called because it
- * can't actually change the current location. Instead, it just records
- * location changes in a context object. Useful mainly in testing and
- * server-rendering scenarios.
- */
-
-var StaticRouter = function (_React$Component) {
-  _inherits$8(StaticRouter, _React$Component);
-
-  function StaticRouter() {
-    var _temp, _this, _ret;
-
-    _classCallCheck$8(this, StaticRouter);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn$8(this, _React$Component.call.apply(_React$Component, [this].concat(args))), _this), _this.createHref = function (path) {
-      return addLeadingSlash$1(_this.props.basename + createURL(path));
-    }, _this.handlePush = function (location) {
-      var _this$props = _this.props,
-          basename = _this$props.basename,
-          context = _this$props.context;
-
-      context.action = "PUSH";
-      context.location = addBasename(basename, createLocation(location));
-      context.url = createURL(context.location);
-    }, _this.handleReplace = function (location) {
-      var _this$props2 = _this.props,
-          basename = _this$props2.basename,
-          context = _this$props2.context;
-
-      context.action = "REPLACE";
-      context.location = addBasename(basename, createLocation(location));
-      context.url = createURL(context.location);
-    }, _this.handleListen = function () {
-      return noop$1;
-    }, _this.handleBlock = function () {
-      return noop$1;
-    }, _temp), _possibleConstructorReturn$8(_this, _ret);
-  }
-
-  StaticRouter.prototype.getChildContext = function getChildContext() {
-    return {
-      router: {
-        staticContext: this.props.context
-      }
-    };
-  };
-
-  StaticRouter.prototype.componentWillMount = function componentWillMount() {
-    warning_1(!this.props.history, "<StaticRouter> ignores the history prop. To use a custom history, " + "use `import { Router }` instead of `import { StaticRouter as Router }`.");
-  };
-
-  StaticRouter.prototype.render = function render() {
-    var _props = this.props,
-        basename = _props.basename,
-        context = _props.context,
-        location = _props.location,
-        props = _objectWithoutProperties$2(_props, ["basename", "context", "location"]);
-
-    var history = {
-      createHref: this.createHref,
-      action: "POP",
-      location: stripBasename$1(basename, createLocation(location)),
-      push: this.handlePush,
-      replace: this.handleReplace,
-      go: staticHandler("go"),
-      goBack: staticHandler("goBack"),
-      goForward: staticHandler("goForward"),
-      listen: this.handleListen,
-      block: this.handleBlock
-    };
-
-    return react.createElement(Router, _extends$a({}, props, { history: history }));
-  };
-
-  return StaticRouter;
-}(react.Component);
-
-StaticRouter.propTypes = {
-  basename: propTypes.string,
-  context: propTypes.object.isRequired,
-  location: propTypes.oneOfType([propTypes.string, propTypes.object])
-};
-StaticRouter.defaultProps = {
-  basename: "",
-  location: "/"
-};
-StaticRouter.childContextTypes = {
-  router: propTypes.object.isRequired
-};
-
-// Written in this round about way for babel-transform-imports
-
-function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$9(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$9(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * The public API for rendering the first <Route> that matches.
- */
-
-var Switch = function (_React$Component) {
-  _inherits$9(Switch, _React$Component);
-
-  function Switch() {
-    _classCallCheck$9(this, Switch);
-
-    return _possibleConstructorReturn$9(this, _React$Component.apply(this, arguments));
-  }
-
-  Switch.prototype.componentWillMount = function componentWillMount() {
-    browser$2(this.context.router, "You should not use <Switch> outside a <Router>");
-  };
-
-  Switch.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps) {
-    warning_1(!(nextProps.location && !this.props.location), '<Switch> elements should not change from uncontrolled to controlled (or vice versa). You initially used no "location" prop and then provided one on a subsequent render.');
-
-    warning_1(!(!nextProps.location && this.props.location), '<Switch> elements should not change from controlled to uncontrolled (or vice versa). You provided a "location" prop initially but omitted it on a subsequent render.');
-  };
-
-  Switch.prototype.render = function render() {
-    var route = this.context.router.route;
-    var children = this.props.children;
-
-    var location = this.props.location || route.location;
-
-    var match = void 0,
-        child = void 0;
-    react.Children.forEach(children, function (element) {
-      if (match == null && react.isValidElement(element)) {
-        var _element$props = element.props,
-            pathProp = _element$props.path,
-            exact = _element$props.exact,
-            strict = _element$props.strict,
-            sensitive = _element$props.sensitive,
-            from = _element$props.from;
-
-        var path = pathProp || from;
-
-        child = element;
-        match = matchPath(location.pathname, { path: path, exact: exact, strict: strict, sensitive: sensitive }, route.match);
-      }
-    });
-
-    return match ? react.cloneElement(child, { location: location, computedMatch: match }) : null;
-  };
-
-  return Switch;
-}(react.Component);
-
-Switch.contextTypes = {
-  router: propTypes.shape({
-    route: propTypes.object.isRequired
-  }).isRequired
-};
-Switch.propTypes = {
-  children: propTypes.node,
-  location: propTypes.object
-};
-
-// Written in this round about way for babel-transform-imports
-
-// Written in this round about way for babel-transform-imports
-
-// Written in this round about way for babel-transform-imports
-
-// Written in this round about way for babel-transform-imports
-
 function constant(x) {
   return function() {
     return x;
@@ -10705,15 +8015,15 @@ var reactMotion_7 = reactMotion.reorderKeys;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$a(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$a(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$a(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function _objectWithoutProperties$4(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 var ANIMATION_PROPTYPES = propTypes.oneOfType([propTypes.string, propTypes.shape({
   stiffness: propTypes.number,
@@ -10742,7 +8052,7 @@ function getAnimationStyle() {
   var damping = animationStyle.damping,
       stiffness = animationStyle.stiffness;
 
-  return _extends$c({
+  return _extends$1({
     damping: damping || reactMotion_5.noWobble.damping,
     stiffness: stiffness || reactMotion_5.noWobble.stiffness
   }, animationStyle);
@@ -10755,7 +8065,7 @@ function getAnimationStyle() {
  */
 function extractAnimatedPropValues(props) {
   var animatedProps = props.animatedProps,
-      otherProps = _objectWithoutProperties$4(props, ['animatedProps']);
+      otherProps = _objectWithoutProperties(props, ['animatedProps']);
 
   return animatedProps.reduce(function (result, animatedPropName) {
     if (otherProps.hasOwnProperty(animatedPropName)) {
@@ -10766,12 +8076,12 @@ function extractAnimatedPropValues(props) {
 }
 
 var Animation = function (_PureComponent) {
-  _inherits$a(Animation, _PureComponent);
+  _inherits(Animation, _PureComponent);
 
   function Animation(props) {
-    _classCallCheck$a(this, Animation);
+    _classCallCheck(this, Animation);
 
-    var _this = _possibleConstructorReturn$a(this, (Animation.__proto__ || Object.getPrototypeOf(Animation)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (Animation.__proto__ || Object.getPrototypeOf(Animation)).call(this, props));
 
     _this._motionEndHandler = function () {
       if (_this.props.onEnd) {
@@ -10795,14 +8105,14 @@ var Animation = function (_PureComponent) {
       if (data && child.props._data) {
         data = data.map(function (row, index) {
           var correspondingCell = child.props._data[index];
-          return _extends$c({}, row, {
+          return _extends$1({}, row, {
             parent: correspondingCell.parent,
             children: correspondingCell.children
           });
         });
       }
 
-      return react.cloneElement(child, _extends$c({}, child.props, interpolatedProps, {
+      return react.cloneElement(child, _extends$1({}, child.props, interpolatedProps, {
         data: data || child.props.data || null,
         // enforce re-rendering
         _animation: Math.random()
@@ -10854,7 +8164,7 @@ var Animation = function (_PureComponent) {
       var key = Math.random();
       return react.createElement(
         reactMotion_1,
-        _extends$c({ defaultStyle: defaultStyle, style: style, key: key }, { onRest: this._motionEndHandler }),
+        _extends$1({ defaultStyle: defaultStyle, style: style, key: key }, { onRest: this._motionEndHandler }),
         this._renderChildren
       );
     }
@@ -12294,6 +9604,8 @@ var friday = weekday(5);
 var saturday = weekday(6);
 
 var sundays = sunday.range;
+var mondays = monday.range;
+var thursdays = thursday.range;
 
 var month = newInterval(function(date) {
   date.setDate(1);
@@ -12383,6 +9695,8 @@ var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
 var utcSundays = utcSunday.range;
+var utcMondays = utcMonday.range;
+var utcThursdays = utcThursday.range;
 
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
@@ -13299,7 +10613,7 @@ var HIDDEN_PROCESSES = {
  * @param {Boolean} onlyShowMessageOnce - whether or not we allow the
  - message to be show multiple times
  */
-function warning$2(message) {
+function warning(message) {
   var onlyShowMessageOnce = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
   /* eslint-disable no-undef, no-process-env */
@@ -13365,7 +10679,7 @@ function addValueToArray(arr, value) {
 
 var _slicedToArray$1 = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _SCALE_FUNCTIONS;
 
@@ -13780,7 +11094,7 @@ function _getScaleDistanceAndAdjustedDomain(data, scaleObject) {
     adjustedDomain[0] = Math.min(domain[1] / 10, 1);
   }
 
-  var adjustedScaleFn = getScaleFnFromScaleObject(_extends$d({}, scaleObject, {
+  var adjustedScaleFn = getScaleFnFromScaleObject(_extends$2({}, scaleObject, {
     domain: adjustedDomain
   }));
 
@@ -14010,7 +11324,7 @@ function getAttributeValue(props, attr) {
   var scaleObject = getScaleObjectFromProps(props, attr);
   if (scaleObject) {
     if (!scaleObject.isValue && props['_' + attr + 'Value'] === undefined) {
-      warning$2('[React-vis] Cannot use data defined ' + attr + ' for this ' + 'series type. Using fallback value instead.');
+      warning('[React-vis] Cannot use data defined ' + attr + ' for this ' + 'series type. Using fallback value instead.');
     }
     return props['_' + attr + 'Value'] || scaleObject.range[0];
   }
@@ -14137,7 +11451,7 @@ function getXYPlotValues(props, children) {
 
 
     if (domain && range$$1 && type) {
-      return _extends$d({}, prev, _defineProperty({}, attr, SCALE_FUNCTIONS[type]().domain(domain).range(range$$1)));
+      return _extends$2({}, prev, _defineProperty({}, attr, SCALE_FUNCTIONS[type]().domain(domain).range(range$$1)));
     }
     return prev;
   }, {});
@@ -14148,7 +11462,7 @@ function getXYPlotValues(props, children) {
         var scaleInput = child.props[attr];
         var scale = XYPlotScales[attr];
         var fallbackValue = scale ? scale(scaleInput) : scaleInput;
-        return _extends$d({}, prev, _defineProperty({}, '_' + attr + 'Value', fallbackValue));
+        return _extends$2({}, prev, _defineProperty({}, '_' + attr + 'Value', fallbackValue));
       }
       return prev;
     }, {});
@@ -14181,15 +11495,15 @@ function getOptionalScaleProps(props) {
 
 var _createClass$1 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$b(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$b(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$b(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var propTypes$2 = _extends$e({}, getScalePropTypesByAttribute('x'), getScalePropTypesByAttribute('y'), getScalePropTypesByAttribute('size'), getScalePropTypesByAttribute('opacity'), getScalePropTypesByAttribute('color'), {
+var propTypes$2 = _extends$3({}, getScalePropTypesByAttribute('x'), getScalePropTypesByAttribute('y'), getScalePropTypesByAttribute('size'), getScalePropTypesByAttribute('opacity'), getScalePropTypesByAttribute('color'), {
   width: propTypes.number,
   height: propTypes.number,
   data: propTypes.arrayOf(propTypes.oneOfType([propTypes.object, propTypes.array])),
@@ -14215,20 +11529,20 @@ var defaultProps = {
 };
 
 var AbstractSeries = function (_PureComponent) {
-  _inherits$b(AbstractSeries, _PureComponent);
+  _inherits$1(AbstractSeries, _PureComponent);
 
   function AbstractSeries() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    _classCallCheck$b(this, AbstractSeries);
+    _classCallCheck$1(this, AbstractSeries);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn$b(this, (_ref = AbstractSeries.__proto__ || Object.getPrototypeOf(AbstractSeries)).call.apply(_ref, [this].concat(args))), _this), _this._seriesClickHandler = function (event) {
+    return _ret = (_temp = (_this = _possibleConstructorReturn$1(this, (_ref = AbstractSeries.__proto__ || Object.getPrototypeOf(AbstractSeries)).call.apply(_ref, [this].concat(args))), _this), _this._seriesClickHandler = function (event) {
       var onSeriesClick = _this.props.onSeriesClick;
 
       if (onSeriesClick) {
@@ -14296,7 +11610,7 @@ var AbstractSeries = function (_PureComponent) {
       if (onSeriesRightClick) {
         onSeriesRightClick({ event: event });
       }
-    }, _temp), _possibleConstructorReturn$b(_this, _ret);
+    }, _temp), _possibleConstructorReturn$1(_this, _ret);
   }
 
   _createClass$1(AbstractSeries, [{
@@ -15557,7 +12871,7 @@ function symbol() {
   return symbol;
 }
 
-function noop$2() {}
+function noop$1() {}
 
 function point$1(that, x, y) {
   that._context.bezierCurveTo(
@@ -15616,8 +12930,8 @@ function BasisClosed(context) {
 }
 
 BasisClosed.prototype = {
-  areaStart: noop$2,
-  areaEnd: noop$2,
+  areaStart: noop$1,
+  areaEnd: noop$1,
   lineStart: function() {
     this._x0 = this._x1 = this._x2 = this._x3 = this._x4 =
     this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = NaN;
@@ -15822,8 +13136,8 @@ function CardinalClosed(context, tension) {
 }
 
 CardinalClosed.prototype = {
-  areaStart: noop$2,
-  areaEnd: noop$2,
+  areaStart: noop$1,
+  areaEnd: noop$1,
   lineStart: function() {
     this._x0 = this._x1 = this._x2 = this._x3 = this._x4 = this._x5 =
     this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = this._y5 = NaN;
@@ -16015,8 +13329,8 @@ function CatmullRomClosed(context, alpha) {
 }
 
 CatmullRomClosed.prototype = {
-  areaStart: noop$2,
-  areaEnd: noop$2,
+  areaStart: noop$1,
+  areaEnd: noop$1,
   lineStart: function() {
     this._x0 = this._x1 = this._x2 = this._x3 = this._x4 = this._x5 =
     this._y0 = this._y1 = this._y2 = this._y3 = this._y4 = this._y5 = NaN;
@@ -16145,8 +13459,8 @@ function LinearClosed(context) {
 }
 
 LinearClosed.prototype = {
-  areaStart: noop$2,
-  areaEnd: noop$2,
+  areaStart: noop$1,
+  areaEnd: noop$1,
   lineStart: function() {
     this._point = 0;
   },
@@ -16647,7 +13961,7 @@ var DEFAULT_SIZE = 5;
 
 var DEFAULT_COLOR = DISCRETE_COLOR_RANGE[0];
 
-var _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _defineProperty$1(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -16726,7 +14040,7 @@ function prepareData(data) {
   }
 
   return data.map(function (row) {
-    return _extends$f({}, row, {
+    return _extends$4({}, row, {
       x: row.radius * Math.cos(row.angle),
       y: row.radius * Math.sin(row.angle)
     });
@@ -16787,11 +14101,11 @@ function getStackedData(children, attr) {
 
         latestAttrPositions[cluster][d[baseAttr]] = (_latestAttrPositions$ = {}, _defineProperty$1(_latestAttrPositions$, attr0, d[attr0]), _defineProperty$1(_latestAttrPositions$, attr, d[attr]), _latestAttrPositions$);
 
-        return _extends$f({}, d);
+        return _extends$4({}, d);
       }
 
       // Calculate the position of the next segment in a bar.
-      var nextD = _extends$f({}, d, (_extends2 = {}, _defineProperty$1(_extends2, attr0, prevD[attr]), _defineProperty$1(_extends2, attr, prevD[attr] + d[attr] - (d[attr0] || 0)), _extends2));
+      var nextD = _extends$4({}, d, (_extends2 = {}, _defineProperty$1(_extends2, attr0, prevD[attr]), _defineProperty$1(_extends2, attr, prevD[attr] + d[attr] - (d[attr0] || 0)), _extends2));
 
       latestAttrPositions[cluster][d[baseAttr]] = (_latestAttrPositions$2 = {}, _defineProperty$1(_latestAttrPositions$2, attr0, nextD[attr0]), _defineProperty$1(_latestAttrPositions$2, attr, nextD[attr]), _latestAttrPositions$2);
 
@@ -16818,7 +14132,7 @@ function getSeriesPropsFromChildren(children) {
     if (isSeriesChild(child)) {
       var seriesTypeInfo = seriesTypesInfo[child.type.displayName];
       var _colorValue = DISCRETE_COLOR_RANGE[seriesIndex % DISCRETE_COLOR_RANGE.length];
-      props = _extends$f({}, seriesTypeInfo, {
+      props = _extends$4({}, seriesTypeInfo, {
         seriesIndex: seriesIndex,
         _colorValue: _colorValue,
         _opacityValue: _opacityValue
@@ -16872,15 +14186,15 @@ function getStackParams(props) {
   return { sameTypeTotal: sameTypeTotal, sameTypeIndex: sameTypeIndex };
 }
 
-var _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$c(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$c(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$2(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$c(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$2(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName = 'rv-xy-plot__series rv-xy-plot__series--line';
 
@@ -16890,12 +14204,12 @@ var STROKE_STYLES = {
 };
 
 var LineSeries = function (_AbstractSeries) {
-  _inherits$c(LineSeries, _AbstractSeries);
+  _inherits$2(LineSeries, _AbstractSeries);
 
   function LineSeries() {
-    _classCallCheck$c(this, LineSeries);
+    _classCallCheck$2(this, LineSeries);
 
-    return _possibleConstructorReturn$c(this, (LineSeries.__proto__ || Object.getPrototypeOf(LineSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$2(this, (LineSeries.__proto__ || Object.getPrototypeOf(LineSeries)).apply(this, arguments));
   }
 
   _createClass$2(LineSeries, [{
@@ -16923,7 +14237,7 @@ var LineSeries = function (_AbstractSeries) {
 
 
       if (this.props.nullAccessor) {
-        warning$2('nullAccessor has been renamed to getNull', true);
+        warning('nullAccessor has been renamed to getNull', true);
       }
 
       if (!data) {
@@ -16933,8 +14247,8 @@ var LineSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$g({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(LineSeries, _extends$g({}, this.props, { animation: null }))
+          _extends$5({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(LineSeries, _extends$5({}, this.props, { animation: null }))
         );
       }
 
@@ -16964,7 +14278,7 @@ var LineSeries = function (_AbstractSeries) {
         onMouseOut: this._seriesMouseOutHandler,
         onClick: this._seriesClickHandler,
         onContextMenu: this._seriesRightClickHandler,
-        style: _extends$g({
+        style: _extends$5({
           opacity: opacity,
           strokeDasharray: STROKE_STYLES[strokeStyle] || strokeDasharray,
           strokeWidth: strokeWidth,
@@ -16978,12 +14292,12 @@ var LineSeries = function (_AbstractSeries) {
 }(AbstractSeries);
 
 LineSeries.displayName = 'LineSeries';
-LineSeries.propTypes = _extends$g({}, AbstractSeries.propTypes, {
+LineSeries.propTypes = _extends$5({}, AbstractSeries.propTypes, {
   strokeStyle: propTypes.oneOf(Object.keys(STROKE_STYLES)),
   curve: propTypes.oneOfType([propTypes.string, propTypes.func]),
   getNull: propTypes.func
 });
-LineSeries.defaultProps = _extends$g({}, AbstractSeries.defaultProps, {
+LineSeries.defaultProps = _extends$5({}, AbstractSeries.defaultProps, {
   strokeStyle: 'solid',
   style: {},
   opacity: 1,
@@ -16994,23 +14308,23 @@ LineSeries.defaultProps = _extends$g({}, AbstractSeries.defaultProps, {
   }
 });
 
-var _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$3 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$d(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$d(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$3(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$d(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$3(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var LineSeriesCanvas = function (_AbstractSeries) {
-  _inherits$d(LineSeriesCanvas, _AbstractSeries);
+  _inherits$3(LineSeriesCanvas, _AbstractSeries);
 
   function LineSeriesCanvas() {
-    _classCallCheck$d(this, LineSeriesCanvas);
+    _classCallCheck$3(this, LineSeriesCanvas);
 
-    return _possibleConstructorReturn$d(this, (LineSeriesCanvas.__proto__ || Object.getPrototypeOf(LineSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$3(this, (LineSeriesCanvas.__proto__ || Object.getPrototypeOf(LineSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$3(LineSeriesCanvas, [{
@@ -17080,35 +14394,35 @@ var LineSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 LineSeriesCanvas.displayName = 'LineSeriesCanvas';
-LineSeriesCanvas.defaultProps = _extends$h({}, AbstractSeries.defaultProps, {
+LineSeriesCanvas.defaultProps = _extends$6({}, AbstractSeries.defaultProps, {
   strokeWidth: 2
 });
 
-LineSeriesCanvas.propTypes = _extends$h({}, AbstractSeries.propTypes, {
+LineSeriesCanvas.propTypes = _extends$6({}, AbstractSeries.propTypes, {
   strokeWidth: propTypes.number
 });
 
-var _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$4 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _defineProperty$2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$e(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$e(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$4(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$e(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$4(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$1 = 'rv-xy-plot__series rv-xy-plot__series--bar';
 
 var BarSeries = function (_AbstractSeries) {
-  _inherits$e(BarSeries, _AbstractSeries);
+  _inherits$4(BarSeries, _AbstractSeries);
 
   function BarSeries() {
-    _classCallCheck$e(this, BarSeries);
+    _classCallCheck$4(this, BarSeries);
 
-    return _possibleConstructorReturn$e(this, (BarSeries.__proto__ || Object.getPrototypeOf(BarSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$4(this, (BarSeries.__proto__ || Object.getPrototypeOf(BarSeries)).apply(this, arguments));
   }
 
   _createClass$4(BarSeries, [{
@@ -17136,8 +14450,8 @@ var BarSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$i({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(BarSeries, _extends$i({}, this.props, { animation: null }))
+          _extends$7({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(BarSeries, _extends$7({}, this.props, { animation: null }))
         );
       }
 
@@ -17165,7 +14479,7 @@ var BarSeries = function (_AbstractSeries) {
           var _attrs;
 
           var attrs = (_attrs = {
-            style: _extends$i({
+            style: _extends$7({
               opacity: opacityFunctor && opacityFunctor(d),
               stroke: strokeFunctor && strokeFunctor(d),
               fill: fillFunctor && fillFunctor(d)
@@ -17186,7 +14500,7 @@ var BarSeries = function (_AbstractSeries) {
   }], [{
     key: 'propTypes',
     get: function get() {
-      return _extends$i({}, AbstractSeries.propTypes, {
+      return _extends$7({}, AbstractSeries.propTypes, {
         linePosAttr: propTypes.string,
         valuePosAttr: propTypes.string,
         lineSizeAttr: propTypes.string,
@@ -17201,29 +14515,29 @@ var BarSeries = function (_AbstractSeries) {
 
 BarSeries.displayName = 'BarSeries';
 
-var _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$f(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$f(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$5(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$f(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$5(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalBarSeries = function (_AbstractSeries) {
-  _inherits$f(HorizontalBarSeries, _AbstractSeries);
+  _inherits$5(HorizontalBarSeries, _AbstractSeries);
 
   function HorizontalBarSeries() {
-    _classCallCheck$f(this, HorizontalBarSeries);
+    _classCallCheck$5(this, HorizontalBarSeries);
 
-    return _possibleConstructorReturn$f(this, (HorizontalBarSeries.__proto__ || Object.getPrototypeOf(HorizontalBarSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$5(this, (HorizontalBarSeries.__proto__ || Object.getPrototypeOf(HorizontalBarSeries)).apply(this, arguments));
   }
 
   _createClass$5(HorizontalBarSeries, [{
     key: 'render',
     value: function render() {
-      return react.createElement(BarSeries, _extends$j({}, this.props, {
+      return react.createElement(BarSeries, _extends$8({}, this.props, {
         linePosAttr: 'y',
         valuePosAttr: 'x',
         lineSizeAttr: 'height',
@@ -17247,15 +14561,15 @@ var HorizontalBarSeries = function (_AbstractSeries) {
 
 HorizontalBarSeries.displayName = 'HorizontalBarSeries';
 
-var _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$g(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$g(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$6(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$g(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$6(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function getScaleDistance(props, attr) {
   var scaleObject = getScaleObjectFromProps(props, attr);
@@ -17263,12 +14577,12 @@ function getScaleDistance(props, attr) {
 }
 
 var BarSeriesCanvas = function (_AbstractSeries) {
-  _inherits$g(BarSeriesCanvas, _AbstractSeries);
+  _inherits$6(BarSeriesCanvas, _AbstractSeries);
 
   function BarSeriesCanvas() {
-    _classCallCheck$g(this, BarSeriesCanvas);
+    _classCallCheck$6(this, BarSeriesCanvas);
 
-    return _possibleConstructorReturn$g(this, (BarSeriesCanvas.__proto__ || Object.getPrototypeOf(BarSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$6(this, (BarSeriesCanvas.__proto__ || Object.getPrototypeOf(BarSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$6(BarSeriesCanvas, [{
@@ -17343,32 +14657,32 @@ var BarSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 BarSeriesCanvas.displayName = 'BarSeriesCanvas';
-BarSeriesCanvas.defaultProps = _extends$k({}, AbstractSeries.defaultProps, {
+BarSeriesCanvas.defaultProps = _extends$9({}, AbstractSeries.defaultProps, {
   linePosAttr: propTypes.string.isRequired,
   valuePosAttr: propTypes.string.isRequired,
   lineSizeAttr: propTypes.string.isRequired,
   valueSizeAttr: propTypes.string.isRequired
 });
 
-BarSeriesCanvas.propTypes = _extends$k({}, AbstractSeries.propTypes);
+BarSeriesCanvas.propTypes = _extends$9({}, AbstractSeries.propTypes);
 
-var _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$h(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$h(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$7(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$h(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$7(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalBarSeriesCanvas = function (_AbstractSeries) {
-  _inherits$h(HorizontalBarSeriesCanvas, _AbstractSeries);
+  _inherits$7(HorizontalBarSeriesCanvas, _AbstractSeries);
 
   function HorizontalBarSeriesCanvas() {
-    _classCallCheck$h(this, HorizontalBarSeriesCanvas);
+    _classCallCheck$7(this, HorizontalBarSeriesCanvas);
 
-    return _possibleConstructorReturn$h(this, (HorizontalBarSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalBarSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$7(this, (HorizontalBarSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalBarSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$7(HorizontalBarSeriesCanvas, [{
@@ -17389,7 +14703,7 @@ var HorizontalBarSeriesCanvas = function (_AbstractSeries) {
   }, {
     key: 'renderLayer',
     value: function renderLayer(props, ctx) {
-      BarSeriesCanvas.renderLayer(_extends$l({}, props, {
+      BarSeriesCanvas.renderLayer(_extends$a({}, props, {
         linePosAttr: 'y',
         valuePosAttr: 'x',
         lineSizeAttr: 'height',
@@ -17412,31 +14726,31 @@ var HorizontalBarSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 HorizontalBarSeriesCanvas.displayName = 'HorizontalBarSeriesCanvas';
-HorizontalBarSeriesCanvas.propTypes = _extends$l({}, AbstractSeries.propTypes);
+HorizontalBarSeriesCanvas.propTypes = _extends$a({}, AbstractSeries.propTypes);
 
-var _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$i(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$i(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$8(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$i(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$8(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var VerticalBarSeries = function (_AbstractSeries) {
-  _inherits$i(VerticalBarSeries, _AbstractSeries);
+  _inherits$8(VerticalBarSeries, _AbstractSeries);
 
   function VerticalBarSeries() {
-    _classCallCheck$i(this, VerticalBarSeries);
+    _classCallCheck$8(this, VerticalBarSeries);
 
-    return _possibleConstructorReturn$i(this, (VerticalBarSeries.__proto__ || Object.getPrototypeOf(VerticalBarSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$8(this, (VerticalBarSeries.__proto__ || Object.getPrototypeOf(VerticalBarSeries)).apply(this, arguments));
   }
 
   _createClass$8(VerticalBarSeries, [{
     key: 'render',
     value: function render() {
-      return react.createElement(BarSeries, _extends$m({}, this.props, {
+      return react.createElement(BarSeries, _extends$b({}, this.props, {
         linePosAttr: 'x',
         valuePosAttr: 'y',
         lineSizeAttr: 'width',
@@ -17460,23 +14774,23 @@ var VerticalBarSeries = function (_AbstractSeries) {
 
 VerticalBarSeries.displayName = 'VerticalBarSeries';
 
-var _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$9 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$j(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$j(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$9(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$j(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$9(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalBarSeriesCanvas$1 = function (_AbstractSeries) {
-  _inherits$j(HorizontalBarSeriesCanvas, _AbstractSeries);
+  _inherits$9(HorizontalBarSeriesCanvas, _AbstractSeries);
 
   function HorizontalBarSeriesCanvas() {
-    _classCallCheck$j(this, HorizontalBarSeriesCanvas);
+    _classCallCheck$9(this, HorizontalBarSeriesCanvas);
 
-    return _possibleConstructorReturn$j(this, (HorizontalBarSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalBarSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$9(this, (HorizontalBarSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalBarSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$9(HorizontalBarSeriesCanvas, [{
@@ -17497,7 +14811,7 @@ var HorizontalBarSeriesCanvas$1 = function (_AbstractSeries) {
   }, {
     key: 'renderLayer',
     value: function renderLayer(props, ctx) {
-      BarSeriesCanvas.renderLayer(_extends$n({}, props, {
+      BarSeriesCanvas.renderLayer(_extends$c({}, props, {
         linePosAttr: 'x',
         valuePosAttr: 'y',
         lineSizeAttr: 'width',
@@ -17520,29 +14834,29 @@ var HorizontalBarSeriesCanvas$1 = function (_AbstractSeries) {
 }(AbstractSeries);
 
 HorizontalBarSeriesCanvas$1.displayName = 'HorizontalBarSeriesCanvas';
-HorizontalBarSeriesCanvas$1.propTypes = _extends$n({}, AbstractSeries.propTypes);
+HorizontalBarSeriesCanvas$1.propTypes = _extends$c({}, AbstractSeries.propTypes);
 
-var _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$a = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _defineProperty$3(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$k(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$a(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$k(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$a(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$k(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$a(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$2 = 'rv-xy-plot__series rv-xy-plot__series--rect';
 
 var RectSeries = function (_AbstractSeries) {
-  _inherits$k(RectSeries, _AbstractSeries);
+  _inherits$a(RectSeries, _AbstractSeries);
 
   function RectSeries() {
-    _classCallCheck$k(this, RectSeries);
+    _classCallCheck$a(this, RectSeries);
 
-    return _possibleConstructorReturn$k(this, (RectSeries.__proto__ || Object.getPrototypeOf(RectSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$a(this, (RectSeries.__proto__ || Object.getPrototypeOf(RectSeries)).apply(this, arguments));
   }
 
   _createClass$a(RectSeries, [{
@@ -17570,8 +14884,8 @@ var RectSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$o({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(RectSeries, _extends$o({}, this.props, { animation: null }))
+          _extends$d({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(RectSeries, _extends$d({}, this.props, { animation: null }))
         );
       }
 
@@ -17593,7 +14907,7 @@ var RectSeries = function (_AbstractSeries) {
           var _attrs;
 
           var attrs = (_attrs = {
-            style: _extends$o({
+            style: _extends$d({
               opacity: opacityFunctor && opacityFunctor(d),
               stroke: strokeFunctor && strokeFunctor(d),
               fill: fillFunctor && fillFunctor(d)
@@ -17614,7 +14928,7 @@ var RectSeries = function (_AbstractSeries) {
   }], [{
     key: 'propTypes',
     get: function get() {
-      return _extends$o({}, AbstractSeries.propTypes, {
+      return _extends$d({}, AbstractSeries.propTypes, {
         linePosAttr: propTypes.string,
         valuePosAttr: propTypes.string,
         lineSizeAttr: propTypes.string,
@@ -17628,29 +14942,29 @@ var RectSeries = function (_AbstractSeries) {
 
 RectSeries.displayName = 'RectSeries';
 
-var _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$b = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$l(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$b(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$l(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$b(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$l(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$b(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var VerticalRectSeries = function (_AbstractSeries) {
-  _inherits$l(VerticalRectSeries, _AbstractSeries);
+  _inherits$b(VerticalRectSeries, _AbstractSeries);
 
   function VerticalRectSeries() {
-    _classCallCheck$l(this, VerticalRectSeries);
+    _classCallCheck$b(this, VerticalRectSeries);
 
-    return _possibleConstructorReturn$l(this, (VerticalRectSeries.__proto__ || Object.getPrototypeOf(VerticalRectSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$b(this, (VerticalRectSeries.__proto__ || Object.getPrototypeOf(VerticalRectSeries)).apply(this, arguments));
   }
 
   _createClass$b(VerticalRectSeries, [{
     key: 'render',
     value: function render() {
-      return react.createElement(RectSeries, _extends$p({}, this.props, {
+      return react.createElement(RectSeries, _extends$e({}, this.props, {
         linePosAttr: 'x',
         valuePosAttr: 'y',
         lineSizeAttr: 'width',
@@ -17674,23 +14988,23 @@ var VerticalRectSeries = function (_AbstractSeries) {
 
 VerticalRectSeries.displayName = 'VerticalRectSeries';
 
-var _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$c = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$m(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$c(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$m(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$c(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$m(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$c(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var RectSeriesCanvas = function (_AbstractSeries) {
-  _inherits$m(RectSeriesCanvas, _AbstractSeries);
+  _inherits$c(RectSeriesCanvas, _AbstractSeries);
 
   function RectSeriesCanvas() {
-    _classCallCheck$m(this, RectSeriesCanvas);
+    _classCallCheck$c(this, RectSeriesCanvas);
 
-    return _possibleConstructorReturn$m(this, (RectSeriesCanvas.__proto__ || Object.getPrototypeOf(RectSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$c(this, (RectSeriesCanvas.__proto__ || Object.getPrototypeOf(RectSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$c(RectSeriesCanvas, [{
@@ -17759,32 +15073,32 @@ var RectSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 RectSeriesCanvas.displayName = 'RectSeriesCanvas';
-RectSeriesCanvas.defaultProps = _extends$q({}, AbstractSeries.defaultProps, {
+RectSeriesCanvas.defaultProps = _extends$f({}, AbstractSeries.defaultProps, {
   linePosAttr: propTypes.string.isRequired,
   valuePosAttr: propTypes.string.isRequired,
   lineSizeAttr: propTypes.string.isRequired,
   valueSizeAttr: propTypes.string.isRequired
 });
 
-RectSeriesCanvas.propTypes = _extends$q({}, AbstractSeries.propTypes);
+RectSeriesCanvas.propTypes = _extends$f({}, AbstractSeries.propTypes);
 
-var _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$d = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$n(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$d(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$n(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$d(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$n(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$d(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalRectSeriesCanvas = function (_AbstractSeries) {
-  _inherits$n(HorizontalRectSeriesCanvas, _AbstractSeries);
+  _inherits$d(HorizontalRectSeriesCanvas, _AbstractSeries);
 
   function HorizontalRectSeriesCanvas() {
-    _classCallCheck$n(this, HorizontalRectSeriesCanvas);
+    _classCallCheck$d(this, HorizontalRectSeriesCanvas);
 
-    return _possibleConstructorReturn$n(this, (HorizontalRectSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalRectSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$d(this, (HorizontalRectSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalRectSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$d(HorizontalRectSeriesCanvas, [{
@@ -17805,7 +15119,7 @@ var HorizontalRectSeriesCanvas = function (_AbstractSeries) {
   }, {
     key: 'renderLayer',
     value: function renderLayer(props, ctx) {
-      RectSeriesCanvas.renderLayer(_extends$r({}, props, {
+      RectSeriesCanvas.renderLayer(_extends$g({}, props, {
         linePosAttr: 'x',
         valuePosAttr: 'y',
         lineSizeAttr: 'width',
@@ -17828,31 +15142,31 @@ var HorizontalRectSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 HorizontalRectSeriesCanvas.displayName = 'HorizontalRectSeriesCanvas';
-HorizontalRectSeriesCanvas.propTypes = _extends$r({}, AbstractSeries.propTypes);
+HorizontalRectSeriesCanvas.propTypes = _extends$g({}, AbstractSeries.propTypes);
 
-var _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$e = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$o(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$e(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$o(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$e(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$o(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$e(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalRectSeries = function (_AbstractSeries) {
-  _inherits$o(HorizontalRectSeries, _AbstractSeries);
+  _inherits$e(HorizontalRectSeries, _AbstractSeries);
 
   function HorizontalRectSeries() {
-    _classCallCheck$o(this, HorizontalRectSeries);
+    _classCallCheck$e(this, HorizontalRectSeries);
 
-    return _possibleConstructorReturn$o(this, (HorizontalRectSeries.__proto__ || Object.getPrototypeOf(HorizontalRectSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$e(this, (HorizontalRectSeries.__proto__ || Object.getPrototypeOf(HorizontalRectSeries)).apply(this, arguments));
   }
 
   _createClass$e(HorizontalRectSeries, [{
     key: 'render',
     value: function render() {
-      return react.createElement(RectSeries, _extends$s({}, this.props, {
+      return react.createElement(RectSeries, _extends$h({}, this.props, {
         linePosAttr: 'y',
         valuePosAttr: 'x',
         lineSizeAttr: 'height',
@@ -17876,23 +15190,23 @@ var HorizontalRectSeries = function (_AbstractSeries) {
 
 HorizontalRectSeries.displayName = 'HorizontalRectSeries';
 
-var _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$f = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$p(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$f(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$p(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$f(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$p(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$f(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var HorizontalRectSeriesCanvas$1 = function (_AbstractSeries) {
-  _inherits$p(HorizontalRectSeriesCanvas, _AbstractSeries);
+  _inherits$f(HorizontalRectSeriesCanvas, _AbstractSeries);
 
   function HorizontalRectSeriesCanvas() {
-    _classCallCheck$p(this, HorizontalRectSeriesCanvas);
+    _classCallCheck$f(this, HorizontalRectSeriesCanvas);
 
-    return _possibleConstructorReturn$p(this, (HorizontalRectSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalRectSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$f(this, (HorizontalRectSeriesCanvas.__proto__ || Object.getPrototypeOf(HorizontalRectSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$f(HorizontalRectSeriesCanvas, [{
@@ -17913,7 +15227,7 @@ var HorizontalRectSeriesCanvas$1 = function (_AbstractSeries) {
   }, {
     key: 'renderLayer',
     value: function renderLayer(props, ctx) {
-      RectSeriesCanvas.renderLayer(_extends$t({}, props, {
+      RectSeriesCanvas.renderLayer(_extends$i({}, props, {
         linePosAttr: 'y',
         valuePosAttr: 'x',
         lineSizeAttr: 'height',
@@ -17936,17 +15250,17 @@ var HorizontalRectSeriesCanvas$1 = function (_AbstractSeries) {
 }(AbstractSeries);
 
 HorizontalRectSeriesCanvas$1.displayName = 'HorizontalRectSeriesCanvas';
-HorizontalRectSeriesCanvas$1.propTypes = _extends$t({}, AbstractSeries.propTypes);
+HorizontalRectSeriesCanvas$1.propTypes = _extends$i({}, AbstractSeries.propTypes);
 
-var _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$g = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$q(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$g(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$q(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$g(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$q(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$g(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 var predefinedClassName$3 = 'rv-xy-plot__series rv-xy-plot__series--label';
 
 var getTextAnchor = function getTextAnchor(labelAnchorX, leftOfMiddle) {
@@ -17957,12 +15271,12 @@ var getAlignmentBaseline = function getAlignmentBaseline(labelAnchorY, aboveMidd
 };
 
 var LabelSeries = function (_AbstractSeries) {
-  _inherits$q(LabelSeries, _AbstractSeries);
+  _inherits$g(LabelSeries, _AbstractSeries);
 
   function LabelSeries() {
-    _classCallCheck$q(this, LabelSeries);
+    _classCallCheck$g(this, LabelSeries);
 
-    return _possibleConstructorReturn$q(this, (LabelSeries.__proto__ || Object.getPrototypeOf(LabelSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$g(this, (LabelSeries.__proto__ || Object.getPrototypeOf(LabelSeries)).apply(this, arguments));
   }
 
   _createClass$g(LabelSeries, [{
@@ -17993,8 +15307,8 @@ var LabelSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$u({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(LabelSeries, _extends$u({}, this.props, { animation: null, _data: data }))
+          _extends$j({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(LabelSeries, _extends$j({}, this.props, { animation: null, _data: data }))
         );
       }
 
@@ -18026,7 +15340,7 @@ var LabelSeries = function (_AbstractSeries) {
 
           var hasRotationValueSet = d.rotation === 0 || d.rotation;
           var labelRotation = hasRotationValueSet ? d.rotation : rotation;
-          var attrs = _extends$u({
+          var attrs = _extends$j({
             alignmentBaseline: getAlignmentBaseline(labelAnchorY, aboveMiddle),
             className: 'rv-xy-plot__series--label-text',
             key: i,
@@ -18084,7 +15398,7 @@ LabelSeries.propTypes = {
   labelAnchorX: propTypes.string,
   labelAnchorY: propTypes.string
 };
-LabelSeries.defaultProps = _extends$u({}, AbstractSeries.defaultProps, {
+LabelSeries.defaultProps = _extends$j({}, AbstractSeries.defaultProps, {
   animation: false,
   rotation: 0,
   getLabel: function getLabel(d) {
@@ -18093,32 +15407,32 @@ LabelSeries.defaultProps = _extends$u({}, AbstractSeries.defaultProps, {
 });
 LabelSeries.displayName = 'LabelSeries';
 
-var _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$h = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$r(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$h(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$r(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$h(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$r(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$h(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$4 = 'rv-xy-plot__series rv-xy-plot__series--polygon';
 var DEFAULT_COLOR$1 = '#12939A';
 
-var generatePath$1 = function generatePath(data, xFunctor, yFunctor) {
+var generatePath = function generatePath(data, xFunctor, yFunctor) {
   return data.reduce(function (res, row, i) {
     return res + ' ' + (i ? 'L' : 'M') + xFunctor(row) + ' ' + yFunctor(row);
   }, '') + ' Z';
 };
 
 var PolygonSeries = function (_AbstractSeries) {
-  _inherits$r(PolygonSeries, _AbstractSeries);
+  _inherits$h(PolygonSeries, _AbstractSeries);
 
   function PolygonSeries() {
-    _classCallCheck$r(this, PolygonSeries);
+    _classCallCheck$h(this, PolygonSeries);
 
-    return _possibleConstructorReturn$r(this, (PolygonSeries.__proto__ || Object.getPrototypeOf(PolygonSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$h(this, (PolygonSeries.__proto__ || Object.getPrototypeOf(PolygonSeries)).apply(this, arguments));
   }
 
   _createClass$h(PolygonSeries, [{
@@ -18143,8 +15457,8 @@ var PolygonSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$v({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(PolygonSeries, _extends$v({}, this.props, { animation: null }))
+          _extends$k({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(PolygonSeries, _extends$k({}, this.props, { animation: null }))
         );
       }
       var xFunctor = this._getAttributeFunctor('x');
@@ -18162,14 +15476,14 @@ var PolygonSeries = function (_AbstractSeries) {
         onContextMenu: this._seriesRightClickHandler,
         fill: color || DEFAULT_COLOR$1,
         style: style,
-        d: generatePath$1(data, xFunctor, yFunctor),
+        d: generatePath(data, xFunctor, yFunctor),
         transform: 'translate(' + marginLeft + ',' + marginTop + ')'
       });
     }
   }], [{
     key: 'propTypes',
     get: function get() {
-      return _extends$v({}, AbstractSeries.propTypes);
+      return _extends$k({}, AbstractSeries.propTypes);
     }
   }]);
 
@@ -18178,26 +15492,26 @@ var PolygonSeries = function (_AbstractSeries) {
 
 PolygonSeries.displayName = 'PolygonSeries';
 
-var _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$i = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$s(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$i(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$s(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$i(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$s(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$i(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$5 = 'rv-xy-plot__series rv-xy-plot__series--mark';
 var DEFAULT_STROKE_WIDTH = 1;
 
 var MarkSeries = function (_AbstractSeries) {
-  _inherits$s(MarkSeries, _AbstractSeries);
+  _inherits$i(MarkSeries, _AbstractSeries);
 
   function MarkSeries() {
-    _classCallCheck$s(this, MarkSeries);
+    _classCallCheck$i(this, MarkSeries);
 
-    return _possibleConstructorReturn$s(this, (MarkSeries.__proto__ || Object.getPrototypeOf(MarkSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$i(this, (MarkSeries.__proto__ || Object.getPrototypeOf(MarkSeries)).apply(this, arguments));
   }
 
   _createClass$i(MarkSeries, [{
@@ -18217,7 +15531,7 @@ var MarkSeries = function (_AbstractSeries) {
         r: size ? size(d) : DEFAULT_SIZE,
         cx: x(d),
         cy: y(d),
-        style: _extends$w({
+        style: _extends$l({
           opacity: opacity ? opacity(d) : DEFAULT_OPACITY,
           stroke: stroke && stroke(d),
           fill: fill && fill(d),
@@ -18255,7 +15569,7 @@ var MarkSeries = function (_AbstractSeries) {
 
 
       if (this.props.nullAccessor) {
-        warning$2('nullAccessor has been renamed to getNull', true);
+        warning('nullAccessor has been renamed to getNull', true);
       }
 
       var getNull = this.props.nullAccessor || this.props.getNull;
@@ -18267,8 +15581,8 @@ var MarkSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$w({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(MarkSeries, _extends$w({}, this.props, { animation: null }))
+          _extends$l({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(MarkSeries, _extends$l({}, this.props, { animation: null }))
         );
       }
 
@@ -18298,7 +15612,7 @@ var MarkSeries = function (_AbstractSeries) {
 }(AbstractSeries);
 
 MarkSeries.displayName = 'MarkSeries';
-MarkSeries.propTypes = _extends$w({}, AbstractSeries.propTypes, {
+MarkSeries.propTypes = _extends$l({}, AbstractSeries.propTypes, {
   getNull: propTypes.func,
   strokeWidth: propTypes.number
 });
@@ -18308,23 +15622,23 @@ MarkSeries.defaultProps = {
   }
 };
 
-var _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$j = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$t(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$j(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$t(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$j(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$t(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$j(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MarkSeriesCanvas = function (_AbstractSeries) {
-  _inherits$t(MarkSeriesCanvas, _AbstractSeries);
+  _inherits$j(MarkSeriesCanvas, _AbstractSeries);
 
   function MarkSeriesCanvas() {
-    _classCallCheck$t(this, MarkSeriesCanvas);
+    _classCallCheck$j(this, MarkSeriesCanvas);
 
-    return _possibleConstructorReturn$t(this, (MarkSeriesCanvas.__proto__ || Object.getPrototypeOf(MarkSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$j(this, (MarkSeriesCanvas.__proto__ || Object.getPrototypeOf(MarkSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$j(MarkSeriesCanvas, [{
@@ -18378,17 +15692,17 @@ var MarkSeriesCanvas = function (_AbstractSeries) {
 
 MarkSeriesCanvas.displayName = 'MarkSeriesCanvas';
 
-MarkSeriesCanvas.propTypes = _extends$x({}, AbstractSeries.propTypes);
+MarkSeriesCanvas.propTypes = _extends$m({}, AbstractSeries.propTypes);
 
 var _createClass$k = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$u(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$k(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$u(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$k(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$u(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$k(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$6 = 'rv-xy-plot__series rv-xy-plot__series--whisker';
 var DEFAULT_STROKE_WIDTH$1 = 1;
@@ -18433,7 +15747,7 @@ var renderWhiskerMark = function renderWhiskerMark(whiskerMarkProps) {
       return null;
     }
 
-    var styleAttr = _extends$y({
+    var styleAttr = _extends$n({
       opacity: opacityFunctor ? opacityFunctor(d) : DEFAULT_OPACITY,
       stroke: strokeFunctor && strokeFunctor(d),
       strokeWidth: strokeWidth || DEFAULT_STROKE_WIDTH$1
@@ -18537,12 +15851,12 @@ var renderWhiskerMark = function renderWhiskerMark(whiskerMarkProps) {
 };
 
 var WhiskerSeries = function (_AbstractSeries) {
-  _inherits$u(WhiskerSeries, _AbstractSeries);
+  _inherits$k(WhiskerSeries, _AbstractSeries);
 
   function WhiskerSeries() {
-    _classCallCheck$u(this, WhiskerSeries);
+    _classCallCheck$k(this, WhiskerSeries);
 
-    return _possibleConstructorReturn$u(this, (WhiskerSeries.__proto__ || Object.getPrototypeOf(WhiskerSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$k(this, (WhiskerSeries.__proto__ || Object.getPrototypeOf(WhiskerSeries)).apply(this, arguments));
   }
 
   _createClass$k(WhiskerSeries, [{
@@ -18564,8 +15878,8 @@ var WhiskerSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$y({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(WhiskerSeries, _extends$y({}, this.props, { animation: null }))
+          _extends$n({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(WhiskerSeries, _extends$n({}, this.props, { animation: null }))
         );
       }
 
@@ -18599,34 +15913,34 @@ var WhiskerSeries = function (_AbstractSeries) {
 }(AbstractSeries);
 
 WhiskerSeries.displayName = 'WhiskerSeries';
-WhiskerSeries.propTypes = _extends$y({}, AbstractSeries.propTypes, {
+WhiskerSeries.propTypes = _extends$n({}, AbstractSeries.propTypes, {
   strokeWidth: propTypes.number
 });
-WhiskerSeries.defaultProps = _extends$y({}, AbstractSeries.defaultProps, {
+WhiskerSeries.defaultProps = _extends$n({}, AbstractSeries.defaultProps, {
   crossBarWidth: DEFAULT_CROSS_BAR_WIDTH,
   size: 0,
   strokeWidth: DEFAULT_STROKE_WIDTH$1
 });
 
-var _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$l = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$v(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$l(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$v(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$l(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$v(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$l(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$7 = 'rv-xy-plot__series rv-xy-plot__series--heatmap';
 
 var HeatmapSeries = function (_AbstractSeries) {
-  _inherits$v(HeatmapSeries, _AbstractSeries);
+  _inherits$l(HeatmapSeries, _AbstractSeries);
 
   function HeatmapSeries() {
-    _classCallCheck$v(this, HeatmapSeries);
+    _classCallCheck$l(this, HeatmapSeries);
 
-    return _possibleConstructorReturn$v(this, (HeatmapSeries.__proto__ || Object.getPrototypeOf(HeatmapSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$l(this, (HeatmapSeries.__proto__ || Object.getPrototypeOf(HeatmapSeries)).apply(this, arguments));
   }
 
   _createClass$l(HeatmapSeries, [{
@@ -18648,12 +15962,12 @@ var HeatmapSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$z({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(HeatmapSeries, _extends$z({}, this.props, { animation: null }))
+          _extends$o({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(HeatmapSeries, _extends$o({}, this.props, { animation: null }))
         );
       }
 
-      var _rectStyle$style = _extends$z({ rectStyle: {} }, style),
+      var _rectStyle$style = _extends$o({ rectStyle: {} }, style),
           rectStyle = _rectStyle$style.rectStyle;
 
       var x = this._getAttributeFunctor('x');
@@ -18670,8 +15984,8 @@ var HeatmapSeries = function (_AbstractSeries) {
           transform: 'translate(' + marginLeft + ',' + marginTop + ')'
         },
         data.map(function (d, i) {
-          var attrs = _extends$z({
-            style: _extends$z({
+          var attrs = _extends$o({
+            style: _extends$o({
               stroke: stroke && stroke(d),
               fill: fill && fill(d),
               opacity: opacity && opacity(d)
@@ -18710,7 +16024,7 @@ var HeatmapSeries = function (_AbstractSeries) {
   return HeatmapSeries;
 }(AbstractSeries);
 
-HeatmapSeries.propTypes = _extends$z({}, AbstractSeries.propTypes);
+HeatmapSeries.propTypes = _extends$o({}, AbstractSeries.propTypes);
 
 HeatmapSeries.displayName = 'HeatmapSeries';
 
@@ -18827,15 +16141,15 @@ function hexbin() {
   return hexbin.radius(1);
 }
 
-var _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$m = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$w(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$m(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$w(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$m(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$w(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$m(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _toConsumableArray$1(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -18853,12 +16167,12 @@ function getColorDomain(_ref, hexes) {
 }
 
 var HexbinSeries = function (_AbstractSeries) {
-  _inherits$w(HexbinSeries, _AbstractSeries);
+  _inherits$m(HexbinSeries, _AbstractSeries);
 
   function HexbinSeries() {
-    _classCallCheck$w(this, HexbinSeries);
+    _classCallCheck$m(this, HexbinSeries);
 
-    return _possibleConstructorReturn$w(this, (HexbinSeries.__proto__ || Object.getPrototypeOf(HexbinSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$m(this, (HexbinSeries.__proto__ || Object.getPrototypeOf(HexbinSeries)).apply(this, arguments));
   }
 
   _createClass$m(HexbinSeries, [{
@@ -18889,8 +16203,8 @@ var HexbinSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$A({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(HexbinSeries, _extends$A({}, this.props, { animation: null }))
+          _extends$p({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(HexbinSeries, _extends$p({}, this.props, { animation: null }))
         );
       }
       var x = this._getAttributeFunctor('x');
@@ -18943,7 +16257,7 @@ var HexbinSeries = function (_AbstractSeries) {
   return HexbinSeries;
 }(AbstractSeries);
 
-HexbinSeries.propTypes = _extends$A({}, AbstractSeries.propTypes, {
+HexbinSeries.propTypes = _extends$p({}, AbstractSeries.propTypes, {
   radius: propTypes.number
 });
 
@@ -19004,7 +16318,7 @@ function within(p, q, r) {
   return p <= q && q <= r || r <= q && q <= p;
 }
 
-function noop$3() {}
+function noop$2() {}
 
 var cases = [
   [],
@@ -19196,7 +16510,7 @@ function contours() {
   };
 
   contours.smooth = function(_) {
-    return arguments.length ? (smooth = _ ? smoothLinear : noop$3, contours) : smooth === smoothLinear;
+    return arguments.length ? (smooth = _ ? smoothLinear : noop$2, contours) : smooth === smoothLinear;
   };
 
   return contours;
@@ -19421,7 +16735,7 @@ var tau$2 = pi$2 * 2;
 var abs$1 = Math.abs;
 var sqrt$2 = Math.sqrt;
 
-function noop$4() {}
+function noop$3() {}
 
 function streamGeometry(geometry, stream) {
   if (geometry && streamGeometryType.hasOwnProperty(geometry.type)) {
@@ -19515,15 +16829,15 @@ var areaSum$1 = adder(),
     y0$1;
 
 var areaStream$1 = {
-  point: noop$4,
-  lineStart: noop$4,
-  lineEnd: noop$4,
+  point: noop$3,
+  lineStart: noop$3,
+  lineEnd: noop$3,
   polygonStart: function() {
     areaStream$1.lineStart = areaRingStart$1;
     areaStream$1.lineEnd = areaRingEnd$1;
   },
   polygonEnd: function() {
-    areaStream$1.lineStart = areaStream$1.lineEnd = areaStream$1.point = noop$4;
+    areaStream$1.lineStart = areaStream$1.lineEnd = areaStream$1.point = noop$3;
     areaSum$1.add(abs$1(areaRingSum$1));
     areaRingSum$1.reset();
   },
@@ -19559,10 +16873,10 @@ var x0$2 = Infinity,
 
 var boundsStream$1 = {
   point: boundsPoint$1,
-  lineStart: noop$4,
-  lineEnd: noop$4,
-  polygonStart: noop$4,
-  polygonEnd: noop$4,
+  lineStart: noop$3,
+  lineEnd: noop$3,
+  polygonStart: noop$3,
+  polygonEnd: noop$3,
   result: function() {
     var bounds = [[x0$2, y0$2], [x1, y1]];
     x1 = y1 = -(y0$2 = x0$2 = Infinity);
@@ -19714,7 +17028,7 @@ PathContext.prototype = {
       }
     }
   },
-  result: noop$4
+  result: noop$3
 };
 
 var lengthSum$1 = adder(),
@@ -19725,13 +17039,13 @@ var lengthSum$1 = adder(),
     y0$4;
 
 var lengthStream$1 = {
-  point: noop$4,
+  point: noop$3,
   lineStart: function() {
     lengthStream$1.point = lengthPointFirst$1;
   },
   lineEnd: function() {
     if (lengthRing) lengthPoint$1(x00$2, y00$2);
-    lengthStream$1.point = noop$4;
+    lengthStream$1.point = noop$3;
   },
   polygonStart: function() {
     lengthRing = true;
@@ -19870,15 +17184,15 @@ function geoPath(projection, context) {
   return path.projection(projection).context(context);
 }
 
-var _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$n = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$x(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$n(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$x(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$n(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$x(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$n(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$9 = 'rv-xy-plot__series rv-xy-plot__series--contour';
 
@@ -19892,12 +17206,12 @@ function getDomain(data) {
 }
 
 var ContourSeries = function (_AbstractSeries) {
-  _inherits$x(ContourSeries, _AbstractSeries);
+  _inherits$n(ContourSeries, _AbstractSeries);
 
   function ContourSeries() {
-    _classCallCheck$x(this, ContourSeries);
+    _classCallCheck$n(this, ContourSeries);
 
-    return _possibleConstructorReturn$x(this, (ContourSeries.__proto__ || Object.getPrototypeOf(ContourSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$n(this, (ContourSeries.__proto__ || Object.getPrototypeOf(ContourSeries)).apply(this, arguments));
   }
 
   _createClass$n(ContourSeries, [{
@@ -19923,8 +17237,8 @@ var ContourSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$B({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(ContourSeries, _extends$B({}, this.props, { animation: null }))
+          _extends$q({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(ContourSeries, _extends$q({}, this.props, { animation: null }))
         );
       }
 
@@ -19955,7 +17269,7 @@ var ContourSeries = function (_AbstractSeries) {
             className: 'rv-xy-plot__series--contour-line',
             key: 'rv-xy-plot__series--contour-line-' + index,
             d: geo(polygon),
-            style: _extends$B({
+            style: _extends$q({
               fill: colorScale(polygon.value)
             }, style)
           });
@@ -19967,7 +17281,7 @@ var ContourSeries = function (_AbstractSeries) {
   return ContourSeries;
 }(AbstractSeries);
 
-ContourSeries.propTypes = _extends$B({}, AbstractSeries.propTypes, {
+ContourSeries.propTypes = _extends$q({}, AbstractSeries.propTypes, {
   animation: propTypes.bool,
   bandwidth: propTypes.number,
   className: propTypes.string,
@@ -19976,20 +17290,20 @@ ContourSeries.propTypes = _extends$B({}, AbstractSeries.propTypes, {
   style: propTypes.object
 });
 
-ContourSeries.defaultProps = _extends$B({}, AbstractSeries.defaultProps, {
+ContourSeries.defaultProps = _extends$q({}, AbstractSeries.defaultProps, {
   bandwidth: 40,
   style: {}
 });
 
 var _createClass$o = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$y(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$o(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$y(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$o(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$y(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$o(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _toConsumableArray$2(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -20050,7 +17364,7 @@ function getInnerComponent(_ref) {
       propsSize = _ref.propsSize;
   var size = customComponent.size;
 
-  var aggStyle = _extends$C({}, style, customComponent.style || {});
+  var aggStyle = _extends$r({}, style, customComponent.style || {});
   var innerComponent = customComponent.customComponent;
   if (!innerComponent && typeof defaultType === 'string') {
     return predefinedComponents(defaultType, size || propsSize, aggStyle);
@@ -20067,12 +17381,12 @@ function getInnerComponent(_ref) {
 }
 
 var CustomSVGSeries = function (_AbstractSeries) {
-  _inherits$y(CustomSVGSeries, _AbstractSeries);
+  _inherits$o(CustomSVGSeries, _AbstractSeries);
 
   function CustomSVGSeries() {
-    _classCallCheck$y(this, CustomSVGSeries);
+    _classCallCheck$o(this, CustomSVGSeries);
 
-    return _possibleConstructorReturn$y(this, (CustomSVGSeries.__proto__ || Object.getPrototypeOf(CustomSVGSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$o(this, (CustomSVGSeries.__proto__ || Object.getPrototypeOf(CustomSVGSeries)).apply(this, arguments));
   }
 
   _createClass$o(CustomSVGSeries, [{
@@ -20100,8 +17414,8 @@ var CustomSVGSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$C({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(CustomSVGSeries, _extends$C({}, this.props, { animation: false }))
+          _extends$r({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(CustomSVGSeries, _extends$r({}, this.props, { animation: false }))
         );
       }
 
@@ -20166,32 +17480,32 @@ CustomSVGSeries.propTypes = {
   onValueMouseOut: propTypes.func
 };
 
-CustomSVGSeries.defaultProps = _extends$C({}, AbstractSeries.defaultProps, {
+CustomSVGSeries.defaultProps = _extends$r({}, AbstractSeries.defaultProps, {
   animation: false,
   customComponent: 'circle',
   style: {},
   size: 2
 });
 
-var _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$p = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$z(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$p(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$z(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$p(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$z(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$p(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$b = 'rv-xy-plot__series rv-xy-plot__series--line';
 
 var AreaSeries = function (_AbstractSeries) {
-  _inherits$z(AreaSeries, _AbstractSeries);
+  _inherits$p(AreaSeries, _AbstractSeries);
 
   function AreaSeries() {
-    _classCallCheck$z(this, AreaSeries);
+    _classCallCheck$p(this, AreaSeries);
 
-    return _possibleConstructorReturn$z(this, (AreaSeries.__proto__ || Object.getPrototypeOf(AreaSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$p(this, (AreaSeries.__proto__ || Object.getPrototypeOf(AreaSeries)).apply(this, arguments));
   }
 
   _createClass$p(AreaSeries, [{
@@ -20223,7 +17537,7 @@ var AreaSeries = function (_AbstractSeries) {
 
 
       if (this.props.nullAccessor) {
-        warning$2('nullAccessor has been renamed to getNull', true);
+        warning('nullAccessor has been renamed to getNull', true);
       }
 
       if (!data) {
@@ -20233,8 +17547,8 @@ var AreaSeries = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$D({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
-          react.createElement(AreaSeries, _extends$D({}, this.props, { animation: null }))
+          _extends$s({}, this.props, { animatedProps: ANIMATED_SERIES_PROPS }),
+          react.createElement(AreaSeries, _extends$s({}, this.props, { animation: null }))
         );
       }
 
@@ -20256,7 +17570,7 @@ var AreaSeries = function (_AbstractSeries) {
         onMouseOut: this._seriesMouseOutHandler,
         onClick: this._seriesClickHandler,
         onContextMenu: this._seriesRightClickHandler,
-        style: _extends$D({
+        style: _extends$s({
           opacity: opacity,
           stroke: stroke,
           fill: fill
@@ -20269,10 +17583,10 @@ var AreaSeries = function (_AbstractSeries) {
 }(AbstractSeries);
 
 AreaSeries.displayName = 'AreaSeries';
-AreaSeries.propTypes = _extends$D({}, AbstractSeries.propTypes, {
+AreaSeries.propTypes = _extends$s({}, AbstractSeries.propTypes, {
   getNull: propTypes.func
 });
-AreaSeries.defaultProps = _extends$D({}, AbstractSeries.defaultProps, {
+AreaSeries.defaultProps = _extends$s({}, AbstractSeries.defaultProps, {
   getNull: function getNull() {
     return true;
   }
@@ -20280,18 +17594,18 @@ AreaSeries.defaultProps = _extends$D({}, AbstractSeries.defaultProps, {
 
 var _createClass$q = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$A(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$q(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$A(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$q(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$A(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$q(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$c = 'rv-xy-plot__series rv-xy-plot__series--arc';
 var ATTRIBUTES = ['radius', 'angle'];
 
-var defaultProps$1 = _extends$E({}, AbstractSeries.defaultProps, {
+var defaultProps$1 = _extends$t({}, AbstractSeries.defaultProps, {
   center: { x: 0, y: 0 },
   arcClassName: '',
   className: '',
@@ -20314,7 +17628,7 @@ function modifyRow(row) {
 
   var truedAngle = -1 * angle + Math.PI / 2;
   var truedAngle0 = -1 * angle0 + Math.PI / 2;
-  return _extends$E({}, row, {
+  return _extends$t({}, row, {
     x: radius * Math.cos(truedAngle),
     y: radius * Math.sin(truedAngle),
     angle: truedAngle,
@@ -20323,12 +17637,12 @@ function modifyRow(row) {
 }
 
 var ArcSeries = function (_AbstractSeries) {
-  _inherits$A(ArcSeries, _AbstractSeries);
+  _inherits$q(ArcSeries, _AbstractSeries);
 
   function ArcSeries(props) {
-    _classCallCheck$A(this, ArcSeries);
+    _classCallCheck$q(this, ArcSeries);
 
-    var _this = _possibleConstructorReturn$A(this, (ArcSeries.__proto__ || Object.getPrototypeOf(ArcSeries)).call(this, props));
+    var _this = _possibleConstructorReturn$q(this, (ArcSeries.__proto__ || Object.getPrototypeOf(ArcSeries)).call(this, props));
 
     var scaleProps = _this._getAllScaleProps(props);
     _this.state = { scaleProps: scaleProps };
@@ -20354,9 +17668,9 @@ var ArcSeries = function (_AbstractSeries) {
     value: function _getAllScaleProps(props) {
       var defaultScaleProps = this._getDefaultScaleProps(props);
       var userScaleProps = extractScalePropsFromProps(props, ATTRIBUTES);
-      var missingScaleProps = getMissingScaleProps(_extends$E({}, defaultScaleProps, userScaleProps), props.data, ATTRIBUTES);
+      var missingScaleProps = getMissingScaleProps(_extends$t({}, defaultScaleProps, userScaleProps), props.data, ATTRIBUTES);
 
-      return _extends$E({}, defaultScaleProps, userScaleProps, missingScaleProps);
+      return _extends$t({}, defaultScaleProps, userScaleProps, missingScaleProps);
     }
 
     /**
@@ -20404,24 +17718,24 @@ var ArcSeries = function (_AbstractSeries) {
 
       if (animation) {
         var cloneData = data.map(function (d) {
-          return _extends$E({}, d);
+          return _extends$t({}, d);
         });
         return react.createElement(
           'g',
           { className: 'rv-xy-plot__series--arc__animation-wrapper' },
           react.createElement(
             Animation,
-            _extends$E({}, this.props, {
+            _extends$t({}, this.props, {
               animatedProps: ANIMATED_SERIES_PROPS,
               data: cloneData
             }),
-            react.createElement(ArcSeries, _extends$E({}, this.props, {
+            react.createElement(ArcSeries, _extends$t({}, this.props, {
               animation: null,
               disableSeries: true,
               data: cloneData
             }))
           ),
-          react.createElement(ArcSeries, _extends$E({}, this.props, {
+          react.createElement(ArcSeries, _extends$t({}, this.props, {
             animation: null,
             hideSeries: true,
             style: { stroke: 'red' }
@@ -20468,7 +17782,7 @@ var ArcSeries = function (_AbstractSeries) {
           var rowStyle = row.style || {};
           var rowClassName = row.className || '';
           return react.createElement('path', {
-            style: _extends$E({
+            style: _extends$t({
               opacity: opacity && opacity(row),
               stroke: stroke && stroke(row),
               fill: fill && fill(row)
@@ -20497,7 +17811,7 @@ var ArcSeries = function (_AbstractSeries) {
   return ArcSeries;
 }(AbstractSeries);
 
-ArcSeries.propTypes = _extends$E({}, AbstractSeries.propTypes, getScalePropTypesByAttribute('radius'), getScalePropTypesByAttribute('angle'), {
+ArcSeries.propTypes = _extends$t({}, AbstractSeries.propTypes, getScalePropTypesByAttribute('radius'), getScalePropTypesByAttribute('angle'), {
   center: propTypes.shape({
     x: propTypes.number,
     y: propTypes.number
@@ -20510,26 +17824,26 @@ ArcSeries.displayName = 'ArcSeries';
 
 var _createClass$r = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$B(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$r(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$B(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$r(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$B(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$r(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var propTypes$3 = _extends$F({}, LineSeries.propTypes, {
+var propTypes$3 = _extends$u({}, LineSeries.propTypes, {
   lineStyle: propTypes.object,
   markStyle: propTypes.object
 });
 
 var LineMarkSeries = function (_AbstractSeries) {
-  _inherits$B(LineMarkSeries, _AbstractSeries);
+  _inherits$r(LineMarkSeries, _AbstractSeries);
 
   function LineMarkSeries() {
-    _classCallCheck$B(this, LineMarkSeries);
+    _classCallCheck$r(this, LineMarkSeries);
 
-    return _possibleConstructorReturn$B(this, (LineMarkSeries.__proto__ || Object.getPrototypeOf(LineMarkSeries)).apply(this, arguments));
+    return _possibleConstructorReturn$r(this, (LineMarkSeries.__proto__ || Object.getPrototypeOf(LineMarkSeries)).apply(this, arguments));
   }
 
   _createClass$r(LineMarkSeries, [{
@@ -20543,14 +17857,14 @@ var LineMarkSeries = function (_AbstractSeries) {
       return react.createElement(
         'g',
         { className: 'rv-xy-plot__series rv-xy-plot__series--linemark' },
-        react.createElement(LineSeries, _extends$F({}, this.props, { style: _extends$F({}, style, lineStyle) })),
-        react.createElement(MarkSeries, _extends$F({}, this.props, { style: _extends$F({}, style, markStyle) }))
+        react.createElement(LineSeries, _extends$u({}, this.props, { style: _extends$u({}, style, lineStyle) })),
+        react.createElement(MarkSeries, _extends$u({}, this.props, { style: _extends$u({}, style, markStyle) }))
       );
     }
   }], [{
     key: 'defaultProps',
     get: function get() {
-      return _extends$F({}, LineSeries.defaultProps, {
+      return _extends$u({}, LineSeries.defaultProps, {
         lineStyle: {},
         markStyle: {}
       });
@@ -20563,23 +17877,23 @@ var LineMarkSeries = function (_AbstractSeries) {
 LineMarkSeries.displayName = 'LineMarkSeries';
 LineMarkSeries.propTypes = propTypes$3;
 
-var _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$s = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$C(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$s(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$C(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$s(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$C(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$s(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var LineMarkSeriesCanvas = function (_AbstractSeries) {
-  _inherits$C(LineMarkSeriesCanvas, _AbstractSeries);
+  _inherits$s(LineMarkSeriesCanvas, _AbstractSeries);
 
   function LineMarkSeriesCanvas() {
-    _classCallCheck$C(this, LineMarkSeriesCanvas);
+    _classCallCheck$s(this, LineMarkSeriesCanvas);
 
-    return _possibleConstructorReturn$C(this, (LineMarkSeriesCanvas.__proto__ || Object.getPrototypeOf(LineMarkSeriesCanvas)).apply(this, arguments));
+    return _possibleConstructorReturn$s(this, (LineMarkSeriesCanvas.__proto__ || Object.getPrototypeOf(LineMarkSeriesCanvas)).apply(this, arguments));
   }
 
   _createClass$s(LineMarkSeriesCanvas, [{
@@ -20609,17 +17923,17 @@ var LineMarkSeriesCanvas = function (_AbstractSeries) {
 }(AbstractSeries);
 
 LineMarkSeriesCanvas.displayName = 'LineMarkSeriesCanvas';
-LineMarkSeriesCanvas.propTypes = _extends$G({}, AbstractSeries.propTypes);
+LineMarkSeriesCanvas.propTypes = _extends$v({}, AbstractSeries.propTypes);
 
-var _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$t = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$D(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$t(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$D(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$t(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$D(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$t(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /*
  * Hint provides two options for placement of hint:
@@ -20672,12 +17986,12 @@ function defaultFormat(value) {
 }
 
 var Hint = function (_PureComponent) {
-  _inherits$D(Hint, _PureComponent);
+  _inherits$t(Hint, _PureComponent);
 
   function Hint() {
-    _classCallCheck$D(this, Hint);
+    _classCallCheck$t(this, Hint);
 
-    return _possibleConstructorReturn$D(this, (Hint.__proto__ || Object.getPrototypeOf(Hint)).apply(this, arguments));
+    return _possibleConstructorReturn$t(this, (Hint.__proto__ || Object.getPrototypeOf(Hint)).apply(this, arguments));
   }
 
   _createClass$t(Hint, [{
@@ -20741,7 +18055,7 @@ var Hint = function (_PureComponent) {
   }, {
     key: '_getAlignStyle',
     value: function _getAlignStyle(align, x, y) {
-      return _extends$H({}, this._getXCSS(align.horizontal, x), this._getYCSS(align.vertical, y));
+      return _extends$w({}, this._getXCSS(align.horizontal, x), this._getYCSS(align.vertical, y));
     }
 
     /**
@@ -20960,7 +18274,7 @@ var Hint = function (_PureComponent) {
         'div',
         {
           className: 'rv-hint ' + className,
-          style: _extends$H({}, style, position, {
+          style: _extends$w({}, style, position, {
             position: 'absolute'
           })
         },
@@ -21044,15 +18358,15 @@ var propTypes$4 = {
   innerHeight: propTypes.number
 };
 
-var _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$u = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$E(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$u(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$E(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$u(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$E(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$u(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
  * Format title by detault.
@@ -21094,12 +18408,12 @@ function getFirstNonEmptyValue(values) {
 }
 
 var Crosshair = function (_PureComponent) {
-  _inherits$E(Crosshair, _PureComponent);
+  _inherits$u(Crosshair, _PureComponent);
 
   function Crosshair() {
-    _classCallCheck$E(this, Crosshair);
+    _classCallCheck$u(this, Crosshair);
 
-    return _possibleConstructorReturn$E(this, (Crosshair.__proto__ || Object.getPrototypeOf(Crosshair)).apply(this, arguments));
+    return _possibleConstructorReturn$u(this, (Crosshair.__proto__ || Object.getPrototypeOf(Crosshair)).apply(this, arguments));
   }
 
   _createClass$u(Crosshair, [{
@@ -21210,7 +18524,7 @@ var Crosshair = function (_PureComponent) {
         },
         react.createElement('div', {
           className: 'rv-crosshair__line',
-          style: _extends$J({ height: innerHeight + 'px' }, style.line)
+          style: _extends$y({ height: innerHeight + 'px' }, style.line)
         }),
         react.createElement(
           'div',
@@ -21402,7 +18716,7 @@ function objEquiv(a, b, opts) {
 }
 });
 
-var _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 /**
  * Get the dimensions of the component for the future use.
@@ -21415,7 +18729,7 @@ function getInnerDimensions(props, defaultMargins) {
       width = props.width,
       height = props.height;
 
-  var marginProps = _extends$K({}, defaultMargins, typeof margin === 'number' ? {
+  var marginProps = _extends$z({}, defaultMargins, typeof margin === 'number' ? {
     left: margin,
     right: margin,
     top: margin,
@@ -21475,13 +18789,13 @@ var DEFAULT_MARGINS = {
 
 var _createClass$v = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$F(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$v(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$F(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$v(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$F(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$v(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MAX_DRAWS = 30;
 
@@ -21527,7 +18841,7 @@ function drawLayers(ctx, height, width, layers, drawIteration) {
     var interpolatedProps = animation ? interpolator ? interpolator(drawIteration / MAX_DRAWS) : interpolator : function () {
       return {};
     };
-    layer.renderLayer(_extends$L({}, newProps, interpolatedProps), ctx);
+    layer.renderLayer(_extends$A({}, newProps, interpolatedProps), ctx);
   });
 }
 
@@ -21543,10 +18857,10 @@ function buildLayers(newChildren, oldChildren) {
     var oldProps = oldChildren[index] ? oldChildren[index].props : {};
     var newProps = child.props;
 
-    var oldAnimatedProps = extractAnimatedPropValues(_extends$L({}, oldProps, {
+    var oldAnimatedProps = extractAnimatedPropValues(_extends$A({}, oldProps, {
       animatedProps: ANIMATED_SERIES_PROPS
     }));
-    var newAnimatedProps = newProps ? extractAnimatedPropValues(_extends$L({}, newProps, {
+    var newAnimatedProps = newProps ? extractAnimatedPropValues(_extends$A({}, newProps, {
       animatedProps: ANIMATED_SERIES_PROPS
     })) : null;
     var interpolator = interpolateValue(oldAnimatedProps, newAnimatedProps);
@@ -21561,12 +18875,12 @@ function buildLayers(newChildren, oldChildren) {
 }
 
 var CanvasWrapper = function (_Component) {
-  _inherits$F(CanvasWrapper, _Component);
+  _inherits$v(CanvasWrapper, _Component);
 
   function CanvasWrapper() {
-    _classCallCheck$F(this, CanvasWrapper);
+    _classCallCheck$v(this, CanvasWrapper);
 
-    return _possibleConstructorReturn$F(this, (CanvasWrapper.__proto__ || Object.getPrototypeOf(CanvasWrapper)).apply(this, arguments));
+    return _possibleConstructorReturn$v(this, (CanvasWrapper.__proto__ || Object.getPrototypeOf(CanvasWrapper)).apply(this, arguments));
   }
 
   _createClass$v(CanvasWrapper, [{
@@ -21690,17 +19004,17 @@ CanvasWrapper.propTypes = {
 
 var _createClass$w = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _toConsumableArray$3(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _defineProperty$4(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$G(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$w(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$G(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$w(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$G(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$w(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ATTRIBUTES$1 = ['x', 'y', 'radius', 'angle', 'color', 'fill', 'stroke', 'opacity', 'size'];
 
@@ -21716,7 +19030,7 @@ function cleanseData(data) {
       return series;
     }
     return series.map(function (row) {
-      return _extends$M({}, row, { parent: null });
+      return _extends$B({}, row, { parent: null });
     });
   });
 }
@@ -21729,10 +19043,10 @@ function cleanseData(data) {
  * @returns {Boolean} whether or not the two mixins objects are equal
  */
 function checkIfMixinsAreEqual(nextScaleMixins, scaleMixins, hasTreeStructure) {
-  var newMixins = _extends$M({}, nextScaleMixins, {
+  var newMixins = _extends$B({}, nextScaleMixins, {
     _allData: hasTreeStructure ? cleanseData(nextScaleMixins._allData) : nextScaleMixins._allData
   });
-  var oldMixins = _extends$M({}, scaleMixins, {
+  var oldMixins = _extends$B({}, scaleMixins, {
     _allData: hasTreeStructure ? cleanseData(scaleMixins._allData) : scaleMixins._allData
   });
   // it's hard to say if this function is reasonable?
@@ -21740,7 +19054,7 @@ function checkIfMixinsAreEqual(nextScaleMixins, scaleMixins, hasTreeStructure) {
 }
 
 var XYPlot = function (_React$Component) {
-  _inherits$G(XYPlot, _React$Component);
+  _inherits$w(XYPlot, _React$Component);
 
   _createClass$w(XYPlot, null, [{
     key: 'defaultProps',
@@ -21778,9 +19092,9 @@ var XYPlot = function (_React$Component) {
   }]);
 
   function XYPlot(props) {
-    _classCallCheck$G(this, XYPlot);
+    _classCallCheck$w(this, XYPlot);
 
-    var _this = _possibleConstructorReturn$G(this, (XYPlot.__proto__ || Object.getPrototypeOf(XYPlot)).call(this, props));
+    var _this = _possibleConstructorReturn$w(this, (XYPlot.__proto__ || Object.getPrototypeOf(XYPlot)).call(this, props));
 
     _initialiseProps.call(_this);
 
@@ -21855,7 +19169,7 @@ var XYPlot = function (_React$Component) {
 
           dataProps = { data: data[seriesIndex] };
         }
-        return react.cloneElement(child, _extends$M({}, dimensions, {
+        return react.cloneElement(child, _extends$B({}, dimensions, {
           animation: animation
         }, dataProps && child.type.prototype && child.type.prototype.render ? {
           ref: function ref(_ref) {
@@ -21880,10 +19194,10 @@ var XYPlot = function (_React$Component) {
 
       var colorRanges = ['color', 'fill', 'stroke'].reduce(function (acc, attr) {
         var range = props[attr + 'Type'] === 'category' ? EXTENDED_DISCRETE_COLOR_RANGE : CONTINUOUS_COLOR_RANGE;
-        return _extends$M({}, acc, _defineProperty$4({}, attr + 'Range', range));
+        return _extends$B({}, acc, _defineProperty$4({}, attr + 'Range', range));
       }, {});
 
-      return _extends$M({
+      return _extends$B({
         xRange: [0, innerWidth],
         yRange: [innerHeight, 0]
       }, colorRanges, {
@@ -21914,7 +19228,7 @@ var XYPlot = function (_React$Component) {
       var defaultScaleProps = this._getDefaultScaleProps(props);
       var optionalScaleProps = getOptionalScaleProps(props);
       var userScaleProps = extractScalePropsFromProps(props, ATTRIBUTES$1);
-      var missingScaleProps = getMissingScaleProps(_extends$M({}, defaultScaleProps, optionalScaleProps, userScaleProps), allData, ATTRIBUTES$1);
+      var missingScaleProps = getMissingScaleProps(_extends$B({}, defaultScaleProps, optionalScaleProps, userScaleProps), allData, ATTRIBUTES$1);
       var children = getSeriesChildren(props.children);
       var zeroBaseProps = {};
       var adjustBy = new Set();
@@ -21938,7 +19252,7 @@ var XYPlot = function (_React$Component) {
           }
         });
       });
-      return _extends$M({}, defaultScaleProps, zeroBaseProps, userScaleProps, missingScaleProps, {
+      return _extends$B({}, defaultScaleProps, zeroBaseProps, userScaleProps, missingScaleProps, {
         _allData: data,
         _adjustBy: Array.from(adjustBy),
         _adjustWhat: Array.from(adjustWhat),
@@ -22079,7 +19393,7 @@ var XYPlot = function (_React$Component) {
       if (!dontCheckIfEmpty && this._isPlotEmpty()) {
         return react.createElement('div', {
           className: 'rv-xy-plot ' + className,
-          style: _extends$M({
+          style: _extends$B({
             width: width + 'px',
             height: height + 'px'
           }, this.props.style)
@@ -22422,7 +19736,7 @@ function getAxisAngle(axisStart, axisEnd) {
   return Math.atan((axisEnd.y - axisStart.y) / (axisEnd.x - axisStart.x));
 }
 
-var _extends$N = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 /**
  * Generate the actual polygons to be plotted
@@ -22459,14 +19773,14 @@ function decorativeAxisTick(props) {
 
   var tickAngle = getAxisAngle(axisStart, axisEnd) + Math.PI / 2;
   return points.map(function (point, index) {
-    var tickProps = _extends$N({
+    var tickProps = _extends$C({
       x1: 0,
       y1: 0,
       x2: tickSize * Math.cos(tickAngle),
       y2: tickSize * Math.sin(tickAngle)
     }, style.ticks);
 
-    var textProps = _extends$N({
+    var textProps = _extends$C({
       x: tickSize * Math.cos(tickAngle),
       y: tickSize * Math.sin(tickAngle),
       textAnchor: 'start'
@@ -22478,37 +19792,37 @@ function decorativeAxisTick(props) {
         transform: 'translate(' + point.x + ', ' + point.y + ')',
         className: 'rv-xy-plot__axis__tick'
       },
-      react.createElement('line', _extends$N({}, tickProps, { className: 'rv-xy-plot__axis__tick__line' })),
+      react.createElement('line', _extends$C({}, tickProps, { className: 'rv-xy-plot__axis__tick__line' })),
       react.createElement(
         'text',
-        _extends$N({}, textProps, { className: 'rv-xy-plot__axis__tick__text' }),
+        _extends$C({}, textProps, { className: 'rv-xy-plot__axis__tick__text' }),
         tickValue(point.text)
       )
     );
   });
 }
 
-var _extends$O = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$x = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$H(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$x(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$H(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$x(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$H(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$x(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$d = 'rv-xy-manipulable-axis rv-xy-plot__axis';
 
 var animatedProps = ['xRange', 'yRange', 'xDomain', 'yDomain', 'width', 'height', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'tickSize', 'tickTotal', 'tickSizeInner', 'tickSizeOuter'];
 
 var DecorativeAxis = function (_AbstractSeries) {
-  _inherits$H(DecorativeAxis, _AbstractSeries);
+  _inherits$x(DecorativeAxis, _AbstractSeries);
 
   function DecorativeAxis() {
-    _classCallCheck$H(this, DecorativeAxis);
+    _classCallCheck$x(this, DecorativeAxis);
 
-    return _possibleConstructorReturn$H(this, (DecorativeAxis.__proto__ || Object.getPrototypeOf(DecorativeAxis)).apply(this, arguments));
+    return _possibleConstructorReturn$x(this, (DecorativeAxis.__proto__ || Object.getPrototypeOf(DecorativeAxis)).apply(this, arguments));
   }
 
   _createClass$x(DecorativeAxis, [{
@@ -22531,8 +19845,8 @@ var DecorativeAxis = function (_AbstractSeries) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$O({}, this.props, { animatedProps: animatedProps }),
-          react.createElement(DecorativeAxis, _extends$O({}, this.props, { animation: null }))
+          _extends$D({}, this.props, { animatedProps: animatedProps }),
+          react.createElement(DecorativeAxis, _extends$D({}, this.props, { animation: null }))
         );
       }
 
@@ -22545,7 +19859,7 @@ var DecorativeAxis = function (_AbstractSeries) {
           className: predefinedClassName$d + ' ' + className,
           transform: 'translate(' + marginLeft + ',' + marginTop + ')'
         },
-        react.createElement('line', _extends$O({}, _extends$O({
+        react.createElement('line', _extends$D({}, _extends$D({
           x1: x({ x: axisStart.x }),
           x2: x({ x: axisEnd.x }),
           y1: y({ y: axisStart.y }),
@@ -22592,7 +19906,7 @@ DecorativeAxis.defaultProps = {
     text: {}
   }
 };
-DecorativeAxis.propTypes = _extends$O({}, AbstractSeries.propTypes, {
+DecorativeAxis.propTypes = _extends$D({}, AbstractSeries.propTypes, {
   axisDomain: propTypes.arrayOf(propTypes.number).isRequired,
   axisEnd: propTypes.shape({
     x: propTypes.oneOfType([propTypes.number, propTypes.string]),
@@ -22614,7 +19928,7 @@ DecorativeAxis.propTypes = _extends$O({}, AbstractSeries.propTypes, {
 });
 DecorativeAxis.displayName = 'DecorativeAxis';
 
-var _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var LEFT = ORIENTATION$1.LEFT,
     RIGHT = ORIENTATION$1.RIGHT,
@@ -22669,24 +19983,24 @@ function AxisLine(_ref) {
       y2: 0
     };
   }
-  return react.createElement('line', _extends$P({}, lineProps, { className: 'rv-xy-plot__axis__line', style: style }));
+  return react.createElement('line', _extends$E({}, lineProps, { className: 'rv-xy-plot__axis__line', style: style }));
 }
 
 AxisLine.defaultProps = defaultProps$2;
 AxisLine.displayName = 'AxisLine';
 AxisLine.propTypes = propTypes$5;
 
-var _extends$Q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$y = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _defineProperty$5(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$I(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$y(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$I(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$y(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$I(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$y(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var LEFT$1 = ORIENTATION$1.LEFT,
     RIGHT$1 = ORIENTATION$1.RIGHT,
@@ -22712,12 +20026,12 @@ function _getTickFormatFn(scale, tickTotal, tickFormat) {
 }
 
 var AxisTicks = function (_React$Component) {
-  _inherits$I(AxisTicks, _React$Component);
+  _inherits$y(AxisTicks, _React$Component);
 
   function AxisTicks() {
-    _classCallCheck$I(this, AxisTicks);
+    _classCallCheck$y(this, AxisTicks);
 
-    return _possibleConstructorReturn$I(this, (AxisTicks.__proto__ || Object.getPrototypeOf(AxisTicks)).apply(this, arguments));
+    return _possibleConstructorReturn$y(this, (AxisTicks.__proto__ || Object.getPrototypeOf(AxisTicks)).apply(this, arguments));
   }
 
   _createClass$y(AxisTicks, [{
@@ -22864,21 +20178,21 @@ var AxisTicks = function (_React$Component) {
 
         return react.createElement(
           'g',
-          _extends$Q({
+          _extends$F({
             key: i
           }, translateFn(pos, 0), {
             className: 'rv-xy-plot__axis__tick',
             style: style
           }),
-          react.createElement('line', _extends$Q({}, pathProps, {
+          react.createElement('line', _extends$F({}, pathProps, {
             className: 'rv-xy-plot__axis__tick__line',
-            style: _extends$Q({}, style, style.line)
+            style: _extends$F({}, style, style.line)
           })),
           react.createElement(
             'text',
-            _extends$Q({}, textProps, {
+            _extends$F({}, textProps, {
               className: 'rv-xy-plot__axis__tick__text',
-              style: _extends$Q({}, style, style.text)
+              style: _extends$F({}, style, style.text)
             }),
             text
           )
@@ -22904,7 +20218,7 @@ AxisTicks.displayName = 'AxisTicks';
 AxisTicks.propTypes = propTypes$6;
 AxisTicks.requiresSVG = true;
 
-var _extends$R = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _defineProperty$6(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -23040,7 +20354,7 @@ function AxisTitle(_ref2) {
     { transform: outerGroupTransform, className: 'rv-xy-plot__axis__title' },
     react.createElement(
       'g',
-      { style: _extends$R({ textAnchor: textAnchor }, style), transform: innerGroupTransform },
+      { style: _extends$G({ textAnchor: textAnchor }, style), transform: innerGroupTransform },
       react.createElement(
         'text',
         { style: style },
@@ -23054,15 +20368,15 @@ AxisTitle.displayName = 'AxisTitle';
 AxisTitle.propTypes = propTypes$7;
 AxisTitle.defaultProps = defaultProps$4;
 
-var _extends$S = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$z = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$J(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$z(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$J(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$z(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$J(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$z(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var defaultAnimatedProps = ['xRange', 'yRange', 'xDomain', 'yDomain', 'width', 'height', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'tickSize', 'tickTotal', 'tickSizeInner', 'tickSizeOuter'];
 
@@ -23121,12 +20435,12 @@ var VERTICAL_CLASS_NAME = 'rv-xy-plot__axis--vertical';
 var HORIZONTAL_CLASS_NAME = 'rv-xy-plot__axis--horizontal';
 
 var Axis = function (_PureComponent) {
-  _inherits$J(Axis, _PureComponent);
+  _inherits$z(Axis, _PureComponent);
 
   function Axis() {
-    _classCallCheck$J(this, Axis);
+    _classCallCheck$z(this, Axis);
 
-    return _possibleConstructorReturn$J(this, (Axis.__proto__ || Object.getPrototypeOf(Axis)).apply(this, arguments));
+    return _possibleConstructorReturn$z(this, (Axis.__proto__ || Object.getPrototypeOf(Axis)).apply(this, arguments));
   }
 
   _createClass$z(Axis, [{
@@ -23193,12 +20507,12 @@ var Axis = function (_PureComponent) {
 
         return react.createElement(
           Animation,
-          _extends$S({}, this.props, { animatedProps: animatedProps }),
-          react.createElement(Axis, _extends$S({}, this.props, { animation: null }))
+          _extends$H({}, this.props, { animatedProps: animatedProps }),
+          react.createElement(Axis, _extends$H({}, this.props, { animation: null }))
         );
       }
 
-      var props = _extends$S({}, this._getDefaultAxisProps(), this.props);
+      var props = _extends$H({}, this._getDefaultAxisProps(), this.props);
 
       var attrAxis = props.attrAxis,
           className = props.className,
@@ -23240,15 +20554,15 @@ var Axis = function (_PureComponent) {
           height: height,
           width: width,
           orientation: orientation,
-          style: _extends$S({}, style, style.line)
+          style: _extends$H({}, style, style.line)
         }),
-        !hideTicks && react.createElement(AxisTicks, _extends$S({}, props, { style: _extends$S({}, style, style.ticks) })),
+        !hideTicks && react.createElement(AxisTicks, _extends$H({}, props, { style: _extends$H({}, style, style.ticks) })),
         title ? react.createElement(AxisTitle, {
           position: position,
           title: title,
           height: height,
           width: width,
-          style: _extends$S({}, style, style.title),
+          style: _extends$H({}, style, style.title),
           orientation: orientation
         }) : null
       );
@@ -23263,45 +20577,45 @@ Axis.propTypes = propTypes$8;
 Axis.defaultProps = defaultProps$5;
 Axis.requiresSVG = true;
 
-var _extends$T = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var TOP$4 = ORIENTATION$1.TOP,
     BOTTOM$4 = ORIENTATION$1.BOTTOM;
 
 
-var propTypes$9 = _extends$T({}, Axis.propTypes, {
+var propTypes$9 = _extends$I({}, Axis.propTypes, {
   orientation: propTypes.oneOf([TOP$4, BOTTOM$4])
 });
 
-var _extends$U = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var LEFT$4 = ORIENTATION$1.LEFT,
     RIGHT$4 = ORIENTATION$1.RIGHT;
 
 
-var propTypes$a = _extends$U({}, Axis.propTypes, {
+var propTypes$a = _extends$J({}, Axis.propTypes, {
   orientation: propTypes.oneOf([LEFT$4, RIGHT$4])
 });
 
-var _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$A = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$K(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$A(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$K(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$A(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$K(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$A(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var animatedProps$1 = ['xRange', 'yRange', 'xDomain', 'yDomain', 'width', 'height', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'tickTotal'];
 
 var CircularGridLines = function (_PureComponent) {
-  _inherits$K(CircularGridLines, _PureComponent);
+  _inherits$A(CircularGridLines, _PureComponent);
 
   function CircularGridLines() {
-    _classCallCheck$K(this, CircularGridLines);
+    _classCallCheck$A(this, CircularGridLines);
 
-    return _possibleConstructorReturn$K(this, (CircularGridLines.__proto__ || Object.getPrototypeOf(CircularGridLines)).apply(this, arguments));
+    return _possibleConstructorReturn$A(this, (CircularGridLines.__proto__ || Object.getPrototypeOf(CircularGridLines)).apply(this, arguments));
   }
 
   _createClass$A(CircularGridLines, [{
@@ -23333,12 +20647,12 @@ var CircularGridLines = function (_PureComponent) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$V({}, this.props, { animatedProps: animatedProps$1 }),
-          react.createElement(CircularGridLines, _extends$V({}, this.props, { animation: null }))
+          _extends$K({}, this.props, { animatedProps: animatedProps$1 }),
+          react.createElement(CircularGridLines, _extends$K({}, this.props, { animation: null }))
         );
       }
 
-      var props = _extends$V({}, this._getDefaultProps(), this.props);
+      var props = _extends$K({}, this._getDefaultProps(), this.props);
 
       var tickTotal = props.tickTotal,
           tickValues = props.tickValues,
@@ -23362,7 +20676,7 @@ var CircularGridLines = function (_PureComponent) {
           if (rRange && (radius < rRange[0] || radius > rRange[1])) {
             return res;
           }
-          return res.concat([react.createElement('circle', _extends$V({ cx: 0, cy: 0, r: radius }, {
+          return res.concat([react.createElement('circle', _extends$K({ cx: 0, cy: 0, r: radius }, {
             key: index,
             className: 'rv-xy-plot__circular-grid-lines__line',
             style: style
@@ -23405,17 +20719,17 @@ CircularGridLines.defaultProps = {
 };
 CircularGridLines.requiresSVG = true;
 
-var _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$B = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _defineProperty$7(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$L(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$B(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$L(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$B(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$L(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$B(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var VERTICAL = DIRECTION.VERTICAL,
     HORIZONTAL = DIRECTION.HORIZONTAL;
@@ -23452,12 +20766,12 @@ var defaultProps$8 = {
 var animatedProps$2 = ['xRange', 'yRange', 'xDomain', 'yDomain', 'width', 'height', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'tickTotal'];
 
 var GridLines = function (_PureComponent) {
-  _inherits$L(GridLines, _PureComponent);
+  _inherits$B(GridLines, _PureComponent);
 
   function GridLines() {
-    _classCallCheck$L(this, GridLines);
+    _classCallCheck$B(this, GridLines);
 
-    return _possibleConstructorReturn$L(this, (GridLines.__proto__ || Object.getPrototypeOf(GridLines)).apply(this, arguments));
+    return _possibleConstructorReturn$B(this, (GridLines.__proto__ || Object.getPrototypeOf(GridLines)).apply(this, arguments));
   }
 
   _createClass$B(GridLines, [{
@@ -23486,12 +20800,12 @@ var GridLines = function (_PureComponent) {
       if (animation) {
         return react.createElement(
           Animation,
-          _extends$W({}, this.props, { animatedProps: animatedProps$2 }),
-          react.createElement(GridLines, _extends$W({}, this.props, { animation: null }))
+          _extends$L({}, this.props, { animatedProps: animatedProps$2 }),
+          react.createElement(GridLines, _extends$L({}, this.props, { animation: null }))
         );
       }
 
-      var props = _extends$W({}, this._getDefaultProps(), this.props);
+      var props = _extends$L({}, this._getDefaultProps(), this.props);
 
       var attr = props.attr,
           direction = props.direction,
@@ -23522,7 +20836,7 @@ var GridLines = function (_PureComponent) {
 
           var pos = scale(v);
           var pathProps = (_pathProps = {}, _defineProperty$7(_pathProps, tickYAttr + '1', pos), _defineProperty$7(_pathProps, tickYAttr + '2', pos), _defineProperty$7(_pathProps, tickXAttr + '1', 0), _defineProperty$7(_pathProps, tickXAttr + '2', length), _pathProps);
-          return react.createElement('line', _extends$W({}, pathProps, {
+          return react.createElement('line', _extends$L({}, pathProps, {
             key: i,
             className: 'rv-xy-plot__grid-lines__line',
             style: style
@@ -23563,25 +20877,25 @@ GradientDefs.defaultProps = {
   className: ''
 };
 
-var _extends$X = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var VERTICAL$1 = DIRECTION.VERTICAL;
 
 
-var propTypes$c = _extends$X({}, GridLines.propTypes, {
+var propTypes$c = _extends$M({}, GridLines.propTypes, {
   direction: propTypes.oneOf([VERTICAL$1])
 });
 
-var _extends$Y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$N = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var HORIZONTAL$1 = DIRECTION.HORIZONTAL;
 
 
-var propTypes$d = _extends$Y({}, GridLines.propTypes, {
+var propTypes$d = _extends$N({}, GridLines.propTypes, {
   direction: propTypes.oneOf([HORIZONTAL$1])
 });
 
-var _extends$Z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$O = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var NOOP = function NOOP(f) {
   return f;
@@ -23675,7 +20989,7 @@ function Voronoi(props) {
           return onBlur(d.data);
         },
         fill: 'none',
-        style: _extends$Z({
+        style: _extends$O({
           pointerEvents: 'all'
         }, polygonStyle, d.data && d.data.style),
         key: i
@@ -23708,15 +21022,15 @@ Voronoi.propTypes = {
   y: propTypes.func
 };
 
-var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$C = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$M(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$C(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$M(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$C(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$M(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$C(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function getLocs(evt) {
   var xLoc = evt.type === 'touchstart' ? evt.pageX : evt.offsetX;
@@ -23725,27 +21039,27 @@ function getLocs(evt) {
 }
 
 var Highlight = function (_AbstractSeries) {
-  _inherits$M(Highlight, _AbstractSeries);
+  _inherits$C(Highlight, _AbstractSeries);
 
   function Highlight() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    _classCallCheck$M(this, Highlight);
+    _classCallCheck$C(this, Highlight);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn$M(this, (_ref = Highlight.__proto__ || Object.getPrototypeOf(Highlight)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+    return _ret = (_temp = (_this = _possibleConstructorReturn$C(this, (_ref = Highlight.__proto__ || Object.getPrototypeOf(Highlight)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
       dragging: false,
       brushArea: { top: 0, right: 0, bottom: 0, left: 0 },
       brushing: false,
       startLocX: 0,
       startLocY: 0,
       dragArea: null
-    }, _temp), _possibleConstructorReturn$M(_this, _ret);
+    }, _temp), _possibleConstructorReturn$C(_this, _ret);
   }
 
   _createClass$C(Highlight, [{
@@ -24096,7 +21410,7 @@ Highlight.defaultProps = {
   opacity: 0.3
 };
 
-Highlight.propTypes = _extends$_({}, AbstractSeries.propTypes, {
+Highlight.propTypes = _extends$P({}, AbstractSeries.propTypes, {
   enableX: propTypes.bool,
   enableY: propTypes.bool,
   highlightHeight: propTypes.number,
@@ -24111,7 +21425,7 @@ Highlight.propTypes = _extends$_({}, AbstractSeries.propTypes, {
   onDragEnd: propTypes.func
 });
 
-var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$Q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var STROKE_STYLES$1 = {
   dashed: '6, 2',
@@ -24147,7 +21461,7 @@ function DiscreteColorLegendItem(_ref) {
       react.createElement('path', {
         className: 'rv-discrete-color-legend-item__color__path',
         d: 'M 0, 1 L 14, 1',
-        style: _extends$10({}, strokeWidth ? { strokeWidth: strokeWidth } : {}, strokeDasharrayStyle ? { strokeDasharray: strokeDasharrayStyle } : {}, {
+        style: _extends$Q({}, strokeWidth ? { strokeWidth: strokeWidth } : {}, strokeDasharrayStyle ? { strokeDasharray: strokeDasharrayStyle } : {}, {
           stroke: disabled ? null : color
         })
 
@@ -24179,7 +21493,7 @@ DiscreteColorLegendItem.defaultProps = {
 };
 DiscreteColorLegendItem.displayName = 'DiscreteColorLegendItem';
 
-var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$R = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function DiscreteColorLegend(_ref) {
   var className = _ref.className,
@@ -24197,7 +21511,7 @@ function DiscreteColorLegend(_ref) {
     'div',
     {
       className: 'rv-discrete-color-legend ' + orientation + ' ' + className,
-      style: _extends$11({ width: width, height: height }, style)
+      style: _extends$R({ width: width, height: height }, style)
     },
     items.map(function (item, i) {
       return react.createElement(DiscreteColorLegendItem, {
@@ -24245,9 +21559,9 @@ DiscreteColorLegend.defaultProps = {
   orientation: 'vertical'
 };
 
-var _extends$12 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$S = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var propTypes$e = _extends$12({}, DiscreteColorLegend.propTypes, {
+var propTypes$e = _extends$S({}, DiscreteColorLegend.propTypes, {
   searchText: propTypes.string,
   onSearchChange: propTypes.func,
   searchPlaceholder: propTypes.string,
@@ -25148,7 +22462,7 @@ var treemapResquarify = (function custom(ratio) {
   return resquarify;
 })(phi);
 
-var _extends$13 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$T = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var ANIMATED_PROPS = ['colorRange', 'colorDomain', 'color', 'opacityRange', 'opacityDomain', 'opacity', 'x0', 'x1', 'y0', 'y1', 'r'];
 
@@ -25172,8 +22486,8 @@ function TreemapLeaf(props) {
   if (animation) {
     return react.createElement(
       Animation,
-      _extends$13({}, props, { animatedProps: ANIMATED_PROPS }),
-      react.createElement(TreemapLeaf, _extends$13({}, props, { animation: null }))
+      _extends$T({}, props, { animatedProps: ANIMATED_PROPS }),
+      react.createElement(TreemapLeaf, _extends$T({}, props, { animation: null }))
     );
   }
   var useCirclePacking = mode === 'circlePack';
@@ -25183,7 +22497,7 @@ function TreemapLeaf(props) {
   var data = node.data;
 
   var title = getLabel(data);
-  var leafStyle = _extends$13({
+  var leafStyle = _extends$T({
     top: useCirclePacking ? y0 - r : y0,
     left: useCirclePacking ? x0 - r : x0,
     width: useCirclePacking ? r * 2 : x1 - x0,
@@ -25233,7 +22547,7 @@ TreemapLeaf.propTypes = {
   y1: propTypes.number.isRequired
 };
 
-var _extends$14 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$U = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function TreemapDOM(props) {
   var animation = props.animation,
@@ -25260,7 +22574,7 @@ function TreemapDOM(props) {
         return null;
       }
 
-      var nodeProps = _extends$14({
+      var nodeProps = _extends$U({
         animation: animation,
         node: node,
         getLabel: getLabel
@@ -25273,32 +22587,32 @@ function TreemapDOM(props) {
         scales: scales,
         style: style
       });
-      return react.createElement(TreemapLeaf, _extends$14({}, nodeProps, { key: 'leaf-' + index }));
+      return react.createElement(TreemapLeaf, _extends$U({}, nodeProps, { key: 'leaf-' + index }));
     })
   );
 }
 
 TreemapDOM.displayName = 'TreemapDOM';
 
-var _extends$15 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$D = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$N(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$D(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$N(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$D(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$N(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$D(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MARGIN_ADJUST = 1.2;
 
 var TreemapSVG = function (_React$Component) {
-  _inherits$N(TreemapSVG, _React$Component);
+  _inherits$D(TreemapSVG, _React$Component);
 
   function TreemapSVG() {
-    _classCallCheck$N(this, TreemapSVG);
+    _classCallCheck$D(this, TreemapSVG);
 
-    return _possibleConstructorReturn$N(this, (TreemapSVG.__proto__ || Object.getPrototypeOf(TreemapSVG)).apply(this, arguments));
+    return _possibleConstructorReturn$D(this, (TreemapSVG.__proto__ || Object.getPrototypeOf(TreemapSVG)).apply(this, arguments));
   }
 
   _createClass$D(TreemapSVG, [{
@@ -25416,7 +22730,7 @@ var TreemapSVG = function (_React$Component) {
           onSeriesMouseLeave: onLeafMouseOut,
           onSeriesClick: onLeafClick,
           data: data,
-          style: _extends$15({}, style, node.style)
+          style: _extends$V({}, style, node.style)
         })]);
         return acc;
       }, {
@@ -25450,7 +22764,7 @@ var TreemapSVG = function (_React$Component) {
         if (!node.data.title) {
           return acc;
         }
-        return acc.concat(_extends$15({}, node.data, {
+        return acc.concat(_extends$V({}, node.data, {
           x: node.x0 || node.x,
           y: node.y0 || node.y,
           label: '' + node.data.title
@@ -25459,7 +22773,7 @@ var TreemapSVG = function (_React$Component) {
 
       return react.createElement(
         XYPlot,
-        _extends$15({
+        _extends$V({
           className: 'rv-treemap ' + (useCirclePacking ? 'rv-treemap-circle-packed' : '') + ' ' + className,
           width: width,
           height: height,
@@ -25481,13 +22795,13 @@ TreemapSVG.displayName = 'TreemapSVG';
 
 var _createClass$E = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$16 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$O(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$E(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$O(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$E(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$O(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$E(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var TREEMAP_TILE_MODES = {
   squarify: squarify,
@@ -25526,7 +22840,7 @@ function _getScaleFns(props) {
 
   // Adding _allData property to the object to reuse the existing
   // getAttributeFunctor function.
-  var compatibleProps = _extends$16({}, props, getMissingScaleProps(props, allData, ATTRIBUTES$2), {
+  var compatibleProps = _extends$W({}, props, getMissingScaleProps(props, allData, ATTRIBUTES$2), {
     _allData: allData
   });
   return {
@@ -25536,14 +22850,14 @@ function _getScaleFns(props) {
 }
 
 var Treemap = function (_React$Component) {
-  _inherits$O(Treemap, _React$Component);
+  _inherits$E(Treemap, _React$Component);
 
   function Treemap(props) {
-    _classCallCheck$O(this, Treemap);
+    _classCallCheck$E(this, Treemap);
 
-    var _this = _possibleConstructorReturn$O(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this, props));
+    var _this = _possibleConstructorReturn$E(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this, props));
 
-    _this.state = _extends$16({
+    _this.state = _extends$W({
       scales: _getScaleFns(props)
     }, getInnerDimensions(props, props.margin));
     return _this;
@@ -25552,7 +22866,7 @@ var Treemap = function (_React$Component) {
   _createClass$E(Treemap, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(props) {
-      this.setState(_extends$16({
+      this.setState(_extends$W({
         scales: _getScaleFns(props)
       }, getInnerDimensions(props, props.margin)));
     }
@@ -25588,7 +22902,7 @@ var Treemap = function (_React$Component) {
         var mappedNodes = partitionFunction(_structuredInput).descendants();
         if (mode === 'partition-pivot') {
           return mappedNodes.map(function (node) {
-            return _extends$16({}, node, {
+            return _extends$W({}, node, {
               x0: node.y0,
               x1: node.y1,
               y0: node.x0,
@@ -25621,7 +22935,7 @@ var Treemap = function (_React$Component) {
 
       var nodes = this._getNodesToRender();
       var TreemapElement = renderMode === 'SVG' ? TreemapSVG : TreemapDOM;
-      return react.createElement(TreemapElement, _extends$16({}, this.props, { nodes: nodes, scales: scales }));
+      return react.createElement(TreemapElement, _extends$W({}, this.props, { nodes: nodes, scales: scales }));
     }
   }]);
 
@@ -25681,7 +22995,7 @@ Treemap.defaultProps = {
   }
 };
 
-var _extends$17 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$X = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var predefinedClassName$g = 'rv-radial-chart';
 
@@ -25700,7 +23014,7 @@ function getWedgesToRender(_ref) {
   var pie$$1 = pieBuilder().sort(null).value(getAngle);
   var pieData = pie$$1(data).reverse();
   return pieData.map(function (row, index) {
-    return _extends$17({}, row.data, {
+    return _extends$X({}, row.data, {
       angle0: row.startAngle,
       angle: row.endAngle,
       radius0: row.data.innerRadius || 0,
@@ -25789,7 +23103,7 @@ function RadialChart(props) {
     getAngle: getAngle
   });
   var radialDomain = getRadialDomain(mappedData);
-  var arcProps = _extends$17({
+  var arcProps = _extends$X({
     colorType: colorType
   }, props, {
     animation: animation,
@@ -25816,14 +23130,14 @@ function RadialChart(props) {
     {
       height: height,
       width: width,
-      margin: _extends$17({}, margin, defaultMargin),
+      margin: _extends$X({}, margin, defaultMargin),
       className: className + ' ' + predefinedClassName$g,
       onMouseLeave: onMouseLeave,
       onMouseEnter: onMouseEnter,
       xDomain: [-radialDomain, radialDomain],
       yDomain: [-radialDomain, radialDomain]
     },
-    react.createElement(ArcSeries, _extends$17({}, arcProps, { getAngle: function getAngle(d) {
+    react.createElement(ArcSeries, _extends$X({}, arcProps, { getAngle: function getAngle(d) {
         return d.angle;
       } })),
     showLabels && !labelsAboveChildren && react.createElement(LabelSeries, { data: labels, style: labelsStyle }),
@@ -25887,7 +23201,7 @@ RadialChart.defaultProps = {
   }
 };
 
-var _extends$18 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$Y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var predefinedClassName$h = 'rv-radar-chart';
 var DEFAULT_FORMAT$1 = format('.2r');
@@ -26032,7 +23346,7 @@ function getPolygons(props) {
       className: predefinedClassName$h + '-polygon',
       key: rowIndex + '-polygon',
       data: mappedData,
-      style: _extends$18({
+      style: _extends$Y({
         stroke: row.color || row.stroke || colorRange[rowIndex % colorRange.length],
         fill: row.color || row.fill || colorRange[rowIndex % colorRange.length]
       }, style.polygons),
@@ -26098,7 +23412,7 @@ function getPolygonPoints(props) {
       key: rowIndex + '-polygonPoint',
       data: mappedData,
       size: 10,
-      style: _extends$18({}, style.polygons, {
+      style: _extends$Y({}, style.polygons, {
         fill: 'transparent',
         stroke: 'transparent'
       }),
@@ -26242,15 +23556,15 @@ RadarChart.defaultProps = {
 
 var _createClass$F = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends$19 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$Z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _defineProperty$8(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$P(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$F(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$P(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$F(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$P(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$F(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$i = 'rv-parallel-coordinates-chart';
 var DEFAULT_FORMAT$2 = format('.2r');
@@ -26363,32 +23677,32 @@ function getLines(props) {
       key: rowIndex + '-polygon',
       data: mappedData,
       color: row.color || colorRange[rowIndex % colorRange.length],
-      style: _extends$19({}, style.lines, row.style || {})
+      style: _extends$Z({}, style.lines, row.style || {})
     };
     if (!withinFilteredRange) {
-      lineProps.style = _extends$19({}, lineProps.style, style.deselectedLineStyle);
+      lineProps.style = _extends$Z({}, lineProps.style, style.deselectedLineStyle);
     }
     return showMarks ? react.createElement(LineMarkSeries, lineProps) : react.createElement(LineSeries, lineProps);
   });
 }
 
 var ParallelCoordinates = function (_Component) {
-  _inherits$P(ParallelCoordinates, _Component);
+  _inherits$F(ParallelCoordinates, _Component);
 
   function ParallelCoordinates() {
     var _ref2;
 
     var _temp, _this, _ret;
 
-    _classCallCheck$P(this, ParallelCoordinates);
+    _classCallCheck$F(this, ParallelCoordinates);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn$P(this, (_ref2 = ParallelCoordinates.__proto__ || Object.getPrototypeOf(ParallelCoordinates)).call.apply(_ref2, [this].concat(args))), _this), _this.state = {
+    return _ret = (_temp = (_this = _possibleConstructorReturn$F(this, (_ref2 = ParallelCoordinates.__proto__ || Object.getPrototypeOf(ParallelCoordinates)).call.apply(_ref2, [this].concat(args))), _this), _this.state = {
       brushFilters: {}
-    }, _temp), _possibleConstructorReturn$P(_this, _ret);
+    }, _temp), _possibleConstructorReturn$F(_this, _ret);
   }
 
   _createClass$F(ParallelCoordinates, [{
@@ -26462,7 +23776,7 @@ var ParallelCoordinates = function (_Component) {
         brushing && domains.map(function (d) {
           var trigger = function trigger(row) {
             _this2.setState({
-              brushFilters: _extends$19({}, brushFilters, _defineProperty$8({}, d.name, row ? { min: row.bottom, max: row.top } : null))
+              brushFilters: _extends$Z({}, brushFilters, _defineProperty$8({}, d.name, row ? { min: row.bottom, max: row.top } : null))
             });
           };
           return react.createElement(Highlight, {
@@ -26852,7 +24166,7 @@ function sankeyLinkHorizontal() {
       .target(horizontalTarget);
 }
 
-var _extends$1a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var DEFAULT_LINK_COLOR = DISCRETE_COLOR_RANGE[1];
 var DEFAULT_LINK_OPACITY = 0.7;
@@ -26872,11 +24186,11 @@ function SankeyLink(props) {
   if (animation) {
     return react.createElement(
       Animation,
-      _extends$1a({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
-      react.createElement(SankeyLink, _extends$1a({}, props, { animation: null }))
+      _extends$_({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
+      react.createElement(SankeyLink, _extends$_({}, props, { animation: null }))
     );
   }
-  return react.createElement('path', _extends$1a({
+  return react.createElement('path', _extends$_({
     d: data
   }, style, {
     className: 'rv-sankey__link',
@@ -26899,7 +24213,7 @@ function SankeyLink(props) {
 SankeyLink.displayName = 'SankeyLink';
 SankeyLink.requiresSVG = true;
 
-var _extends$1b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _toConsumableArray$4(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 var NOOP$2 = function NOOP(f) {
@@ -26946,10 +24260,10 @@ function Sankey(props) {
       width = props.width;
 
   var nodesCopy = [].concat(_toConsumableArray$4(new Array(nodes.length))).map(function (e, i) {
-    return _extends$1b({}, nodes[i]);
+    return _extends$10({}, nodes[i]);
   });
   var linksCopy = [].concat(_toConsumableArray$4(new Array(links.length))).map(function (e, i) {
-    return _extends$1b({}, links[i]);
+    return _extends$10({}, links[i]);
   });
 
   var _getInnerDimensions = getInnerDimensions({
@@ -26970,7 +24284,7 @@ function Sankey(props) {
 
   return react.createElement(
     XYPlot,
-    _extends$1b({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
+    _extends$10({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
     linksCopy.map(function (link, i) {
       return react.createElement(SankeyLink, {
         style: style.links,
@@ -26990,7 +24304,7 @@ function Sankey(props) {
       animation: animation,
       className: className + ' rv-sankey__node',
       data: nodesCopy.map(function (node) {
-        return _extends$1b({}, node, {
+        return _extends$10({}, node, {
           y: node.y1 - marginTop,
           y0: node.y0 - marginTop,
           x: node.x1,
@@ -27012,11 +24326,11 @@ function Sankey(props) {
       rotation: labelRotation,
       labelAnchorY: 'text-before-edge',
       data: nodesCopy.map(function (node, i) {
-        return _extends$1b({
+        return _extends$10({
           x: node.x0 + (node.x0 < width / 2 ? nWidth + 10 : -10),
           y: (node.y0 + node.y1) / 2 - marginTop,
           label: node.name,
-          style: _extends$1b({
+          style: _extends$10({
             textAnchor: node.x0 < width / 2 ? 'start' : 'end',
             dy: '-.5em'
           }, style.labels)
@@ -27094,7 +24408,7 @@ Sankey.propTypes = {
   width: propTypes.number.isRequired
 };
 
-var _extends$1c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var predefinedClassName$j = 'rv-sunburst';
 
@@ -27128,7 +24442,7 @@ function getNodesToRender(_ref) {
       return res;
     }
 
-    return res.concat([_extends$1c({
+    return res.concat([_extends$11({
       angle0: Math.max(0, Math.min(2 * Math.PI, x(cell.x0))),
       angle: Math.max(0, Math.min(2 * Math.PI, x(cell.x1))),
       radius0: Math.max(0, y(cell.y0)),
@@ -27160,13 +24474,13 @@ function buildLabels(mappedData, accessors) {
     var rotateLabels = !row.dontRotateLabel;
     var rotAngle = -angle / (2 * Math.PI) * 360;
 
-    return _extends$1c({}, row, {
+    return _extends$11({}, row, {
       children: null,
       angle: null,
       radius: null,
       x: getRadius0(row) * Math.cos(angle),
       y: getRadius0(row) * Math.sin(angle),
-      style: _extends$1c({
+      style: _extends$11({
         textAnchor: rotAngle > 90 ? 'end' : 'start'
       }, row.labelStyle),
       rotation: rotateLabels ? rotAngle > 90 ? rotAngle + 180 : rotAngle === 90 ? 90 : rotAngle : null
@@ -27225,14 +24539,14 @@ function Sunburst(props) {
       xDomain: [-radialDomain, radialDomain],
       yDomain: [-radialDomain, radialDomain]
     },
-    react.createElement(ArcSeries, _extends$1c({
+    react.createElement(ArcSeries, _extends$11({
       colorType: colorType
     }, props, {
       animation: animation,
       radiusDomain: [0, radialDomain],
       // need to present a stripped down version for interpolation
       data: animation ? mappedData.map(function (row, index) {
-        return _extends$1c({}, row, {
+        return _extends$11({}, row, {
           parent: null,
           children: null,
           index: index
@@ -27304,17 +24618,17 @@ if (typeof window !== "undefined") {
 
 var window_1 = win;
 
-var _extends$1d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$12 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$G = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _objectWithoutProperties$5(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties$1(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-function _classCallCheck$Q(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$G(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$Q(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$G(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$Q(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$G(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var CONTAINER_REF = 'container';
 
@@ -27396,7 +24710,7 @@ function getDisplayName(Component) {
 
 function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
   var ResultClass = function (_React$Component) {
-    _inherits$Q(ResultClass, _React$Component);
+    _inherits$G(ResultClass, _React$Component);
 
     _createClass$G(ResultClass, null, [{
       key: 'propTypes',
@@ -27404,7 +24718,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
         var _Component$propTypes = Component.propTypes,
             height = _Component$propTypes.height,
             width = _Component$propTypes.width,
-            otherPropTypes = _objectWithoutProperties$5(_Component$propTypes, ['height', 'width']); // eslint-disable-line no-unused-vars
+            otherPropTypes = _objectWithoutProperties$1(_Component$propTypes, ['height', 'width']); // eslint-disable-line no-unused-vars
 
 
         return otherPropTypes;
@@ -27412,9 +24726,9 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
     }]);
 
     function ResultClass(props) {
-      _classCallCheck$Q(this, ResultClass);
+      _classCallCheck$G(this, ResultClass);
 
-      var _this = _possibleConstructorReturn$Q(this, (ResultClass.__proto__ || Object.getPrototypeOf(ResultClass)).call(this, props));
+      var _this = _possibleConstructorReturn$G(this, (ResultClass.__proto__ || Object.getPrototypeOf(ResultClass)).call(this, props));
 
       _this._onResize = function () {
         var containerElement = getDOMNode(_this[CONTAINER_REF]);
@@ -27426,7 +24740,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
 
         var newWidth = _this.state.width === offsetWidth ? {} : { width: offsetWidth };
 
-        _this.setState(_extends$1d({}, newHeight, newWidth));
+        _this.setState(_extends$12({}, newHeight, newWidth));
       };
 
       _this.state = {
@@ -27467,11 +24781,11 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             height = _state.height,
             width = _state.width;
 
-        var props = _extends$1d({}, this.props, {
+        var props = _extends$12({}, this.props, {
           animation: height === 0 && width === 0 ? null : this.props.animation
         });
 
-        var updatedDimensions = _extends$1d({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
+        var updatedDimensions = _extends$12({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
 
         return react.createElement(
           'div',
@@ -27481,7 +24795,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             },
             style: { width: '100%', height: '100%' }
           },
-          react.createElement(Component, _extends$1d({}, updatedDimensions, props))
+          react.createElement(Component, _extends$12({}, updatedDimensions, props))
         );
       }
     }]);
@@ -27655,7 +24969,8 @@ var SunburstContainer = function (_React$Component) {
     var _this = possibleConstructorReturn(this, (SunburstContainer.__proto__ || Object.getPrototypeOf(SunburstContainer)).call(this, props));
 
     _this.state = {
-      simhashData: null
+      simhashData: null,
+      timestamp: _this.props.timestamp
     };
     return _this;
   }
@@ -27667,9 +24982,6 @@ var SunburstContainer = function (_React$Component) {
 
       if (this.state.showError) {
         return react.createElement(ErrorMessage, { url: this.props.url, code: this._errorCode });
-      }
-      if (this._redirectToValidatedTimestamp) {
-        return this._renderRedirect();
       }
       if (this.state.simhashData) {
         return react.createElement(
@@ -27713,18 +25025,9 @@ var SunburstContainer = function (_React$Component) {
       var Loader = function Loader() {
         return _this2.props.loader;
       };
-      if (this.state.timestampValidated) {
-        this._fetchTimestampSimhashData();
-      } else {
-        this._validateTimestamp();
-      }
+      this._fetchTimestampSimhashData(this.state.timestamp);
+      this._validateTimestamp();
       return react.createElement(Loader, null);
-    }
-  }, {
-    key: '_renderRedirect',
-    value: function _renderRedirect() {
-      this._redirectToValidatedTimestamp = false;
-      return react.createElement(Redirect, { to: this.state.newURL });
     }
   }, {
     key: '_validateTimestamp',
@@ -27733,9 +25036,9 @@ var SunburstContainer = function (_React$Component) {
 
       var promise = void 0;
       if (this.props.fetchSnapshotCallback) {
-        promise = this.props.fetchSnapshotCallback(this.props.timestamp);
+        promise = this.props.fetchSnapshotCallback(this.state.timestamp);
       } else {
-        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + encodeURIComponent(this.props.url);
+        var url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestamp + '/' + encodeURIComponent(this.props.url);
         promise = fetch_with_timeout(fetch(url, { redirect: 'follow' }));
       }
       promise.then(function (response) {
@@ -27743,12 +25046,11 @@ var SunburstContainer = function (_React$Component) {
       }).then(function (response) {
         var url = response.url;
         var fetchedTimestamp = url.split('/')[4];
-        if (_this3.props.timestamp !== fetchedTimestamp) {
-          _this3._redirectToValidatedTimestamp = true;
-          _this3.setState({ newURL: _this3.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + _this3.props.url,
-            timestampValidated: true });
+        if (_this3.state.timestamp !== fetchedTimestamp) {
+
+          window.history.pushState({}, '', _this3.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + _this3.props.url);
+          _this3.setState({ timestamp: fetchedTimestamp });
         }
-        _this3.setState({ timestampValidated: true });
       }).catch(function (error) {
         _this3.errorHandled(error.message);
       });
@@ -27761,10 +25063,10 @@ var SunburstContainer = function (_React$Component) {
     }
   }, {
     key: '_fetchTimestampSimhashData',
-    value: function _fetchTimestampSimhashData() {
+    value: function _fetchTimestampSimhashData(timestamp) {
       var _this4 = this;
 
-      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.props.timestamp;
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + timestamp;
       fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
@@ -27778,18 +25080,18 @@ var SunburstContainer = function (_React$Component) {
     }
   }, {
     key: '_fetchSimhashData',
-    value: function _fetchSimhashData(timestamp) {
+    value: function _fetchSimhashData(timestampJson) {
       var _this5 = this;
 
-      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.props.timestamp.substring(0, 4);
+      var url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.state.timestamp.substring(0, 4);
       fetch_with_timeout(fetch(url)).then(function (response) {
         return checkResponse(response);
       }).then(function (response) {
         return response.json();
       }).then(function (jsonResponse) {
         var json = _this5._decodeJson(jsonResponse);
-        var data = _this5._calcDistance(json, timestamp);
-        _this5._createLevels(data, timestamp);
+        var data = _this5._calcDistance(json, timestampJson);
+        _this5._createLevels(data, timestampJson);
       }).catch(function (error) {
         _this5.errorHandled(error.message);
       });
@@ -27833,7 +25135,7 @@ var SunburstContainer = function (_React$Component) {
       json.simhash = json.simhash.toString().replace(/=/, '');
       json.simhash = base64.decode(json.simhash);
 
-      return [this.props.timestamp, json.simhash];
+      return [this.state.timestamp, json.simhash];
     }
   }, {
     key: '_calcDistance',
