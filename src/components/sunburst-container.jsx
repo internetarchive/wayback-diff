@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import D3Sunburst from './d3-sunburst.jsx';
-import {hammingDistance} from '../js/utils.js';
+import {similarity} from '../js/utils.js';
 import '../css/diffgraph.css';
 import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
 import ErrorMessage from './errors.jsx';
@@ -160,11 +160,15 @@ export default class SunburstContainer extends React.Component {
   }
 
   _calcDistance(json, timestamp){
-    this._minDistance = 64;
+    this._mostSimilar = 0;
+    this._lessSimilar = 1;
     for (var i = 0; i<json.length; i++){
-      json[i][1] = hammingDistance(timestamp[0][1], json[i][1]);
-      if (this._minDistance > json[i][1] && json[i][1] !== 0) {
-        this._minDistance = json[i][1];
+      json[i][1] = similarity(timestamp[1], json[i][1]);
+      if (this._lessSimilar > json[i][1]) {
+        this._lessSimilar = json[i][1];
+      }
+      if (this._mostSimilar< json[i][1]) {
+        this._mostSimilar = json[i][1];
       }
     }
     return json;
@@ -176,21 +180,29 @@ export default class SunburstContainer extends React.Component {
     var thirdLevel = [];
     var fourthLevel = [];
     var fifthLevel = [];
+    let step = 0.1;
 
     const colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
+    let diffLevels = (this._mostSimilar - this._lessSimilar);
+
+    if (diffLevels > 0.2) {
+      step = diffLevels/5;
+    }
+
+
     for (var i = 0; i<json.length; i++){
       if (json[i][1] !== 0) {
-        if (json[i][1] <= this._minDistance) {
-          firstLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[1], children: []});
-        } else if (json[i][1] <= this._minDistance + 2) {
-          secondLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[2], children: []});
-        } else if (json[i][1] <= this._minDistance + 4) {
-          thirdLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[3], children: []});
-        } else if (json[i][1] <= this._minDistance + 6) {
-          fourthLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[4], children: []});
+        if (json[i][1] <= this._lessSimilar + step) {
+          fifthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
+        } else if (json[i][1] <= this._lessSimilar + 2 * step) {
+          fourthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
+        } else if (json[i][1] <= this._lessSimilar + 3*step) {
+          thirdLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
+        } else if (json[i][1] <= this._lessSimilar + 4*step) {
+          secondLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
         } else {
-          fifthLevel.push({name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[5], children: []});
+          firstLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
         }
       }
     }
@@ -211,6 +223,29 @@ export default class SunburstContainer extends React.Component {
       fifthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
 
+
+    if (firstLevel.length === 0){
+      firstLevel = secondLevel;
+      secondLevel = thirdLevel;
+      thirdLevel = fourthLevel;
+      fourthLevel= fifthLevel;
+      fifthLevel = [];
+    }
+    if (secondLevel.length === 0){
+      secondLevel = thirdLevel;
+      thirdLevel = fourthLevel;
+      fourthLevel= fifthLevel;
+      fifthLevel = [];
+    }
+    if (thirdLevel.length === 0){
+      thirdLevel = fourthLevel;
+      fourthLevel = fifthLevel;
+      fifthLevel = [];
+    }
+    if (fourthLevel.length === 0){
+      fourthLevel= fifthLevel;
+      fifthLevel = [];
+    }
 
     for (i = 0; i<fifthLevel.length; i++) {
       let mod = i % fourthLevel.length;
@@ -233,7 +268,7 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].bigness = '';
     }
 
-    var data = {name:timestamp[0], clr: colors[0], children:firstLevel};
+    var data = {name:timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
     this.setState({simhashData: data});
   }
 
