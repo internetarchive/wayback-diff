@@ -1,7 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import {handleRelativeURL, fetch_with_timeout} from '../js/utils.js';
-
+import {handleRelativeURL, fetch_with_timeout, checkResponse} from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -11,7 +10,8 @@ import {handleRelativeURL, fetch_with_timeout} from '../js/utils.js';
 export default class TimestampHeader extends React.Component {
 
   ABORT_CONTROLLER = new window.AbortController();
-  isMountedNow = false;
+  _isMountedNow = false;
+  _shouldValidateTimestamp = true;
 
   constructor(props) {
     super(props);
@@ -19,7 +19,9 @@ export default class TimestampHeader extends React.Component {
     this.state = {
       cdxData: false,
       showDiff: false,
-      showError: false
+      showError: false,
+      timestampA: this.props.timestampA,
+      timestampB: this.props.timestampB
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -35,11 +37,11 @@ export default class TimestampHeader extends React.Component {
   }
 
   componentDidMount() {
-    this.isMountedNow = true;
+    this._isMountedNow = true;
   }
 
   componentWillUnmount(){
-    this.isMountedNow = false;
+    this._isMountedNow = false;
     this.ABORT_CONTROLLER.abort();
   }
 
@@ -64,20 +66,13 @@ export default class TimestampHeader extends React.Component {
   }
 
   render () {
-    // console.log('TimestampHeader render');
     const Loader = () => this.props.loader;
 
     if (!this.state.showError) {
-      if (this.state.showDiff) {
-        return (
-          <div className="timestamp-header-view">
-            {this._showInfo()}
-            {this._showTimestampSelector()}
-            {this._exportParams()}
-          </div>
-        );
-      }
       if (this.state.cdxData) {
+        if (this._shouldValidateTimestamp) {
+          this._checkTimestamps();
+        }
         return (
           <div className="timestamp-header-view">
             {this._showInfo()}
@@ -87,20 +82,77 @@ export default class TimestampHeader extends React.Component {
         );
       }
       return (<div>
-        {this._widgetRender()}
+        {this._fetchCDXData()}
         <Loader/>
       </div>
       );
     }
   }
 
-  _exportParams(){
-    let timestampA = document.getElementById('timestamp-select-left').value;
-    let timestampB = document.getElementById('timestamp-select-right').value;
-    window.location.href = `${this.props.conf.urlPrefix}${timestampA}/${timestampB}/${this.props.url}`;
+  _checkTimestamps () {
+    this._shouldValidateTimestamp = false;
+    var fetchedTimestamps = { a: '', b: '' };
+    if (this.state.timestampA && this.state.timestampB) {
+      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
+        .then(() => {return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b');})
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        }).catch(error => {this._errorHandled(error.message);});
+    } else if (this.state.timestampA) {
+      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        }).catch(error => {this._errorHandled(error.message);});
+    } else if (this.state.timestampB) {
+      this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b')
+        .then(()=> {
+          if (this._redirectToValidatedTimestamps){
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          }
+        }).catch(error => {this._errorHandled(error.message);});
+    }
   }
 
-  _widgetRender () {
+  _validateTimestamp(timestamp, fetchedTimestamps, position){
+    if (this.props.fetchSnapshotCallback) {
+      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
+    }
+    const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
+  }
+
+  _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
+    return promise
+      .then(response => {return checkResponse(response);})
+      .then(response => {
+        let url = response.url;
+        fetchedTimestamps[position] = url.split('/')[4];
+        if (timestamp !== fetchedTimestamps[position]) {
+          this._redirectToValidatedTimestamps = true;
+        }
+      })
+      .catch(error => {this.errorHandled(error.message);});
+  }
+
+  _setNewURL(fetchedTimestampA, fetchedTimestampB){
+    this._redirectToValidatedTimestamps = false;
+    if (fetchedTimestampA === undefined) {
+      fetchedTimestampA = '';
+    }
+    if (fetchedTimestampB === undefined) {
+      fetchedTimestampB = '';
+    }
+    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    this.setState({timestampA: fetchedTimestampA, timestampB: fetchedTimestampB});
+    document.getElementById('timestamp-select-left').value = fetchedTimestampA;
+    document.getElementById('timestamp-select-right').value = fetchedTimestampB;
+  }
+
+  _fetchCDXData () {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
@@ -127,12 +179,6 @@ export default class TimestampHeader extends React.Component {
       })
       .then((data) => {
         if (data && data.length > 0 ){
-          if (data.length === 2) {
-            let timestamp = data[1][0];
-            if (this.props.timestampA !== timestamp) {
-              window.location.href = `${this.props.conf.urlPrefix}${timestamp}//${this.props.url}`;
-            }
-          }
           this._prepareData(data);
           if (!this.props.isInitial) {
             this._selectValues();
@@ -147,9 +193,8 @@ export default class TimestampHeader extends React.Component {
   }
 
   _errorHandled(error) {
-    if (this.isMountedNow) {
+    if (this._isMountedNow) {
       this.props.errorHandledCallback(error);
-      // console.log('widgetRender--setState');
       this.setState({showError: true});
     }
   }
@@ -249,11 +294,11 @@ export default class TimestampHeader extends React.Component {
   _showOpenLinks(){
     if(!this.props.isInitial) {
       if (this.props.timestampA) {
-        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampA + '/' + this.props.url}
+        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
           id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
       }
       if (this.props.timestampB) {
-        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.props.timestampB + '/' + this.props.url}
+        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
           id="timestamp-right" target="_blank" rel="noopener">
           Open in new window</a>);
       }
@@ -273,13 +318,23 @@ export default class TimestampHeader extends React.Component {
   }
 
   _showDiffs () {
+
+    let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
+
+    while(loaders.length > 0) {
+      loaders[0].parentNode.removeChild(loaders[0]);
+    }
+
+    let timestampA = document.getElementById('timestamp-select-left').value;
+    let timestampB = document.getElementById('timestamp-select-right').value;
+    this.props.changeTimestampsCallback(timestampA, timestampB);
     this.setState({showDiff: true});
   }
 
   _selectValues () {
-    if (!(!this.props.timestampA && !this.props.timestampB && !this.props.isInitial)){
-      document.getElementById('timestamp-select-left').value = this.props.timestampA;
-      document.getElementById('timestamp-select-right').value = this.props.timestampB;
+    if (!(!this.state.timestampA && !this.state.timestampB && !this.props.isInitial)){
+      document.getElementById('timestamp-select-left').value = this.state.timestampA;
+      document.getElementById('timestamp-select-right').value = this.state.timestampB;
     }
 
   }

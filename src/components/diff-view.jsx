@@ -163,8 +163,8 @@ export default class DiffView extends React.Component {
    */
   _propsSpecifySameDiff (newProps, props) {
     props = props || this.props;
-    return props.a.uuid === newProps.a.uuid
-      && props.b.uuid === newProps.b.uuid
+    return props.a === newProps.a
+      && props.b === newProps.b
       && props.diffType === newProps.diffType;
   }
 
@@ -211,7 +211,6 @@ export default class DiffView extends React.Component {
   _errorHandled(error) {
     if (this.isMountedNow) {
       this.props.errorHandledCallback(error);
-      // console.log('diffview--setState');
       this.setState({showError: true});
     }
   }

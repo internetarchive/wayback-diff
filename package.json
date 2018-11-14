@@ -1,6 +1,6 @@
 {
   "name": "wayback-diff",
-  "version": "0.1.14",
+  "version": "0.1.2",
   "private": true,
   "main": "build/app.js",
   "dependencies": {
@@ -49,5 +49,11 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "webpack-cli": "^3.0.6",
     "webpack-dev-server": "^3.1.4"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

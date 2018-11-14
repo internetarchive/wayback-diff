@@ -4,7 +4,6 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import TimestampHeader from './timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import { Redirect } from 'react-router-dom';
 import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
@@ -16,22 +15,31 @@ import ErrorMessage from './errors.jsx';
  * @extends {React.Component}
  */
 export default class DiffContainer extends React.Component {
-  _timestampsValidated = false;
-  _redirectToValidatedTimestamps = false;
   _errorCode = '';
   constructor (props) {
     super(props);
     this.state = {
       fetchedRaw: null,
-      showError: false
+      showError: false,
+      timestampA: this.props.timestampA,
+      timestampB: this.props.timestampB
     };
     this._oneFrame = null;
     this.errorHandled = this.errorHandled.bind(this);
+    this.changeTimestamps = this.changeTimestamps.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
   }
 
+  changeTimestamps(timestampA, timestampB){
+    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+    this.setState({
+      fetchedRaw: null,
+      showError: false,
+      timestampA: timestampA,
+      timestampB: timestampB});
+  }
+
   errorHandled (errorCode) {
-    // console.log('I am handling this error: ' + _errorCode);
     this._errorCode = errorCode;
     this.setState({showError: true});
   }
@@ -40,18 +48,15 @@ export default class DiffContainer extends React.Component {
     if (this._urlIsInvalid()) {
       return this._invalidURL();
     }
-    if (this._redirectToValidatedTimestamps) {
-      return(this._renderRedirect());
-    }
     if (this.state.showError){
       return(
         <ErrorMessage url={this.props.url} code={this._errorCode}/>);
     }
-    if (!this.props.timestampA && !this.props.timestampB) {
+    if (!this.state.timestampA && !this.state.timestampB) {
       if (this.props.noTimestamps){
         return (
           <div className="diffcontainer-view">
-            <TimestampHeader {...this.props}
+            <TimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
               isInitial={false} errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
@@ -59,42 +64,38 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={true} {...this.props}
-            errorHandledCallback={this.errorHandled}/>
+            errorHandledCallback={this.errorHandled}
+            changeTimestampsCallback={this.changeTimestamps}/>
         </div>
       );
     }
-    if (!this._timestampsValidated) {this._checkTimestamps();}
-    if (this.props.timestampA && this.props.timestampB) {
+    if (this.state.timestampA && this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false}
-            {...this.props}
+            {...this.props} changeTimestampsCallback={this.changeTimestamps}
             errorHandledCallback={this.errorHandled}/>
           {this.prepareDiffView()}
           <DiffFooter/>
         </div>);
     }
-    if (this.props.timestampA) {
+    if (this.state.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <TimestampHeader {...this.props}
+          <TimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
             isInitial={false} errorHandledCallback={this.errorHandled}/>
-          {this._showOneSnapshot(true, this.props.timestampA)}
+          {this._showOneSnapshot(true, this.state.timestampA)}
         </div>);
     }
-    if (this.props.timestampB) {
+    if (this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
           <TimestampHeader isInitial={false} {...this.props}
-            errorHandledCallback={this.errorHandled}/>
-          {this._showOneSnapshot(false, this.props.timestampB)}
+            errorHandledCallback={this.errorHandled}
+            changeTimestampsCallback={this.changeTimestamps}/>
+          {this._showOneSnapshot(false, this.state.timestampB)}
         </div>);
     }
-  }
-
-  _renderRedirect () {
-    this._redirectToValidatedTimestamps = false;
-    return (<Redirect to={this.state.newURL} />);
   }
 
   _showNoTimestamps() {
@@ -107,6 +108,7 @@ export default class DiffContainer extends React.Component {
   }
 
   _showOneSnapshot (isLeft, timestamp) {
+    this._timestampsValidated = true;
     if(this.state.fetchedRaw){
       if (isLeft){
         return(
@@ -159,67 +161,12 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.showError){
-      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampA + '/' + encodeURIComponent(this.props.url);
-      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestampB + '/' + encodeURIComponent(this.props.url);
+      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampA + '/' + encodeURIComponent(this.props.url);
+      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampB + '/' + encodeURIComponent(this.props.url);
 
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
         loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
-    }
-  }
-
-  _checkTimestamps () {
-    var fetchedTimestamps = { a: '', b: '' };
-    if (this.props.timestampA && this.props.timestampB) {
-      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(() => {return this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b');})
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        });
-    } else if (this.props.timestampA) {
-      this._validateTimestamp(this.props.timestampA, fetchedTimestamps, 'a')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        });
-    } else if (this.props.timestampB) {
-      this._validateTimestamp(this.props.timestampB, fetchedTimestamps, 'b')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          }
-        });
-    }
-  }
-
-  _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
-    return promise
-      .then(response => {return checkResponse(response);})
-      .then(response => {
-        let url = response.url;
-        fetchedTimestamps[position] = url.split('/')[4];
-        if (timestamp !== fetchedTimestamps[position]) {
-          this._redirectToValidatedTimestamps = true;
-        }
-      })
-      .catch(error => {this.errorHandled(error.message);});
-  }
-
-  _validateTimestamp(timestamp, fetchedTimestamps, position){
-    if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
-    }
-    const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
-  }
-
-  _setNewURL(fetchedTimestampA, fetchedTimestampB){
-    if (this._redirectToValidatedTimestamps && (fetchedTimestampA || fetchedTimestampB)){
-      // console.log('checkTimestamps--setState');
-      this.setState({newURL: this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url});
     }
   }
 

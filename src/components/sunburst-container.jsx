@@ -1,5 +1,4 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import D3Sunburst from './d3-sunburst.jsx';
 import {hammingDistance} from '../js/utils.js';
 import '../css/diffgraph.css';
@@ -20,7 +19,8 @@ export default class SunburstContainer extends React.Component {
     super(props);
 
     this.state = {
-      simhashData: null
+      simhashData: null,
+      timestamp: this.props.timestamp
     };
   }
 
@@ -28,9 +28,6 @@ export default class SunburstContainer extends React.Component {
     if (this.state.showError){
       return(
         <ErrorMessage url={this.props.url} code={this._errorCode}/>);
-    }
-    if (this._redirectToValidatedTimestamp){
-      return this._renderRedirect();
     }
     if (this.state.simhashData) {
       return (
@@ -54,37 +51,29 @@ export default class SunburstContainer extends React.Component {
       );
     }
     const Loader = () => this.props.loader;
-    if (this.state.timestampValidated) {
-      this._fetchTimestampSimhashData();
-    } else {
-      this._validateTimestamp();
-    }
+    this._fetchTimestampSimhashData(this.state.timestamp);
+    this._validateTimestamp();
     return (<Loader/>);
-  }
-
-  _renderRedirect () {
-    this._redirectToValidatedTimestamp = false;
-    return (<Redirect to={this.state.newURL} />);
   }
 
   _validateTimestamp() {
     let promise;
     if (this.props.fetchSnapshotCallback) {
-      promise = this.props.fetchSnapshotCallback(this.props.timestamp);
+      promise = this.props.fetchSnapshotCallback(this.state.timestamp);
     } else {
-      let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.props.timestamp + '/' + encodeURIComponent(this.props.url);
+      let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestamp + '/' + encodeURIComponent(this.props.url);
       promise = fetch_with_timeout(fetch(url, {redirect: 'follow'}));
     }
     promise.then(response => {return checkResponse(response);})
       .then(response => {
         let url = response.url;
         let fetchedTimestamp = url.split('/')[4];
-        if (this.props.timestamp !== fetchedTimestamp) {
-          this._redirectToValidatedTimestamp = true;
-          this.setState({newURL: this.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + this.props.url,
-            timestampValidated: true});
+        if (this.state.timestamp !== fetchedTimestamp) {
+
+          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + this.props.url);
+          this.setState({timestamp: fetchedTimestamp});
+
         }
-        this.setState({timestampValidated: true});
       })
       .catch(error => {this.errorHandled(error.message);});
   }
@@ -94,8 +83,8 @@ export default class SunburstContainer extends React.Component {
     this.setState({showError: true});
   }
 
-  _fetchTimestampSimhashData () {
-    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&timestamp=${this.props.timestamp}`;
+  _fetchTimestampSimhashData (timestamp) {
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&timestamp=${timestamp}`;
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
@@ -105,14 +94,14 @@ export default class SunburstContainer extends React.Component {
       .catch(error => {this.errorHandled(error.message);});
   }
 
-  _fetchSimhashData (timestamp) {
-    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&year=${this.props.timestamp.substring(0, 4)}`;
+  _fetchSimhashData (timestampJson) {
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&year=${this.state.timestamp.substring(0, 4)}`;
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         var json = this._decodeJson(jsonResponse);
-        let data = this._calcDistance(json, timestamp);
-        this._createLevels(data, timestamp);
+        let data = this._calcDistance(json, timestampJson);
+        this._createLevels(data, timestampJson);
       })
       .catch(error => {this.errorHandled(error.message);});
   }
@@ -156,7 +145,7 @@ export default class SunburstContainer extends React.Component {
     json.simhash = json.simhash.toString().replace(/=/, '');
     json.simhash = base64.decode(json.simhash);
 
-    return [this.props.timestamp, json.simhash];
+    return [this.state.timestamp, json.simhash];
   }
 
   _calcDistance(json, timestamp){
