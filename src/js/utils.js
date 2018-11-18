@@ -74,3 +74,7 @@ export function fetch_with_timeout(promise) {
     promise.then(resolve, reject);
   });
 }
+
+export function getTwoDigitInt(n){
+  return n > 9 ? '' + n: '0' + n;
+}

@@ -4128,7 +4128,7 @@ var TimestampHeader = function (_React$Component) {
         }
       }).then(function (data) {
         if (data && data.length > 0) {
-          _this5._prepareData(data);
+          _this5._prepareCDXData(data);
           if (!_this5.props.isInitial) {
             _this5._selectValues();
           }
@@ -4149,7 +4149,7 @@ var TimestampHeader = function (_React$Component) {
       }
     }
   }, {
-    key: '_prepareData',
+    key: '_prepareCDXData',
     value: function _prepareData(data) {
       data.shift();
       this.setState({
