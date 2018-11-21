@@ -131,8 +131,8 @@ export default class NewTimestampHeader extends React.Component {
           </div>
         );
       }
-      let leftMonth = this.props.timestampA.substring(4,6);
-      let rightMonth = this.props.timestampB.substring(4,6);
+      let leftMonth = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(4,6);
+      let rightMonth = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(4,6);
       this._fetchCDXData(leftMonth,rightMonth);
       return (
         <Loader/>
@@ -209,16 +209,21 @@ export default class NewTimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
+      let url;
+      if (monthLeft) {
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
       &url=${encodeURIComponent(this.props.url)}&status=200
       &fl=timestamp,digest&output=json&sort=reverse
       &from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}`;
-      leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
-      url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
-      &url=${encodeURIComponent(this.props.url)}&status=200
-      &fl=timestamp,digest&output=json&sort=reverse
-      &from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}`;
-      rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+        leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
+      }
+      if (monthRight) {
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
+        &url=${encodeURIComponent(this.props.url)}&status=200
+        &fl=timestamp,digest&output=json&sort=reverse
+        &from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}`;
+        rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
+      }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
   }
@@ -236,29 +241,52 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _exportCDXData(leftFetchPromise, rightFetchPromise){
-    leftFetchPromise
-      .then((data) => {
-        if (data && data.length > 0 ){
-          let leftData = data;
-          rightFetchPromise
-            .then((data) => {
-              if (data && data.length > 0) {
-                this._prepareCDXData(leftData, data);
-                if (!this.props.isInitial) {
-                  this._selectValues();
-                }
-              }
-              else {
-                this.props.errorHandledCallback('404');
-                this.setState({showError: true});
-              }
-            });
-        } else {
-          this.props.errorHandledCallback('404');
-          this.setState({showError:true});
-        }
-      })
-      .catch(error => {this._errorHandled(error.message);});
+    if (leftFetchPromise) {
+      leftFetchPromise
+        .then((data) => {
+          if (data && data.length > 0 ){
+            if (rightFetchPromise) {
+              let leftData = data;
+              rightFetchPromise
+                .then((data) => {
+                  if (data && data.length > 0) {
+                    this._prepareCDXData(leftData, data);
+                    if (!this.props.isInitial) {
+                      this._selectValues();
+                    }
+                  }
+                  else {
+                    this.props.errorHandledCallback('404');
+                    this.setState({showError: true});
+                  }
+                });
+            }
+            this._prepareCDXData(data, null);
+            if (!this.props.isInitial) {
+              this._selectValues();
+            }
+          } else {
+            this.props.errorHandledCallback('404');
+            this.setState({showError:true});
+          }
+        })
+        .catch(error => {this._errorHandled(error.message);});
+    } else if (rightFetchPromise) {
+      rightFetchPromise
+        .then((data) => {
+          if (data && data.length > 0) {
+            this._prepareCDXData(null, data);
+            if (!this.props.isInitial) {
+              this._selectValues();
+            }
+          }
+          else {
+            this.props.errorHandledCallback('404');
+            this.setState({showError: true});
+          }
+        });
+    }
+
   }
 
   _errorHandled(error) {
@@ -268,8 +296,12 @@ export default class NewTimestampHeader extends React.Component {
     }
   }
   _prepareCDXData(leftData, data){
-    data.shift();
-    leftData.shift();
+    if (data) {
+      data.shift();
+    }
+    if (leftData) {
+      leftData.shift();
+    }
     this.setState({
       leftMonthOptions: null,
       rightMonthOptions: null,
@@ -282,24 +314,26 @@ export default class NewTimestampHeader extends React.Component {
     });
   }
 
-  _prepareOptionElements(data){
-    let yearGroup;
-    let initialSnapshots = [];
-    let year;
-    if (data.length > 0) {
-      yearGroup = this._getYear(data[0][0]);
-      initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
-    }
-    for (let i = 0; i < data.length; i++){
-      let utcTime = this._getUTCDateFormat(data[i][0]);
-      year = this._getYear(data[i][0]);
-      if (year < yearGroup) {
-        yearGroup = year;
-        initialSnapshots.push(<optgroup key={-i+2} label={yearGroup}/>);
+  _prepareOptionElements(data) {
+    if (data) {
+      let yearGroup;
+      let initialSnapshots = [];
+      let year;
+      if (data.length > 0) {
+        yearGroup = this._getYear(data[0][0]);
+        initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
       }
-      initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
+      for (let i = 0; i < data.length; i++) {
+        let utcTime = this._getUTCDateFormat(data[i][0]);
+        year = this._getYear(data[i][0]);
+        if (year < yearGroup) {
+          yearGroup = year;
+          initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
+        }
+        initialSnapshots.push(<option key={i} value={data[i][0]}>{utcTime}</option>);
+      }
+      return initialSnapshots;
     }
-    return initialSnapshots;
   }
 
   _prepareSparklineOptionElements(data){
