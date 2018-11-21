@@ -17,12 +17,17 @@ export default class NewTimestampHeader extends React.Component {
   constructor(props) {
     super(props);
 
+    let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0,4);
+    let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0,4);
+
     this.state = {
       cdxData: false,
       showDiff: false,
       showError: false,
       timestampA: this.props.timestampA,
-      timestampB: this.props.timestampB
+      timestampB: this.props.timestampB,
+      leftYear: leftYear,
+      rightYear: rightYear,
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -74,29 +79,47 @@ export default class NewTimestampHeader extends React.Component {
     const Loader = () => this.props.loader;
 
     if (!this.state.showError) {
-      if (this.state.yearOptions) {
-        if (this._shouldValidateTimestamp) {
-          this._checkTimestamps();
+      if (this.props.isInitial) {
+        if (this.state.yearOptions) {
+          if (this._shouldValidateTimestamp) {
+            this._checkTimestamps();
+          }
+          return (
+            <div className="timestamp-header-view">
+              {this._showYearInfo()}
+              {this._showYearSelector()}
+            </div>
+          );
         }
+        if (this.state.leftMonthOptions && this.state.rightMonthOptions) {
+          if (this._shouldValidateTimestamp) {
+            this._checkTimestamps();
+          }
+          return (
+            <div className="timestamp-header-view">
+              {this._showMonthInfo()}
+              {this._showMonthSelector()}
+            </div>
+          );
+        }
+        else if (this.state.cdxData) {
+          if (this._shouldValidateTimestamp) {
+            this._checkTimestamps();
+          }
+          return (
+            <div className="timestamp-header-view">
+              {this._showInfo()}
+              {this._showTimestampSelector()}
+              {this._showOpenLinks()}
+            </div>
+          );
+        }
+        this._fetchSparklineData();
         return (
-          <div className="timestamp-header-view">
-            {this._showYearInfo()}
-            {this._showYearSelector()}
-          </div>
+          <Loader/>
         );
       }
-      if (this.state.leftMonthOptions && this.state.rightMonthOptions) {
-        if (this._shouldValidateTimestamp) {
-          this._checkTimestamps();
-        }
-        return (
-          <div className="timestamp-header-view">
-            {this._showMonthInfo()}
-            {this._showMonthSelector()}
-          </div>
-        );
-      }
-      else if (this.state.cdxData) {
+      if (this.state.cdxData) {
         if (this._shouldValidateTimestamp) {
           this._checkTimestamps();
         }
@@ -108,8 +131,9 @@ export default class NewTimestampHeader extends React.Component {
           </div>
         );
       }
-      this._fetchSparklineData();
-      // this._fetchCDXData();
+      let leftMonth = this.props.timestampA.substring(4,6);
+      let rightMonth = this.props.timestampB.substring(4,6);
+      this._fetchCDXData(leftMonth,rightMonth);
       return (
         <Loader/>
       );
@@ -220,9 +244,9 @@ export default class NewTimestampHeader extends React.Component {
             .then((data) => {
               if (data && data.length > 0) {
                 this._prepareCDXData(leftData, data);
-                // if (!this.props.isInitial) {
-                //   this._selectValues();
-                // }
+                if (!this.props.isInitial) {
+                  this._selectValues();
+                }
               }
               else {
                 this.props.errorHandledCallback('404');

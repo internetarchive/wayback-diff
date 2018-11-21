@@ -57,7 +57,7 @@ export default class DiffContainer extends React.Component {
         return (
           <div className="diffcontainer-view">
             <NewTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
-              isInitial={false} errorHandledCallback={this.errorHandled}/>
+              isInitial={true} errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
       }
