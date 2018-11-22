@@ -249,7 +249,7 @@ export default class NewTimestampHeader extends React.Component {
     if (leftFetchPromise) {
       leftFetchPromise
         .then((data) => {
-          if (data && data.length > 0 ){
+          if (data && data.length > 0 ) {
             if (rightFetchPromise) {
               let leftData = data;
               rightFetchPromise
@@ -265,10 +265,11 @@ export default class NewTimestampHeader extends React.Component {
                     this.setState({showError: true});
                   }
                 });
-            }
-            this._prepareCDXData(data, null);
-            if (!this.state.showSteps) {
-              this._selectValues();
+            } else {
+              this._prepareCDXData(data, null);
+              if (!this.state.showSteps) {
+                this._selectValues();
+              }
             }
           } else {
             this.props.errorHandledCallback('404');
