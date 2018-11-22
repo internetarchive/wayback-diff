@@ -44,6 +44,10 @@ export default class NewTimestampHeader extends React.Component {
 
     this._getTimestamps = this._getTimestamps.bind(this);
 
+    this._goToYear = this._goToYear.bind(this);
+
+    this._goToMonth = this._goToMonth.bind(this);
+
   }
 
   componentDidMount() {
@@ -388,6 +392,7 @@ export default class NewTimestampHeader extends React.Component {
           {this.state.leftSnapElements}
         </select>
         <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showDiffs}>Show differences</button>
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._goToMonth}>Back</button>
         <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this._restartPressed}>Restart</button>
         <select className="form-control" id="timestamp-select-right" onChange={this._handleRightTimestampChange}>
           {this.state.rightSnapElements}
@@ -416,6 +421,7 @@ export default class NewTimestampHeader extends React.Component {
           {this.state.leftMonthOptions}
         </select>
         <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._getTimestamps}>Select timestamp</button>
+        <button className="btn btn-default navbar-btn" id="back-diff-btn" onClick={this._goToYear}>Back</button>
         <select className="form-control" id="timestamp-select-right">
           {this.state.rightMonthOptions}
         </select>
@@ -584,5 +590,18 @@ export default class NewTimestampHeader extends React.Component {
     let monthLeft = document.getElementById('timestamp-select-left').selectedIndex + 1;
     let monthRight = document.getElementById('timestamp-select-right').selectedIndex + 1;
     this._fetchCDXData(monthLeft, monthRight);
+  }
+
+  _goToYear () {
+    this.setState({
+      leftMonthOptions: null,
+      rightMonthOptions: null
+    });
+  }
+
+  _goToMonth () {
+    this.setState({
+      cdxData: null
+    });
   }
 }
