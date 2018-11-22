@@ -28,6 +28,7 @@ export default class NewTimestampHeader extends React.Component {
       timestampB: this.props.timestampB,
       leftYear: leftYear,
       rightYear: rightYear,
+      showSteps: this.props.isInitial
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -83,7 +84,7 @@ export default class NewTimestampHeader extends React.Component {
     const Loader = () => this.props.loader;
 
     if (!this.state.showError) {
-      if (this.props.isInitial) {
+      if (this.state.showSteps) {
         if (this.state.yearOptions) {
           if (this._shouldValidateTimestamp) {
             this._checkTimestamps();
@@ -255,7 +256,7 @@ export default class NewTimestampHeader extends React.Component {
                 .then((data) => {
                   if (data && data.length > 0) {
                     this._prepareCDXData(leftData, data);
-                    if (!this.props.isInitial) {
+                    if (!this.state.showSteps) {
                       this._selectValues();
                     }
                   }
@@ -266,7 +267,7 @@ export default class NewTimestampHeader extends React.Component {
                 });
             }
             this._prepareCDXData(data, null);
-            if (!this.props.isInitial) {
+            if (!this.state.showSteps) {
               this._selectValues();
             }
           } else {
@@ -280,7 +281,7 @@ export default class NewTimestampHeader extends React.Component {
         .then((data) => {
           if (data && data.length > 0) {
             this._prepareCDXData(null, data);
-            if (!this.props.isInitial) {
+            if (!this.state.showSteps) {
               this._selectValues();
             }
           }
@@ -463,7 +464,7 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _showOpenLinks(){
-    if(!this.props.isInitial) {
+    if(!this.state.showSteps) {
       if (this.props.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
           id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
@@ -503,7 +504,7 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    if (!(!this.state.timestampA && !this.state.timestampB && !this.props.isInitial)){
+    if (!(!this.state.timestampA && !this.state.timestampB && !this.state.showSteps)){
       document.getElementById('timestamp-select-left').value = this.state.timestampA;
       document.getElementById('timestamp-select-right').value = this.state.timestampB;
     }
@@ -601,7 +602,8 @@ export default class NewTimestampHeader extends React.Component {
 
   _goToMonth () {
     this.setState({
-      cdxData: null
+      cdxData: null,
+      showSteps: true
     });
   }
 }
