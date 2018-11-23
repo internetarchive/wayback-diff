@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import {handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt} from '../js/utils.js';
+import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue } from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -12,8 +12,9 @@ export default class NewTimestampHeader extends React.Component {
   ABORT_CONTROLLER = new window.AbortController();
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
-  _monthNames = ['January','February','March', 'April', 'May',
-    'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  _monthNames = {1:'January', 2:'February', 3:'March', 4:'April', 5:'May',
+    6:'June', 7:'July', 8:'August', 9:'September', 10:'October', 11:'November', 12:'December'};
+
   constructor(props) {
     super(props);
 
@@ -216,17 +217,11 @@ export default class NewTimestampHeader extends React.Component {
     } else {
       let url;
       if (monthLeft) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
-      &url=${encodeURIComponent(this.props.url)}&status=200
-      &fl=timestamp,digest&output=json&sort=reverse
-      &from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}`;
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}`;
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
       if (monthRight) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?
-        &url=${encodeURIComponent(this.props.url)}&status=200
-        &fl=timestamp,digest&output=json&sort=reverse
-        &from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}`;
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}`;
         rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
     }
@@ -557,16 +552,8 @@ export default class NewTimestampHeader extends React.Component {
     let leftMonths = this.state.sparkline[leftYear];
     let rightMonths = this.state.sparkline[rightYear];
 
-    let leftMonthsData = new Array(leftMonths.length);
-    let rightMonthsData = new Array(rightMonths.length);
-
-    for (let month = 0; month < leftMonths.length; month ++) {
-      leftMonthsData[month] = [this._monthNames[month], leftMonths[month]];
-    }
-
-    for (let month = 0; month < rightMonths.length; month ++) {
-      rightMonthsData[month] = [this._monthNames[month], rightMonths[month]];
-    }
+    let leftMonthsData = this._getMonthData(leftMonths);
+    let rightMonthsData= this._getMonthData(rightMonths);
 
     this.setState({
       yearOptions: null,
@@ -577,10 +564,21 @@ export default class NewTimestampHeader extends React.Component {
     });
   }
 
+  _getMonthData(data){
+    let monthData = [];
+    for (let i = 0; i < data.length; i ++) {
+      if (data[i] > 0) {
+        monthData.push([this._monthNames[i+1], data[i]]);
+      }
+    }
+    return monthData;
+  }
+
   _getTimestamps () {
-    let monthLeft = document.getElementById('timestamp-select-left').selectedIndex + 1;
-    let monthRight = document.getElementById('timestamp-select-right').selectedIndex + 1;
-    this._fetchCDXData(monthLeft, monthRight);
+    let monthLeft = document.getElementById('timestamp-select-left').value;
+    let monthRight = document.getElementById('timestamp-select-right').value;
+
+    this._fetchCDXData(parseInt(getKeyByValue(this._monthNames,monthLeft),0), parseInt(getKeyByValue(this._monthNames,monthRight),0));
   }
 
   _goToYear () {
@@ -594,16 +592,8 @@ export default class NewTimestampHeader extends React.Component {
     let leftMonths = this.state.sparkline[this.state.leftYear];
     let rightMonths = this.state.sparkline[this.state.rightYear];
 
-    let leftMonthsData = new Array(leftMonths.length);
-    let rightMonthsData = new Array(rightMonths.length);
-
-    for (let month = 0; month < leftMonths.length; month ++) {
-      leftMonthsData[month] = [this._monthNames[month], leftMonths[month]];
-    }
-
-    for (let month = 0; month < rightMonths.length; month ++) {
-      rightMonthsData[month] = [this._monthNames[month], rightMonths[month]];
-    }
+    let leftMonthsData = this._getMonthData(leftMonths);
+    let rightMonthsData= this._getMonthData(rightMonths);
 
     this.setState({
       leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),

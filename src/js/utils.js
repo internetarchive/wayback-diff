@@ -81,3 +81,7 @@ export function getTwoDigitInt(n){
   }
   return n > 9 ? '' + n: '0' + n;
 }
+
+export function getKeyByValue (obj, value) {
+  return Object.keys(obj).find(key => obj[key] === value);
+}

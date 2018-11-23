@@ -5,6 +5,7 @@
   "urlPrefix": "/diff/",
   "diffgraphPrefix": "/diffgraph/",
   "cdxServer": "http://web.archive.org/cdx/",
+  "sparklineURL": "http://web.archive.org/__wb/sparkline",
   "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
   "waybackDiscoverDiff": "http://localhost:4000",
   "maxSunburstLevelLength": "70"
