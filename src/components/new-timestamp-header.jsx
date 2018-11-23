@@ -589,16 +589,15 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _goToMonth () {
-    let leftMonths = this.state.sparkline[this.state.leftYear];
-    let rightMonths = this.state.sparkline[this.state.rightYear];
 
-    let leftMonthsData = this._getMonthData(leftMonths);
-    let rightMonthsData= this._getMonthData(rightMonths);
+    let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0,4);
+    let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0,4);
 
     this.setState({
-      leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),
-      rightMonthOptions: this._prepareSparklineOptionElements(rightMonthsData),
       cdxData: null,
+      showError: false,
+      leftYear: leftYear,
+      rightYear: rightYear,
       showSteps: true
     });
   }
