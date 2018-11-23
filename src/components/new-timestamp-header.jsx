@@ -322,20 +322,9 @@ export default class NewTimestampHeader extends React.Component {
 
   _prepareOptionElements(data) {
     if (data) {
-      let yearGroup;
       let initialSnapshots = [];
-      let year;
-      if (data.length > 0) {
-        yearGroup = this._getYear(data[0][0]);
-        initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
-      }
       for (let i = 0; i < data.length; i++) {
         let utcTime = this._getUTCDateFormat(data[i][0]);
-        year = this._getYear(data[i][0]);
-        if (year < yearGroup) {
-          yearGroup = year;
-          initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
-        }
         initialSnapshots.push(<option key={i} value={data[i][0]}>{utcTime}</option>);
       }
       return initialSnapshots;
