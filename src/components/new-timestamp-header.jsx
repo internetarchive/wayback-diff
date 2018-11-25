@@ -62,21 +62,19 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _handleRightTimestampChange(){
-    const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
-    let allowedSnapshots = this.state.cdxData;
+    const selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
+    let allowedSnapshots = this.state.leftSnaps;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
-      leftSnaps: allowedSnapshots,
       leftSnapElements : this._prepareOptionElements(allowedSnapshots)
     });
   }
 
   _handleLeftTimestampChange(){
-    const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
-    let allowedSnapshots = this.state.cdxData;
+    const selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
+    let allowedSnapshots = this.state.rightSnaps;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
-      rightSnaps: allowedSnapshots,
       rightSnapElements : this._prepareOptionElements(allowedSnapshots)
     });
   }
@@ -362,12 +360,9 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _restartPressed () {
-    let initialData = this.state.cdxData;
     this.setState({
-      leftSnaps : initialData,
-      rightSnaps : initialData,
-      leftSnapElements : this._prepareOptionElements(initialData),
-      rightSnapElements : this._prepareOptionElements(initialData)
+      leftSnapElements : this._prepareOptionElements(this.state.leftSnaps),
+      rightSnapElements : this._prepareOptionElements(this.state.rightSnaps)
     });
   }
 
