@@ -215,11 +215,11 @@ export default class NewTimestampHeader extends React.Component {
     } else {
       let url;
       if (monthLeft) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}`;
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&limit=${this.props.conf.limit}`;
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
       if (monthRight) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}`;
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}&limit=${this.props.conf.limit}`;
         rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
     }
@@ -327,7 +327,11 @@ export default class NewTimestampHeader extends React.Component {
   _prepareSparklineOptionElements(data){
     let options = [];
     for (let i = 0; i < data.length; i++){
-      options.push(<option key = {i} value = {data[i][0]}>{`${data[i][0]} (${data[i][1]})`}</option>);
+      let count = data[i][1];
+      if (count > parseInt(this.props.conf.limit, 0)) {
+        count = this.props.conf.limit;
+      }
+      options.push(<option key = {i} value = {data[i][0]}>{`${data[i][0]} (${count})`}</option>);
     }
     return options;
   }
