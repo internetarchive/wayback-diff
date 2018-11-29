@@ -12,14 +12,18 @@ export default class NewTimestampHeader extends React.Component {
   ABORT_CONTROLLER = new window.AbortController();
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
-  _monthNames = {1:'January', 2:'February', 3:'March', 4:'April', 5:'May',
-    6:'June', 7:'July', 8:'August', 9:'September', 10:'October', 11:'November', 12:'December'};
+  _monthNames = {
+    1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May',
+    6: 'June', 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
+  };
+  _leftMonthIndex = -1;
+  _rightMonthIndex = -1;
 
-  constructor(props) {
+  constructor (props) {
     super(props);
 
-    let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0,4);
-    let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0,4);
+    let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0, 4);
+    let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0, 4);
 
     this.state = {
       cdxData: false,
@@ -46,36 +50,50 @@ export default class NewTimestampHeader extends React.Component {
 
     this._getTimestamps = this._getTimestamps.bind(this);
 
-    this._goToYear = this._goToYear.bind(this);
-
-    this._goToMonth = this._goToMonth.bind(this);
+    this._handleYearChange = this._handleYearChange.bind(this);
 
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this._isMountedNow = true;
   }
 
-  componentWillUnmount(){
+  componentDidUpdate () {
+    if (this.state.cdxData) {
+      if (!this.state.sparkline) {
+        this._fetchSparklineData();
+      }
+      this._selectValues();
+    }
+    if (this.state.leftMonthOptions || this.state.rightMonthOptions){
+      this._selectValues();
+    } else if (this.state.yearOptions) {
+      this._showMonths();
+    }
+  }
+
+  componentWillUnmount () {
     this._isMountedNow = false;
     this.ABORT_CONTROLLER.abort();
   }
 
-  _handleRightTimestampChange(){
+  _handleRightTimestampChange () {
+    this._showElement('restart-btn');
     const selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
     let allowedSnapshots = this.state.leftSnaps;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
-      leftSnapElements : this._prepareOptionElements(allowedSnapshots)
+      leftSnapElements: this._prepareOptionElements(allowedSnapshots)
     });
   }
 
-  _handleLeftTimestampChange(){
+  _handleLeftTimestampChange () {
+    this._showElement('restart-btn');
     const selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
     let allowedSnapshots = this.state.rightSnaps;
     allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
     this.setState({
-      rightSnapElements : this._prepareOptionElements(allowedSnapshots)
+      rightSnapElements: this._prepareOptionElements(allowedSnapshots)
     });
   }
 
@@ -84,37 +102,23 @@ export default class NewTimestampHeader extends React.Component {
 
     if (!this.state.showError) {
       if (this.state.showSteps) {
-        if (this.state.yearOptions) {
+        if (this.state.cdxData) {
           if (this._shouldValidateTimestamp) {
             this._checkTimestamps();
           }
           return (
             <div className="timestamp-header-view">
-              {this._showYearInfo()}
-              {this._showYearSelector()}
-            </div>
-          );
-        }
-        if (this.state.leftMonthOptions && this.state.rightMonthOptions) {
-          if (this._shouldValidateTimestamp) {
-            this._checkTimestamps();
-          }
-          return (
-            <div className="timestamp-header-view">
-              {this._showMonthInfo()}
-              {this._showMonthSelector()}
-            </div>
-          );
-        }
-        else if (this.state.cdxData) {
-          if (this._shouldValidateTimestamp) {
-            this._checkTimestamps();
-          }
-          return (
-            <div className="timestamp-header-view">
-              {this._showInfo()}
               {this._showTimestampSelector()}
               {this._showOpenLinks()}
+            </div>
+          );
+        } else if ((this.state.leftMonthOptions && this.state.rightMonthOptions) || this.state.yearOptions) {
+          if (this._shouldValidateTimestamp) {
+            this._checkTimestamps();
+          }
+          return (
+            <div className="timestamp-header-view">
+              {this._showTimestampSelector()}
             </div>
           );
         }
@@ -129,15 +133,12 @@ export default class NewTimestampHeader extends React.Component {
         }
         return (
           <div className="timestamp-header-view">
-            {this._showInfo()}
             {this._showTimestampSelector()}
             {this._showOpenLinks()}
           </div>
         );
       }
-      let leftMonth = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(4,6);
-      let rightMonth = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(4,6);
-      this._fetchCDXData(leftMonth,rightMonth);
+      this._fetchCDXData();
       return (
         <Loader/>
       );
@@ -146,33 +147,33 @@ export default class NewTimestampHeader extends React.Component {
 
   _checkTimestamps () {
     this._shouldValidateTimestamp = false;
-    var fetchedTimestamps = { a: '', b: '' };
+    var fetchedTimestamps = {a: '', b: ''};
     if (this.state.timestampA && this.state.timestampB) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
         .then(() => {return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b');})
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
+        .then(() => {
+          if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         }).catch(error => {this._errorHandled(error.message);});
     } else if (this.state.timestampA) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
+        .then(() => {
+          if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         }).catch(error => {this._errorHandled(error.message);});
     } else if (this.state.timestampB) {
       this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b')
-        .then(()=> {
-          if (this._redirectToValidatedTimestamps){
+        .then(() => {
+          if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           }
         }).catch(error => {this._errorHandled(error.message);});
     }
   }
 
-  _validateTimestamp(timestamp, fetchedTimestamps, position){
+  _validateTimestamp (timestamp, fetchedTimestamps, position) {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
@@ -180,7 +181,7 @@ export default class NewTimestampHeader extends React.Component {
     return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
   }
 
-  _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
+  _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
     return promise
       .then(response => {return checkResponse(response);})
       .then(response => {
@@ -193,7 +194,7 @@ export default class NewTimestampHeader extends React.Component {
       .catch(error => {this.errorHandled(error.message);});
   }
 
-  _setNewURL(fetchedTimestampA, fetchedTimestampB){
+  _setNewURL (fetchedTimestampA, fetchedTimestampB) {
     this._redirectToValidatedTimestamps = false;
     if (fetchedTimestampA === undefined) {
       fetchedTimestampA = '';
@@ -207,26 +208,27 @@ export default class NewTimestampHeader extends React.Component {
     document.getElementById('timestamp-select-right').value = fetchedTimestampB;
   }
 
-  _fetchCDXData (monthLeft, monthRight) {
+  _fetchCDXData () {
     let leftFetchPromise;
     let rightFetchPromise;
+    this._saveMonthsIndex();
     if (this.props.fetchCDXCallback) {
       leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
     } else {
       let url;
-      if (monthLeft) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&to=${this.state.leftYear}${getTwoDigitInt(monthLeft)}&limit=${this.props.conf.limit}`;
+      if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&to=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&limit=${this.props.conf.limit}`;
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
-      if (monthRight) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(monthRight)}&to=${this.state.rightYear}${getTwoDigitInt(monthRight)}&limit=${this.props.conf.limit}`;
+      if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
+        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&to=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&limit=${this.props.conf.limit}`;
         rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
       }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
   }
 
-  _handleFetch(promise) {
+  _handleFetch (promise) {
     return promise
       .then(function (response) {
         if (response) {
@@ -238,35 +240,28 @@ export default class NewTimestampHeader extends React.Component {
       });
   }
 
-  _exportCDXData(leftFetchPromise, rightFetchPromise){
+  _exportCDXData (leftFetchPromise, rightFetchPromise) {
     if (leftFetchPromise) {
       leftFetchPromise
         .then((data) => {
-          if (data && data.length > 0 ) {
+          if (data && data.length > 0) {
             if (rightFetchPromise) {
               let leftData = data;
               rightFetchPromise
                 .then((data) => {
                   if (data && data.length > 0) {
                     this._prepareCDXData(leftData, data);
-                    if (!this.state.showSteps) {
-                      this._selectValues();
-                    }
-                  }
-                  else {
+                  } else {
                     this.props.errorHandledCallback('404');
                     this.setState({showError: true});
                   }
                 });
             } else {
               this._prepareCDXData(data, null);
-              if (!this.state.showSteps) {
-                this._selectValues();
-              }
             }
           } else {
             this.props.errorHandledCallback('404');
-            this.setState({showError:true});
+            this.setState({showError: true});
           }
         })
         .catch(error => {this._errorHandled(error.message);});
@@ -275,11 +270,7 @@ export default class NewTimestampHeader extends React.Component {
         .then((data) => {
           if (data && data.length > 0) {
             this._prepareCDXData(null, data);
-            if (!this.state.showSteps) {
-              this._selectValues();
-            }
-          }
-          else {
+          } else {
             this.props.errorHandledCallback('404');
             this.setState({showError: true});
           }
@@ -288,13 +279,14 @@ export default class NewTimestampHeader extends React.Component {
 
   }
 
-  _errorHandled(error) {
+  _errorHandled (error) {
     if (this._isMountedNow) {
       this.props.errorHandledCallback(error);
       this.setState({showError: true});
     }
   }
-  _prepareCDXData(leftData, data){
+
+  _prepareCDXData (leftData, data) {
     if (data) {
       data.shift();
     }
@@ -302,18 +294,15 @@ export default class NewTimestampHeader extends React.Component {
       leftData.shift();
     }
     this.setState({
-      leftMonthOptions: null,
-      rightMonthOptions: null,
-      yearOptions: null,
       cdxData: true,
-      leftSnaps : leftData,
-      rightSnaps : data,
-      leftSnapElements : this._prepareOptionElements(leftData),
-      rightSnapElements : this._prepareOptionElements(data)
+      leftSnaps: leftData,
+      rightSnaps: data,
+      leftSnapElements: this._prepareOptionElements(leftData),
+      rightSnapElements: this._prepareOptionElements(data)
     });
   }
 
-  _prepareOptionElements(data) {
+  _prepareOptionElements (data) {
     if (data) {
       let initialSnapshots = [];
       for (let i = 0; i < data.length; i++) {
@@ -324,34 +313,36 @@ export default class NewTimestampHeader extends React.Component {
     }
   }
 
-  _prepareSparklineOptionElements(data){
-    let options = [];
-    for (let i = 0; i < data.length; i++){
-      let count = data[i][1];
-      if (count > parseInt(this.props.conf.limit, 0)) {
-        count = this.props.conf.limit;
+  _prepareSparklineOptionElements (data) {
+    if (data) {
+      let options = [];
+      for (let i = 0; i < data.length; i++) {
+        let count = data[i][1];
+        if (count > parseInt(this.props.conf.limit)) {
+          count = this.props.conf.limit;
+        }
+        options.push(<option key={i} value={data[i][0]}>{`${data[i][0]} (${count})`}</option>);
       }
-      options.push(<option key = {i} value = {data[i][0]}>{`${data[i][0]} (${count})`}</option>);
+      return options;
     }
-    return options;
   }
 
-  _getUTCDateFormat (date){
-    let year = parseInt(date.substring(0,4), 10);
-    let month = parseInt(date.substring(4,6), 10) - 1;
-    let day = parseInt(date.substring(6,8), 10);
-    let hour = parseInt(date.substring(8,10), 10);
-    let minutes = parseInt(date.substring(10,12), 10);
-    let seconds = parseInt(date.substring(12,14), 10);
+  _getUTCDateFormat (date) {
+    let year = parseInt(date.substring(0, 4), 10);
+    let month = parseInt(date.substring(4, 6), 10) - 1;
+    let day = parseInt(date.substring(6, 8), 10);
+    let hour = parseInt(date.substring(8, 10), 10);
+    let minutes = parseInt(date.substring(10, 12), 10);
+    let seconds = parseInt(date.substring(12, 14), 10);
 
     let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
     return (niceTime.toUTCString());
   }
 
-  _getShortUTCDateFormat (date){
-    let year = parseInt(date.substring(0,4), 10);
-    let month = parseInt(date.substring(4,6), 10) - 1;
-    let day = parseInt(date.substring(6,8), 10);
+  _getShortUTCDateFormat (date) {
+    let year = parseInt(date.substring(0, 4), 10);
+    let month = parseInt(date.substring(4, 6), 10) - 1;
+    let day = parseInt(date.substring(6, 8), 10);
     var shortTime = new Date(Date.UTC(year, month, day));
     shortTime = shortTime.toUTCString();
     shortTime = shortTime.split(' ');
@@ -360,95 +351,47 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _getYear (date) {
-    return parseInt(date.substring(0,4), 10);
+    return parseInt(date.substring(0, 4), 10);
   }
 
   _restartPressed () {
+    this._hideElement('restart-btn');
     this.setState({
-      leftSnapElements : this._prepareOptionElements(this.state.leftSnaps),
-      rightSnapElements : this._prepareOptionElements(this.state.rightSnaps)
+      leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
+      rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
     });
   }
 
   _showTimestampSelector () {
     return (
       <div className="timestamp-container-view">
+        <select className="form-control" id="year-select-left" onChange={this._handleYearChange}>
+          {this.state.yearOptions}
+        </select>
+        <select className="form-control" id="month-select-left" onChange={this._getTimestamps}>
+          {this.state.leftMonthOptions}
+        </select>
         <select className="form-control" id="timestamp-select-left" onChange={this._handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showDiffs}>Show differences</button>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._goToMonth}>Back</button>
-        <button className="btn btn-default navbar-btn" id="restart-btn" onClick={this._restartPressed}>Restart</button>
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showDiffs}>Show differences
+        </button>
+        <button className="btn btn-default navbar-btn" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
         <select className="form-control" id="timestamp-select-right" onChange={this._handleRightTimestampChange}>
           {this.state.rightSnapElements}
         </select>
-      </div>
-    );
-  }
-
-  _showYearSelector () {
-    return (
-      <div className="timestamp-container-view">
-        <select className="form-control" id="timestamp-select-left">
-          {this.state.yearOptions}
-        </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showMonths}>Select month</button>
-        <select className="form-control" id="timestamp-select-right">
-          {this.state.yearOptions}
-        </select>
-      </div>
-    );
-  }
-  _showMonthSelector () {
-    return (
-      <div className="timestamp-container-view">
-        <select className="form-control" id="timestamp-select-left">
-          {this.state.leftMonthOptions}
-        </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._getTimestamps}>Select timestamp</button>
-        <button className="btn btn-default navbar-btn" id="back-diff-btn" onClick={this._goToYear}>Back</button>
-        <select className="form-control" id="timestamp-select-right">
+        <select className="form-control" id="month-select-right" onChange={this._getTimestamps}>
           {this.state.rightMonthOptions}
         </select>
+        <select className="form-control" id="year-select-right" onChange={this._handleYearChange}>
+          {this.state.yearOptions}
+        </select>
       </div>
     );
   }
 
-  _showInfo(){
-    return (
-      <div>
-        {this.state.headerInfo}
-        <div id="timestamp-left">Please select a capture</div>
-        <div id="timestamp-right">Please select a capture</div>
-        <br/>
-      </div>
-    );
-  }
-
-  _showYearInfo(){
-    return (
-      <div>
-        {this.state.headerInfo}
-        <div id="timestamp-left">Please select year:</div>
-        <div id="timestamp-right">Please select year:</div>
-        <br/>
-      </div>
-    );
-  }
-
-  _showMonthInfo(){
-    return (
-      <div>
-        {this.state.headerInfo}
-        <div id="timestamp-left">You selected {this.state.leftYear}. Please select month:</div>
-        <div id="timestamp-right">You selected {this.state.rightYear}. Please select month:</div>
-        <br/>
-      </div>
-    );
-  }
-
-  _showOpenLinks(){
-    if(!this.state.showSteps) {
+  _showOpenLinks () {
+    if (!this.state.showSteps) {
       if (this.props.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
           id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
@@ -469,15 +412,11 @@ export default class NewTimestampHeader extends React.Component {
     }
   }
 
-  _notFound () {
-    return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.url} archived.</div>);
-  }
-
   _showDiffs () {
 
     let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
 
-    while(loaders.length > 0) {
+    while (loaders.length > 0) {
       loaders[0].parentNode.removeChild(loaders[0]);
     }
 
@@ -488,10 +427,17 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    if (!(!this.state.timestampA && !this.state.timestampB && !this.state.showSteps)){
+    if (this.state.timestampA) {
       document.getElementById('timestamp-select-left').value = this.state.timestampA;
+    }
+    if (this.state.timestampB) {
       document.getElementById('timestamp-select-right').value = this.state.timestampB;
     }
+    document.getElementById('month-select-left').value = this._monthNames[this._leftMonthIndex];
+    document.getElementById('month-select-right').value = this._monthNames[this._rightMonthIndex];
+
+    document.getElementById('year-select-left').value = this.state.leftYear;
+    document.getElementById('year-select-right').value = this.state.rightYear;
 
   }
 
@@ -501,24 +447,25 @@ export default class NewTimestampHeader extends React.Component {
     const numberWithCommas = (x) => {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     };
-    return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection of {numberWithCommas(count)} dating from {first} to {last}.</p>);
+    return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection
+      of {numberWithCommas(count)} dating from {first} to {last}.</p>);
   }
 
   _fetchSparklineData () {
     let url = handleRelativeURL(this.props.conf.sparklineURL);
     url += `?url=${encodeURIComponent(this.props.url)}&collection=web&output=json`;
-    let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+    let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
     this._exportSparklineData(fetchPromise);
   }
 
   _exportSparklineData (promise) {
     promise
       .then((data) => {
-        if (data){
+        if (data) {
           this._prepareSparklineData(data);
         } else {
           this.props.errorHandledCallback('404');
-          this.setState({showError:true});
+          this.setState({showError: true});
         }
       })
       .catch(error => {this._errorHandled(error.message);});
@@ -537,7 +484,6 @@ export default class NewTimestampHeader extends React.Component {
       }
       j++;
     }
-
     this.setState({
       sparkline: snapshots,
       yearOptions: this._prepareSparklineOptionElements(yearSum)
@@ -545,17 +491,16 @@ export default class NewTimestampHeader extends React.Component {
   }
 
   _showMonths () {
-    let leftYear = document.getElementById('timestamp-select-left').value;
-    let rightYear = document.getElementById('timestamp-select-right').value;
+    let leftYear = document.getElementById('year-select-left').value;
+    let rightYear = document.getElementById('year-select-right').value;
 
     let leftMonths = this.state.sparkline[leftYear];
     let rightMonths = this.state.sparkline[rightYear];
 
     let leftMonthsData = this._getMonthData(leftMonths);
-    let rightMonthsData= this._getMonthData(rightMonths);
+    let rightMonthsData = this._getMonthData(rightMonths);
 
     this.setState({
-      yearOptions: null,
       leftYear: leftYear,
       rightYear: rightYear,
       leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),
@@ -563,55 +508,69 @@ export default class NewTimestampHeader extends React.Component {
     });
   }
 
-  _getMonthData(data){
-    let monthData = [];
-    for (let i = 0; i < data.length; i ++) {
-      if (data[i] > 0) {
-        monthData.push([this._monthNames[i+1], data[i]]);
+  _getMonthData (data) {
+    if (data) {
+      let monthData = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] > 0) {
+          monthData.push([this._monthNames[i + 1], data[i]]);
+        }
       }
+      return monthData;
     }
-    return monthData;
   }
 
-  _getTimestamps () {
-    let monthLeft = document.getElementById('timestamp-select-left').value;
-    let monthRight = document.getElementById('timestamp-select-right').value;
-
-    this._fetchCDXData(parseInt(getKeyByValue(this._monthNames,monthLeft),0), parseInt(getKeyByValue(this._monthNames,monthRight),0));
-  }
-
-  _goToYear () {
-    this.setState({
-      leftMonthOptions: null,
-      rightMonthOptions: null
-    });
-  }
-
-  _goToMonth () {
-    if (this.state.sparkline) {
-      let leftMonths = this.state.sparkline[this.state.leftYear];
-      let rightMonths = this.state.sparkline[this.state.rightYear];
-
-      let leftMonthsData = this._getMonthData(leftMonths);
-      let rightMonthsData= this._getMonthData(rightMonths);
-
-      this.setState({
-        leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),
-        rightMonthOptions: this._prepareSparklineOptionElements(rightMonthsData),
-        cdxData: null,
-        showSteps: true
-      });
+  _getTimestamps (e) {
+    this._fetchCDXData();
+    let elemToShow;
+    if (e.target.id === 'month-select-left'){
+      elemToShow = 'timestamp-select-left';
     } else {
-      let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0, 4);
-      let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0, 4);
+      elemToShow = 'timestamp-select-right';
+    }
+    document.getElementById(elemToShow).selectedIndex = '0';
+    this._showElement(elemToShow);
+  }
 
-      this.setState({
-        cdxData: null,
-        showError: false,
-        leftYear: leftYear,
-        rightYear: rightYear,
-        showSteps: true
-      });
+
+  _showElement (elementID) {
+    let restartButton = document.getElementById(elementID);
+    if (restartButton.style.visibility === 'hidden') {
+      restartButton.style.visibility = 'visible';
+    }
+  }
+
+  _hideElement (elementID) {
+    let restartButton = document.getElementById(elementID);
+    if (restartButton.style.visibility !== 'hidden') {
+      restartButton.style.visibility = 'hidden';
+    }
+  }
+
+  _handleYearChange (e) {
+    let elemToHide;
+    if (e.target.id === 'year-select-left'){
+      elemToHide = 'timestamp-select-left';
+    } else {
+      elemToHide = 'timestamp-select-right';
+    }
+    this._hideElement(elemToHide);
+    this._showMonths();
+  }
+
+  _saveMonthsIndex () {
+    if (document.getElementById('month-select-left')) {
+      const monthLeft = document.getElementById('month-select-left').value;
+      const monthRight = document.getElementById('month-select-right').value;
+      this._leftMonthIndex = parseInt(getKeyByValue(this._monthNames, monthLeft));
+      this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
+    } else {
+      if (this.props.timestampA) {
+        this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
+      }
+      if (this.props.timestampB) {
+        this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
+      }
     }
   }
 }
