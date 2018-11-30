@@ -420,8 +420,16 @@ export default class NewTimestampHeader extends React.Component {
       loaders[0].parentNode.removeChild(loaders[0]);
     }
 
-    let timestampA = document.getElementById('timestamp-select-left').value;
-    let timestampB = document.getElementById('timestamp-select-right').value;
+    let timestampAelement = document.getElementById('timestamp-select-left');
+    let timestampA = '';
+    if (timestampAelement.style.visibility !== 'hidden') {
+      timestampA = timestampAelement.value;
+    }
+    let timestampBelement = document.getElementById('timestamp-select-right');
+    let timestampB = '';
+    if (timestampBelement.style.visibility !== 'hidden') {
+      timestampB = timestampBelement.value;
+    }
     this.props.changeTimestampsCallback(timestampA, timestampB);
     this.setState({showDiff: true});
   }
