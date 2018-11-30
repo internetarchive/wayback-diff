@@ -367,24 +367,30 @@ export default class NewTimestampHeader extends React.Component {
     return (
       <div className="timestamp-container-view">
         <select className="form-control" id="year-select-left" onChange={this._handleYearChange}>
+          <optgroup label="Years and available captures"/>
           {this.state.yearOptions}
         </select>
         <select className="form-control" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._getTimestamps}>
+          <optgroup label="Months and available captures"/>
           {this.state.leftMonthOptions}
         </select>
         <select className="form-control" id="timestamp-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._handleLeftTimestampChange}>
+          <optgroup label="Available captures"/>
           {this.state.leftSnapElements}
         </select>
         <button className="btn btn-default navbar-btn" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
         </button>
         <button className="btn btn-default navbar-btn" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
         <select className="form-control" id="timestamp-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._handleRightTimestampChange}>
+          <optgroup label="Available captures"/>
           {this.state.rightSnapElements}
         </select>
         <select className="form-control" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._getTimestamps}>
+          <optgroup label="Months and available captures"/>
           {this.state.rightMonthOptions}
         </select>
         <select className="form-control" id="year-select-right" onChange={this._handleYearChange}>
+          <optgroup label="Years and available captures"/>
           {this.state.yearOptions}
         </select>
       </div>
