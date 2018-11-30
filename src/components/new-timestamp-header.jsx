@@ -317,7 +317,7 @@ export default class NewTimestampHeader extends React.Component {
   _prepareSparklineOptionElements (data) {
     if (data) {
       let options = [];
-      for (let i = 0; i < data.length; i++) {
+      for (let i = data.length-1; i > 0; i--) {
         let count = data[i][1];
         if (count > parseInt(this.props.conf.limit)) {
           count = this.props.conf.limit;
@@ -496,8 +496,7 @@ export default class NewTimestampHeader extends React.Component {
     const snapshots = data['years'];
     let yearSum = new Array(snapshots.length);
     let j = 0;
-
-    for (var year in snapshots) {
+    for (let year in snapshots) {
       yearSum[j] = [year, 0];
       for (let i = 0; i < snapshots[year].length; i++) {
         yearSum[j][1] = yearSum[j][1] + snapshots[year][i];
