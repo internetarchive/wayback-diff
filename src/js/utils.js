@@ -85,3 +85,13 @@ export function getTwoDigitInt(n){
 export function getKeyByValue (obj, value) {
   return Object.keys(obj).find(key => obj[key] === value);
 }
+
+export function selectHasValue(select, value) {
+  let obj = document.getElementById(select);
+
+  if (obj !== null) {
+    return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
+  } else {
+    return false;
+  }
+}

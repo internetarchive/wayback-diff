@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue } from '../js/utils.js';
+import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue, selectHasValue } from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -368,19 +368,19 @@ export default class NewTimestampHeader extends React.Component {
         <select className="form-control" id="year-select-left" onChange={this._handleYearChange}>
           {this.state.yearOptions}
         </select>
-        <select className="form-control" id="month-select-left" onChange={this._getTimestamps}>
+        <select className="form-control" id="month-select-left" style={{visibility:'hidden'}} onChange={this._getTimestamps}>
           {this.state.leftMonthOptions}
         </select>
-        <select className="form-control" id="timestamp-select-left" onChange={this._handleLeftTimestampChange}>
+        <select className="form-control" id="timestamp-select-left" style={{visibility:'hidden'}} onChange={this._handleLeftTimestampChange}>
           {this.state.leftSnapElements}
         </select>
-        <button className="btn btn-default navbar-btn" id="show-diff-btn" onClick={this._showDiffs}>Show differences
+        <button className="btn btn-default navbar-btn" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
         </button>
         <button className="btn btn-default navbar-btn" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
-        <select className="form-control" id="timestamp-select-right" onChange={this._handleRightTimestampChange}>
+        <select className="form-control" id="timestamp-select-right" style={{visibility:'hidden'}} onChange={this._handleRightTimestampChange}>
           {this.state.rightSnapElements}
         </select>
-        <select className="form-control" id="month-select-right" onChange={this._getTimestamps}>
+        <select className="form-control" id="month-select-right" style={{visibility:'hidden'}} onChange={this._getTimestamps}>
           {this.state.rightMonthOptions}
         </select>
         <select className="form-control" id="year-select-right" onChange={this._handleYearChange}>
@@ -433,8 +433,19 @@ export default class NewTimestampHeader extends React.Component {
     if (this.state.timestampB) {
       document.getElementById('timestamp-select-right').value = this.state.timestampB;
     }
-    document.getElementById('month-select-left').value = this._monthNames[this._leftMonthIndex];
-    document.getElementById('month-select-right').value = this._monthNames[this._rightMonthIndex];
+    let monthLeft = document.getElementById('month-select-left');
+    let monthRight = document.getElementById('month-select-right');
+
+    if (selectHasValue(monthLeft.id, this._monthNames[this._leftMonthIndex])) {
+      monthLeft.value = this._monthNames[this._leftMonthIndex];
+    } else {
+      monthLeft.selectedIndex = 0;
+    }
+    if (selectHasValue(monthRight.id, this._monthNames[this._rightMonthIndex])) {
+      monthRight.value = this._monthNames[this._rightMonthIndex];
+    } else {
+      monthRight.selectedIndex = 0;
+    }
 
     document.getElementById('year-select-left').value = this.state.leftYear;
     document.getElementById('year-select-right').value = this.state.rightYear;
@@ -530,6 +541,7 @@ export default class NewTimestampHeader extends React.Component {
     }
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
+    this._showElement('show-diff-btn');
   }
 
 
@@ -551,10 +563,20 @@ export default class NewTimestampHeader extends React.Component {
     let elemToHide;
     if (e.target.id === 'year-select-left'){
       elemToHide = 'timestamp-select-left';
+      this._leftMonthIndex = 0;
     } else {
       elemToHide = 'timestamp-select-right';
+      this._rightMonthIndex = 0;
     }
     this._hideElement(elemToHide);
+    this._hideElement('show-diff-btn');
+    let elemToShow;
+    if (e.target.id === 'year-select-left'){
+      elemToShow = 'month-select-left';
+    } else {
+      elemToShow = 'month-select-right';
+    }
+    this._showElement(elemToShow);
     this._showMonths();
   }
 
