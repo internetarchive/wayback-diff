@@ -366,11 +366,11 @@ export default class NewTimestampHeader extends React.Component {
   _showTimestampSelector () {
     return (
       <div className="timestamp-container-view">
-        <select className="form-control" id="year-select-left" onChange={this._handleYearChange}>
+        <select className="form-control" id="year-select-left" onClick={this._handleYearChange}>
           <optgroup label="Years and available captures"/>
           {this.state.yearOptions}
         </select>
-        <select className="form-control" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._getTimestamps}>
+        <select className="form-control" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onClick={this._getTimestamps}>
           <optgroup label="Months and available captures"/>
           {this.state.leftMonthOptions}
         </select>
@@ -385,11 +385,11 @@ export default class NewTimestampHeader extends React.Component {
           <optgroup label="Available captures"/>
           {this.state.rightSnapElements}
         </select>
-        <select className="form-control" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._getTimestamps}>
+        <select className="form-control" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onClick={this._getTimestamps}>
           <optgroup label="Months and available captures"/>
           {this.state.rightMonthOptions}
         </select>
-        <select className="form-control" id="year-select-right" onChange={this._handleYearChange}>
+        <select className="form-control" id="year-select-right" onClick={this._handleYearChange}>
           <optgroup label="Years and available captures"/>
           {this.state.yearOptions}
         </select>
