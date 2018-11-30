@@ -3685,6 +3685,29 @@ function fetch_with_timeout(promise) {
   });
 }
 
+function getTwoDigitInt(n) {
+  if (typeof n === 'string') {
+    return n;
+  }
+  return n > 9 ? '' + n : '0' + n;
+}
+
+function getKeyByValue(obj, value) {
+  return Object.keys(obj).find(function (key) {
+    return obj[key] === value;
+  });
+}
+
+function selectHasValue(select, value) {
+  var obj = document.getElementById(select);
+
+  if (obj !== null) {
+    return obj.innerHTML.indexOf('value="' + value + '"') > -1;
+  } else {
+    return false;
+  }
+}
+
 /**
  * @typedef DiffViewProps
  * @property {Page} page
@@ -3912,35 +3935,48 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left{\n    width: auto;\n}\n\n#timestamp-select-right{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left, #timestamp-select-right,\n#year-select-left, #year-select-right,\n#month-select-right, #month-select-left{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}\n";
 styleInject(css$1);
 
 /**
  * Display a timestamp selector
  *
- * @class TimestampHeader
+ * @class NewTimestampHeader
  * @extends {React.Component}
  */
 
-var TimestampHeader = function (_React$Component) {
-  inherits(TimestampHeader, _React$Component);
+var NewTimestampHeader = function (_React$Component) {
+  inherits(NewTimestampHeader, _React$Component);
 
-  function TimestampHeader(props) {
-    classCallCheck(this, TimestampHeader);
+  function NewTimestampHeader(props) {
+    classCallCheck(this, NewTimestampHeader);
 
-    var _this = possibleConstructorReturn(this, (TimestampHeader.__proto__ || Object.getPrototypeOf(TimestampHeader)).call(this, props));
+    var _this = possibleConstructorReturn(this, (NewTimestampHeader.__proto__ || Object.getPrototypeOf(NewTimestampHeader)).call(this, props));
 
     _this.ABORT_CONTROLLER = new window.AbortController();
     _this._isMountedNow = false;
     _this._shouldValidateTimestamp = true;
+    _this._monthNames = {
+      1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May',
+      6: 'June', 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
+    };
+    _this._leftMonthIndex = -1;
+    _this._rightMonthIndex = -1;
+    _this._visibilityState = ['visible', 'hidden'];
 
+
+    var leftYear = _this.props.timestampA === undefined ? null : _this.props.timestampA.substring(0, 4);
+    var rightYear = _this.props.timestampB === undefined ? null : _this.props.timestampB.substring(0, 4);
 
     _this.state = {
       cdxData: false,
       showDiff: false,
       showError: false,
       timestampA: _this.props.timestampA,
-      timestampB: _this.props.timestampB
+      timestampB: _this.props.timestampB,
+      leftYear: leftYear,
+      rightYear: rightYear,
+      showSteps: _this.props.isInitial
     };
 
     _this._handleLeftTimestampChange = _this._handleLeftTimestampChange.bind(_this);
@@ -3953,13 +3989,34 @@ var TimestampHeader = function (_React$Component) {
 
     _this._errorHandled = _this._errorHandled.bind(_this);
 
+    _this._showMonths = _this._showMonths.bind(_this);
+
+    _this._getTimestamps = _this._getTimestamps.bind(_this);
+
+    _this._handleYearChange = _this._handleYearChange.bind(_this);
+
     return _this;
   }
 
-  createClass(TimestampHeader, [{
+  createClass(NewTimestampHeader, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       this._isMountedNow = true;
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      if (this.state.cdxData) {
+        if (!this.state.sparkline) {
+          this._fetchSparklineData();
+        }
+        this._selectValues();
+      }
+      if (this.state.leftMonthOptions || this.state.rightMonthOptions) {
+        this._selectValues();
+      } else if (this.state.yearOptions) {
+        this._showMonths();
+      }
     }
   }, {
     key: 'componentWillUnmount',
@@ -3970,26 +4027,26 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_handleRightTimestampChange',
     value: function _handleRightTimestampChange() {
-      var selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
-      var allowedSnapshots = this.state.cdxData;
+      this._showElement('restart-btn');
+      var selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
+      var allowedSnapshots = this.state.leftSnaps;
       allowedSnapshots = allowedSnapshots.filter(function (hash) {
         return hash[1] !== selectedDigest;
       });
       this.setState({
-        leftSnaps: allowedSnapshots,
         leftSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
   }, {
     key: '_handleLeftTimestampChange',
     value: function _handleLeftTimestampChange() {
-      var selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
-      var allowedSnapshots = this.state.cdxData;
+      this._showElement('restart-btn');
+      var selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
+      var allowedSnapshots = this.state.rightSnaps;
       allowedSnapshots = allowedSnapshots.filter(function (hash) {
         return hash[1] !== selectedDigest;
       });
       this.setState({
-        rightSnaps: allowedSnapshots,
         rightSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
@@ -4003,6 +4060,30 @@ var TimestampHeader = function (_React$Component) {
       };
 
       if (!this.state.showError) {
+        if (this.state.showSteps) {
+          if (this.state.cdxData) {
+            if (this._shouldValidateTimestamp) {
+              this._checkTimestamps();
+            }
+            return react.createElement(
+              'div',
+              { className: 'timestamp-header-view' },
+              this._showTimestampSelector(),
+              this._showOpenLinks()
+            );
+          } else if (this.state.leftMonthOptions && this.state.rightMonthOptions || this.state.yearOptions) {
+            if (this._shouldValidateTimestamp) {
+              this._checkTimestamps();
+            }
+            return react.createElement(
+              'div',
+              { className: 'timestamp-header-view' },
+              this._showTimestampSelector()
+            );
+          }
+          this._fetchSparklineData();
+          return react.createElement(Loader, null);
+        }
         if (this.state.cdxData) {
           if (this._shouldValidateTimestamp) {
             this._checkTimestamps();
@@ -4010,17 +4091,12 @@ var TimestampHeader = function (_React$Component) {
           return react.createElement(
             'div',
             { className: 'timestamp-header-view' },
-            this._showInfo(),
             this._showTimestampSelector(),
             this._showOpenLinks()
           );
         }
-        return react.createElement(
-          'div',
-          null,
-          this._fetchCDXData(),
-          react.createElement(Loader, null)
-        );
+        this._fetchCDXData();
+        return react.createElement(Loader, null);
       }
     }
   }, {
@@ -4102,43 +4178,74 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_fetchCDXData',
     value: function _fetchCDXData() {
+      var leftFetchPromise = void 0;
+      var rightFetchPromise = void 0;
+      this._saveMonthsIndex();
       if (this.props.fetchCDXCallback) {
-        this._handleFetch(this.props.fetchCDXCallback());
+        leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
       } else {
-        var url = handleRelativeURL(this.props.conf.cdxServer);
-        if (this.props.conf.limit) {
-          url += 'search?url=' + encodeURIComponent(this.props.url) + '&status=200&limit=' + this.props.conf.limit + '&fl=timestamp,digest&output=json&sort=reverse';
-        } else {
-          url += 'search?url=' + encodeURIComponent(this.props.url) + '&status=200&fl=timestamp,digest&output=json&sort=reverse';
+        var url = void 0;
+        if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
+          url = handleRelativeURL(this.props.conf.cdxServer) + 'search?&url=' + encodeURIComponent(this.props.url) + '&status=200&fl=timestamp,digest&output=json&from=' + this.state.leftYear + getTwoDigitInt(this._leftMonthIndex) + '&to=' + this.state.leftYear + getTwoDigitInt(this._leftMonthIndex) + '&limit=' + this.props.conf.limit;
+          leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
         }
-        this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+        if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
+          url = handleRelativeURL(this.props.conf.cdxServer) + 'search?&url=' + encodeURIComponent(this.props.url) + '&status=200&fl=timestamp,digest&output=json&from=' + this.state.rightYear + getTwoDigitInt(this._rightMonthIndex) + '&to=' + this.state.rightYear + getTwoDigitInt(this._rightMonthIndex) + '&limit=' + this.props.conf.limit;
+          rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+        }
       }
+      this._exportCDXData(leftFetchPromise, rightFetchPromise);
     }
   }, {
     key: '_handleFetch',
     value: function _handleFetch(promise) {
-      var _this5 = this;
-
-      promise.then(function (response) {
+      return promise.then(function (response) {
         if (response) {
           if (!response.ok) {
             throw Error(response.status);
           }
           return response.json();
         }
-      }).then(function (data) {
-        if (data && data.length > 0) {
-          _this5._prepareCDXData(data);
-          if (!_this5.props.isInitial) {
-            _this5._selectValues();
-          }
-        } else {
-          _this5.props.errorHandledCallback('404');
-          _this5.setState({ showError: true });
-        }
-      }).catch(function (error) {
-        _this5._errorHandled(error.message);
       });
+    }
+  }, {
+    key: '_exportCDXData',
+    value: function _exportCDXData(leftFetchPromise, rightFetchPromise) {
+      var _this5 = this;
+
+      if (leftFetchPromise) {
+        leftFetchPromise.then(function (data) {
+          if (data && data.length > 0) {
+            if (rightFetchPromise) {
+              var leftData = data;
+              rightFetchPromise.then(function (data) {
+                if (data && data.length > 0) {
+                  _this5._prepareCDXData(leftData, data);
+                } else {
+                  _this5.props.errorHandledCallback('404');
+                  _this5.setState({ showError: true });
+                }
+              });
+            } else {
+              _this5._prepareCDXData(data, null);
+            }
+          } else {
+            _this5.props.errorHandledCallback('404');
+            _this5.setState({ showError: true });
+          }
+        }).catch(function (error) {
+          _this5._errorHandled(error.message);
+        });
+      } else if (rightFetchPromise) {
+        rightFetchPromise.then(function (data) {
+          if (data && data.length > 0) {
+            _this5._prepareCDXData(null, data);
+          } else {
+            _this5.props.errorHandledCallback('404');
+            _this5.setState({ showError: true });
+          }
+        });
+      }
     }
   }, {
     key: '_errorHandled',
@@ -4150,39 +4257,55 @@ var TimestampHeader = function (_React$Component) {
     }
   }, {
     key: '_prepareCDXData',
-    value: function _prepareData(data) {
-      data.shift();
+    value: function _prepareCDXData(leftData, data) {
+      if (data) {
+        data.shift();
+      }
+      if (leftData) {
+        leftData.shift();
+      }
       this.setState({
-        cdxData: data,
-        leftSnaps: data,
+        cdxData: true,
+        leftSnaps: leftData,
         rightSnaps: data,
-        leftSnapElements: this._prepareOptionElements(data),
-        rightSnapElements: this._prepareOptionElements(data),
-        headerInfo: this._getHeaderInfo(data)
+        leftSnapElements: this._prepareOptionElements(leftData),
+        rightSnapElements: this._prepareOptionElements(data)
       });
     }
   }, {
     key: '_prepareOptionElements',
     value: function _prepareOptionElements(data) {
-      var initialSnapshots = [];
-      if (data.length > 0) {
-        var yearGroup = this._getYear(data[0][0]);
-        initialSnapshots.push(react.createElement('optgroup', { key: -1, label: yearGroup }));
-      }
-      for (var i = 0; i < data.length; i++) {
-        var utcTime = this._getUTCDateFormat(data[i][0]);
-        var year = this._getYear(data[i][0]);
-        if (year < yearGroup) {
-          yearGroup = year;
-          initialSnapshots.push(react.createElement('optgroup', { key: -i + 2, label: yearGroup }));
+      if (data) {
+        var initialSnapshots = [];
+        for (var i = 0; i < data.length; i++) {
+          var utcTime = this._getUTCDateFormat(data[i][0]);
+          initialSnapshots.push(react.createElement(
+            'option',
+            { key: i, value: data[i][0] },
+            utcTime
+          ));
         }
-        initialSnapshots.push(react.createElement(
-          'option',
-          { key: i, value: data[i][0] },
-          utcTime
-        ));
+        return initialSnapshots;
       }
-      return initialSnapshots;
+    }
+  }, {
+    key: '_prepareSparklineOptionElements',
+    value: function _prepareSparklineOptionElements(data) {
+      if (data) {
+        var options = [];
+        for (var i = data.length - 1; i > 0; i--) {
+          var count = data[i][1];
+          if (count > parseInt(this.props.conf.limit)) {
+            count = this.props.conf.limit;
+          }
+          options.push(react.createElement(
+            'option',
+            { key: i, value: data[i][0] },
+            data[i][0] + ' (' + count + ')'
+          ));
+        }
+        return options;
+      }
     }
   }, {
     key: '_getUTCDateFormat',
@@ -4217,12 +4340,10 @@ var TimestampHeader = function (_React$Component) {
   }, {
     key: '_restartPressed',
     value: function _restartPressed() {
-      var initialData = this.state.cdxData;
+      this._hideElement('restart-btn');
       this.setState({
-        leftSnaps: initialData,
-        rightSnaps: initialData,
-        leftSnapElements: this._prepareOptionElements(initialData),
-        rightSnapElements: this._prepareOptionElements(initialData)
+        leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
+        rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
       });
     }
   }, {
@@ -4233,50 +4354,56 @@ var TimestampHeader = function (_React$Component) {
         { className: 'timestamp-container-view' },
         react.createElement(
           'select',
-          { className: 'form-control', id: 'timestamp-select-left', onChange: this._handleLeftTimestampChange },
+          { className: 'form-control', id: 'year-select-left', onClick: this._handleYearChange },
+          react.createElement('optgroup', { label: 'Years and available captures' }),
+          this.state.yearOptions
+        ),
+        react.createElement(
+          'select',
+          { className: 'form-control', id: 'month-select-left', style: { visibility: this._visibilityState[+(this.props.timestampA == null)] }, onClick: this._getTimestamps },
+          react.createElement('optgroup', { label: 'Months and available captures' }),
+          this.state.leftMonthOptions
+        ),
+        react.createElement(
+          'select',
+          { className: 'form-control', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+(this.props.timestampA == null)] }, onChange: this._handleLeftTimestampChange },
+          react.createElement('optgroup', { label: 'Available captures' }),
           this.state.leftSnapElements
         ),
         react.createElement(
           'button',
-          { className: 'btn btn-default navbar-btn', id: 'show-diff-btn', onClick: this._showDiffs },
+          { className: 'btn btn-default navbar-btn', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
           'Show differences'
         ),
         react.createElement(
           'button',
-          { className: 'btn btn-default navbar-btn', id: 'restart-btn', onClick: this._restartPressed },
+          { className: 'btn btn-default navbar-btn', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
           'Restart'
         ),
         react.createElement(
           'select',
-          { className: 'form-control', id: 'timestamp-select-right', onChange: this._handleRightTimestampChange },
+          { className: 'form-control', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+(this.props.timestampB == null)] }, onChange: this._handleRightTimestampChange },
+          react.createElement('optgroup', { label: 'Available captures' }),
           this.state.rightSnapElements
+        ),
+        react.createElement(
+          'select',
+          { className: 'form-control', id: 'month-select-right', style: { visibility: this._visibilityState[+(this.props.timestampB == null)] }, onClick: this._getTimestamps },
+          react.createElement('optgroup', { label: 'Months and available captures' }),
+          this.state.rightMonthOptions
+        ),
+        react.createElement(
+          'select',
+          { className: 'form-control', id: 'year-select-right', onClick: this._handleYearChange },
+          react.createElement('optgroup', { label: 'Years and available captures' }),
+          this.state.yearOptions
         )
-      );
-    }
-  }, {
-    key: '_showInfo',
-    value: function _showInfo() {
-      return react.createElement(
-        'div',
-        null,
-        this.state.headerInfo,
-        react.createElement(
-          'div',
-          { id: 'timestamp-left' },
-          'Please select a capture'
-        ),
-        react.createElement(
-          'div',
-          { id: 'timestamp-right' },
-          'Please select a capture'
-        ),
-        react.createElement('br', null)
       );
     }
   }, {
     key: '_showOpenLinks',
     value: function _showOpenLinks() {
-      if (!this.props.isInitial) {
+      if (!this.state.showSteps) {
         if (this.props.timestampA) {
           var aLeft = react.createElement(
             'a',
@@ -4304,17 +4431,6 @@ var TimestampHeader = function (_React$Component) {
       }
     }
   }, {
-    key: '_notFound',
-    value: function _notFound() {
-      return react.createElement(
-        'div',
-        { className: 'alert alert-warning', role: 'alert' },
-        'The Wayback Machine doesn\'t have ',
-        this.props.url,
-        ' archived.'
-      );
-    }
-  }, {
     key: '_showDiffs',
     value: function _showDiffs() {
 
@@ -4324,45 +4440,217 @@ var TimestampHeader = function (_React$Component) {
         loaders[0].parentNode.removeChild(loaders[0]);
       }
 
-      var timestampA = document.getElementById('timestamp-select-left').value;
-      var timestampB = document.getElementById('timestamp-select-right').value;
+      var timestampAelement = document.getElementById('timestamp-select-left');
+      var timestampA = '';
+      if (timestampAelement.style.visibility !== 'hidden') {
+        timestampA = timestampAelement.value;
+      }
+      var timestampBelement = document.getElementById('timestamp-select-right');
+      var timestampB = '';
+      if (timestampBelement.style.visibility !== 'hidden') {
+        timestampB = timestampBelement.value;
+      }
       this.props.changeTimestampsCallback(timestampA, timestampB);
       this.setState({ showDiff: true });
     }
   }, {
     key: '_selectValues',
     value: function _selectValues() {
-      if (!(!this.state.timestampA && !this.state.timestampB && !this.props.isInitial)) {
+      if (this.state.timestampA) {
         document.getElementById('timestamp-select-left').value = this.state.timestampA;
+      }
+      if (this.state.timestampB) {
         document.getElementById('timestamp-select-right').value = this.state.timestampB;
       }
+      var monthLeft = document.getElementById('month-select-left');
+      var monthRight = document.getElementById('month-select-right');
+
+      if (selectHasValue(monthLeft.id, this._monthNames[this._leftMonthIndex])) {
+        monthLeft.value = this._monthNames[this._leftMonthIndex];
+      } else {
+        monthLeft.selectedIndex = 0;
+      }
+      if (selectHasValue(monthRight.id, this._monthNames[this._rightMonthIndex])) {
+        monthRight.value = this._monthNames[this._rightMonthIndex];
+      } else {
+        monthRight.selectedIndex = 0;
+      }
+
+      document.getElementById('year-select-left').value = this.state.leftYear;
+      document.getElementById('year-select-right').value = this.state.rightYear;
     }
   }, {
     key: '_getHeaderInfo',
-    value: function _getHeaderInfo(data) {
+    value: function _getHeaderInfo(firstTimestamp, lastTimestamp, count) {
+      var first = this._getShortUTCDateFormat(firstTimestamp);
+      var last = this._getShortUTCDateFormat(lastTimestamp);
+      var numberWithCommas = function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      };
+      return react.createElement(
+        'p',
+        { id: 'explanation-middle' },
+        ' Compare any two captures of ',
+        this.props.url,
+        ' from our collection of ',
+        numberWithCommas(count),
+        ' dating from ',
+        first,
+        ' to ',
+        last,
+        '.'
+      );
+    }
+  }, {
+    key: '_fetchSparklineData',
+    value: function _fetchSparklineData() {
+      var url = handleRelativeURL(this.props.conf.sparklineURL);
+      url += '?url=' + encodeURIComponent(this.props.url) + '&collection=web&output=json';
+      var fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+      this._exportSparklineData(fetchPromise);
+    }
+  }, {
+    key: '_exportSparklineData',
+    value: function _exportSparklineData(promise) {
+      var _this6 = this;
+
+      promise.then(function (data) {
+        if (data) {
+          _this6._prepareSparklineData(data);
+        } else {
+          _this6.props.errorHandledCallback('404');
+          _this6.setState({ showError: true });
+        }
+      }).catch(function (error) {
+        _this6._errorHandled(error.message);
+      });
+    }
+  }, {
+    key: '_prepareSparklineData',
+    value: function _prepareSparklineData(data) {
+
+      var snapshots = data['years'];
+      var yearSum = new Array(snapshots.length);
+      var j = 0;
+      for (var year in snapshots) {
+        yearSum[j] = [year, 0];
+        for (var i = 0; i < snapshots[year].length; i++) {
+          yearSum[j][1] = yearSum[j][1] + snapshots[year][i];
+        }
+        j++;
+      }
+      this.setState({
+        sparkline: snapshots,
+        yearOptions: this._prepareSparklineOptionElements(yearSum)
+      });
+    }
+  }, {
+    key: '_showMonths',
+    value: function _showMonths() {
+      var leftYear = document.getElementById('year-select-left').value;
+      var rightYear = document.getElementById('year-select-right').value;
+
+      var leftMonths = this.state.sparkline[leftYear];
+      var rightMonths = this.state.sparkline[rightYear];
+
+      var leftMonthsData = this._getMonthData(leftMonths);
+      var rightMonthsData = this._getMonthData(rightMonths);
+
+      this.setState({
+        leftYear: leftYear,
+        rightYear: rightYear,
+        leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),
+        rightMonthOptions: this._prepareSparklineOptionElements(rightMonthsData)
+      });
+    }
+  }, {
+    key: '_getMonthData',
+    value: function _getMonthData(data) {
       if (data) {
-        var first = this._getShortUTCDateFormat(data[0][0]);
-        var last = this._getShortUTCDateFormat(data[data.length - 1][0]);
-        var numberWithCommas = function numberWithCommas(x) {
-          return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        };
-        return react.createElement(
-          'p',
-          { id: 'explanation-middle' },
-          ' Compare any two captures of ',
-          this.props.url,
-          ' from our collection of ',
-          numberWithCommas(data.length),
-          ' dating from ',
-          first,
-          ' to ',
-          last,
-          '.'
-        );
+        var monthData = [];
+        for (var i = 0; i < data.length; i++) {
+          if (data[i] > 0) {
+            monthData.push([this._monthNames[i + 1], data[i]]);
+          }
+        }
+        return monthData;
+      }
+    }
+  }, {
+    key: '_getTimestamps',
+    value: function _getTimestamps(e) {
+      this._fetchCDXData();
+      var elemToShow = void 0;
+      if (e.target.id === 'month-select-left') {
+        elemToShow = 'timestamp-select-left';
+      } else {
+        elemToShow = 'timestamp-select-right';
+      }
+      document.getElementById(elemToShow).selectedIndex = '0';
+      this._showElement(elemToShow);
+      this._showElement('show-diff-btn');
+      this.setState({
+        timestampA: null,
+        timestampB: null
+      });
+    }
+  }, {
+    key: '_showElement',
+    value: function _showElement(elementID) {
+      var restartButton = document.getElementById(elementID);
+      if (restartButton.style.visibility === 'hidden') {
+        restartButton.style.visibility = 'visible';
+      }
+    }
+  }, {
+    key: '_hideElement',
+    value: function _hideElement(elementID) {
+      var restartButton = document.getElementById(elementID);
+      if (restartButton.style.visibility !== 'hidden') {
+        restartButton.style.visibility = 'hidden';
+      }
+    }
+  }, {
+    key: '_handleYearChange',
+    value: function _handleYearChange(e) {
+      var elemToHide = void 0;
+      if (e.target.id === 'year-select-left') {
+        elemToHide = 'timestamp-select-left';
+        this._leftMonthIndex = 0;
+      } else {
+        elemToHide = 'timestamp-select-right';
+        this._rightMonthIndex = 0;
+      }
+      this._hideElement(elemToHide);
+      this._hideElement('show-diff-btn');
+      var elemToShow = void 0;
+      if (e.target.id === 'year-select-left') {
+        elemToShow = 'month-select-left';
+      } else {
+        elemToShow = 'month-select-right';
+      }
+      this._showElement(elemToShow);
+      this._showMonths();
+    }
+  }, {
+    key: '_saveMonthsIndex',
+    value: function _saveMonthsIndex() {
+      if (document.getElementById('month-select-left')) {
+        var monthLeft = document.getElementById('month-select-left').value;
+        var monthRight = document.getElementById('month-select-right').value;
+        this._leftMonthIndex = parseInt(getKeyByValue(this._monthNames, monthLeft));
+        this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
+      } else {
+        if (this.props.timestampA) {
+          this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
+        }
+        if (this.props.timestampB) {
+          this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
+        }
       }
     }
   }]);
-  return TimestampHeader;
+  return NewTimestampHeader;
 }(react.Component);
 
 /**
@@ -4459,6 +4747,7 @@ var ErrorMessage = function (_React$Component) {
   createClass(ErrorMessage, [{
     key: 'render',
     value: function render() {
+      console.warn(this.props.code);
       if (this.props.code === '404') {
         return react.createElement(
           'div',
@@ -4538,15 +4827,15 @@ var DiffContainer = function (_React$Component) {
           return react.createElement(
             'div',
             { className: 'diffcontainer-view' },
-            react.createElement(TimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
-              isInitial: false, errorHandledCallback: this.errorHandled })),
+            react.createElement(NewTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
+              isInitial: true, errorHandledCallback: this.errorHandled })),
             this._showNoTimestamps()
           );
         }
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, _extends({ isInitial: true }, this.props, {
+          react.createElement(NewTimestampHeader, _extends({ isInitial: true }, this.props, {
             errorHandledCallback: this.errorHandled,
             changeTimestampsCallback: this.changeTimestamps }))
         );
@@ -4555,7 +4844,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, _extends({ isInitial: false
+          react.createElement(NewTimestampHeader, _extends({ isInitial: false
           }, this.props, { changeTimestampsCallback: this.changeTimestamps,
             errorHandledCallback: this.errorHandled })),
           this.prepareDiffView(),
@@ -4566,7 +4855,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
+          react.createElement(NewTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
             isInitial: false, errorHandledCallback: this.errorHandled })),
           this._showOneSnapshot(true, this.state.timestampA)
         );
@@ -4575,7 +4864,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(TimestampHeader, _extends({ isInitial: false }, this.props, {
+          react.createElement(NewTimestampHeader, _extends({ isInitial: false }, this.props, {
             errorHandledCallback: this.errorHandled,
             changeTimestampsCallback: this.changeTimestamps })),
           this._showOneSnapshot(false, this.state.timestampB)
@@ -9604,8 +9893,6 @@ var friday = weekday(5);
 var saturday = weekday(6);
 
 var sundays = sunday.range;
-var mondays = monday.range;
-var thursdays = thursday.range;
 
 var month = newInterval(function(date) {
   date.setDate(1);
@@ -9695,8 +9982,6 @@ var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
 var utcSundays = utcSunday.range;
-var utcMondays = utcMonday.range;
-var utcThursdays = utcThursday.range;
 
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
