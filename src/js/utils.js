@@ -68,3 +68,24 @@ export function fetch_with_timeout(promise) {
     promise.then(resolve, reject);
   });
 }
+
+export function getTwoDigitInt(n){
+  if (typeof n === 'string'){
+    return n;
+  }
+  return n > 9 ? '' + n: '0' + n;
+}
+
+export function getKeyByValue (obj, value) {
+  return Object.keys(obj).find(key => obj[key] === value);
+}
+
+export function selectHasValue(select, value) {
+  let obj = document.getElementById(select);
+
+  if (obj !== null) {
+    return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
+  } else {
+    return false;
+  }
+}

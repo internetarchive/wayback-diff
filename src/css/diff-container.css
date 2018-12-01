@@ -20,11 +20,9 @@ blue-diff-footer{
     background-color: #1d9efd;
 }
 
-#timestamp-select-left{
-    width: auto;
-}
-
-#timestamp-select-right{
+#timestamp-select-left, #timestamp-select-right,
+#year-select-left, #year-select-right,
+#month-select-right, #month-select-left{
     width: auto;
 }
 
