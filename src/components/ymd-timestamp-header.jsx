@@ -4,10 +4,10 @@ import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, g
 /**
  * Display a timestamp selector
  *
- * @class NewTimestampHeader
+ * @class YmdTimestampHeader
  * @extends {React.Component}
  */
-export default class NewTimestampHeader extends React.Component {
+export default class YmdTimestampHeader extends React.Component {
 
   ABORT_CONTROLLER = new window.AbortController();
   _isMountedNow = false;
