@@ -39,3 +39,9 @@ blue-diff-footer{
     display: inline-block;
     float: right;
 }
+
+#restart-btn{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
