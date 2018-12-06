@@ -367,36 +367,50 @@ export default class YmdTimestampHeader extends React.Component {
 
   _showTimestampSelector () {
     return (
-      <div>
-        <div className="timestamp-container-view">
-          <select className="form-control input-sm" id="year-select-left" onClick={this._handleYearChange}>
-            <optgroup label="Years and available captures"/>
-            {this.state.yearOptions}
-          </select>
-          <select className="form-control input-sm" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onClick={this._getTimestamps}>
-            <optgroup label="Months and available captures"/>
-            {this.state.leftMonthOptions}
-          </select>
-          <select className="form-control input-sm" id="timestamp-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._handleLeftTimestampChange}>
-            <optgroup label="Available captures"/>
-            {this.state.leftSnapElements}
-          </select>
-          <button className="btn btn-default navbar-btn" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
-          </button>
-          <select className="form-control input-sm" id="timestamp-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._handleRightTimestampChange}>
-            <optgroup label="Available captures"/>
-            {this.state.rightSnapElements}
-          </select>
-          <select className="form-control input-sm" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onClick={this._getTimestamps}>
-            <optgroup label="Months and available captures"/>
-            {this.state.rightMonthOptions}
-          </select>
-          <select className="form-control input-sm" id="year-select-right" onClick={this._handleYearChange}>
+      <div className="form-row align-items-center">
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="year-select-left" onClick={this._handleYearChange}>
             <optgroup label="Years and available captures"/>
             {this.state.yearOptions}
           </select>
         </div>
-        <button className="btn btn-default navbar-btn" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onClick={this._getTimestamps}>
+            <optgroup label="Months and available captures"/>
+            {this.state.leftMonthOptions}
+          </select>
+        </div>
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._handleLeftTimestampChange}>
+            <optgroup label="Available captures"/>
+            {this.state.leftSnapElements}
+          </select>
+        </div>
+        <div className="col-auto">
+          <button className="btn btn-sm" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
+          </button>
+        </div>
+        <div className="col-auto">
+          <button className="btn btn-sm" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
+        </div>
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._handleRightTimestampChange}>
+            <optgroup label="Available captures"/>
+            {this.state.rightSnapElements}
+          </select>
+        </div>
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onClick={this._getTimestamps}>
+            <optgroup label="Months and available captures"/>
+            {this.state.rightMonthOptions}
+          </select>
+        </div>
+        <div className="col-auto">
+          <select className="form-control mr-sm-1" id="year-select-right" onClick={this._handleYearChange}>
+            <optgroup label="Years and available captures"/>
+            {this.state.yearOptions}
+          </select>
+        </div>
       </div>
     );
   }
