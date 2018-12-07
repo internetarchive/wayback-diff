@@ -18,6 +18,8 @@ export default class YmdTimestampHeader extends React.Component {
   };
   _leftMonthIndex = -1;
   _rightMonthIndex = -1;
+  _leftTimestampIndex = -1;
+  _rightTimestampIndex = -1;
   _visibilityState = ['visible', 'hidden'];
 
   constructor (props) {
@@ -81,10 +83,11 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleRightTimestampChange () {
+    this._rightTimestampIndex = document.getElementById('timestamp-select-right').selectedIndex;
     if (this._isShowing('timestamp-select-left')) {
       this._showElement('restart-btn');
       this._showElement('show-diff-btn');
-      const selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
+      const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex][1];
       let allowedSnapshots = this.state.leftSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
       this.setState({
@@ -94,10 +97,11 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleLeftTimestampChange () {
+    this._leftTimestampIndex = document.getElementById('timestamp-select-left').selectedIndex;
     if (this._isShowing('timestamp-select-right')) {
       this._showElement('restart-btn');
       this._showElement('show-diff-btn');
-      const selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
+      const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex][1];
       let allowedSnapshots = this.state.rightSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
       this.setState({
@@ -459,11 +463,19 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    if (this.state.timestampA) {
-      document.getElementById('timestamp-select-left').value = this.state.timestampA;
+    if (this._isShowing('timestamp-select-left')) {
+      if (this._leftTimestampIndex !== -1) {
+        document.getElementById('timestamp-select-left').selectedIndex = this._leftTimestampIndex;
+      } else {
+        document.getElementById('timestamp-select-left').value = this.state.timestampA;
+      }
     }
-    if (this.state.timestampB) {
-      document.getElementById('timestamp-select-right').value = this.state.timestampB;
+    if (this._isShowing('timestamp-select-right')) {
+      if (this._rightTimestampIndex !== -1) {
+        document.getElementById('timestamp-select-right').selectedIndex = this._rightTimestampIndex;
+      } else {
+        document.getElementById('timestamp-select-right').value = this.state.timestampB;
+      }
     }
     let monthLeft = document.getElementById('month-select-left');
     let monthRight = document.getElementById('month-select-right');
@@ -569,8 +581,10 @@ export default class YmdTimestampHeader extends React.Component {
     let elemToShow;
     if (e.target.id === 'month-select-left'){
       elemToShow = 'timestamp-select-left';
+      this._leftTimestampIndex = 0;
     } else {
       elemToShow = 'timestamp-select-right';
+      this._rightTimestampIndex = 0;
     }
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
