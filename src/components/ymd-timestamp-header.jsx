@@ -81,25 +81,29 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleRightTimestampChange () {
-    this._showElement('restart-btn');
-    this._showElement('show-diff-btn');
-    const selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
-    let allowedSnapshots = this.state.leftSnaps;
-    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
-    this.setState({
-      leftSnapElements: this._prepareOptionElements(allowedSnapshots)
-    });
+    if (this._isShowing('timestamp-select-left')) {
+      this._showElement('restart-btn');
+      this._showElement('show-diff-btn');
+      const selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
+      let allowedSnapshots = this.state.leftSnaps;
+      allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+      this.setState({
+        leftSnapElements: this._prepareOptionElements(allowedSnapshots)
+      });
+    }
   }
 
   _handleLeftTimestampChange () {
-    this._showElement('restart-btn');
-    this._showElement('show-diff-btn');
-    const selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
-    let allowedSnapshots = this.state.rightSnaps;
-    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
-    this.setState({
-      rightSnapElements: this._prepareOptionElements(allowedSnapshots)
-    });
+    if (this._isShowing('timestamp-select-right')) {
+      this._showElement('restart-btn');
+      this._showElement('show-diff-btn');
+      const selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
+      let allowedSnapshots = this.state.rightSnaps;
+      allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+      this.setState({
+        rightSnapElements: this._prepareOptionElements(allowedSnapshots)
+      });
+    }
   }
 
   render () {
