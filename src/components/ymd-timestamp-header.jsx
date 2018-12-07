@@ -64,12 +64,14 @@ export default class YmdTimestampHeader extends React.Component {
       if (!this.state.sparkline) {
         this._fetchSparklineData();
       }
-      this._selectValues();
-    }
-    if (this.state.leftMonthOptions || this.state.rightMonthOptions){
-      this._selectValues();
-    } else if (this.state.yearOptions) {
-      this._showMonths();
+      if (!this.state.showLoader) {
+        this._selectValues();
+        if (this.state.sparkline && !this.state.leftMonthOptions) {
+          if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
+            this._showMonths();
+          }
+        }
+      }
     }
   }
 
@@ -102,23 +104,14 @@ export default class YmdTimestampHeader extends React.Component {
 
   render () {
     const Loader = () => this.props.loader;
-
+    if (this.state.showLoader && !this.state.showError) {
+      return (
+        <Loader/>
+      );
+    }
     if (!this.state.showError) {
       if (this.state.showSteps) {
-        if (this.state.cdxData) {
-          if (this._shouldValidateTimestamp) {
-            this._checkTimestamps();
-          }
-          return (
-            <div className="timestamp-header-view">
-              {this._showTimestampSelector()}
-              {this._showOpenLinks()}
-            </div>
-          );
-        } else if ((this.state.leftMonthOptions && this.state.rightMonthOptions) || this.state.yearOptions) {
-          if (this._shouldValidateTimestamp) {
-            this._checkTimestamps();
-          }
+        if (this.state.yearOptions) {
           return (
             <div className="timestamp-header-view">
               {this._showTimestampSelector()}
@@ -212,6 +205,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _fetchCDXData () {
+    this.setState({showLoader: true});
     let leftFetchPromise;
     let rightFetchPromise;
     this._saveMonthsIndex();
@@ -301,7 +295,8 @@ export default class YmdTimestampHeader extends React.Component {
       leftSnaps: leftData,
       rightSnaps: data,
       leftSnapElements: this._prepareOptionElements(leftData),
-      rightSnapElements: this._prepareOptionElements(data)
+      rightSnapElements: this._prepareOptionElements(data),
+      showLoader: false
     });
   }
 
@@ -375,13 +370,13 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
         </div>
         <div className="col-auto">
-          <select className="form-control mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onClick={this._getTimestamps}>
+          <select className="form-control mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}} onClick={this._getTimestamps}>
             <optgroup label="Months and available captures"/>
             {this.state.leftMonthOptions}
           </select>
         </div>
         <div className="col-auto">
-          <select className="form-control mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+(this.props.timestampA == null)]}} onChange={this._handleLeftTimestampChange}>
+          <select className="form-control mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+!this.state.leftSnapElements]}} onClick={this._handleLeftTimestampChange}>
             <optgroup label="Available captures"/>
             {this.state.leftSnapElements}
           </select>
@@ -394,13 +389,13 @@ export default class YmdTimestampHeader extends React.Component {
           <button className="btn btn-sm" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
         </div>
         <div className="col-auto">
-          <select className="form-control mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onChange={this._handleRightTimestampChange}>
+          <select className="form-control mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onClick={this._handleRightTimestampChange}>
             <optgroup label="Available captures"/>
             {this.state.rightSnapElements}
           </select>
         </div>
         <div className="col-auto">
-          <select className="form-control mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this.props.timestampB == null)]}} onClick={this._getTimestamps}>
+          <select className="form-control mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}} onClick={this._getTimestamps}>
             <optgroup label="Months and available captures"/>
             {this.state.rightMonthOptions}
           </select>
@@ -582,16 +577,21 @@ export default class YmdTimestampHeader extends React.Component {
 
 
   _showElement (elementID) {
-    let restartButton = document.getElementById(elementID);
-    if (restartButton.style.visibility === 'hidden') {
-      restartButton.style.visibility = 'visible';
+    let element = document.getElementById(elementID);
+    if (element.style.visibility === 'hidden') {
+      element.style.visibility = 'visible';
     }
   }
 
+  _isShowing (elementID) {
+    let element = document.getElementById(elementID);
+    return (element && element.style.visibility === 'visible');
+  }
+
   _hideElement (elementID) {
-    let restartButton = document.getElementById(elementID);
-    if (restartButton.style.visibility !== 'hidden') {
-      restartButton.style.visibility = 'hidden';
+    let element = document.getElementById(elementID);
+    if (element.style.visibility !== 'hidden') {
+      element.style.visibility = 'hidden';
     }
   }
 
@@ -617,18 +617,18 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _saveMonthsIndex () {
-    if (document.getElementById('month-select-left')) {
+    if (this._isShowing('month-select-left')) {
       const monthLeft = document.getElementById('month-select-left').value;
-      const monthRight = document.getElementById('month-select-right').value;
       this._leftMonthIndex = parseInt(getKeyByValue(this._monthNames, monthLeft));
+    } else if (this.props.timestampA) {
+      this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
+    }
+    if (this._isShowing('month-select-right')){
+      const monthRight = document.getElementById('month-select-right').value;
       this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
-    } else {
-      if (this.props.timestampA) {
-        this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
-      }
-      if (this.props.timestampB) {
-        this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
-      }
+    }
+    else if (this.props.timestampB) {
+      this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
     }
   }
 }
