@@ -61,12 +61,12 @@ export default class YmdTimestampHeader extends React.Component {
 
   componentDidUpdate () {
     if (this.state.cdxData) {
-      if (!this.state.sparkline) {
+      if (!this.state.sparkline && !this.state.showLoader) {
         this._fetchSparklineData();
       }
       if (!this.state.showLoader) {
         this._selectValues();
-        if (this.state.sparkline && !this.state.leftMonthOptions) {
+        if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
           if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
             this._showMonths();
           }
@@ -495,6 +495,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _fetchSparklineData () {
+    this.setState({showLoader: true});
     let url = handleRelativeURL(this.props.conf.sparklineURL);
     url += `?url=${encodeURIComponent(this.props.url)}&collection=web&output=json`;
     let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
@@ -527,6 +528,7 @@ export default class YmdTimestampHeader extends React.Component {
       j++;
     }
     this.setState({
+      showLoader: false,
       sparkline: snapshots,
       yearOptions: this._prepareSparklineOptionElements(yearSum)
     });
