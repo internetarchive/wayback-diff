@@ -122,6 +122,7 @@ export default class YmdTimestampHeader extends React.Component {
         if (this.state.yearOptions) {
           return (
             <div className="timestamp-header-view">
+              {this._showInfo()}
               {this._showTimestampSelector()}
               {this._showOpenLinks()}
             </div>
@@ -138,6 +139,7 @@ export default class YmdTimestampHeader extends React.Component {
         }
         return (
           <div className="timestamp-header-view">
+            {this._showInfo()}
             {this._showTimestampSelector()}
             {this._showOpenLinks()}
           </div>
@@ -535,17 +537,20 @@ export default class YmdTimestampHeader extends React.Component {
     const snapshots = data['years'];
     let yearSum = new Array(snapshots.length);
     let j = 0;
+    let allSum = 0;
     for (let year in snapshots) {
       yearSum[j] = [year, 0];
       for (let i = 0; i < snapshots[year].length; i++) {
         yearSum[j][1] = yearSum[j][1] + snapshots[year][i];
+        allSum = allSum + snapshots[year][i];
       }
       j++;
     }
     this.setState({
       showLoader: false,
       sparkline: snapshots,
-      yearOptions: this._prepareSparklineOptionElements(yearSum)
+      yearOptions: this._prepareSparklineOptionElements(yearSum),
+      headerInfo: this._getHeaderInfo(data['first_ts'], data['last_ts'], allSum)
     });
   }
 
@@ -616,6 +621,17 @@ export default class YmdTimestampHeader extends React.Component {
     if (element.style.visibility !== 'hidden') {
       element.style.visibility = 'hidden';
     }
+  }
+
+  _showInfo(){
+    return (
+      <div>
+        {this.state.headerInfo}
+        <div id="timestamp-left">Please select a capture</div>
+        <div id="timestamp-right">Please select a capture</div>
+        <br/>
+      </div>
+    );
   }
 
   _handleYearChange (e) {
