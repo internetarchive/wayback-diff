@@ -123,6 +123,7 @@ export default class YmdTimestampHeader extends React.Component {
           return (
             <div className="timestamp-header-view">
               {this._showTimestampSelector()}
+              {this._showOpenLinks()}
             </div>
           );
         }
@@ -419,12 +420,12 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _showOpenLinks () {
-    if (!this.state.showSteps) {
-      if (this.props.timestampA) {
+    if (!this.state.showSteps || this.state.showDiff) {
+      if (this.state.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
           id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
       }
-      if (this.props.timestampB) {
+      if (this.state.timestampB) {
         var aRight = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
           id="timestamp-right" target="_blank" rel="noopener">
           Open in new window</a>);
@@ -459,7 +460,9 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB = timestampBelement.value;
     }
     this.props.changeTimestampsCallback(timestampA, timestampB);
-    this.setState({showDiff: true});
+    this.setState({showDiff: true,
+      timestampA: timestampA,
+      timestampB: timestampB});
   }
 
   _selectValues () {
