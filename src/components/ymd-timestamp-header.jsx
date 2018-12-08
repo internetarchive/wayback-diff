@@ -364,7 +364,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _restartPressed () {
-    this._hideElement('restart-btn');
+    this._hideAndCollapseElement('restart-btn');
     this.setState({
       leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
       rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
@@ -608,6 +608,8 @@ export default class YmdTimestampHeader extends React.Component {
     let element = document.getElementById(elementID);
     if (element.style.visibility === 'hidden') {
       element.style.visibility = 'visible';
+    } else if (element.style.display === 'none') {
+      element.style.display = 'block';
     }
   }
 
@@ -620,6 +622,13 @@ export default class YmdTimestampHeader extends React.Component {
     let element = document.getElementById(elementID);
     if (element.style.visibility !== 'hidden') {
       element.style.visibility = 'hidden';
+    }
+  }
+
+  _hideAndCollapseElement (elementID) {
+    let element = document.getElementById(elementID);
+    if (element.style.display !== 'none') {
+      element.style.display = 'none';
     }
   }
 
