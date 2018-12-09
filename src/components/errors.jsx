@@ -14,6 +14,10 @@ export default class ErrorMessage extends React.Component {
       return (
         <div className='alert alert-warning' role='alert'>The Wayback Machine doesn't have {this.props.url} archived.</div>
       );
+    } else if (this.props.code === 'NoSimhash') {
+      return (
+        <div className='alert alert-warning' role='alert'>The Wayback Machine doesn't have Simhash data for {this.props.url} and year {this.props.timestamp.substring(0, 4)}.</div>
+      );
     }
     return (
       <div className='alert alert-warning' role='alert'>Communication with the Wayback Machine
