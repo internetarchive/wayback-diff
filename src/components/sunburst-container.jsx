@@ -209,17 +209,17 @@ export default class SunburstContainer extends React.Component {
 
 
     for (var i = 0; i<json.length; i++){
-      if (json[i][1] !== 0) {
+      if (json[i][1] !== 1) {
         if (json[i][1] <= this._lessSimilar + step) {
-          fifthLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
+          fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
         } else if (json[i][1] <= this._lessSimilar + 2 * step) {
-          fourthLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
+          fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
         } else if (json[i][1] <= this._lessSimilar + 3*step) {
-          thirdLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
+          thirdLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
         } else if (json[i][1] <= this._lessSimilar + 4*step) {
-          secondLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
+          secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
         } else {
-          firstLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
+          firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
         }
       }
     }
@@ -241,20 +241,20 @@ export default class SunburstContainer extends React.Component {
     }
 
 
-    if (firstLevel.length === 0){
+    while (firstLevel.length === 0) {
       firstLevel = secondLevel;
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
     }
-    if (secondLevel.length === 0){
+    while (secondLevel.length === 0) {
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
     }
-    if (thirdLevel.length === 0){
+    while (thirdLevel.length === 0) {
       thirdLevel = fourthLevel;
       fourthLevel = fifthLevel;
       fifthLevel = [];
@@ -285,7 +285,7 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].bigness = '';
     }
 
-    var data = {name:getUTCDateFormat(timestamp[0]), clr: colors[0], children:firstLevel, similarity: -1};
+    var data = {name:getUTCDateFormat(timestamp[0]), timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
     this.setState({simhashData: data});
   }
 
