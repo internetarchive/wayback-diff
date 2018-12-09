@@ -12,8 +12,9 @@ Install node dependencies with `yarn`
 
 # Usage
 
-In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism implemented.
-You can find my implementation of a CORS-enabled web-monitoring-processing server [here](https://github.com/ftsalamp/web-monitoring-processing/tree/cors).
+In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism enabled.
+
+In addition, this component uses Bootstrap, so make sure to include it in your entry point HTML document.
 
 You also need to have a CORS-enabled browser for this component to work.
 
