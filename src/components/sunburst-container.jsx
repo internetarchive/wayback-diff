@@ -26,7 +26,7 @@ export default class SunburstContainer extends React.Component {
   render () {
     if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this.state.error}/>);
+        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp}/>);
     }
     if (this.state.simhashData) {
       return (
@@ -89,6 +89,9 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
+        if (jsonResponse['simhash'] === 'None') {
+          throw Error('NoSimhash');
+        }
         const json = this._decodeJson(jsonResponse);
         this._fetchSimhashData(json);
       })
