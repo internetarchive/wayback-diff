@@ -20,10 +20,17 @@ blue-diff-footer{
     background-color: #1d9efd;
 }
 
+.align-items-center > .col-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #timestamp-select-left, #timestamp-select-right,
 #year-select-left, #year-select-right,
 #month-select-right, #month-select-left{
     width: auto;
+    padding-left: 1px;
+    padding-right: 1px;
 }
 
 #explanation-middle{
@@ -38,4 +45,10 @@ blue-diff-footer{
 #timestamp-right{
     display: inline-block;
     float: right;
+}
+
+#restart-btn{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }

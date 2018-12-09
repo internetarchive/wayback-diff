@@ -323,10 +323,10 @@ var objectAssign = shouldUseNative() ? Object.assign : function (target, source)
 	return to;
 };
 
-function A(a,b,d,c,e,g,h,f){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var k=[d,c,e,g,h,f],l=0;a=Error(b.replace(/%s/g,function(){return k[l++]}));a.name="Invariant Violation";}a.framesToPop=1;throw a;}}
-function B(a){for(var b=arguments.length-1,d="https://reactjs.org/docs/error-decoder.html?invariant="+a,c=0;c<b;c++)d+="&args[]="+encodeURIComponent(arguments[c+1]);A(!1,"Minified React error #"+a+"; visit %s for the full message or use the non-minified dev environment for full errors and additional helpful warnings. ",d);}var C={isMounted:function(){return !1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},D={};
-function E(a,b,d){this.props=a;this.context=b;this.refs=D;this.updater=d||C;}E.prototype.isReactComponent={};E.prototype.setState=function(a,b){"object"!==typeof a&&"function"!==typeof a&&null!=a?B("85"):void 0;this.updater.enqueueSetState(this,a,b,"setState");};E.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate");};function F(){}F.prototype=E.prototype;function G(a,b,d){this.props=a;this.context=b;this.refs=D;this.updater=d||C;}var H=G.prototype=new F;
-H.constructor=G;objectAssign(H,E.prototype);H.isPureReactComponent=!0;
+function aa(a,b,e,c,d,g,h,f){if(!a){a=void 0;if(void 0===b)a=Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var l=[e,c,d,g,h,f],m=0;a=Error(b.replace(/%s/g,function(){return l[m++]}));a.name="Invariant Violation";}a.framesToPop=1;throw a;}}
+function D(a){for(var b=arguments.length-1,e="https://reactjs.org/docs/error-decoder.html?invariant="+a,c=0;c<b;c++)e+="&args[]="+encodeURIComponent(arguments[c+1]);aa(!1,"Minified React error #"+a+"; visit %s for the full message or use the non-minified dev environment for full errors and additional helpful warnings. ",e);}var E={isMounted:function(){return !1},enqueueForceUpdate:function(){},enqueueReplaceState:function(){},enqueueSetState:function(){}},F={};
+function G(a,b,e){this.props=a;this.context=b;this.refs=F;this.updater=e||E;}G.prototype.isReactComponent={};G.prototype.setState=function(a,b){"object"!==typeof a&&"function"!==typeof a&&null!=a?D("85"):void 0;this.updater.enqueueSetState(this,a,b,"setState");};G.prototype.forceUpdate=function(a){this.updater.enqueueForceUpdate(this,a,"forceUpdate");};function H(){}H.prototype=G.prototype;function I(a,b,e){this.props=a;this.context=b;this.refs=F;this.updater=e||E;}var J=I.prototype=new H;
+J.constructor=I;objectAssign(J,G.prototype);J.isPureReactComponent=!0;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -434,7 +434,7 @@ var checkPropTypes = checkPropTypes_1;
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.5.2';
+var ReactVersion = '16.6.3';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -447,9 +447,12 @@ var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeac
 var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
 var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
 var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace;
-var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for('react.async_mode') : 0xeacf;
+
+var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
 var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
-var REACT_PLACEHOLDER_TYPE = hasSymbol ? Symbol.for('react.placeholder') : 0xead1;
+var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
+var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
+var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
 
 var MAYBE_ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
 var FAUX_ITERATOR_SYMBOL = '@@iterator';
@@ -464,39 +467,6 @@ function getIteratorFn(maybeIterable) {
   }
   return null;
 }
-// Helps identify side effects in begin-phase lifecycle hooks and setState reducers:
-
-
-// In some cases, StrictMode should also double-render lifecycles.
-// This can be confusing for tests though,
-// And it can be bad for performance in production.
-// This feature flag can be used to control the behavior:
-
-
-// To preserve the "Pause on caught exceptions" behavior of the debugger, we
-// replay the begin phase of a failed component inside invokeGuardedCallback.
-
-
-// Warn about deprecated, async-unsafe lifecycles; relates to RFC #6:
-
-
-// Warn about legacy context API
-
-
-// Gather advanced timing metrics for Profiler subtrees.
-
-
-// Trace which interactions trigger each commit.
-
-
-// Only used in www builds.
-
-
-// Only used in www builds.
-
-
-// React Fire: prevent the value and checked attributes from syncing
-// with their related DOM properties
 
 /**
  * Use invariant() to assert state which your program assumes to be true.
@@ -622,63 +592,24 @@ var warningWithoutStack = function () {};
       return;
     }
     if (typeof console !== 'undefined') {
-      var _args$map = args.map(function (item) {
+      var argsWithFormat = args.map(function (item) {
         return '' + item;
-      }),
-          a = _args$map[0],
-          b = _args$map[1],
-          c = _args$map[2],
-          d = _args$map[3],
-          e = _args$map[4],
-          f = _args$map[5],
-          g = _args$map[6],
-          h = _args$map[7];
+      });
+      argsWithFormat.unshift('Warning: ' + format);
 
-      var message = 'Warning: ' + format;
-
-      // We intentionally don't use spread (or .apply) because it breaks IE9:
-      // https://github.com/facebook/react/issues/13610
-      switch (args.length) {
-        case 0:
-          console.error(message);
-          break;
-        case 1:
-          console.error(message, a);
-          break;
-        case 2:
-          console.error(message, a, b);
-          break;
-        case 3:
-          console.error(message, a, b, c);
-          break;
-        case 4:
-          console.error(message, a, b, c, d);
-          break;
-        case 5:
-          console.error(message, a, b, c, d, e);
-          break;
-        case 6:
-          console.error(message, a, b, c, d, e, f);
-          break;
-        case 7:
-          console.error(message, a, b, c, d, e, f, g);
-          break;
-        case 8:
-          console.error(message, a, b, c, d, e, f, g, h);
-          break;
-        default:
-          throw new Error('warningWithoutStack() currently supports at most 8 arguments.');
-      }
+      // We intentionally don't use spread (or .apply) directly because it
+      // breaks IE9: https://github.com/facebook/react/issues/13610
+      Function.prototype.apply.call(console.error, console, argsWithFormat);
     }
     try {
       // --- Welcome to debugging React ---
       // This error was thrown as a convenience so that you can use this stack
       // to find the callsite that caused this warning to fire.
       var argIndex = 0;
-      var _message = 'Warning: ' + format.replace(/%s/g, function () {
+      var message = 'Warning: ' + format.replace(/%s/g, function () {
         return args[argIndex++];
       });
-      throw new Error(_message);
+      throw new Error(message);
     } catch (x) {}
   };
 }
@@ -938,10 +869,13 @@ var describeComponentFrame = function (name, source, ownerName) {
 var Resolved = 1;
 
 
+function refineResolvedLazyComponent(lazyComponent) {
+  return lazyComponent._status === Resolved ? lazyComponent._result : null;
+}
 
-
-function refineResolvedThenable(thenable) {
-  return thenable._reactStatus === Resolved ? thenable._reactResult : null;
+function getWrappedName(outerType, innerType, wrapperName) {
+  var functionName = innerType.displayName || innerType.name || '';
+  return outerType.displayName || (functionName !== '' ? wrapperName + '(' + functionName + ')' : wrapperName);
 }
 
 function getComponentName(type) {
@@ -961,8 +895,8 @@ function getComponentName(type) {
     return type;
   }
   switch (type) {
-    case REACT_ASYNC_MODE_TYPE:
-      return 'AsyncMode';
+    case REACT_CONCURRENT_MODE_TYPE:
+      return 'ConcurrentMode';
     case REACT_FRAGMENT_TYPE:
       return 'Fragment';
     case REACT_PORTAL_TYPE:
@@ -971,8 +905,8 @@ function getComponentName(type) {
       return 'Profiler';
     case REACT_STRICT_MODE_TYPE:
       return 'StrictMode';
-    case REACT_PLACEHOLDER_TYPE:
-      return 'Placeholder';
+    case REACT_SUSPENSE_TYPE:
+      return 'Suspense';
   }
   if (typeof type === 'object') {
     switch (type.$$typeof) {
@@ -981,16 +915,17 @@ function getComponentName(type) {
       case REACT_PROVIDER_TYPE:
         return 'Context.Provider';
       case REACT_FORWARD_REF_TYPE:
-        var renderFn = type.render;
-        var functionName = renderFn.displayName || renderFn.name || '';
-        return type.displayName || (functionName !== '' ? 'ForwardRef(' + functionName + ')' : 'ForwardRef');
-    }
-    if (typeof type.then === 'function') {
-      var thenable = type;
-      var resolvedThenable = refineResolvedThenable(thenable);
-      if (resolvedThenable) {
-        return getComponentName(resolvedThenable);
-      }
+        return getWrappedName(type, type.render, 'ForwardRef');
+      case REACT_MEMO_TYPE:
+        return getComponentName(type.type);
+      case REACT_LAZY_TYPE:
+        {
+          var thenable = type;
+          var resolvedThenable = refineResolvedLazyComponent(thenable);
+          if (resolvedThenable) {
+            return getComponentName(resolvedThenable);
+          }
+        }
     }
   }
   return null;
@@ -1705,12 +1640,6 @@ function onlyChild(children) {
   return children;
 }
 
-function readContext(context, observedBits) {
-  var dispatcher = ReactCurrentOwner.currentDispatcher;
-  !(dispatcher !== null) ? invariant(false, 'Context.unstable_read(): Context can only be read while React is rendering, e.g. inside the render method or getDerivedStateFromProps.') : void 0;
-  return dispatcher.readContext(context, observedBits);
-}
-
 function createContext(defaultValue, calculateChangedBits) {
   if (calculateChangedBits === undefined) {
     calculateChangedBits = null;
@@ -1730,18 +1659,82 @@ function createContext(defaultValue, calculateChangedBits) {
     // Secondary renderers store their context values on separate fields.
     _currentValue: defaultValue,
     _currentValue2: defaultValue,
+    // Used to track how many concurrent renderers this context currently
+    // supports within in a single renderer. Such as parallel server rendering.
+    _threadCount: 0,
     // These are circular
     Provider: null,
-    Consumer: null,
-    unstable_read: null
+    Consumer: null
   };
 
   context.Provider = {
     $$typeof: REACT_PROVIDER_TYPE,
     _context: context
   };
-  context.Consumer = context;
-  context.unstable_read = readContext.bind(null, context);
+
+  var hasWarnedAboutUsingNestedContextConsumers = false;
+  var hasWarnedAboutUsingConsumerProvider = false;
+
+  {
+    // A separate object, but proxies back to the original context object for
+    // backwards compatibility. It has a different $$typeof, so we can properly
+    // warn for the incorrect usage of Context as a Consumer.
+    var Consumer = {
+      $$typeof: REACT_CONTEXT_TYPE,
+      _context: context,
+      _calculateChangedBits: context._calculateChangedBits
+    };
+    // $FlowFixMe: Flow complains about not setting a value, which is intentional here
+    Object.defineProperties(Consumer, {
+      Provider: {
+        get: function () {
+          if (!hasWarnedAboutUsingConsumerProvider) {
+            hasWarnedAboutUsingConsumerProvider = true;
+            warning$1(false, 'Rendering <Context.Consumer.Provider> is not supported and will be removed in ' + 'a future major release. Did you mean to render <Context.Provider> instead?');
+          }
+          return context.Provider;
+        },
+        set: function (_Provider) {
+          context.Provider = _Provider;
+        }
+      },
+      _currentValue: {
+        get: function () {
+          return context._currentValue;
+        },
+        set: function (_currentValue) {
+          context._currentValue = _currentValue;
+        }
+      },
+      _currentValue2: {
+        get: function () {
+          return context._currentValue2;
+        },
+        set: function (_currentValue2) {
+          context._currentValue2 = _currentValue2;
+        }
+      },
+      _threadCount: {
+        get: function () {
+          return context._threadCount;
+        },
+        set: function (_threadCount) {
+          context._threadCount = _threadCount;
+        }
+      },
+      Consumer: {
+        get: function () {
+          if (!hasWarnedAboutUsingNestedContextConsumers) {
+            hasWarnedAboutUsingNestedContextConsumers = true;
+            warning$1(false, 'Rendering <Context.Consumer.Consumer> is not supported and will be removed in ' + 'a future major release. Did you mean to render <Context.Consumer> instead?');
+          }
+          return context.Consumer;
+        }
+      }
+    });
+    // $FlowFixMe: Flow complains about missing properties because it doesn't understand defineProperty
+    context.Consumer = Consumer;
+  }
 
   {
     context._currentRenderer = null;
@@ -1751,9 +1744,21 @@ function createContext(defaultValue, calculateChangedBits) {
   return context;
 }
 
+function lazy(ctor) {
+  return {
+    $$typeof: REACT_LAZY_TYPE,
+    _ctor: ctor,
+    // React uses these fields to store the result.
+    _status: -1,
+    _result: null
+  };
+}
+
 function forwardRef(render) {
   {
-    if (typeof render !== 'function') {
+    if (render != null && render.$$typeof === REACT_MEMO_TYPE) {
+      warningWithoutStack$1(false, 'forwardRef requires a render function but received a `memo` ' + 'component. Instead of forwardRef(memo(...)), use ' + 'memo(forwardRef(...)).');
+    } else if (typeof render !== 'function') {
       warningWithoutStack$1(false, 'forwardRef requires a render function but was given %s.', render === null ? 'null' : typeof render);
     } else {
       !(
@@ -1775,7 +1780,20 @@ function forwardRef(render) {
 function isValidElementType(type) {
   return typeof type === 'string' || typeof type === 'function' ||
   // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
-  type === REACT_FRAGMENT_TYPE || type === REACT_ASYNC_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_PLACEHOLDER_TYPE || typeof type === 'object' && type !== null && (typeof type.then === 'function' || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE);
+  type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE);
+}
+
+function memo(type, compare) {
+  {
+    if (!isValidElementType(type)) {
+      warningWithoutStack$1(false, 'memo: The first argument must be a component. Instead ' + 'received: %s', type === null ? 'null' : typeof type);
+    }
+  }
+  return {
+    $$typeof: REACT_MEMO_TYPE,
+    type: type,
+    compare: compare === undefined ? null : compare
+  };
 }
 
 /**
@@ -1792,12 +1810,6 @@ var propTypesMisspellWarningShown = void 0;
 }
 
 function getDeclarationErrorAddendum() {
-  if (ReactCurrentOwner.current) {
-    var name = getComponentName(ReactCurrentOwner.current.type);
-    if (name) {
-      return '\n\nCheck the render method of `' + name + '`.';
-    }
-  }
   return '';
 }
 
@@ -1923,7 +1935,7 @@ function validatePropTypes(element) {
   var name = void 0,
       propTypes = void 0;
   if (typeof type === 'function') {
-    // Class or functional component
+    // Class or function component
     name = type.displayName || type.name;
     propTypes = type.propTypes;
   } else if (typeof type === 'object' && type !== null && type.$$typeof === REACT_FORWARD_REF_TYPE) {
@@ -2075,11 +2087,12 @@ var React = {
 
   createContext: createContext,
   forwardRef: forwardRef,
+  lazy: lazy,
+  memo: memo,
 
   Fragment: REACT_FRAGMENT_TYPE,
   StrictMode: REACT_STRICT_MODE_TYPE,
-  unstable_AsyncMode: REACT_ASYNC_MODE_TYPE,
-  unstable_Profiler: REACT_PROFILER_TYPE,
+  Suspense: REACT_SUSPENSE_TYPE,
 
   createElement: createElementWithValidation,
   cloneElement: cloneElementWithValidation,
@@ -2090,6 +2103,11 @@ var React = {
 
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals
 };
+
+{
+  React.unstable_ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+  React.unstable_Profiler = REACT_PROFILER_TYPE;
+}
 
 
 
@@ -3648,23 +3666,16 @@ function handleRelativeURL(url) {
   return window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + url;
 }
 
-/**
- * Calculates binary hamming distance of two base 16 integers.
- */
-function hammingDistance(x, y) {
-  var a1 = parseInt(x, 16);
-  var a2 = parseInt(y, 16);
-  var v1 = a1 ^ a2;
-  var v2 = (a1 ^ a2) >> 32;
+function hammingWeight(l) {
+  var c;
+  for (c = 0; l; c++) {
+    l &= l - 1;
+  }
+  return c;
+}
 
-  v1 = v1 - (v1 >> 1 & 0x55555555);
-  v2 = v2 - (v2 >> 1 & 0x55555555);
-  v1 = (v1 & 0x33333333) + (v1 >> 2 & 0x33333333);
-  v2 = (v2 & 0x33333333) + (v2 >> 2 & 0x33333333);
-  var c1 = (v1 + (v1 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-  var c2 = (v2 + (v2 >> 4) & 0xF0F0F0F) * 0x1010101 >> 24;
-
-  return c1 + c2;
+function similarity(simhash1, simhash2) {
+  return hammingWeight(simhash1 & simhash2) / hammingWeight(simhash1 | simhash2);
 }
 
 function checkResponse(response) {
@@ -3935,23 +3946,23 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n#timestamp-select-left, #timestamp-select-right,\n#year-select-left, #year-select-right,\n#month-select-right, #month-select-left{\n    width: auto;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}\n";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n.align-items-center > .col-auto {\n    margin-left: auto;\n    margin-right: auto;\n}\n\n#timestamp-select-left, #timestamp-select-right,\n#year-select-left, #year-select-right,\n#month-select-right, #month-select-left{\n    width: auto;\n    padding-left: 1px;\n    padding-right: 1px;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}\n\n#restart-btn{\n    display: block;\n    margin-left: auto;\n    margin-right: auto;\n}\n";
 styleInject(css$1);
 
 /**
  * Display a timestamp selector
  *
- * @class NewTimestampHeader
+ * @class YmdTimestampHeader
  * @extends {React.Component}
  */
 
-var NewTimestampHeader = function (_React$Component) {
-  inherits(NewTimestampHeader, _React$Component);
+var YmdTimestampHeader = function (_React$Component) {
+  inherits(YmdTimestampHeader, _React$Component);
 
-  function NewTimestampHeader(props) {
-    classCallCheck(this, NewTimestampHeader);
+  function YmdTimestampHeader(props) {
+    classCallCheck(this, YmdTimestampHeader);
 
-    var _this = possibleConstructorReturn(this, (NewTimestampHeader.__proto__ || Object.getPrototypeOf(NewTimestampHeader)).call(this, props));
+    var _this = possibleConstructorReturn(this, (YmdTimestampHeader.__proto__ || Object.getPrototypeOf(YmdTimestampHeader)).call(this, props));
 
     _this.ABORT_CONTROLLER = new window.AbortController();
     _this._isMountedNow = false;
@@ -3962,6 +3973,8 @@ var NewTimestampHeader = function (_React$Component) {
     };
     _this._leftMonthIndex = -1;
     _this._rightMonthIndex = -1;
+    _this._leftTimestampIndex = -1;
+    _this._rightTimestampIndex = -1;
     _this._visibilityState = ['visible', 'hidden'];
 
 
@@ -3998,7 +4011,7 @@ var NewTimestampHeader = function (_React$Component) {
     return _this;
   }
 
-  createClass(NewTimestampHeader, [{
+  createClass(YmdTimestampHeader, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       this._isMountedNow = true;
@@ -4007,15 +4020,17 @@ var NewTimestampHeader = function (_React$Component) {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
       if (this.state.cdxData) {
-        if (!this.state.sparkline) {
+        if (!this.state.sparkline && !this.state.showLoader) {
           this._fetchSparklineData();
         }
-        this._selectValues();
-      }
-      if (this.state.leftMonthOptions || this.state.rightMonthOptions) {
-        this._selectValues();
-      } else if (this.state.yearOptions) {
-        this._showMonths();
+        if (!this.state.showLoader) {
+          this._selectValues();
+          if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
+            if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
+              this._showMonths();
+            }
+          }
+        }
       }
     }
   }, {
@@ -4027,28 +4042,36 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_handleRightTimestampChange',
     value: function _handleRightTimestampChange() {
-      this._showElement('restart-btn');
-      var selectedDigest = this.state.rightSnaps[document.getElementById('timestamp-select-right').selectedIndex][1];
-      var allowedSnapshots = this.state.leftSnaps;
-      allowedSnapshots = allowedSnapshots.filter(function (hash) {
-        return hash[1] !== selectedDigest;
-      });
-      this.setState({
-        leftSnapElements: this._prepareOptionElements(allowedSnapshots)
-      });
+      this._rightTimestampIndex = document.getElementById('timestamp-select-right').selectedIndex;
+      if (this._isShowing('timestamp-select-left')) {
+        this._showElement('restart-btn');
+        this._showElement('show-diff-btn');
+        var selectedDigest = this.state.rightSnaps[this._rightTimestampIndex][1];
+        var allowedSnapshots = this.state.leftSnaps;
+        allowedSnapshots = allowedSnapshots.filter(function (hash) {
+          return hash[1] !== selectedDigest;
+        });
+        this.setState({
+          leftSnapElements: this._prepareOptionElements(allowedSnapshots)
+        });
+      }
     }
   }, {
     key: '_handleLeftTimestampChange',
     value: function _handleLeftTimestampChange() {
-      this._showElement('restart-btn');
-      var selectedDigest = this.state.leftSnaps[document.getElementById('timestamp-select-left').selectedIndex][1];
-      var allowedSnapshots = this.state.rightSnaps;
-      allowedSnapshots = allowedSnapshots.filter(function (hash) {
-        return hash[1] !== selectedDigest;
-      });
-      this.setState({
-        rightSnapElements: this._prepareOptionElements(allowedSnapshots)
-      });
+      this._leftTimestampIndex = document.getElementById('timestamp-select-left').selectedIndex;
+      if (this._isShowing('timestamp-select-right')) {
+        this._showElement('restart-btn');
+        this._showElement('show-diff-btn');
+        var selectedDigest = this.state.leftSnaps[this._leftTimestampIndex][1];
+        var allowedSnapshots = this.state.rightSnaps;
+        allowedSnapshots = allowedSnapshots.filter(function (hash) {
+          return hash[1] !== selectedDigest;
+        });
+        this.setState({
+          rightSnapElements: this._prepareOptionElements(allowedSnapshots)
+        });
+      }
     }
   }, {
     key: 'render',
@@ -4058,27 +4081,18 @@ var NewTimestampHeader = function (_React$Component) {
       var Loader = function Loader() {
         return _this2.props.loader;
       };
-
+      if (this.state.showLoader && !this.state.showError) {
+        return react.createElement(Loader, null);
+      }
       if (!this.state.showError) {
         if (this.state.showSteps) {
-          if (this.state.cdxData) {
-            if (this._shouldValidateTimestamp) {
-              this._checkTimestamps();
-            }
+          if (this.state.yearOptions) {
             return react.createElement(
               'div',
               { className: 'timestamp-header-view' },
+              this._showInfo(),
               this._showTimestampSelector(),
               this._showOpenLinks()
-            );
-          } else if (this.state.leftMonthOptions && this.state.rightMonthOptions || this.state.yearOptions) {
-            if (this._shouldValidateTimestamp) {
-              this._checkTimestamps();
-            }
-            return react.createElement(
-              'div',
-              { className: 'timestamp-header-view' },
-              this._showTimestampSelector()
             );
           }
           this._fetchSparklineData();
@@ -4091,6 +4105,7 @@ var NewTimestampHeader = function (_React$Component) {
           return react.createElement(
             'div',
             { className: 'timestamp-header-view' },
+            this._showInfo(),
             this._showTimestampSelector(),
             this._showOpenLinks()
           );
@@ -4178,6 +4193,7 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_fetchCDXData',
     value: function _fetchCDXData() {
+      this.setState({ showLoader: true });
       var leftFetchPromise = void 0;
       var rightFetchPromise = void 0;
       this._saveMonthsIndex();
@@ -4269,7 +4285,8 @@ var NewTimestampHeader = function (_React$Component) {
         leftSnaps: leftData,
         rightSnaps: data,
         leftSnapElements: this._prepareOptionElements(leftData),
-        rightSnapElements: this._prepareOptionElements(data)
+        rightSnapElements: this._prepareOptionElements(data),
+        showLoader: false
       });
     }
   }, {
@@ -4293,7 +4310,7 @@ var NewTimestampHeader = function (_React$Component) {
     value: function _prepareSparklineOptionElements(data) {
       if (data) {
         var options = [];
-        for (var i = data.length - 1; i > 0; i--) {
+        for (var i = data.length - 1; i >= 0; i--) {
           var count = data[i][1];
           if (count > parseInt(this.props.conf.limit)) {
             count = this.props.conf.limit;
@@ -4340,7 +4357,7 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_restartPressed',
     value: function _restartPressed() {
-      this._hideElement('restart-btn');
+      this._hideAndCollapseElement('restart-btn');
       this.setState({
         leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
         rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
@@ -4351,60 +4368,92 @@ var NewTimestampHeader = function (_React$Component) {
     value: function _showTimestampSelector() {
       return react.createElement(
         'div',
-        { className: 'timestamp-container-view' },
+        { className: 'form-row align-items-center' },
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'year-select-left', onClick: this._handleYearChange },
-          react.createElement('optgroup', { label: 'Years and available captures' }),
-          this.state.yearOptions
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'year-select-left', onClick: this._handleYearChange },
+            react.createElement('optgroup', { label: 'Years and available captures' }),
+            this.state.yearOptions
+          )
         ),
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'month-select-left', style: { visibility: this._visibilityState[+(this.props.timestampA == null)] }, onClick: this._getTimestamps },
-          react.createElement('optgroup', { label: 'Months and available captures' }),
-          this.state.leftMonthOptions
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'month-select-left', style: { visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }, onClick: this._getTimestamps },
+            react.createElement('optgroup', { label: 'Months and available captures' }),
+            this.state.leftMonthOptions
+          )
         ),
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+(this.props.timestampA == null)] }, onChange: this._handleLeftTimestampChange },
-          react.createElement('optgroup', { label: 'Available captures' }),
-          this.state.leftSnapElements
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+!this.state.leftSnapElements] }, onClick: this._handleLeftTimestampChange },
+            react.createElement('optgroup', { label: 'Available captures' }),
+            this.state.leftSnapElements
+          )
         ),
         react.createElement(
-          'button',
-          { className: 'btn btn-default navbar-btn', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
-          'Show differences'
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'button',
+            { className: 'btn btn-sm', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
+            'Show differences'
+          )
         ),
         react.createElement(
-          'button',
-          { className: 'btn btn-default navbar-btn', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
-          'Restart'
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'button',
+            { className: 'btn btn-sm', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
+            'Restart'
+          )
         ),
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+(this.props.timestampB == null)] }, onChange: this._handleRightTimestampChange },
-          react.createElement('optgroup', { label: 'Available captures' }),
-          this.state.rightSnapElements
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+!this.state.rightSnapElements] }, onClick: this._handleRightTimestampChange },
+            react.createElement('optgroup', { label: 'Available captures' }),
+            this.state.rightSnapElements
+          )
         ),
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'month-select-right', style: { visibility: this._visibilityState[+(this.props.timestampB == null)] }, onClick: this._getTimestamps },
-          react.createElement('optgroup', { label: 'Months and available captures' }),
-          this.state.rightMonthOptions
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'month-select-right', style: { visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }, onClick: this._getTimestamps },
+            react.createElement('optgroup', { label: 'Months and available captures' }),
+            this.state.rightMonthOptions
+          )
         ),
         react.createElement(
-          'select',
-          { className: 'form-control', id: 'year-select-right', onClick: this._handleYearChange },
-          react.createElement('optgroup', { label: 'Years and available captures' }),
-          this.state.yearOptions
+          'div',
+          { className: 'col-auto' },
+          react.createElement(
+            'select',
+            { className: 'form-control mr-sm-1', id: 'year-select-right', onClick: this._handleYearChange },
+            react.createElement('optgroup', { label: 'Years and available captures' }),
+            this.state.yearOptions
+          )
         )
       );
     }
   }, {
     key: '_showOpenLinks',
     value: function _showOpenLinks() {
-      if (!this.state.showSteps) {
-        if (this.props.timestampA) {
+      if (!this.state.showSteps || this.state.showDiff) {
+        if (this.state.timestampA) {
           var aLeft = react.createElement(
             'a',
             { href: this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url,
@@ -4412,7 +4461,7 @@ var NewTimestampHeader = function (_React$Component) {
             ' Open in new window'
           );
         }
-        if (this.props.timestampB) {
+        if (this.state.timestampB) {
           var aRight = react.createElement(
             'a',
             { href: this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url,
@@ -4451,16 +4500,26 @@ var NewTimestampHeader = function (_React$Component) {
         timestampB = timestampBelement.value;
       }
       this.props.changeTimestampsCallback(timestampA, timestampB);
-      this.setState({ showDiff: true });
+      this.setState({ showDiff: true,
+        timestampA: timestampA,
+        timestampB: timestampB });
     }
   }, {
     key: '_selectValues',
     value: function _selectValues() {
-      if (this.state.timestampA) {
-        document.getElementById('timestamp-select-left').value = this.state.timestampA;
+      if (this._isShowing('timestamp-select-left')) {
+        if (this._leftTimestampIndex !== -1) {
+          document.getElementById('timestamp-select-left').selectedIndex = this._leftTimestampIndex;
+        } else {
+          document.getElementById('timestamp-select-left').value = this.state.timestampA;
+        }
       }
-      if (this.state.timestampB) {
-        document.getElementById('timestamp-select-right').value = this.state.timestampB;
+      if (this._isShowing('timestamp-select-right')) {
+        if (this._rightTimestampIndex !== -1) {
+          document.getElementById('timestamp-select-right').selectedIndex = this._rightTimestampIndex;
+        } else {
+          document.getElementById('timestamp-select-right').value = this.state.timestampB;
+        }
       }
       var monthLeft = document.getElementById('month-select-left');
       var monthRight = document.getElementById('month-select-right');
@@ -4504,6 +4563,7 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_fetchSparklineData',
     value: function _fetchSparklineData() {
+      this.setState({ showLoader: true });
       var url = handleRelativeURL(this.props.conf.sparklineURL);
       url += '?url=' + encodeURIComponent(this.props.url) + '&collection=web&output=json';
       var fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
@@ -4532,16 +4592,20 @@ var NewTimestampHeader = function (_React$Component) {
       var snapshots = data['years'];
       var yearSum = new Array(snapshots.length);
       var j = 0;
+      var allSum = 0;
       for (var year in snapshots) {
         yearSum[j] = [year, 0];
         for (var i = 0; i < snapshots[year].length; i++) {
           yearSum[j][1] = yearSum[j][1] + snapshots[year][i];
+          allSum = allSum + snapshots[year][i];
         }
         j++;
       }
       this.setState({
+        showLoader: false,
         sparkline: snapshots,
-        yearOptions: this._prepareSparklineOptionElements(yearSum)
+        yearOptions: this._prepareSparklineOptionElements(yearSum),
+        headerInfo: this._getHeaderInfo(data['first_ts'], data['last_ts'], allSum)
       });
     }
   }, {
@@ -4583,8 +4647,10 @@ var NewTimestampHeader = function (_React$Component) {
       var elemToShow = void 0;
       if (e.target.id === 'month-select-left') {
         elemToShow = 'timestamp-select-left';
+        this._leftTimestampIndex = 0;
       } else {
         elemToShow = 'timestamp-select-right';
+        this._rightTimestampIndex = 0;
       }
       document.getElementById(elemToShow).selectedIndex = '0';
       this._showElement(elemToShow);
@@ -4597,18 +4663,54 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_showElement',
     value: function _showElement(elementID) {
-      var restartButton = document.getElementById(elementID);
-      if (restartButton.style.visibility === 'hidden') {
-        restartButton.style.visibility = 'visible';
+      var element = document.getElementById(elementID);
+      if (element.style.visibility === 'hidden') {
+        element.style.visibility = 'visible';
+      } else if (element.style.display === 'none') {
+        element.style.display = 'block';
       }
+    }
+  }, {
+    key: '_isShowing',
+    value: function _isShowing(elementID) {
+      var element = document.getElementById(elementID);
+      return element && element.style.visibility === 'visible';
     }
   }, {
     key: '_hideElement',
     value: function _hideElement(elementID) {
-      var restartButton = document.getElementById(elementID);
-      if (restartButton.style.visibility !== 'hidden') {
-        restartButton.style.visibility = 'hidden';
+      var element = document.getElementById(elementID);
+      if (element.style.visibility !== 'hidden') {
+        element.style.visibility = 'hidden';
       }
+    }
+  }, {
+    key: '_hideAndCollapseElement',
+    value: function _hideAndCollapseElement(elementID) {
+      var element = document.getElementById(elementID);
+      if (element.style.display !== 'none') {
+        element.style.display = 'none';
+      }
+    }
+  }, {
+    key: '_showInfo',
+    value: function _showInfo() {
+      return react.createElement(
+        'div',
+        null,
+        this.state.headerInfo,
+        react.createElement(
+          'div',
+          { id: 'timestamp-left' },
+          'Please select a capture'
+        ),
+        react.createElement(
+          'div',
+          { id: 'timestamp-right' },
+          'Please select a capture'
+        ),
+        react.createElement('br', null)
+      );
     }
   }, {
     key: '_handleYearChange',
@@ -4635,22 +4737,21 @@ var NewTimestampHeader = function (_React$Component) {
   }, {
     key: '_saveMonthsIndex',
     value: function _saveMonthsIndex() {
-      if (document.getElementById('month-select-left')) {
+      if (this._isShowing('month-select-left')) {
         var monthLeft = document.getElementById('month-select-left').value;
-        var monthRight = document.getElementById('month-select-right').value;
         this._leftMonthIndex = parseInt(getKeyByValue(this._monthNames, monthLeft));
+      } else if (this.props.timestampA) {
+        this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
+      }
+      if (this._isShowing('month-select-right')) {
+        var monthRight = document.getElementById('month-select-right').value;
         this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
-      } else {
-        if (this.props.timestampA) {
-          this._leftMonthIndex = parseInt(this.props.timestampA.substring(4, 6));
-        }
-        if (this.props.timestampB) {
-          this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
-        }
+      } else if (this.props.timestampB) {
+        this._rightMonthIndex = parseInt(this.props.timestampB.substring(4, 6));
       }
     }
   }]);
-  return NewTimestampHeader;
+  return YmdTimestampHeader;
 }(react.Component);
 
 /**
@@ -4827,7 +4928,7 @@ var DiffContainer = function (_React$Component) {
           return react.createElement(
             'div',
             { className: 'diffcontainer-view' },
-            react.createElement(NewTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
+            react.createElement(YmdTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
               isInitial: true, errorHandledCallback: this.errorHandled })),
             this._showNoTimestamps()
           );
@@ -4835,7 +4936,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(NewTimestampHeader, _extends({ isInitial: true }, this.props, {
+          react.createElement(YmdTimestampHeader, _extends({ isInitial: true }, this.props, {
             errorHandledCallback: this.errorHandled,
             changeTimestampsCallback: this.changeTimestamps }))
         );
@@ -4844,7 +4945,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(NewTimestampHeader, _extends({ isInitial: false
+          react.createElement(YmdTimestampHeader, _extends({ isInitial: false
           }, this.props, { changeTimestampsCallback: this.changeTimestamps,
             errorHandledCallback: this.errorHandled })),
           this.prepareDiffView(),
@@ -4855,7 +4956,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(NewTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
+          react.createElement(YmdTimestampHeader, _extends({}, this.props, { changeTimestampsCallback: this.changeTimestamps,
             isInitial: false, errorHandledCallback: this.errorHandled })),
           this._showOneSnapshot(true, this.state.timestampA)
         );
@@ -4864,7 +4965,7 @@ var DiffContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'diffcontainer-view' },
-          react.createElement(NewTimestampHeader, _extends({ isInitial: false }, this.props, {
+          react.createElement(YmdTimestampHeader, _extends({ isInitial: false }, this.props, {
             errorHandledCallback: this.errorHandled,
             changeTimestampsCallback: this.changeTimestamps })),
           this._showOneSnapshot(false, this.state.timestampB)
@@ -9819,7 +9920,6 @@ millisecond.every = function(k) {
     return (end - start) / k;
   });
 };
-var milliseconds = millisecond.range;
 
 var durationSecond = 1e3;
 var durationMinute = 6e4;
@@ -9836,7 +9936,6 @@ var second = newInterval(function(date) {
 }, function(date) {
   return date.getUTCSeconds();
 });
-var seconds = second.range;
 
 var minute = newInterval(function(date) {
   date.setTime(Math.floor(date / durationMinute) * durationMinute);
@@ -9847,7 +9946,6 @@ var minute = newInterval(function(date) {
 }, function(date) {
   return date.getMinutes();
 });
-var minutes = minute.range;
 
 var hour = newInterval(function(date) {
   var offset = date.getTimezoneOffset() * durationMinute % durationHour;
@@ -9860,7 +9958,6 @@ var hour = newInterval(function(date) {
 }, function(date) {
   return date.getHours();
 });
-var hours = hour.range;
 
 var day = newInterval(function(date) {
   date.setHours(0, 0, 0, 0);
@@ -9871,7 +9968,6 @@ var day = newInterval(function(date) {
 }, function(date) {
   return date.getDate() - 1;
 });
-var days = day.range;
 
 function weekday(i) {
   return newInterval(function(date) {
@@ -9892,8 +9988,6 @@ var thursday = weekday(4);
 var friday = weekday(5);
 var saturday = weekday(6);
 
-var sundays = sunday.range;
-
 var month = newInterval(function(date) {
   date.setDate(1);
   date.setHours(0, 0, 0, 0);
@@ -9904,7 +9998,6 @@ var month = newInterval(function(date) {
 }, function(date) {
   return date.getMonth();
 });
-var months = month.range;
 
 var year = newInterval(function(date) {
   date.setMonth(0, 1);
@@ -9927,7 +10020,6 @@ year.every = function(k) {
     date.setFullYear(date.getFullYear() + step * k);
   });
 };
-var years = year.range;
 
 var utcMinute = newInterval(function(date) {
   date.setUTCSeconds(0, 0);
@@ -9938,7 +10030,6 @@ var utcMinute = newInterval(function(date) {
 }, function(date) {
   return date.getUTCMinutes();
 });
-var utcMinutes = utcMinute.range;
 
 var utcHour = newInterval(function(date) {
   date.setUTCMinutes(0, 0, 0);
@@ -9949,7 +10040,6 @@ var utcHour = newInterval(function(date) {
 }, function(date) {
   return date.getUTCHours();
 });
-var utcHours = utcHour.range;
 
 var utcDay = newInterval(function(date) {
   date.setUTCHours(0, 0, 0, 0);
@@ -9960,7 +10050,6 @@ var utcDay = newInterval(function(date) {
 }, function(date) {
   return date.getUTCDate() - 1;
 });
-var utcDays = utcDay.range;
 
 function utcWeekday(i) {
   return newInterval(function(date) {
@@ -9981,8 +10070,6 @@ var utcThursday = utcWeekday(4);
 var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
-var utcSundays = utcSunday.range;
-
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
   date.setUTCHours(0, 0, 0, 0);
@@ -9993,7 +10080,6 @@ var utcMonth = newInterval(function(date) {
 }, function(date) {
   return date.getUTCMonth();
 });
-var utcMonths = utcMonth.range;
 
 var utcYear = newInterval(function(date) {
   date.setUTCMonth(0, 1);
@@ -10016,7 +10102,6 @@ utcYear.every = function(k) {
     date.setUTCFullYear(date.getUTCFullYear() + step * k);
   });
 };
-var utcYears = utcYear.range;
 
 function localDate(d) {
   if (0 <= d.y && d.y < 100) {
@@ -14725,7 +14810,8 @@ var BarSeries = function (_AbstractSeries) {
           marginTop = _props.marginTop,
           style = _props.style,
           valuePosAttr = _props.valuePosAttr,
-          valueSizeAttr = _props.valueSizeAttr;
+          valueSizeAttr = _props.valueSizeAttr,
+          barWidth = _props.barWidth;
 
 
       if (!data) {
@@ -14752,7 +14838,7 @@ var BarSeries = function (_AbstractSeries) {
       var strokeFunctor = this._getAttributeFunctor('stroke') || this._getAttributeFunctor('color');
       var opacityFunctor = this._getAttributeFunctor('opacity');
 
-      var itemSize = distance / 2 * 0.85;
+      var halfSpace = distance / 2 * barWidth;
 
       return react.createElement(
         'g',
@@ -14763,13 +14849,26 @@ var BarSeries = function (_AbstractSeries) {
         data.map(function (d, i) {
           var _attrs;
 
+          // totalSpaceAvailable is the space we have available to draw all the
+          // bars of a same 'linePosAttr' value (a.k.a. sameTypeTotal)
+          var totalSpaceAvailable = halfSpace * 2;
+          var totalSpaceCenter = lineFunctor(d);
+          // totalSpaceStartingPoint is the first pixel were we can start drawing
+          var totalSpaceStartingPoint = totalSpaceCenter - halfSpace;
+          // spaceTakenByInterBarsPixels has the overhead space consumed by each bar of sameTypeTotal
+          var spaceTakenByInterBarsPixels = (sameTypeTotal - 1) / sameTypeTotal;
+          // spacePerBar is the space we have available to draw sameTypeIndex bar
+          var spacePerBar = totalSpaceAvailable / sameTypeTotal - spaceTakenByInterBarsPixels;
+          // barStartingPoint is the first pixel were we can start drawing sameTypeIndex bar
+          var barStartingPoint = totalSpaceStartingPoint + spacePerBar * sameTypeIndex + sameTypeIndex;
+
           var attrs = (_attrs = {
             style: _extends$7({
               opacity: opacityFunctor && opacityFunctor(d),
               stroke: strokeFunctor && strokeFunctor(d),
               fill: fillFunctor && fillFunctor(d)
             }, style)
-          }, _defineProperty$2(_attrs, linePosAttr, lineFunctor(d) - itemSize + itemSize * 2 / sameTypeTotal * sameTypeIndex), _defineProperty$2(_attrs, lineSizeAttr, itemSize * 2 / sameTypeTotal), _defineProperty$2(_attrs, valuePosAttr, Math.min(value0Functor(d), valueFunctor(d))), _defineProperty$2(_attrs, valueSizeAttr, Math.abs(-value0Functor(d) + valueFunctor(d))), _defineProperty$2(_attrs, 'onClick', function onClick(e) {
+          }, _defineProperty$2(_attrs, linePosAttr, barStartingPoint), _defineProperty$2(_attrs, lineSizeAttr, spacePerBar), _defineProperty$2(_attrs, valuePosAttr, Math.min(value0Functor(d), valueFunctor(d))), _defineProperty$2(_attrs, valueSizeAttr, Math.abs(-value0Functor(d) + valueFunctor(d))), _defineProperty$2(_attrs, 'onClick', function onClick(e) {
             return _this2._valueClickHandler(d, e);
           }), _defineProperty$2(_attrs, 'onContextMenu', function onContextMenu(e) {
             return _this2._valueRightClickHandler(d, e);
@@ -14790,8 +14889,16 @@ var BarSeries = function (_AbstractSeries) {
         valuePosAttr: propTypes.string,
         lineSizeAttr: propTypes.string,
         valueSizeAttr: propTypes.string,
-        cluster: propTypes.string
+        cluster: propTypes.string,
+        barWidth: propTypes.number
       });
+    }
+  }, {
+    key: 'defaultProps',
+    get: function get() {
+      return {
+        barWidth: 0.85
+      };
     }
   }]);
 
@@ -14897,23 +15004,35 @@ var BarSeriesCanvas = function (_AbstractSeries) {
       var stroke = getAttributeFunctor(props, 'stroke') || getAttributeFunctor(props, 'color');
       var opacity = getAttributeFunctor(props, 'opacity');
 
-      var itemSize = distance / 2 * 0.85;
+      var halfSpace = distance / 2 * 0.85;
+      // totalSpaceAvailable is the space we have available to draw all the
+      // bars of a same 'linePosAttr' value (a.k.a. sameTypeTotal)
+      var totalSpaceAvailable = halfSpace * 2;
 
       var _getStackParams = getStackParams(props),
           sameTypeTotal = _getStackParams.sameTypeTotal,
           sameTypeIndex = _getStackParams.sameTypeIndex;
 
       data.forEach(function (row) {
+        var totalSpaceCenter = line(row);
+        // totalSpaceStartingPoint is the first pixel were we can start drawing
+        var totalSpaceStartingPoint = totalSpaceCenter - halfSpace;
+
+        // spaceTakenByInterBarsPixels has the overhead space consumed by each bar of sameTypeTotal
+        var spaceTakenByInterBarsPixels = (sameTypeTotal - 1) / sameTypeTotal;
+        // lineSize is the space we have available to draw sameTypeIndex bar
+        var lineSize = totalSpaceAvailable / sameTypeTotal - spaceTakenByInterBarsPixels;
+
         var fillColor = rgb(fill(row));
         var strokeColor = rgb(stroke(row));
         var rowOpacity = opacity(row) || DEFAULT_OPACITY;
 
-        var linePos = line(row) - itemSize + itemSize * 2 / sameTypeTotal * sameTypeIndex;
+        // linePos is the first pixel were we can start drawing sameTypeIndex bar
+        var linePos = totalSpaceStartingPoint + lineSize * sameTypeIndex + sameTypeIndex;
         var valuePos = Math.min(value0(row), value(row));
         var x = valuePosAttr === 'x' ? valuePos : linePos;
         var y = valuePosAttr === 'y' ? valuePos : linePos;
 
-        var lineSize = itemSize * 2 / sameTypeTotal;
         var valueSize = Math.abs(-value0(row) + value(row));
         var height = lineSizeAttr === 'height' ? lineSize : valueSize;
         var width = lineSizeAttr === 'width' ? lineSize : valueSize;
@@ -15551,7 +15670,7 @@ var predefinedClassName$3 = 'rv-xy-plot__series rv-xy-plot__series--label';
 var getTextAnchor = function getTextAnchor(labelAnchorX, leftOfMiddle) {
   return labelAnchorX ? labelAnchorX : leftOfMiddle ? 'start' : 'end';
 };
-var getAlignmentBaseline = function getAlignmentBaseline(labelAnchorY, aboveMiddle) {
+var getDominantBaseline = function getDominantBaseline(labelAnchorY, aboveMiddle) {
   return labelAnchorY ? labelAnchorY : aboveMiddle ? 'text-before-edge' : 'text-after-edge';
 };
 
@@ -15626,7 +15745,7 @@ var LabelSeries = function (_AbstractSeries) {
           var hasRotationValueSet = d.rotation === 0 || d.rotation;
           var labelRotation = hasRotationValueSet ? d.rotation : rotation;
           var attrs = _extends$j({
-            alignmentBaseline: getAlignmentBaseline(labelAnchorY, aboveMiddle),
+            dominantBaseline: getDominantBaseline(labelAnchorY, aboveMiddle),
             className: 'rv-xy-plot__series--label-text',
             key: i,
             onClick: function onClick(e) {
@@ -17754,8 +17873,8 @@ CustomSVGSeries.propTypes = {
   className: propTypes.string,
   customComponent: propTypes.oneOfType([propTypes.string, propTypes.func]),
   data: propTypes.arrayOf(propTypes.shape({
-    x: propTypes.number.isRequired,
-    y: propTypes.number.isRequired
+    x: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired,
+    y: propTypes.oneOfType([propTypes.string, propTypes.number]).isRequired
   })).isRequired,
   marginLeft: propTypes.number,
   marginTop: propTypes.number,
@@ -20459,8 +20578,9 @@ var AxisTicks = function (_React$Component) {
 
       var ticks = values.map(function (v, i) {
         var pos = scale(v);
-        var text = tickFormatFn(v, i, scale, tickTotal);
-
+        var labelNode = tickFormatFn(v, i, scale, tickTotal);
+        var shouldRenderAsOwnNode = react.isValidElement(labelNode) && !['tspan', 'textPath'].includes(labelNode.type);
+        var shouldAddProps = labelNode && typeof labelNode.type !== 'string';
         return react.createElement(
           'g',
           _extends$F({
@@ -20473,13 +20593,16 @@ var AxisTicks = function (_React$Component) {
             className: 'rv-xy-plot__axis__tick__line',
             style: _extends$F({}, style, style.line)
           })),
-          react.createElement(
+          shouldRenderAsOwnNode ? react.cloneElement(labelNode, shouldAddProps ? _extends$F({}, textProps, {
+            containerWidth: width,
+            tickCount: values.length
+          }) : undefined) : react.createElement(
             'text',
             _extends$F({}, textProps, {
               className: 'rv-xy-plot__axis__tick__text',
               style: _extends$F({}, style, style.text)
             }),
-            text
+            labelNode
           )
         );
       });
@@ -21004,17 +21127,95 @@ CircularGridLines.defaultProps = {
 };
 CircularGridLines.requiresSVG = true;
 
-var _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass$B = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _defineProperty$7(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck$B(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn$B(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits$B(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ChartLabel = function (_React$PureComponent) {
+  _inherits$B(ChartLabel, _React$PureComponent);
+
+  function ChartLabel() {
+    _classCallCheck$B(this, ChartLabel);
+
+    return _possibleConstructorReturn$B(this, (ChartLabel.__proto__ || Object.getPrototypeOf(ChartLabel)).apply(this, arguments));
+  }
+
+  _createClass$B(ChartLabel, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          innerHeight = _props.innerHeight,
+          innerWidth = _props.innerWidth,
+          marginBottom = _props.marginBottom,
+          marginLeft = _props.marginLeft,
+          marginRight = _props.marginRight,
+          marginTop = _props.marginTop,
+          className = _props.className,
+          includeMargin = _props.includeMargin,
+          style = _props.style,
+          text = _props.text,
+          xPercent = _props.xPercent,
+          yPercent = _props.yPercent;
+
+      var width = innerWidth + (includeMargin ? marginLeft + marginRight : 0);
+      var height = innerHeight + (includeMargin ? marginTop + marginBottom : 0);
+      var xPos = width * xPercent + (includeMargin ? 0 : marginLeft);
+      var yPos = height * yPercent + (includeMargin ? marginLeft : 0);
+      return react.createElement(
+        'g',
+        {
+          transform: 'translate(' + xPos + ', ' + yPos + ')',
+          className: 'rv-xy-plot__axis__title ' + className },
+        react.createElement(
+          'text',
+          style,
+          text
+        )
+      );
+    }
+  }], [{
+    key: 'requiresSVG',
+    get: function get() {
+      return true;
+    }
+  }]);
+
+  return ChartLabel;
+}(react.PureComponent);
+
+ChartLabel.displayName = 'ChartLabel';
+ChartLabel.propTypes = {
+  className: propTypes.string,
+  includeMargin: propTypes.bool,
+  style: propTypes.object,
+  text: propTypes.string.isRequired,
+  xPercent: propTypes.number.isRequired,
+  yPercent: propTypes.number.isRequired
+};
+ChartLabel.defaultProps = {
+  className: '',
+  includeMargin: true,
+  text: '',
+  xPercent: 0,
+  yPercent: 0,
+  style: {}
+};
+
+var _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass$C = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty$7(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck$C(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$C(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$C(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var VERTICAL = DIRECTION.VERTICAL,
     HORIZONTAL = DIRECTION.HORIZONTAL;
@@ -21051,15 +21252,15 @@ var defaultProps$8 = {
 var animatedProps$2 = ['xRange', 'yRange', 'xDomain', 'yDomain', 'width', 'height', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'tickTotal'];
 
 var GridLines = function (_PureComponent) {
-  _inherits$B(GridLines, _PureComponent);
+  _inherits$C(GridLines, _PureComponent);
 
   function GridLines() {
-    _classCallCheck$B(this, GridLines);
+    _classCallCheck$C(this, GridLines);
 
-    return _possibleConstructorReturn$B(this, (GridLines.__proto__ || Object.getPrototypeOf(GridLines)).apply(this, arguments));
+    return _possibleConstructorReturn$C(this, (GridLines.__proto__ || Object.getPrototypeOf(GridLines)).apply(this, arguments));
   }
 
-  _createClass$B(GridLines, [{
+  _createClass$C(GridLines, [{
     key: '_getDefaultProps',
     value: function _getDefaultProps() {
       var _props = this.props,
@@ -21309,13 +21510,13 @@ Voronoi.propTypes = {
 
 var _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _createClass$C = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$D = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$C(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$D(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$C(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$D(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$C(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$D(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function getLocs(evt) {
   var xLoc = evt.type === 'touchstart' ? evt.pageX : evt.offsetX;
@@ -21324,30 +21525,30 @@ function getLocs(evt) {
 }
 
 var Highlight = function (_AbstractSeries) {
-  _inherits$C(Highlight, _AbstractSeries);
+  _inherits$D(Highlight, _AbstractSeries);
 
   function Highlight() {
     var _ref;
 
     var _temp, _this, _ret;
 
-    _classCallCheck$C(this, Highlight);
+    _classCallCheck$D(this, Highlight);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn$C(this, (_ref = Highlight.__proto__ || Object.getPrototypeOf(Highlight)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+    return _ret = (_temp = (_this = _possibleConstructorReturn$D(this, (_ref = Highlight.__proto__ || Object.getPrototypeOf(Highlight)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
       dragging: false,
       brushArea: { top: 0, right: 0, bottom: 0, left: 0 },
       brushing: false,
       startLocX: 0,
       startLocY: 0,
       dragArea: null
-    }, _temp), _possibleConstructorReturn$C(_this, _ret);
+    }, _temp), _possibleConstructorReturn$D(_this, _ret);
   }
 
-  _createClass$C(Highlight, [{
+  _createClass$D(Highlight, [{
     key: '_getDrawArea',
     value: function _getDrawArea(xLoc, yLoc) {
       var _state = this.state,
@@ -22881,26 +23082,26 @@ TreemapDOM.displayName = 'TreemapDOM';
 
 var _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _createClass$D = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$E = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$D(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$E(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$D(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$E(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$D(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$E(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var MARGIN_ADJUST = 1.2;
 
 var TreemapSVG = function (_React$Component) {
-  _inherits$D(TreemapSVG, _React$Component);
+  _inherits$E(TreemapSVG, _React$Component);
 
   function TreemapSVG() {
-    _classCallCheck$D(this, TreemapSVG);
+    _classCallCheck$E(this, TreemapSVG);
 
-    return _possibleConstructorReturn$D(this, (TreemapSVG.__proto__ || Object.getPrototypeOf(TreemapSVG)).apply(this, arguments));
+    return _possibleConstructorReturn$E(this, (TreemapSVG.__proto__ || Object.getPrototypeOf(TreemapSVG)).apply(this, arguments));
   }
 
-  _createClass$D(TreemapSVG, [{
+  _createClass$E(TreemapSVG, [{
     key: 'getCircularNodes',
     value: function getCircularNodes() {
       var _props = this.props,
@@ -23078,15 +23279,15 @@ var TreemapSVG = function (_React$Component) {
 
 TreemapSVG.displayName = 'TreemapSVG';
 
-var _createClass$E = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$F = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function _classCallCheck$E(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$F(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$E(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$F(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$E(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$F(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var TREEMAP_TILE_MODES = {
   squarify: squarify,
@@ -23135,12 +23336,12 @@ function _getScaleFns(props) {
 }
 
 var Treemap = function (_React$Component) {
-  _inherits$E(Treemap, _React$Component);
+  _inherits$F(Treemap, _React$Component);
 
   function Treemap(props) {
-    _classCallCheck$E(this, Treemap);
+    _classCallCheck$F(this, Treemap);
 
-    var _this = _possibleConstructorReturn$E(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this, props));
+    var _this = _possibleConstructorReturn$F(this, (Treemap.__proto__ || Object.getPrototypeOf(Treemap)).call(this, props));
 
     _this.state = _extends$W({
       scales: _getScaleFns(props)
@@ -23148,7 +23349,7 @@ var Treemap = function (_React$Component) {
     return _this;
   }
 
-  _createClass$E(Treemap, [{
+  _createClass$F(Treemap, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(props) {
       this.setState(_extends$W({
@@ -23839,17 +24040,17 @@ RadarChart.defaultProps = {
   renderAxesOverPolygons: false
 };
 
-var _createClass$F = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$G = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _extends$Z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _defineProperty$8(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _classCallCheck$F(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$G(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$F(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$G(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$F(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$G(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var predefinedClassName$i = 'rv-parallel-coordinates-chart';
 var DEFAULT_FORMAT$2 = format('.2r');
@@ -23972,25 +24173,25 @@ function getLines(props) {
 }
 
 var ParallelCoordinates = function (_Component) {
-  _inherits$F(ParallelCoordinates, _Component);
+  _inherits$G(ParallelCoordinates, _Component);
 
   function ParallelCoordinates() {
     var _ref2;
 
     var _temp, _this, _ret;
 
-    _classCallCheck$F(this, ParallelCoordinates);
+    _classCallCheck$G(this, ParallelCoordinates);
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn$F(this, (_ref2 = ParallelCoordinates.__proto__ || Object.getPrototypeOf(ParallelCoordinates)).call.apply(_ref2, [this].concat(args))), _this), _this.state = {
+    return _ret = (_temp = (_this = _possibleConstructorReturn$G(this, (_ref2 = ParallelCoordinates.__proto__ || Object.getPrototypeOf(ParallelCoordinates)).call.apply(_ref2, [this].concat(args))), _this), _this.state = {
       brushFilters: {}
-    }, _temp), _possibleConstructorReturn$F(_this, _ret);
+    }, _temp), _possibleConstructorReturn$G(_this, _ret);
   }
 
-  _createClass$F(ParallelCoordinates, [{
+  _createClass$G(ParallelCoordinates, [{
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -24451,7 +24652,7 @@ function sankeyLinkHorizontal() {
       .target(horizontalTarget);
 }
 
-var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var DEFAULT_LINK_COLOR = DISCRETE_COLOR_RANGE[1];
 var DEFAULT_LINK_OPACITY = 0.7;
@@ -24471,11 +24672,11 @@ function SankeyLink(props) {
   if (animation) {
     return react.createElement(
       Animation,
-      _extends$_({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
-      react.createElement(SankeyLink, _extends$_({}, props, { animation: null }))
+      _extends({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
+      react.createElement(SankeyLink, _extends({}, props, { animation: null }))
     );
   }
-  return react.createElement('path', _extends$_({
+  return react.createElement('path', _extends({
     d: data
   }, style, {
     className: 'rv-sankey__link',
@@ -24498,7 +24699,7 @@ function SankeyLink(props) {
 SankeyLink.displayName = 'SankeyLink';
 SankeyLink.requiresSVG = true;
 
-var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _toConsumableArray$4(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 var NOOP$2 = function NOOP(f) {
@@ -24545,10 +24746,10 @@ function Sankey(props) {
       width = props.width;
 
   var nodesCopy = [].concat(_toConsumableArray$4(new Array(nodes.length))).map(function (e, i) {
-    return _extends$10({}, nodes[i]);
+    return _extends$_({}, nodes[i]);
   });
   var linksCopy = [].concat(_toConsumableArray$4(new Array(links.length))).map(function (e, i) {
-    return _extends$10({}, links[i]);
+    return _extends$_({}, links[i]);
   });
 
   var _getInnerDimensions = getInnerDimensions({
@@ -24569,7 +24770,7 @@ function Sankey(props) {
 
   return react.createElement(
     XYPlot,
-    _extends$10({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
+    _extends$_({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
     linksCopy.map(function (link, i) {
       return react.createElement(SankeyLink, {
         style: style.links,
@@ -24589,7 +24790,7 @@ function Sankey(props) {
       animation: animation,
       className: className + ' rv-sankey__node',
       data: nodesCopy.map(function (node) {
-        return _extends$10({}, node, {
+        return _extends$_({}, node, {
           y: node.y1 - marginTop,
           y0: node.y0 - marginTop,
           x: node.x1,
@@ -24611,11 +24812,11 @@ function Sankey(props) {
       rotation: labelRotation,
       labelAnchorY: 'text-before-edge',
       data: nodesCopy.map(function (node, i) {
-        return _extends$10({
+        return _extends$_({
           x: node.x0 + (node.x0 < width / 2 ? nWidth + 10 : -10),
           y: (node.y0 + node.y1) / 2 - marginTop,
           label: node.name,
-          style: _extends$10({
+          style: _extends$_({
             textAnchor: node.x0 < width / 2 ? 'start' : 'end',
             dy: '-.5em'
           }, style.labels)
@@ -24693,7 +24894,7 @@ Sankey.propTypes = {
   width: propTypes.number.isRequired
 };
 
-var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var predefinedClassName$j = 'rv-sunburst';
 
@@ -24727,7 +24928,7 @@ function getNodesToRender(_ref) {
       return res;
     }
 
-    return res.concat([_extends$11({
+    return res.concat([_extends$10({
       angle0: Math.max(0, Math.min(2 * Math.PI, x(cell.x0))),
       angle: Math.max(0, Math.min(2 * Math.PI, x(cell.x1))),
       radius0: Math.max(0, y(cell.y0)),
@@ -24759,13 +24960,13 @@ function buildLabels(mappedData, accessors) {
     var rotateLabels = !row.dontRotateLabel;
     var rotAngle = -angle / (2 * Math.PI) * 360;
 
-    return _extends$11({}, row, {
+    return _extends$10({}, row, {
       children: null,
       angle: null,
       radius: null,
       x: getRadius0(row) * Math.cos(angle),
       y: getRadius0(row) * Math.sin(angle),
-      style: _extends$11({
+      style: _extends$10({
         textAnchor: rotAngle > 90 ? 'end' : 'start'
       }, row.labelStyle),
       rotation: rotateLabels ? rotAngle > 90 ? rotAngle + 180 : rotAngle === 90 ? 90 : rotAngle : null
@@ -24824,14 +25025,14 @@ function Sunburst(props) {
       xDomain: [-radialDomain, radialDomain],
       yDomain: [-radialDomain, radialDomain]
     },
-    react.createElement(ArcSeries, _extends$11({
+    react.createElement(ArcSeries, _extends$10({
       colorType: colorType
     }, props, {
       animation: animation,
       radiusDomain: [0, radialDomain],
       // need to present a stripped down version for interpolation
       data: animation ? mappedData.map(function (row, index) {
-        return _extends$11({}, row, {
+        return _extends$10({}, row, {
           parent: null,
           children: null,
           index: index
@@ -24903,17 +25104,17 @@ if (typeof window !== "undefined") {
 
 var window_1 = win;
 
-var _extends$12 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _createClass$G = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$H = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _objectWithoutProperties$1(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-function _classCallCheck$G(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$H(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn$G(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn$H(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits$G(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits$H(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var CONTAINER_REF = 'container';
 
@@ -24995,9 +25196,9 @@ function getDisplayName(Component) {
 
 function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
   var ResultClass = function (_React$Component) {
-    _inherits$G(ResultClass, _React$Component);
+    _inherits$H(ResultClass, _React$Component);
 
-    _createClass$G(ResultClass, null, [{
+    _createClass$H(ResultClass, null, [{
       key: 'propTypes',
       get: function get() {
         var _Component$propTypes = Component.propTypes,
@@ -25011,9 +25212,9 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
     }]);
 
     function ResultClass(props) {
-      _classCallCheck$G(this, ResultClass);
+      _classCallCheck$H(this, ResultClass);
 
-      var _this = _possibleConstructorReturn$G(this, (ResultClass.__proto__ || Object.getPrototypeOf(ResultClass)).call(this, props));
+      var _this = _possibleConstructorReturn$H(this, (ResultClass.__proto__ || Object.getPrototypeOf(ResultClass)).call(this, props));
 
       _this._onResize = function () {
         var containerElement = getDOMNode(_this[CONTAINER_REF]);
@@ -25025,7 +25226,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
 
         var newWidth = _this.state.width === offsetWidth ? {} : { width: offsetWidth };
 
-        _this.setState(_extends$12({}, newHeight, newWidth));
+        _this.setState(_extends$11({}, newHeight, newWidth));
       };
 
       _this.state = {
@@ -25041,7 +25242,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
      */
 
 
-    _createClass$G(ResultClass, [{
+    _createClass$H(ResultClass, [{
       key: 'componentDidMount',
       value: function componentDidMount() {
         this._onResize();
@@ -25066,11 +25267,11 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             height = _state.height,
             width = _state.width;
 
-        var props = _extends$12({}, this.props, {
+        var props = _extends$11({}, this.props, {
           animation: height === 0 && width === 0 ? null : this.props.animation
         });
 
-        var updatedDimensions = _extends$12({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
+        var updatedDimensions = _extends$11({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
 
         return react.createElement(
           'div',
@@ -25080,7 +25281,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             },
             style: { width: '100%', height: '100%' }
           },
-          react.createElement(Component, _extends$12({}, updatedDimensions, props))
+          react.createElement(Component, _extends$11({}, updatedDimensions, props))
         );
       }
     }]);
@@ -25227,8 +25428,8 @@ var D3Sunburst = function (_React$Component) {
   }, {
     key: 'getDistance',
     value: function getDistance(hoveredCell) {
-      if (hoveredCell.hamDist) {
-        return 'Hamming Distance: ' + hoveredCell.hamDist;
+      if (hoveredCell.similarity !== -1) {
+        return 'Differences: ' + Math.round(hoveredCell.similarity * 100) + '%';
       }
     }
   }]);
@@ -25425,11 +25626,15 @@ var SunburstContainer = function (_React$Component) {
   }, {
     key: '_calcDistance',
     value: function _calcDistance(json, timestamp) {
-      this._minDistance = 64;
+      this._mostSimilar = 0;
+      this._lessSimilar = 1;
       for (var i = 0; i < json.length; i++) {
-        json[i][1] = hammingDistance(timestamp[0][1], json[i][1]);
-        if (this._minDistance > json[i][1] && json[i][1] !== 0) {
-          this._minDistance = json[i][1];
+        json[i][1] = similarity(timestamp[1], json[i][1]);
+        if (this._lessSimilar > json[i][1]) {
+          this._lessSimilar = json[i][1];
+        }
+        if (this._mostSimilar < json[i][1]) {
+          this._mostSimilar = json[i][1];
         }
       }
       return json;
@@ -25442,21 +25647,28 @@ var SunburstContainer = function (_React$Component) {
       var thirdLevel = [];
       var fourthLevel = [];
       var fifthLevel = [];
+      var step = 0.1;
 
       var colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
+      var diffLevels = this._mostSimilar - this._lessSimilar;
+
+      if (diffLevels > 0.2) {
+        step = diffLevels / 5;
+      }
+
       for (var i = 0; i < json.length; i++) {
         if (json[i][1] !== 0) {
-          if (json[i][1] <= this._minDistance) {
-            firstLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[1], children: [] });
-          } else if (json[i][1] <= this._minDistance + 2) {
-            secondLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[2], children: [] });
-          } else if (json[i][1] <= this._minDistance + 4) {
-            thirdLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[3], children: [] });
-          } else if (json[i][1] <= this._minDistance + 6) {
-            fourthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[4], children: [] });
+          if (json[i][1] <= this._lessSimilar + step) {
+            fifthLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: [] });
+          } else if (json[i][1] <= this._lessSimilar + 2 * step) {
+            fourthLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: [] });
+          } else if (json[i][1] <= this._lessSimilar + 3 * step) {
+            thirdLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: [] });
+          } else if (json[i][1] <= this._lessSimilar + 4 * step) {
+            secondLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: [] });
           } else {
-            fifthLevel.push({ name: json[i][0], bigness: 10, hamDist: json[i][1], clr: colors[5], children: [] });
+            firstLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: [] });
           }
         }
       }
@@ -25475,6 +25687,29 @@ var SunburstContainer = function (_React$Component) {
       }
       if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
         fifthLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+
+      if (firstLevel.length === 0) {
+        firstLevel = secondLevel;
+        secondLevel = thirdLevel;
+        thirdLevel = fourthLevel;
+        fourthLevel = fifthLevel;
+        fifthLevel = [];
+      }
+      if (secondLevel.length === 0) {
+        secondLevel = thirdLevel;
+        thirdLevel = fourthLevel;
+        fourthLevel = fifthLevel;
+        fifthLevel = [];
+      }
+      if (thirdLevel.length === 0) {
+        thirdLevel = fourthLevel;
+        fourthLevel = fifthLevel;
+        fifthLevel = [];
+      }
+      if (fourthLevel.length === 0) {
+        fourthLevel = fifthLevel;
+        fifthLevel = [];
       }
 
       for (i = 0; i < fifthLevel.length; i++) {
@@ -25498,7 +25733,7 @@ var SunburstContainer = function (_React$Component) {
         firstLevel[_mod3].bigness = '';
       }
 
-      var data = { name: timestamp[0], clr: colors[0], children: firstLevel };
+      var data = { name: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
       this.setState({ simhashData: data });
     }
   }]);

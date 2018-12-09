@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
-import NewTimestampHeader from './new-timestamp-header.jsx';
+import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
 import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
@@ -56,14 +56,14 @@ export default class DiffContainer extends React.Component {
       if (this.props.noTimestamps){
         return (
           <div className="diffcontainer-view">
-            <NewTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
+            <YmdTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
               isInitial={true} errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
       }
       return (
         <div className="diffcontainer-view">
-          <NewTimestampHeader isInitial={true} {...this.props}
+          <YmdTimestampHeader isInitial={true} {...this.props}
             errorHandledCallback={this.errorHandled}
             changeTimestampsCallback={this.changeTimestamps}/>
         </div>
@@ -72,7 +72,7 @@ export default class DiffContainer extends React.Component {
     if (this.state.timestampA && this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <NewTimestampHeader isInitial={false}
+          <YmdTimestampHeader isInitial={false}
             {...this.props} changeTimestampsCallback={this.changeTimestamps}
             errorHandledCallback={this.errorHandled}/>
           {this.prepareDiffView()}
@@ -82,7 +82,7 @@ export default class DiffContainer extends React.Component {
     if (this.state.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <NewTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
+          <YmdTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
             isInitial={false} errorHandledCallback={this.errorHandled}/>
           {this._showOneSnapshot(true, this.state.timestampA)}
         </div>);
@@ -90,7 +90,7 @@ export default class DiffContainer extends React.Component {
     if (this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <NewTimestampHeader isInitial={false} {...this.props}
+          <YmdTimestampHeader isInitial={false} {...this.props}
             errorHandledCallback={this.errorHandled}
             changeTimestampsCallback={this.changeTimestamps}/>
           {this._showOneSnapshot(false, this.state.timestampB)}
