@@ -41,3 +41,9 @@
 .rv-sunburst {
     margin: 0 auto;
 }
+
+#calcButton {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
