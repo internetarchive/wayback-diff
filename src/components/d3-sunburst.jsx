@@ -33,7 +33,7 @@ export default class D3Sunburst extends React.Component {
         style={{stroke: '#fff'}}
         onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
         onValueMouseOut={() => this.setState({hoveredCell: false})}
-        onValueClick={node => {let url = this.props.urlPrefix + node.name + '/' + this.props.simhashData.name + '/' + this.props.url;
+        onValueClick={node => {let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
           window.open(url,'_blank');}}
         data={this.props.simhashData}
         padAngle={() => 0.02}
