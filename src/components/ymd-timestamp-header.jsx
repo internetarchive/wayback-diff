@@ -1,6 +1,7 @@
 import React from 'react';
 import '../css/diff-container.css';
-import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue, selectHasValue } from '../js/utils.js';
+import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue, selectHasValue,
+  getUTCDateFormat} from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -315,7 +316,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (data) {
       let initialSnapshots = [];
       for (let i = 0; i < data.length; i++) {
-        let utcTime = this._getUTCDateFormat(data[i][0]);
+        let utcTime = getUTCDateFormat(data[i][0]);
         initialSnapshots.push(<option key={i} value={data[i][0]}>{utcTime}</option>);
       }
       return initialSnapshots;
@@ -334,18 +335,6 @@ export default class YmdTimestampHeader extends React.Component {
       }
       return options;
     }
-  }
-
-  _getUTCDateFormat (date) {
-    let year = parseInt(date.substring(0, 4), 10);
-    let month = parseInt(date.substring(4, 6), 10) - 1;
-    let day = parseInt(date.substring(6, 8), 10);
-    let hour = parseInt(date.substring(8, 10), 10);
-    let minutes = parseInt(date.substring(10, 12), 10);
-    let seconds = parseInt(date.substring(12, 14), 10);
-
-    let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
-    return (niceTime.toUTCString());
   }
 
   _getShortUTCDateFormat (date) {

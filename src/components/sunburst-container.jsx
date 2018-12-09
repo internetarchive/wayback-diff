@@ -5,6 +5,7 @@ import '../css/diffgraph.css';
 import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
 import ErrorMessage from './errors.jsx';
 import PropTypes from 'prop-types';
+import { getUTCDateFormat } from '../js/utils';
 
 /**
  * Container of d3 Sunburst diagram
@@ -187,15 +188,15 @@ export default class SunburstContainer extends React.Component {
     for (var i = 0; i<json.length; i++){
       if (json[i][1] !== 0) {
         if (json[i][1] <= this._lessSimilar + step) {
-          fifthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
+          fifthLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
         } else if (json[i][1] <= this._lessSimilar + 2 * step) {
-          fourthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
+          fourthLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
         } else if (json[i][1] <= this._lessSimilar + 3*step) {
-          thirdLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
+          thirdLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
         } else if (json[i][1] <= this._lessSimilar + 4*step) {
-          secondLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
+          secondLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
         } else {
-          firstLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
+          firstLevel.push({name: getUTCDateFormat(json[i][0]), bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
         }
       }
     }
@@ -261,7 +262,7 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].bigness = '';
     }
 
-    var data = {name:timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
+    var data = {name:getUTCDateFormat(timestamp[0]), clr: colors[0], children:firstLevel, similarity: -1};
     this.setState({simhashData: data});
   }
 
