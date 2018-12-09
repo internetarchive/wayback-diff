@@ -89,3 +89,15 @@ export function selectHasValue(select, value) {
     return false;
   }
 }
+
+export function getUTCDateFormat (date) {
+  let year = parseInt(date.substring(0, 4), 10);
+  let month = parseInt(date.substring(4, 6), 10) - 1;
+  let day = parseInt(date.substring(6, 8), 10);
+  let hour = parseInt(date.substring(8, 10), 10);
+  let minutes = parseInt(date.substring(10, 12), 10);
+  let seconds = parseInt(date.substring(12, 14), 10);
+
+  let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
+  return (niceTime.toUTCString());
+}
