@@ -26,7 +26,8 @@ export default class SunburstContainer extends React.Component {
   render () {
     if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp}/>);
+        <ErrorMessage url={this.props.url} code={this.state.error} year={this.state.timestamp.substring(0, 4)}
+          conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
