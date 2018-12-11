@@ -3946,7 +3946,7 @@ var DiffView = function (_React$Component) {
   return DiffView;
 }(react.Component);
 
-var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n.align-items-center > .col-auto {\n    margin-left: auto;\n    margin-right: auto;\n}\n\n#timestamp-select-left, #timestamp-select-right,\n#year-select-left, #year-select-right,\n#month-select-right, #month-select-left{\n    width: auto;\n    padding-left: 1px;\n    padding-right: 1px;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n}\n\n#restart-btn{\n    display: block;\n    margin-left: auto;\n    margin-right: auto;\n}\n";
+var css$1 = "#diff-select{\n    margin-bottom: 0.7em;\n}\n\n.timestamp-container-view{\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n#diff-footer{\n    text-align: center;\n}\n\nyellow-diff-footer{\n    background-color: #f7f417;\n}\n\nblue-diff-footer{\n    background-color: #1d9efd;\n}\n\n.align-items-center > .col-auto {\n    margin-left: auto;\n    margin-right: auto;\n}\n\n#timestamp-select-left, #timestamp-select-right,\n#year-select-left, #year-select-right,\n#month-select-right, #month-select-left{\n    width: auto;\n    padding-left: 1px;\n    padding-right: 1px;\n}\n\n#explanation-middle{\n    text-align: center;\n}\n\n#timestamp-left{\n    display: inline-block;\n    float: left;\n    margin-left: 15px;\n}\n\n#timestamp-right{\n    display: inline-block;\n    float: right;\n    margin-right: 15px;\n}\n\n#restart-btn{\n    display: block;\n    margin-left: auto;\n    margin-right: auto;\n}\n\n.wayback-ymd-timestamp{\n    display: flex;\n}\n\n.wayback-timestamps> * {\n    margin-left: 10px;\n    margin-right: 10px;\n}\n\n.wayback-timestamps {\n    flex: 2 auto;\n    display: flex;\n    flex-flow: row wrap;\n    justify-content: center;\n}\n\n.wayback-ymd-buttons {\n    flex: 1 auto;\n    display: flex;\n    flex-flow: row wrap;\n    justify-content: center;\n}\n\n";
 styleInject(css$1);
 
 /**
@@ -4368,30 +4368,22 @@ var YmdTimestampHeader = function (_React$Component) {
     value: function _showTimestampSelector() {
       return react.createElement(
         'div',
-        { className: 'form-row align-items-center' },
+        { className: 'wayback-ymd-timestamp' },
         react.createElement(
           'div',
-          { className: 'col-auto' },
+          { className: 'wayback-timestamps' },
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'year-select-left', onClick: this._handleYearChange },
             react.createElement('optgroup', { label: 'Years and available captures' }),
             this.state.yearOptions
-          )
-        ),
-        react.createElement(
-          'div',
-          { className: 'col-auto' },
+          ),
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'month-select-left', style: { visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }, onClick: this._getTimestamps },
             react.createElement('optgroup', { label: 'Months and available captures' }),
             this.state.leftMonthOptions
-          )
-        ),
-        react.createElement(
-          'div',
-          { className: 'col-auto' },
+          ),
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+!this.state.leftSnapElements] }, onClick: this._handleLeftTimestampChange },
@@ -4401,16 +4393,12 @@ var YmdTimestampHeader = function (_React$Component) {
         ),
         react.createElement(
           'div',
-          { className: 'col-auto' },
+          { className: 'wayback-ymd-buttons' },
           react.createElement(
             'button',
             { className: 'btn btn-sm', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
             'Show differences'
-          )
-        ),
-        react.createElement(
-          'div',
-          { className: 'col-auto' },
+          ),
           react.createElement(
             'button',
             { className: 'btn btn-sm', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
@@ -4419,27 +4407,19 @@ var YmdTimestampHeader = function (_React$Component) {
         ),
         react.createElement(
           'div',
-          { className: 'col-auto' },
+          { className: 'wayback-timestamps' },
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+!this.state.rightSnapElements] }, onClick: this._handleRightTimestampChange },
             react.createElement('optgroup', { label: 'Available captures' }),
             this.state.rightSnapElements
-          )
-        ),
-        react.createElement(
-          'div',
-          { className: 'col-auto' },
+          ),
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'month-select-right', style: { visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }, onClick: this._getTimestamps },
             react.createElement('optgroup', { label: 'Months and available captures' }),
             this.state.rightMonthOptions
-          )
-        ),
-        react.createElement(
-          'div',
-          { className: 'col-auto' },
+          ),
           react.createElement(
             'select',
             { className: 'form-control mr-sm-1', id: 'year-select-right', onClick: this._handleYearChange },
