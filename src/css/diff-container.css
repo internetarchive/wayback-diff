@@ -40,11 +40,13 @@ blue-diff-footer{
 #timestamp-left{
     display: inline-block;
     float: left;
+    margin-left: 15px;
 }
 
 #timestamp-right{
     display: inline-block;
     float: right;
+    margin-right: 15px;
 }
 
 #restart-btn{
@@ -52,3 +54,27 @@ blue-diff-footer{
     margin-left: auto;
     margin-right: auto;
 }
+
+.wayback-ymd-timestamp{
+    display: flex;
+}
+
+.wayback-timestamps> * {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.wayback-timestamps {
+    flex: 2 auto;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+.wayback-ymd-buttons {
+    flex: 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
