@@ -96,7 +96,7 @@ export default class D3Sunburst extends React.Component {
         <div style={tipStyle}>
           <div style={{...boxStyle, background: hoveredCell.clr}}/>
           {this.getDistance(hoveredCell)}
-          {' Timestamp: ' + hoveredCell.name}
+          {hoveredCell.name}
         </div>
       </ Hint>;
     }
