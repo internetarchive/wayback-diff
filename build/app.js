@@ -1810,6 +1810,12 @@ var propTypesMisspellWarningShown = void 0;
 }
 
 function getDeclarationErrorAddendum() {
+  if (ReactCurrentOwner.current) {
+    var name = getComponentName(ReactCurrentOwner.current.type);
+    if (name) {
+      return '\n\nCheck the render method of `' + name + '`.';
+    }
+  }
   return '';
 }
 
@@ -3719,6 +3725,18 @@ function selectHasValue(select, value) {
   }
 }
 
+function getUTCDateFormat(date) {
+  var year = parseInt(date.substring(0, 4), 10);
+  var month = parseInt(date.substring(4, 6), 10) - 1;
+  var day = parseInt(date.substring(6, 8), 10);
+  var hour = parseInt(date.substring(8, 10), 10);
+  var minutes = parseInt(date.substring(10, 12), 10);
+  var seconds = parseInt(date.substring(12, 14), 10);
+
+  var niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
+  return niceTime.toUTCString();
+}
+
 /**
  * @typedef DiffViewProps
  * @property {Page} page
@@ -4295,7 +4313,7 @@ var YmdTimestampHeader = function (_React$Component) {
       if (data) {
         var initialSnapshots = [];
         for (var i = 0; i < data.length; i++) {
-          var utcTime = this._getUTCDateFormat(data[i][0]);
+          var utcTime = getUTCDateFormat(data[i][0]);
           initialSnapshots.push(react.createElement(
             'option',
             { key: i, value: data[i][0] },
@@ -4323,19 +4341,6 @@ var YmdTimestampHeader = function (_React$Component) {
         }
         return options;
       }
-    }
-  }, {
-    key: '_getUTCDateFormat',
-    value: function _getUTCDateFormat(date) {
-      var year = parseInt(date.substring(0, 4), 10);
-      var month = parseInt(date.substring(4, 6), 10) - 1;
-      var day = parseInt(date.substring(6, 8), 10);
-      var hour = parseInt(date.substring(8, 10), 10);
-      var minutes = parseInt(date.substring(10, 12), 10);
-      var seconds = parseInt(date.substring(12, 14), 10);
-
-      var niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
-      return niceTime.toUTCString();
     }
   }, {
     key: '_getShortUTCDateFormat',
@@ -4840,9 +4845,16 @@ var NoSnapshotURL = function (_React$Component) {
 var ErrorMessage = function (_React$Component) {
   inherits(ErrorMessage, _React$Component);
 
-  function ErrorMessage() {
+  function ErrorMessage(props) {
     classCallCheck(this, ErrorMessage);
-    return possibleConstructorReturn(this, (ErrorMessage.__proto__ || Object.getPrototypeOf(ErrorMessage)).apply(this, arguments));
+
+    var _this = possibleConstructorReturn(this, (ErrorMessage.__proto__ || Object.getPrototypeOf(ErrorMessage)).call(this, props));
+
+    _this._calculateSimhash = _this._calculateSimhash.bind(_this);
+    _this._errorHandled = _this._errorHandled.bind(_this);
+    _this._reloadPage = _this._reloadPage.bind(_this);
+
+    return _this;
   }
 
   createClass(ErrorMessage, [{
@@ -4857,12 +4869,55 @@ var ErrorMessage = function (_React$Component) {
           this.props.url,
           ' archived.'
         );
+      } else if (this.props.code === 'NoSimhash') {
+        return react.createElement(
+          'div',
+          null,
+          react.createElement(
+            'div',
+            { className: 'alert alert-warning', role: 'alert' },
+            'The Wayback Machine doesn\'t have Simhash data for ',
+            this.props.url,
+            ' and year ',
+            this.props.year,
+            '.'
+          ),
+          react.createElement(
+            'button',
+            { className: 'btn btn-sm', id: 'calcButton', onClick: this._calculateSimhash },
+            'Calculate now'
+          )
+        );
       }
       return react.createElement(
         'div',
         { className: 'alert alert-warning', role: 'alert' },
         'Communication with the Wayback Machine is not possible at the moment. Please try again later.'
       );
+    }
+  }, {
+    key: '_calculateSimhash',
+    value: function _calculateSimhash() {
+      var _this2 = this;
+
+      var url = this.props.conf.waybackDiscoverDiff + '/calculate-simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.props.year;
+      fetch_with_timeout(fetch(url)).then(function (response) {
+        return checkResponse(response);
+      }).then(function () {
+        setTimeout(_this2._reloadPage, 10000);
+      }).catch(function (error) {
+        _this2._errorHandled(error.message);
+      });
+    }
+  }, {
+    key: '_errorHandled',
+    value: function _errorHandled(error) {
+      this.props.errorHandledCallback(error);
+    }
+  }, {
+    key: '_reloadPage',
+    value: function _reloadPage() {
+      window.location.reload(true);
     }
   }]);
   return ErrorMessage;
@@ -9920,6 +9975,7 @@ millisecond.every = function(k) {
     return (end - start) / k;
   });
 };
+var milliseconds = millisecond.range;
 
 var durationSecond = 1e3;
 var durationMinute = 6e4;
@@ -9936,6 +9992,7 @@ var second = newInterval(function(date) {
 }, function(date) {
   return date.getUTCSeconds();
 });
+var seconds = second.range;
 
 var minute = newInterval(function(date) {
   date.setTime(Math.floor(date / durationMinute) * durationMinute);
@@ -9946,6 +10003,7 @@ var minute = newInterval(function(date) {
 }, function(date) {
   return date.getMinutes();
 });
+var minutes = minute.range;
 
 var hour = newInterval(function(date) {
   var offset = date.getTimezoneOffset() * durationMinute % durationHour;
@@ -9958,6 +10016,7 @@ var hour = newInterval(function(date) {
 }, function(date) {
   return date.getHours();
 });
+var hours = hour.range;
 
 var day = newInterval(function(date) {
   date.setHours(0, 0, 0, 0);
@@ -9968,6 +10027,7 @@ var day = newInterval(function(date) {
 }, function(date) {
   return date.getDate() - 1;
 });
+var days = day.range;
 
 function weekday(i) {
   return newInterval(function(date) {
@@ -9988,6 +10048,8 @@ var thursday = weekday(4);
 var friday = weekday(5);
 var saturday = weekday(6);
 
+var sundays = sunday.range;
+
 var month = newInterval(function(date) {
   date.setDate(1);
   date.setHours(0, 0, 0, 0);
@@ -9998,6 +10060,7 @@ var month = newInterval(function(date) {
 }, function(date) {
   return date.getMonth();
 });
+var months = month.range;
 
 var year = newInterval(function(date) {
   date.setMonth(0, 1);
@@ -10020,6 +10083,7 @@ year.every = function(k) {
     date.setFullYear(date.getFullYear() + step * k);
   });
 };
+var years = year.range;
 
 var utcMinute = newInterval(function(date) {
   date.setUTCSeconds(0, 0);
@@ -10030,6 +10094,7 @@ var utcMinute = newInterval(function(date) {
 }, function(date) {
   return date.getUTCMinutes();
 });
+var utcMinutes = utcMinute.range;
 
 var utcHour = newInterval(function(date) {
   date.setUTCMinutes(0, 0, 0);
@@ -10040,6 +10105,7 @@ var utcHour = newInterval(function(date) {
 }, function(date) {
   return date.getUTCHours();
 });
+var utcHours = utcHour.range;
 
 var utcDay = newInterval(function(date) {
   date.setUTCHours(0, 0, 0, 0);
@@ -10050,6 +10116,7 @@ var utcDay = newInterval(function(date) {
 }, function(date) {
   return date.getUTCDate() - 1;
 });
+var utcDays = utcDay.range;
 
 function utcWeekday(i) {
   return newInterval(function(date) {
@@ -10070,6 +10137,8 @@ var utcThursday = utcWeekday(4);
 var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
+var utcSundays = utcSunday.range;
+
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
   date.setUTCHours(0, 0, 0, 0);
@@ -10080,6 +10149,7 @@ var utcMonth = newInterval(function(date) {
 }, function(date) {
   return date.getUTCMonth();
 });
+var utcMonths = utcMonth.range;
 
 var utcYear = newInterval(function(date) {
   date.setUTCMonth(0, 1);
@@ -10102,6 +10172,7 @@ utcYear.every = function(k) {
     date.setUTCFullYear(date.getUTCFullYear() + step * k);
   });
 };
+var utcYears = utcYear.range;
 
 function localDate(d) {
   if (0 <= d.y && d.y < 100) {
@@ -24652,7 +24723,7 @@ function sankeyLinkHorizontal() {
       .target(horizontalTarget);
 }
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var DEFAULT_LINK_COLOR = DISCRETE_COLOR_RANGE[1];
 var DEFAULT_LINK_OPACITY = 0.7;
@@ -24672,11 +24743,11 @@ function SankeyLink(props) {
   if (animation) {
     return react.createElement(
       Animation,
-      _extends({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
-      react.createElement(SankeyLink, _extends({}, props, { animation: null }))
+      _extends$_({}, props, { animatedProps: ANIMATED_SERIES_PROPS }),
+      react.createElement(SankeyLink, _extends$_({}, props, { animation: null }))
     );
   }
-  return react.createElement('path', _extends({
+  return react.createElement('path', _extends$_({
     d: data
   }, style, {
     className: 'rv-sankey__link',
@@ -24699,7 +24770,7 @@ function SankeyLink(props) {
 SankeyLink.displayName = 'SankeyLink';
 SankeyLink.requiresSVG = true;
 
-var _extends$_ = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _toConsumableArray$4(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 var NOOP$2 = function NOOP(f) {
@@ -24746,10 +24817,10 @@ function Sankey(props) {
       width = props.width;
 
   var nodesCopy = [].concat(_toConsumableArray$4(new Array(nodes.length))).map(function (e, i) {
-    return _extends$_({}, nodes[i]);
+    return _extends$10({}, nodes[i]);
   });
   var linksCopy = [].concat(_toConsumableArray$4(new Array(links.length))).map(function (e, i) {
-    return _extends$_({}, links[i]);
+    return _extends$10({}, links[i]);
   });
 
   var _getInnerDimensions = getInnerDimensions({
@@ -24770,7 +24841,7 @@ function Sankey(props) {
 
   return react.createElement(
     XYPlot,
-    _extends$_({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
+    _extends$10({}, props, { yType: 'literal', className: 'rv-sankey ' + className }),
     linksCopy.map(function (link, i) {
       return react.createElement(SankeyLink, {
         style: style.links,
@@ -24790,7 +24861,7 @@ function Sankey(props) {
       animation: animation,
       className: className + ' rv-sankey__node',
       data: nodesCopy.map(function (node) {
-        return _extends$_({}, node, {
+        return _extends$10({}, node, {
           y: node.y1 - marginTop,
           y0: node.y0 - marginTop,
           x: node.x1,
@@ -24812,11 +24883,11 @@ function Sankey(props) {
       rotation: labelRotation,
       labelAnchorY: 'text-before-edge',
       data: nodesCopy.map(function (node, i) {
-        return _extends$_({
+        return _extends$10({
           x: node.x0 + (node.x0 < width / 2 ? nWidth + 10 : -10),
           y: (node.y0 + node.y1) / 2 - marginTop,
           label: node.name,
-          style: _extends$_({
+          style: _extends$10({
             textAnchor: node.x0 < width / 2 ? 'start' : 'end',
             dy: '-.5em'
           }, style.labels)
@@ -24894,7 +24965,7 @@ Sankey.propTypes = {
   width: propTypes.number.isRequired
 };
 
-var _extends$10 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var predefinedClassName$j = 'rv-sunburst';
 
@@ -24928,7 +24999,7 @@ function getNodesToRender(_ref) {
       return res;
     }
 
-    return res.concat([_extends$10({
+    return res.concat([_extends$11({
       angle0: Math.max(0, Math.min(2 * Math.PI, x(cell.x0))),
       angle: Math.max(0, Math.min(2 * Math.PI, x(cell.x1))),
       radius0: Math.max(0, y(cell.y0)),
@@ -24960,13 +25031,13 @@ function buildLabels(mappedData, accessors) {
     var rotateLabels = !row.dontRotateLabel;
     var rotAngle = -angle / (2 * Math.PI) * 360;
 
-    return _extends$10({}, row, {
+    return _extends$11({}, row, {
       children: null,
       angle: null,
       radius: null,
       x: getRadius0(row) * Math.cos(angle),
       y: getRadius0(row) * Math.sin(angle),
-      style: _extends$10({
+      style: _extends$11({
         textAnchor: rotAngle > 90 ? 'end' : 'start'
       }, row.labelStyle),
       rotation: rotateLabels ? rotAngle > 90 ? rotAngle + 180 : rotAngle === 90 ? 90 : rotAngle : null
@@ -25025,14 +25096,14 @@ function Sunburst(props) {
       xDomain: [-radialDomain, radialDomain],
       yDomain: [-radialDomain, radialDomain]
     },
-    react.createElement(ArcSeries, _extends$10({
+    react.createElement(ArcSeries, _extends$11({
       colorType: colorType
     }, props, {
       animation: animation,
       radiusDomain: [0, radialDomain],
       // need to present a stripped down version for interpolation
       data: animation ? mappedData.map(function (row, index) {
-        return _extends$10({}, row, {
+        return _extends$11({}, row, {
           parent: null,
           children: null,
           index: index
@@ -25104,7 +25175,7 @@ if (typeof window !== "undefined") {
 
 var window_1 = win;
 
-var _extends$11 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends$12 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass$H = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -25226,7 +25297,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
 
         var newWidth = _this.state.width === offsetWidth ? {} : { width: offsetWidth };
 
-        _this.setState(_extends$11({}, newHeight, newWidth));
+        _this.setState(_extends$12({}, newHeight, newWidth));
       };
 
       _this.state = {
@@ -25267,11 +25338,11 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             height = _state.height,
             width = _state.width;
 
-        var props = _extends$11({}, this.props, {
+        var props = _extends$12({}, this.props, {
           animation: height === 0 && width === 0 ? null : this.props.animation
         });
 
-        var updatedDimensions = _extends$11({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
+        var updatedDimensions = _extends$12({}, isHeightFlexible ? { height: height } : {}, isWidthFlexible ? { width: width } : {});
 
         return react.createElement(
           'div',
@@ -25281,7 +25352,7 @@ function makeFlexible(Component, isWidthFlexible, isHeightFlexible) {
             },
             style: { width: '100%', height: '100%' }
           },
-          react.createElement(Component, _extends$11({}, updatedDimensions, props))
+          react.createElement(Component, _extends$12({}, updatedDimensions, props))
         );
       }
     }]);
@@ -25370,7 +25441,7 @@ var D3Sunburst = function (_React$Component) {
             return _this2.setState({ hoveredCell: false });
           },
           onValueClick: function onValueClick(node) {
-            var url = _this2.props.urlPrefix + node.name + '/' + _this2.props.simhashData.name + '/' + _this2.props.url;
+            var url = _this2.props.urlPrefix + node.timestamp + '/' + _this2.props.simhashData.timestamp + '/' + _this2.props.url;
             window.open(url, '_blank');
           },
           data: this.props.simhashData,
@@ -25436,7 +25507,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n";
 styleInject(css$3);
 
 /**
@@ -25454,6 +25525,12 @@ var SunburstContainer = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (SunburstContainer.__proto__ || Object.getPrototypeOf(SunburstContainer)).call(this, props));
 
+    _this.ROOT_LABEL_STYLE = {
+      fontSize: '12px',
+      transform: 'rotate(0,0,0)'
+    };
+
+
     _this.state = {
       simhashData: null,
       timestamp: _this.props.timestamp
@@ -25467,7 +25544,8 @@ var SunburstContainer = function (_React$Component) {
       var _this2 = this;
 
       if (this.state.showError) {
-        return react.createElement(ErrorMessage, { url: this.props.url, code: this._errorCode });
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this._errorCode, year: this.state.timestamp.substring(0, 4),
+          conf: this.props.conf, errorHandledCallback: this.errorHandled });
       }
       if (this.state.simhashData) {
         return react.createElement(
@@ -25558,6 +25636,9 @@ var SunburstContainer = function (_React$Component) {
       }).then(function (response) {
         return response.json();
       }).then(function (jsonResponse) {
+        if (jsonResponse['simhash'] === 'None') {
+          throw Error('NoSimhash');
+        }
         var json = _this4._decodeJson(jsonResponse);
         _this4._fetchSimhashData(json);
       }).catch(function (error) {
@@ -25658,17 +25739,17 @@ var SunburstContainer = function (_React$Component) {
       }
 
       for (var i = 0; i < json.length; i++) {
-        if (json[i][1] !== 0) {
+        if (json[i][1] !== 1) {
           if (json[i][1] <= this._lessSimilar + step) {
-            fifthLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: [] });
+            fifthLevel.push({ name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: [] });
           } else if (json[i][1] <= this._lessSimilar + 2 * step) {
-            fourthLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: [] });
+            fourthLevel.push({ name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: [] });
           } else if (json[i][1] <= this._lessSimilar + 3 * step) {
-            thirdLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: [] });
+            thirdLevel.push({ name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: [] });
           } else if (json[i][1] <= this._lessSimilar + 4 * step) {
-            secondLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: [] });
+            secondLevel.push({ name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: [] });
           } else {
-            firstLevel.push({ name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: [] });
+            firstLevel.push({ name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: [] });
           }
         }
       }
@@ -25689,20 +25770,20 @@ var SunburstContainer = function (_React$Component) {
         fifthLevel.length = this.props.conf.maxSunburstLevelLength;
       }
 
-      if (firstLevel.length === 0) {
+      while (firstLevel.length === 0) {
         firstLevel = secondLevel;
         secondLevel = thirdLevel;
         thirdLevel = fourthLevel;
         fourthLevel = fifthLevel;
         fifthLevel = [];
       }
-      if (secondLevel.length === 0) {
+      while (secondLevel.length === 0) {
         secondLevel = thirdLevel;
         thirdLevel = fourthLevel;
         fourthLevel = fifthLevel;
         fifthLevel = [];
       }
-      if (thirdLevel.length === 0) {
+      while (thirdLevel.length === 0) {
         thirdLevel = fourthLevel;
         fourthLevel = fifthLevel;
         fifthLevel = [];
@@ -25733,7 +25814,34 @@ var SunburstContainer = function (_React$Component) {
         firstLevel[_mod3].bigness = '';
       }
 
-      var data = { name: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
+      var rootUTCDate = getUTCDateFormat(timestamp[0]);
+      var rootUTCDateArray = rootUTCDate.split(' ');
+      var rootLabel = react.createElement(
+        'tspan',
+        { dx: '-22%' },
+        react.createElement(
+          'tspan',
+          null,
+          rootUTCDateArray[0],
+          ' ',
+          rootUTCDateArray[1],
+          ' ',
+          rootUTCDateArray[2],
+          ' ',
+          rootUTCDateArray[3]
+        ),
+        react.createElement(
+          'tspan',
+          { dx: '-33%', dy: '1.3em' },
+          rootUTCDateArray[4],
+          ' ',
+          rootUTCDateArray[5],
+          ' ',
+          rootUTCDateArray[6]
+        )
+      );
+
+      var data = { label: rootLabel, labelStyle: this.ROOT_LABEL_STYLE, name: rootUTCDate, timestamp: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
       this.setState({ simhashData: data });
     }
   }]);
