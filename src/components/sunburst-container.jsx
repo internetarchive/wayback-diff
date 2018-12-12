@@ -54,6 +54,8 @@ export default class SunburstContainer extends React.Component {
               <div className="heat-map-legend-summary-max-caption">High</div>
             </div>
           </div>
+          <br/>
+          <div>This diagram illustrates the differences of capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>{getUTCDateFormat(this.state.timestamp)}</a> of {this.props.url} compared to other {this.state.timestamp.substring(0, 4)} captures.</div>
         </div>
       );
     }
