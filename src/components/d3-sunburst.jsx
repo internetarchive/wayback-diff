@@ -25,6 +25,12 @@ export default class D3Sunburst extends React.Component {
     hoveredCell: false
   };
 
+  constructor (props) {
+    super(props);
+
+    this._cellClick = this._cellClick.bind(this);
+  }
+
   render () {
     const {hoveredCell} = this.state;
 
@@ -33,8 +39,7 @@ export default class D3Sunburst extends React.Component {
         style={{stroke: '#fff'}}
         onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
         onValueMouseOut={() => this.setState({hoveredCell: false})}
-        onValueClick={node => {let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
-          window.open(url,'_blank');}}
+        onValueClick={node => {this._cellClick(node);}}
         data={this.props.simhashData}
         padAngle={() => 0.02}
         width={this._getSize()}
@@ -81,6 +86,13 @@ export default class D3Sunburst extends React.Component {
   getDistance (hoveredCell) {
     if (hoveredCell.similarity !== -1){
       return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
+    }
+  }
+
+  _cellClick (node) {
+    if (node.timestamp !== this.props.simhashData.timestamp) {
+      let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
+      window.open(url, '_blank');
     }
   }
 }
