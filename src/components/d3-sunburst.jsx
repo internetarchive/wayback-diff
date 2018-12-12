@@ -46,13 +46,7 @@ export default class D3Sunburst extends React.Component {
         height={this._getSize()}
         getSize={d => d.bigness}
         getColor={d => d.clr}>
-        {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>
-          <div style={tipStyle}>
-            <div style={{...boxStyle, background: hoveredCell.clr}}/>
-            {this.getDistance(hoveredCell)}
-            {' Timestamp: ' + hoveredCell.name}
-          </div>
-        </ Hint> : null}
+        {hoveredCell ? this._showInfoLabel(hoveredCell) : null}
       </Sunburst>
     );
   }
@@ -94,5 +88,18 @@ export default class D3Sunburst extends React.Component {
       let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
       window.open(url, '_blank');
     }
+  }
+
+  _showInfoLabel (hoveredCell) {
+    if (hoveredCell.timestamp !== this.props.simhashData.timestamp) {
+      return <Hint value={this._buildValue(hoveredCell)}>
+        <div style={tipStyle}>
+          <div style={{...boxStyle, background: hoveredCell.clr}}/>
+          {this.getDistance(hoveredCell)}
+          {' Timestamp: ' + hoveredCell.name}
+        </div>
+      </ Hint>;
+    }
+    return null;
   }
 }
