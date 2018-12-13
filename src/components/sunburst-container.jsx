@@ -17,7 +17,7 @@ import { getUTCDateFormat } from '../js/utils';
 export default class SunburstContainer extends React.Component {
 
   ROOT_LABEL_STYLE = {
-    fontSize: '12px',
+    fontSize: '100%',
     transform: 'rotate(0,0,0)'
   };
 
@@ -272,9 +272,9 @@ export default class SunburstContainer extends React.Component {
     const rootUTCDate = getUTCDateFormat(timestamp[0]);
     const rootUTCDateArray = rootUTCDate.split(' ');
     const rootLabel =
-      <tspan dx="-22%">
-        <tspan>{rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}</tspan>
-        <tspan dx="-33%" dy="1.3em">{rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}</tspan>
+      <tspan>
+        <tspan lengthAdjust="spacingAndGlyphs" textLength="40%" x="27%">{rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}</tspan>
+        <tspan lengthAdjust="spacingAndGlyphs" textLength="30%" x="27%" dy="1.3em">{rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}</tspan>
       </tspan>;
 
     var data = {label:rootLabel, labelStyle: this.ROOT_LABEL_STYLE, name:rootUTCDate, timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
