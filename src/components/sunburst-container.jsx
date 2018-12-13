@@ -163,6 +163,16 @@ export default class SunburstContainer extends React.Component {
     return json;
   }
 
+  /*
+  This function receives the JSON fetched from wayback-discover-diff
+  and produces the data tree required for the Sunburst diagram.
+
+  It separates the snapshots into 5 or less "difference steps"
+  depending on the minimum and maximum percentage of difference
+  between the selected snapshot and the rest of the snapshots
+  for the same year.
+   */
+
   _createLevels(json, timestamp) {
     var firstLevel = [];
     var secondLevel = [];
