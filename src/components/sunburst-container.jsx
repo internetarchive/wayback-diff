@@ -87,7 +87,7 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
-        var json = this._decodeJson(jsonResponse);
+        const json = this._decodeJson(jsonResponse);
         this._fetchSimhashData(json);
       })
       .catch(error => {this.errorHandled(error.message);});
@@ -147,6 +147,18 @@ export default class SunburstContainer extends React.Component {
     return [this.state.timestamp, json.simhash];
   }
 
+  /*
+  _calcDistance receives two JSONs. The first variable contains
+  all the timestamps for the selected year and webpage and their
+  simhash values and the second one the selected timestamp and
+  its simhash value.
+
+  It returns a JSON variable containing all the timestamps for
+  the selected year and webpage and their similarity index to
+  the selected timestamp. Also, it saves the highest and the
+  lowest similarity index into instance variables.
+   */
+
   _calcDistance(json, timestamp){
     this._mostSimilar = 0;
     this._lessSimilar = 1;
@@ -161,6 +173,16 @@ export default class SunburstContainer extends React.Component {
     }
     return json;
   }
+
+  /*
+  This function receives the JSON fetched from wayback-discover-diff
+  and produces the data tree required for the Sunburst diagram.
+
+  It separates the snapshots into 5 or less "difference steps"
+  depending on the minimum and maximum percentage of difference
+  between the selected snapshot and the rest of the snapshots
+  for the same year.
+   */
 
   _createLevels(json, timestamp) {
     var firstLevel = [];
