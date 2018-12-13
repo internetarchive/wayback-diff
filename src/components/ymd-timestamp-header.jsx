@@ -29,9 +29,6 @@ export default class YmdTimestampHeader extends React.Component {
     let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0, 4);
 
     this.state = {
-      cdxData: false,
-      showDiff: false,
-      showError: false,
       timestampA: this.props.timestampA,
       timestampB: this.props.timestampB,
       leftYear: leftYear,
@@ -260,16 +257,14 @@ export default class YmdTimestampHeader extends React.Component {
                   if (data && data.length > 0) {
                     this._prepareCDXData(leftData, data);
                   } else {
-                    this.props.errorHandledCallback('404');
-                    this.setState({showError: true});
+                    this._errorHandled('404');
                   }
                 });
             } else {
               this._prepareCDXData(data, null);
             }
           } else {
-            this.props.errorHandledCallback('404');
-            this.setState({showError: true});
+            this._errorHandled('404');
           }
         })
         .catch(error => {this._errorHandled(error.message);});
@@ -279,8 +274,7 @@ export default class YmdTimestampHeader extends React.Component {
           if (data && data.length > 0) {
             this._prepareCDXData(null, data);
           } else {
-            this.props.errorHandledCallback('404');
-            this.setState({showError: true});
+            this._errorHandled('404');
           }
         });
     }
@@ -515,8 +509,7 @@ export default class YmdTimestampHeader extends React.Component {
         if (data) {
           this._prepareSparklineData(data);
         } else {
-          this.props.errorHandledCallback('404');
-          this.setState({showError: true});
+          this._errorHandled('404');
         }
       })
       .catch(error => {this._errorHandled(error.message);});

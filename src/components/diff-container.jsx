@@ -15,12 +15,10 @@ import ErrorMessage from './errors.jsx';
  * @extends {React.Component}
  */
 export default class DiffContainer extends React.Component {
-  _errorCode = '';
+
   constructor (props) {
     super(props);
     this.state = {
-      fetchedRaw: null,
-      showError: false,
       timestampA: this.props.timestampA,
       timestampB: this.props.timestampB
     };
@@ -34,23 +32,22 @@ export default class DiffContainer extends React.Component {
     window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
     this.setState({
       fetchedRaw: null,
-      showError: false,
+      error: null,
       timestampA: timestampA,
       timestampB: timestampB});
   }
 
   errorHandled (errorCode) {
-    this._errorCode = errorCode;
-    this.setState({showError: true});
+    this.setState({error: errorCode});
   }
 
   render () {
     if (this._urlIsInvalid()) {
       return this._invalidURL();
     }
-    if (this.state.showError){
+    if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this._errorCode}/>);
+        <ErrorMessage url={this.props.url} code={this.state.error}/>);
     }
     if (!this.state.timestampA && !this.state.timestampB) {
       if (this.props.noTimestamps){
@@ -160,7 +157,7 @@ export default class DiffContainer extends React.Component {
   }
 
   prepareDiffView(){
-    if (!this.state.showError){
+    if (!this.state.error){
       let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampA + '/' + encodeURIComponent(this.props.url);
       let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampB + '/' + encodeURIComponent(this.props.url);
 

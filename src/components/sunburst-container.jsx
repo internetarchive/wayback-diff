@@ -25,9 +25,9 @@ export default class SunburstContainer extends React.Component {
   }
 
   render () {
-    if (this.state.showError){
+    if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this._errorCode}/>);
+        <ErrorMessage url={this.props.url} code={this.state.error}/>);
     }
     if (this.state.simhashData) {
       return (
@@ -79,8 +79,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   errorHandled (errorCode) {
-    this._errorCode = errorCode;
-    this.setState({showError: true});
+    this.setState({error: errorCode});
   }
 
   _fetchTimestampSimhashData (timestamp) {
