@@ -19,8 +19,7 @@ export default class SunburstContainer extends React.Component {
     super(props);
 
     this.state = {
-      simhashData: null,
-      timestamp: this.props.timestamp
+      simhashData: null
     };
   }
 
@@ -51,28 +50,31 @@ export default class SunburstContainer extends React.Component {
       );
     }
     const Loader = () => this.props.loader;
-    this._fetchTimestampSimhashData(this.state.timestamp);
-    this._validateTimestamp();
+    if (this.state.timestamp) {
+      this._fetchTimestampSimhashData();
+    } else {
+      this._validateTimestamp();
+    }
     return (<Loader/>);
   }
 
   _validateTimestamp() {
     let promise;
     if (this.props.fetchSnapshotCallback) {
-      promise = this.props.fetchSnapshotCallback(this.state.timestamp);
+      promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      let url = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestamp + '/' + encodeURIComponent(this.props.url);
+      let url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.props.timestamp;
       promise = fetch_with_timeout(fetch(url, {redirect: 'follow'}));
     }
-    promise.then(response => {return checkResponse(response);})
-      .then(response => {
-        let url = response.url;
-        let fetchedTimestamp = url.split('/')[4];
-        if (this.state.timestamp !== fetchedTimestamp) {
+    promise.then(response => {return checkResponse(response).json();})
+      .then(data => {
+        let fetchedTimestamp = data.archived_snapshots.closest.timestamp;
+        if (this.props.timestamp !== fetchedTimestamp) {
 
           window.history.pushState({}, '', this.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + this.props.url);
           this.setState({timestamp: fetchedTimestamp});
-
+        } else {
+          this.setState({timestamp: this.props.timestamp});
         }
       })
       .catch(error => {this.errorHandled(error.message);});
@@ -82,8 +84,8 @@ export default class SunburstContainer extends React.Component {
     this.setState({error: errorCode});
   }
 
-  _fetchTimestampSimhashData (timestamp) {
-    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&timestamp=${timestamp}`;
+  _fetchTimestampSimhashData () {
+    const url = `${this.props.conf.waybackDiscoverDiff}/simhash?url=${encodeURIComponent(this.props.url)}&timestamp=${this.state.timestamp}`;
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {

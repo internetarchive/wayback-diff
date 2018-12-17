@@ -181,16 +181,15 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
+    const url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + timestamp;
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow', signal: this.ABORT_CONTROLLER.signal})), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
-    return promise
-      .then(response => {return checkResponse(response);})
-      .then(response => {
-        let url = response.url;
-        fetchedTimestamps[position] = url.split('/')[4];
+    return this._handleFetch(promise)
+      .then(data => {
+        let fetchedTimestamp = data.archived_snapshots.closest.timestamp;
+        fetchedTimestamps[position] = fetchedTimestamp;
         if (timestamp !== fetchedTimestamps[position]) {
           this._redirectToValidatedTimestamps = true;
         }
