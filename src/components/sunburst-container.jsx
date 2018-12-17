@@ -5,6 +5,7 @@ import '../css/diffgraph.css';
 import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
 import ErrorMessage from './errors.jsx';
 import PropTypes from 'prop-types';
+import { getUTCDateFormat } from '../js/utils';
 
 /**
  * Container of d3 Sunburst diagram
@@ -14,6 +15,11 @@ import PropTypes from 'prop-types';
  */
 
 export default class SunburstContainer extends React.Component {
+
+  ROOT_LABEL_STYLE = {
+    fontSize: '100%',
+    transform: 'rotate(0,0,0)'
+  };
 
   constructor(props) {
     super(props);
@@ -26,7 +32,8 @@ export default class SunburstContainer extends React.Component {
   render () {
     if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this.state.error}/>);
+        <ErrorMessage url={this.props.url} code={this.state.error} year={this.state.timestamp.substring(0, 4)}
+          conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
@@ -46,6 +53,8 @@ export default class SunburstContainer extends React.Component {
               <div className="heat-map-legend-summary-max-caption">High</div>
             </div>
           </div>
+          <br/>
+          <div>This diagram illustrates the differences of capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>{getUTCDateFormat(this.state.timestamp)}</a> of {this.props.url} compared to other {this.state.timestamp.substring(0, 4)} captures.</div>
         </div>
       );
     }
@@ -89,6 +98,9 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
+        if (jsonResponse['simhash'] === 'None') {
+          throw Error('NoSimhash');
+        }
         const json = this._decodeJson(jsonResponse);
         this._fetchSimhashData(json);
       })
@@ -204,17 +216,17 @@ export default class SunburstContainer extends React.Component {
 
 
     for (var i = 0; i<json.length; i++){
-      if (json[i][1] !== 0) {
+      if (json[i][1] !== 1) {
         if (json[i][1] <= this._lessSimilar + step) {
-          fifthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
+          fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[5], children: []});
         } else if (json[i][1] <= this._lessSimilar + 2 * step) {
-          fourthLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
+          fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[4], children: []});
         } else if (json[i][1] <= this._lessSimilar + 3*step) {
-          thirdLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
+          thirdLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[3], children: []});
         } else if (json[i][1] <= this._lessSimilar + 4*step) {
-          secondLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
+          secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[2], children: []});
         } else {
-          firstLevel.push({name: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
+          firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10, similarity: 1 - json[i][1], clr: colors[1], children: []});
         }
       }
     }
@@ -236,20 +248,20 @@ export default class SunburstContainer extends React.Component {
     }
 
 
-    if (firstLevel.length === 0){
+    while (firstLevel.length === 0) {
       firstLevel = secondLevel;
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
     }
-    if (secondLevel.length === 0){
+    while (secondLevel.length === 0) {
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
     }
-    if (thirdLevel.length === 0){
+    while (thirdLevel.length === 0) {
       thirdLevel = fourthLevel;
       fourthLevel = fifthLevel;
       fifthLevel = [];
@@ -280,7 +292,15 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].bigness = '';
     }
 
-    var data = {name:timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
+    const rootUTCDate = getUTCDateFormat(timestamp[0]);
+    const rootUTCDateArray = rootUTCDate.split(' ');
+    const rootLabel =
+      <tspan>
+        <tspan lengthAdjust="spacingAndGlyphs" textLength="40%" x="27%">{rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}</tspan>
+        <tspan lengthAdjust="spacingAndGlyphs" textLength="30%" x="27%" dy="1.3em">{rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}</tspan>
+      </tspan>;
+
+    var data = {label:rootLabel, labelStyle: this.ROOT_LABEL_STYLE, name:rootUTCDate, timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
     this.setState({simhashData: data});
   }
 

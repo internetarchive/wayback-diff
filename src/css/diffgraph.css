@@ -41,3 +41,13 @@
 .rv-sunburst {
     margin: 0 auto;
 }
+
+#calcButton {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {
+    cursor: pointer;
+}

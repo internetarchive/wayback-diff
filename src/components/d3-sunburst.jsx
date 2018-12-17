@@ -25,6 +25,12 @@ export default class D3Sunburst extends React.Component {
     hoveredCell: false
   };
 
+  constructor (props) {
+    super(props);
+
+    this._cellClick = this._cellClick.bind(this);
+  }
+
   render () {
     const {hoveredCell} = this.state;
 
@@ -33,21 +39,14 @@ export default class D3Sunburst extends React.Component {
         style={{stroke: '#fff'}}
         onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
         onValueMouseOut={() => this.setState({hoveredCell: false})}
-        onValueClick={node => {let url = this.props.urlPrefix + node.name + '/' + this.props.simhashData.name + '/' + this.props.url;
-          window.open(url,'_blank');}}
+        onValueClick={node => {this._cellClick(node);}}
         data={this.props.simhashData}
         padAngle={() => 0.02}
         width={this._getSize()}
         height={this._getSize()}
         getSize={d => d.bigness}
         getColor={d => d.clr}>
-        {hoveredCell ? <Hint value={this._buildValue(hoveredCell)}>
-          <div style={tipStyle}>
-            <div style={{...boxStyle, background: hoveredCell.clr}}/>
-            {this.getDistance(hoveredCell)}
-            {' Timestamp: ' + hoveredCell.name}
-          </div>
-        </ Hint> : null}
+        {hoveredCell ? this._showInfoLabel(hoveredCell) : null}
       </Sunburst>
     );
   }
@@ -82,5 +81,25 @@ export default class D3Sunburst extends React.Component {
     if (hoveredCell.similarity !== -1){
       return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
     }
+  }
+
+  _cellClick (node) {
+    if (node.timestamp !== this.props.simhashData.timestamp) {
+      let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
+      window.open(url, '_blank');
+    }
+  }
+
+  _showInfoLabel (hoveredCell) {
+    if (hoveredCell.timestamp !== this.props.simhashData.timestamp) {
+      return <Hint value={this._buildValue(hoveredCell)}>
+        <div style={tipStyle}>
+          <div style={{...boxStyle, background: hoveredCell.clr}}/>
+          {this.getDistance(hoveredCell)}
+          {hoveredCell.name}
+        </div>
+      </ Hint>;
+    }
+    return null;
   }
 }
