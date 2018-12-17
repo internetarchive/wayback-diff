@@ -152,6 +152,7 @@ The configuration file should have the following format:
   "sparklineURL": "http://web.archive.org/__wb/sparkline",
   "iframeLoader": "https://web.archive.org/static/bower_components/wayback-search-js/dist/feb463f3270afee4352651aac697d7e5.gif",
   "waybackDiscoverDiff": "http://localhost:4000",
+  "waybackAvailabilityAPI": "http://archive.org/wayback/available",
   "maxSunburstLevelLength": "70"
 }
 ```
