@@ -75,16 +75,14 @@ export default class SunburstContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      let url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.props.timestamp;
-      promise = fetch_with_timeout(fetch(url, {redirect: 'follow'}));
+      const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+      promise = fetch_with_timeout(fetch(url));
     }
     promise.then(response => {return checkResponse(response).json();})
       .then(data => {
-        let fetchedTimestamp = data.archived_snapshots.closest.timestamp;
-        if (this.props.timestamp !== fetchedTimestamp) {
-
-          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + this.props.url);
-          this.setState({timestamp: fetchedTimestamp});
+        if (this.props.timestamp !== `${data}`) {
+          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + data + '/' + this.props.url);
+          this.setState({timestamp: `${data}`});
         } else {
           this.setState({timestamp: this.props.timestamp});
         }
