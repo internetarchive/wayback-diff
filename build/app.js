@@ -4035,6 +4035,9 @@ var YmdTimestampHeader = function (_React$Component) {
     key: 'componentDidUpdate',
     value: function componentDidUpdate() {
       if (this.state.cdxData) {
+        if (this._shouldValidateTimestamp) {
+          this._checkTimestamps();
+        }
         if (!this.state.sparkline && !this.state.showLoader) {
           this._fetchSparklineData();
         }
@@ -4114,9 +4117,6 @@ var YmdTimestampHeader = function (_React$Component) {
           return react.createElement(Loader, null);
         }
         if (this.state.cdxData) {
-          if (this._shouldValidateTimestamp) {
-            this._checkTimestamps();
-          }
           return react.createElement(
             'div',
             { className: 'timestamp-header-view' },
@@ -4170,8 +4170,8 @@ var YmdTimestampHeader = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
-      var url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + timestamp;
-      return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { redirect: 'follow', signal: this.ABORT_CONTROLLER.signal })), timestamp, fetchedTimestamps, position);
+      var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+      return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })), timestamp, fetchedTimestamps, position);
     }
   }, {
     key: '_handleTimestampValidationFetch',
@@ -4179,8 +4179,7 @@ var YmdTimestampHeader = function (_React$Component) {
       var _this4 = this;
 
       return this._handleFetch(promise).then(function (data) {
-        var fetchedTimestamp = data.archived_snapshots.closest.timestamp;
-        fetchedTimestamps[position] = fetchedTimestamp;
+        fetchedTimestamps[position] = '' + data;
         if (timestamp !== fetchedTimestamps[position]) {
           _this4._redirectToValidatedTimestamps = true;
         }
@@ -4200,8 +4199,12 @@ var YmdTimestampHeader = function (_React$Component) {
       }
       window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
       this.setState({ timestampA: fetchedTimestampA, timestampB: fetchedTimestampB });
-      document.getElementById('timestamp-select-left').value = fetchedTimestampA;
-      document.getElementById('timestamp-select-right').value = fetchedTimestampB;
+      if (this.state.leftSnaps) {
+        this._leftTimestampIndex = this.state.leftSnaps.indexOf(fetchedTimestampA);
+      }
+      if (this.state.rightSnaps) {
+        this._rightTimestampIndex = this.state.rightSnaps.indexOf(fetchedTimestampB);
+      }
     }
   }, {
     key: '_fetchCDXData',
@@ -25603,17 +25606,15 @@ var SunburstContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         promise = this.props.fetchSnapshotCallback(this.props.timestamp);
       } else {
-        var url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.props.timestamp;
-        promise = fetch_with_timeout(fetch(url, { redirect: 'follow' }));
+        var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+        promise = fetch_with_timeout(fetch(url));
       }
       promise.then(function (response) {
         return checkResponse(response).json();
       }).then(function (data) {
-        var fetchedTimestamp = data.archived_snapshots.closest.timestamp;
-        if (_this3.props.timestamp !== fetchedTimestamp) {
-
-          window.history.pushState({}, '', _this3.props.conf.diffgraphPrefix + fetchedTimestamp + '/' + _this3.props.url);
-          _this3.setState({ timestamp: fetchedTimestamp });
+        if (_this3.props.timestamp !== '' + data) {
+          window.history.pushState({}, '', _this3.props.conf.diffgraphPrefix + data + '/' + _this3.props.url);
+          _this3.setState({ timestamp: '' + data });
         } else {
           _this3.setState({ timestamp: _this3.props.timestamp });
         }
