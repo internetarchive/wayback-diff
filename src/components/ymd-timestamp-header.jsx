@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import { handleRelativeURL, fetch_with_timeout, checkResponse, getTwoDigitInt, getKeyByValue, selectHasValue,
+import { handleRelativeURL, fetch_with_timeout, getTwoDigitInt, getKeyByValue, selectHasValue,
   getUTCDateFormat} from '../js/utils.js';
 /**
  * Display a timestamp selector
@@ -61,6 +61,9 @@ export default class YmdTimestampHeader extends React.Component {
 
   componentDidUpdate () {
     if (this.state.cdxData) {
+      if (this._shouldValidateTimestamp) {
+        this._checkTimestamps();
+      }
       if (!this.state.sparkline && !this.state.showLoader) {
         this._fetchSparklineData();
       }
@@ -132,9 +135,6 @@ export default class YmdTimestampHeader extends React.Component {
         );
       }
       if (this.state.cdxData) {
-        if (this._shouldValidateTimestamp) {
-          this._checkTimestamps();
-        }
         return (
           <div className="timestamp-header-view">
             {this._showInfo()}
@@ -182,15 +182,14 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = handleRelativeURL(this.props.conf.waybackAvailabilityAPI) + '?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + timestamp;
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow', signal: this.ABORT_CONTROLLER.signal})), timestamp, fetchedTimestamps, position);
+    const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
     return this._handleFetch(promise)
       .then(data => {
-        let fetchedTimestamp = data.archived_snapshots.closest.timestamp;
-        fetchedTimestamps[position] = fetchedTimestamp;
+        fetchedTimestamps[position] = `${data}`;
         if (timestamp !== fetchedTimestamps[position]) {
           this._redirectToValidatedTimestamps = true;
         }
@@ -208,8 +207,12 @@ export default class YmdTimestampHeader extends React.Component {
     }
     window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
     this.setState({timestampA: fetchedTimestampA, timestampB: fetchedTimestampB});
-    document.getElementById('timestamp-select-left').value = fetchedTimestampA;
-    document.getElementById('timestamp-select-right').value = fetchedTimestampB;
+    if (this.state.leftSnaps) {
+      this._leftTimestampIndex = this.state.leftSnaps.indexOf(fetchedTimestampA);
+    }
+    if (this.state.rightSnaps) {
+      this._rightTimestampIndex = this.state.rightSnaps.indexOf(fetchedTimestampB);
+    }
   }
 
   _fetchCDXData () {
