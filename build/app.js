@@ -25450,8 +25450,8 @@ var D3Sunburst = function (_React$Component) {
       return w * 0.45;
     }
   }, {
-    key: 'getDistance',
-    value: function getDistance(hoveredCell) {
+    key: '_getDistance',
+    value: function _getDistance(hoveredCell) {
       if (hoveredCell.similarity !== -1) {
         return 'Differences: ' + Math.round(hoveredCell.similarity * 100) + '%';
       }
@@ -25475,7 +25475,8 @@ var D3Sunburst = function (_React$Component) {
             'div',
             { style: tipStyle },
             react.createElement('div', { style: _extends({}, boxStyle, { background: hoveredCell.clr }) }),
-            this.getDistance(hoveredCell),
+            this._getDistance(hoveredCell),
+            react.createElement('br', null),
             hoveredCell.name
           )
         );
@@ -25496,6 +25497,8 @@ styleInject(css$3);
  * @extends {React.Component}
  */
 
+var SMBase64 = require('smbase64');
+
 var SunburstContainer = function (_React$Component) {
   inherits(SunburstContainer, _React$Component);
 
@@ -25513,6 +25516,7 @@ var SunburstContainer = function (_React$Component) {
     _this.state = {
       simhashData: null
     };
+
     return _this;
   }
 
@@ -25522,7 +25526,7 @@ var SunburstContainer = function (_React$Component) {
       var _this2 = this;
 
       if (this.state.error) {
-        return react.createElement(ErrorMessage, { url: this.props.url, code: this.state.error, year: this.state.timestamp.substring(0, 4),
+        return react.createElement(ErrorMessage, { url: this.props.url, code: this.state.error, year: this.state.timestamp ? this.state.timestamp.substring(0, 4) : this.props.timestamp.substring(0, 4),
           conf: this.props.conf, errorHandledCallback: this.errorHandled });
       }
       if (this.state.simhashData) {
@@ -25660,44 +25664,27 @@ var SunburstContainer = function (_React$Component) {
         _this5.errorHandled(error.message);
       });
     }
+
+    /*
+    The _decodeJson function assumes the task of decoding the simhash
+    value received from wayback-discover-diff in base64 into a number.
+    This function handles both a JSON array and a single JSON value.
+     */
+
   }, {
     key: '_decodeJson',
     value: function _decodeJson(json) {
-      var Base64 = function () {
-
-        var ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-        var Base64 = function Base64() {};
-
-        var _decode = function _decode(value) {
-
-          var result = 0;
-          for (var i = 0, len = value.length; i < len; i++) {
-            result *= 64;
-            result += ALPHA.indexOf(value[i]);
-          }
-
-          return result;
-        };
-
-        Base64.prototype = {
-          constructor: Base64,
-          decode: _decode
-        };
-
-        return Base64;
-      }();
-      var base64 = new Base64();
+      var base64 = new SMBase64();
       if (json.length) {
         for (var i = 0; i < json.length; i++) {
           json[i][1] = json[i][1].toString().replace(/=/, '');
-          json[i][1] = base64.decode(json[i][1]);
+          json[i][1] = base64.toNumber(json[i][1]);
         }
         return json;
       }
 
       json.simhash = json.simhash.toString().replace(/=/, '');
-      json.simhash = base64.decode(json.simhash);
+      json.simhash = base64.toNumber(json.simhash);
 
       return [this.state.timestamp, json.simhash];
     }

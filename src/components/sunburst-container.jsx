@@ -14,6 +14,8 @@ import { getUTCDateFormat } from '../js/utils';
  * @extends {React.Component}
  */
 
+const SMBase64 = require('smbase64');
+
 export default class SunburstContainer extends React.Component {
 
   ROOT_LABEL_STYLE = {
@@ -27,12 +29,13 @@ export default class SunburstContainer extends React.Component {
     this.state = {
       simhashData: null
     };
+
   }
 
   render () {
     if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this.state.error} year={this.state.timestamp.substring(0, 4)}
+        <ErrorMessage url={this.props.url} code={this.state.error} year={this.state.timestamp ? this.state.timestamp.substring(0, 4) : this.props.timestamp.substring(0, 4)}
           conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
@@ -119,44 +122,24 @@ export default class SunburstContainer extends React.Component {
       .catch(error => {this.errorHandled(error.message);});
   }
 
+  /*
+  The _decodeJson function assumes the task of decoding the simhash
+  value received from wayback-discover-diff in base64 into a number.
+  This function handles both a JSON array and a single JSON value.
+   */
 
   _decodeJson(json){
-    var Base64 = (function () {
-
-      var ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-      var Base64 = function () {};
-
-      var _decode = function (value) {
-
-        var result = 0;
-        for (var i = 0, len = value.length; i < len; i++) {
-          result *= 64;
-          result += ALPHA.indexOf(value[i]);
-        }
-
-        return result;
-      };
-
-      Base64.prototype = {
-        constructor: Base64,
-        decode: _decode
-      };
-
-      return Base64;
-
-    })();
-    let base64 = new Base64();
+    let base64 = new SMBase64();
     if(json.length) {
       for (var i = 0; i < json.length; i++) {
         json[i][1] = json[i][1].toString().replace(/=/, '');
-        json[i][1] = base64.decode(json[i][1]);
+        json[i][1] = base64.toNumber(json[i][1]);
       }
       return json;
     }
 
     json.simhash = json.simhash.toString().replace(/=/, '');
-    json.simhash = base64.decode(json.simhash);
+    json.simhash = base64.toNumber(json.simhash);
 
     return [this.state.timestamp, json.simhash];
   }

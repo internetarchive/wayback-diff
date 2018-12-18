@@ -77,7 +77,7 @@ export default class D3Sunburst extends React.Component {
     return w*0.45;
   }
 
-  getDistance (hoveredCell) {
+  _getDistance (hoveredCell) {
     if (hoveredCell.similarity !== -1){
       return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
     }
@@ -95,7 +95,8 @@ export default class D3Sunburst extends React.Component {
       return <Hint value={this._buildValue(hoveredCell)}>
         <div style={tipStyle}>
           <div style={{...boxStyle, background: hoveredCell.clr}}/>
-          {this.getDistance(hoveredCell)}
+          {this._getDistance(hoveredCell)}
+          <br/>
           {hoveredCell.name}
         </div>
       </ Hint>;
