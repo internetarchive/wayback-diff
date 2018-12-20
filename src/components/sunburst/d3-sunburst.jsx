@@ -1,6 +1,7 @@
 import React from 'react';
 import {Sunburst, Hint} from 'react-vis';
-import '../../node_modules/react-vis/dist/style.css';
+import '../../../node_modules/react-vis/dist/style.css';
+import {buildValue, getDistance, getSize} from './sunburst-container-utils.js';
 
 /**
  * Display a d3 Sunburst diagram
@@ -42,8 +43,8 @@ export default class D3Sunburst extends React.Component {
         onValueClick={node => {this._cellClick(node);}}
         data={this.props.simhashData}
         padAngle={() => 0.02}
-        width={this._getSize()}
-        height={this._getSize()}
+        width={getSize()}
+        height={getSize()}
         getSize={d => d.bigness}
         getColor={d => d.clr}>
         {hoveredCell ? this._showInfoLabel(hoveredCell) : null}
@@ -51,37 +52,6 @@ export default class D3Sunburst extends React.Component {
     );
   }
 
-  _buildValue(hoveredCell) {
-    const {radius, angle, angle0} = hoveredCell;
-    const truedAngle = (angle + angle0) / 2;
-    const temp = {
-      x: radius * Math.cos(truedAngle),
-      y: radius * Math.sin(truedAngle)
-    };
-
-    return temp;
-  }
-
-  _getSize () {
-    var w = window.innerWidth
-      || document.documentElement.clientWidth
-      || document.body.clientWidth;
-
-    var h = window.innerHeight
-      || document.documentElement.clientHeight
-      || document.body.clientHeight;
-
-    if (h<w){
-      return h*0.45;
-    }
-    return w*0.45;
-  }
-
-  _getDistance (hoveredCell) {
-    if (hoveredCell.similarity !== -1){
-      return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
-    }
-  }
 
   _cellClick (node) {
     if (node.timestamp !== this.props.simhashData.timestamp) {
@@ -92,10 +62,10 @@ export default class D3Sunburst extends React.Component {
 
   _showInfoLabel (hoveredCell) {
     if (hoveredCell.timestamp !== this.props.simhashData.timestamp) {
-      return <Hint value={this._buildValue(hoveredCell)}>
+      return <Hint value={buildValue(hoveredCell)}>
         <div style={tipStyle}>
           <div style={{...boxStyle, background: hoveredCell.clr}}/>
-          {this._getDistance(hoveredCell)}
+          {getDistance(hoveredCell)}
           <br/>
           {hoveredCell.name}
         </div>
