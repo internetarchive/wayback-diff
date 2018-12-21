@@ -25355,6 +25355,48 @@ var FlexibleXYPlot = makeVisFlexible(XYPlot);
 var css$2 = ".react-vis-magic-css-import-rule{display:inherit}.rv-treemap{font-size:12px;position:relative}.rv-treemap__leaf{overflow:hidden;position:absolute}.rv-treemap__leaf--circle{align-items:center;border-radius:100%;display:flex;justify-content:center}.rv-treemap__leaf__content{overflow:hidden;padding:10px;text-overflow:ellipsis}.rv-xy-plot{color:#c3c3c3;position:relative}.rv-xy-plot canvas{pointer-events:none}.rv-xy-plot .rv-xy-canvas{pointer-events:none;position:absolute}.rv-xy-plot__inner{display:block}.rv-xy-plot__axis__line{fill:none;stroke-width:2px;stroke:#e6e6e9}.rv-xy-plot__axis__tick__line{stroke:#e6e6e9}.rv-xy-plot__axis__tick__text{fill:#6b6b76;font-size:11px}.rv-xy-plot__axis__title text{fill:#6b6b76;font-size:11px}.rv-xy-plot__grid-lines__line{stroke:#e6e6e9}.rv-xy-plot__circular-grid-lines__line{fill-opacity:0;stroke:#e6e6e9}.rv-xy-plot__series,.rv-xy-plot__series path{pointer-events:all}.rv-xy-plot__series--line{fill:none;stroke:#000;stroke-width:2px}.rv-crosshair{position:absolute;font-size:11px;pointer-events:none}.rv-crosshair__line{background:#47d3d9;width:1px}.rv-crosshair__inner{position:absolute;text-align:left;top:0}.rv-crosshair__inner__content{border-radius:4px;background:#3a3a48;color:#fff;font-size:12px;padding:7px 10px;box-shadow:0 2px 4px rgba(0,0,0,0.5)}.rv-crosshair__inner--left{right:4px}.rv-crosshair__inner--right{left:4px}.rv-crosshair__title{font-weight:bold;white-space:nowrap}.rv-crosshair__item{white-space:nowrap}.rv-hint{position:absolute;pointer-events:none}.rv-hint__content{border-radius:4px;padding:7px 10px;font-size:12px;background:#3a3a48;box-shadow:0 2px 4px rgba(0,0,0,0.5);color:#fff;text-align:left;white-space:nowrap}.rv-discrete-color-legend{box-sizing:border-box;overflow-y:auto;font-size:12px}.rv-discrete-color-legend.horizontal{white-space:nowrap}.rv-discrete-color-legend-item{color:#3a3a48;border-radius:1px;padding:9px 10px}.rv-discrete-color-legend-item.horizontal{display:inline-block}.rv-discrete-color-legend-item.horizontal .rv-discrete-color-legend-item__title{margin-left:0;display:block}.rv-discrete-color-legend-item__color{display:inline-block;vertical-align:middle;overflow:visible}.rv-discrete-color-legend-item__color__path{stroke:#dcdcdc;stroke-width:2px}.rv-discrete-color-legend-item__title{margin-left:10px}.rv-discrete-color-legend-item.disabled{color:#b8b8b8}.rv-discrete-color-legend-item.clickable{cursor:pointer}.rv-discrete-color-legend-item.clickable:hover{background:#f9f9f9}.rv-search-wrapper{display:flex;flex-direction:column}.rv-search-wrapper__form{flex:0}.rv-search-wrapper__form__input{width:100%;color:#a6a6a5;border:1px solid #e5e5e4;padding:7px 10px;font-size:12px;box-sizing:border-box;border-radius:2px;margin:0 0 9px;outline:0}.rv-search-wrapper__contents{flex:1;overflow:auto}.rv-continuous-color-legend{font-size:12px}.rv-continuous-color-legend .rv-gradient{height:4px;border-radius:2px;margin-bottom:5px}.rv-continuous-size-legend{font-size:12px}.rv-continuous-size-legend .rv-bubbles{text-align:justify;overflow:hidden;margin-bottom:5px;width:100%}.rv-continuous-size-legend .rv-bubble{background:#d8d9dc;display:inline-block;vertical-align:bottom}.rv-continuous-size-legend .rv-spacer{display:inline-block;font-size:0;line-height:0;width:100%}.rv-legend-titles{height:16px;position:relative}.rv-legend-titles__left,.rv-legend-titles__right,.rv-legend-titles__center{position:absolute;white-space:nowrap;overflow:hidden}.rv-legend-titles__center{display:block;text-align:center;width:100%}.rv-legend-titles__right{right:0}.rv-radial-chart .rv-xy-plot__series--label{pointer-events:none}\n";
 styleInject(css$2);
 
+function buildValue(hoveredCell) {
+  var radius = hoveredCell.radius,
+      angle = hoveredCell.angle,
+      angle0 = hoveredCell.angle0;
+
+  var truedAngle = (angle + angle0) / 2;
+  var temp = {
+    x: radius * Math.cos(truedAngle),
+    y: radius * Math.sin(truedAngle)
+  };
+
+  return temp;
+}
+
+function getSize() {
+
+  var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+  var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  var size = void 0;
+  if (h < w) {
+    size = h * 0.45;
+  } else {
+    size = w * 0.45;
+  }
+  _showRootInfo(size);
+  return size;
+}
+
+function _showRootInfo(size) {
+  var rootInfoDiv = document.getElementById('root-cell-tooltip');
+  if (rootInfoDiv) {
+    rootInfoDiv.setAttribute('style', 'top:' + size * 0.4 + 'px; width:' + size * 0.4 + 'px; height:' + size * 0.22 + 'px; font-size: ' + size * 0.004 + 'em;');
+  }
+}
+
+function getDistance(hoveredCell) {
+  if (hoveredCell.similarity !== -1) {
+    return 'Differences: ' + Math.round(hoveredCell.similarity * 100) + '%';
+  }
+}
+
 /**
  * Display a d3 Sunburst diagram
  *
@@ -25414,9 +25456,9 @@ var D3Sunburst = function (_React$Component) {
           padAngle: function padAngle() {
             return 0.02;
           },
-          width: this._getSize(),
-          height: this._getSize(),
-          getSize: function getSize(d) {
+          width: getSize(),
+          height: getSize(),
+          getSize: function getSize$$1(d) {
             return d.bigness;
           },
           getColor: function getColor(d) {
@@ -25424,40 +25466,6 @@ var D3Sunburst = function (_React$Component) {
           } },
         hoveredCell ? this._showInfoLabel(hoveredCell) : null
       );
-    }
-  }, {
-    key: '_buildValue',
-    value: function _buildValue(hoveredCell) {
-      var radius = hoveredCell.radius,
-          angle = hoveredCell.angle,
-          angle0 = hoveredCell.angle0;
-
-      var truedAngle = (angle + angle0) / 2;
-      var temp = {
-        x: radius * Math.cos(truedAngle),
-        y: radius * Math.sin(truedAngle)
-      };
-
-      return temp;
-    }
-  }, {
-    key: '_getSize',
-    value: function _getSize() {
-      var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-      var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-      if (h < w) {
-        return h * 0.45;
-      }
-      return w * 0.45;
-    }
-  }, {
-    key: '_getDistance',
-    value: function _getDistance(hoveredCell) {
-      if (hoveredCell.similarity !== -1) {
-        return 'Differences: ' + Math.round(hoveredCell.similarity * 100) + '%';
-      }
     }
   }, {
     key: '_cellClick',
@@ -25473,12 +25481,12 @@ var D3Sunburst = function (_React$Component) {
       if (hoveredCell.timestamp !== this.props.simhashData.timestamp) {
         return react.createElement(
           Hint,
-          { value: this._buildValue(hoveredCell) },
+          { value: buildValue(hoveredCell) },
           react.createElement(
             'div',
             { style: tipStyle },
             react.createElement('div', { style: _extends({}, boxStyle, { background: hoveredCell.clr }) }),
-            this._getDistance(hoveredCell),
+            getDistance(hoveredCell),
             react.createElement('br', null),
             hoveredCell.name
           )
@@ -25490,7 +25498,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n\n#root-cell-tooltip {\n    position: absolute;\n    display: inline-block;\n    margin: auto;\n    right: 0;\n    left: 0;\n    z-index: 10;\n    text-align: center;\n}\n\n.rv-hint {\n    z-index: 10;\n}\n";
 styleInject(css$3);
 
 /**
@@ -25510,20 +25518,22 @@ var SunburstContainer = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (SunburstContainer.__proto__ || Object.getPrototypeOf(SunburstContainer)).call(this, props));
 
-    _this.ROOT_LABEL_STYLE = {
-      fontSize: '100%',
-      transform: 'rotate(0,0,0)'
-    };
-
-
+    _this.isUpdate = 0;
     _this.state = {
       simhashData: null
     };
-
     return _this;
   }
 
   createClass(SunburstContainer, [{
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      if (this.isUpdate < 2) {
+        getSize();
+        this.isUpdate++;
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -25536,6 +25546,11 @@ var SunburstContainer = function (_React$Component) {
         return react.createElement(
           'div',
           { className: 'sunburst-container' },
+          react.createElement(
+            'div',
+            { id: 'root-cell-tooltip' },
+            this.rootLabel
+          ),
           react.createElement(D3Sunburst, { urlPrefix: this.props.conf.urlPrefix, url: this.props.url, simhashData: this.state.simhashData }),
           react.createElement(
             'div',
@@ -25761,22 +25776,6 @@ var SunburstContainer = function (_React$Component) {
         }
       }
 
-      if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
-        firstLevel.length = this.props.conf.maxSunburstLevelLength;
-      }
-      if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
-        secondLevel.length = this.props.conf.maxSunburstLevelLength;
-      }
-      if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
-        thirdLevel.length = this.props.conf.maxSunburstLevelLength;
-      }
-      if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
-        fourthLevel.length = this.props.conf.maxSunburstLevelLength;
-      }
-      if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
-        fifthLevel.length = this.props.conf.maxSunburstLevelLength;
-      }
-
       while (firstLevel.length === 0) {
         firstLevel = secondLevel;
         secondLevel = thirdLevel;
@@ -25798,6 +25797,38 @@ var SunburstContainer = function (_React$Component) {
       if (fourthLevel.length === 0) {
         fourthLevel = fifthLevel;
         fifthLevel = [];
+      }
+
+      firstLevel.sort(function (a, b) {
+        return a.timestamp > b.timestamp ? 1 : b.timestamp > a.timestamp ? -1 : 0;
+      });
+      secondLevel.sort(function (a, b) {
+        return a.timestamp > b.timestamp ? 1 : b.timestamp > a.timestamp ? -1 : 0;
+      });
+      thirdLevel.sort(function (a, b) {
+        return a.timestamp > b.timestamp ? 1 : b.timestamp > a.timestamp ? -1 : 0;
+      });
+      fourthLevel.sort(function (a, b) {
+        return a.timestamp > b.timestamp ? 1 : b.timestamp > a.timestamp ? -1 : 0;
+      });
+      fifthLevel.sort(function (a, b) {
+        return a.timestamp > b.timestamp ? 1 : b.timestamp > a.timestamp ? -1 : 0;
+      });
+
+      if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+        firstLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+        secondLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+        thirdLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fourthLevel.length = this.props.conf.maxSunburstLevelLength;
+      }
+      if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+        fifthLevel.length = this.props.conf.maxSunburstLevelLength;
       }
 
       for (i = 0; i < fifthLevel.length; i++) {
@@ -25823,32 +25854,25 @@ var SunburstContainer = function (_React$Component) {
 
       var rootUTCDate = getUTCDateFormat(timestamp[0]);
       var rootUTCDateArray = rootUTCDate.split(' ');
-      var rootLabel = react.createElement(
-        'tspan',
+      this.rootLabel = react.createElement(
+        'div',
         null,
-        react.createElement(
-          'tspan',
-          { lengthAdjust: 'spacingAndGlyphs', textLength: '40%', x: '27%' },
-          rootUTCDateArray[0],
-          ' ',
-          rootUTCDateArray[1],
-          ' ',
-          rootUTCDateArray[2],
-          ' ',
-          rootUTCDateArray[3]
-        ),
-        react.createElement(
-          'tspan',
-          { lengthAdjust: 'spacingAndGlyphs', textLength: '30%', x: '27%', dy: '1.3em' },
-          rootUTCDateArray[4],
-          ' ',
-          rootUTCDateArray[5],
-          ' ',
-          rootUTCDateArray[6]
-        )
+        rootUTCDateArray[0],
+        ' ',
+        rootUTCDateArray[1],
+        ' ',
+        rootUTCDateArray[2],
+        ' ',
+        rootUTCDateArray[3],
+        react.createElement('br', null),
+        rootUTCDateArray[4],
+        ' ',
+        rootUTCDateArray[5],
+        ' ',
+        rootUTCDateArray[6]
       );
 
-      var data = { label: rootLabel, labelStyle: this.ROOT_LABEL_STYLE, name: rootUTCDate, timestamp: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
+      var data = { name: rootUTCDate, timestamp: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
       this.setState({ simhashData: data });
     }
   }]);
