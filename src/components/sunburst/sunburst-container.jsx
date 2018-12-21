@@ -1,11 +1,10 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
-import {similarity} from '../js/utils.js';
-import '../css/diffgraph.css';
-import { handleRelativeURL, checkResponse, fetch_with_timeout } from '../js/utils.js';
-import ErrorMessage from './errors.jsx';
+import '../../css/diffgraph.css';
+import { similarity, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat } from '../../js/utils.js';
+import {getSize} from './sunburst-container-utils.js';
+import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
-import { getUTCDateFormat } from '../js/utils';
 
 /**
  * Container of d3 Sunburst diagram
@@ -18,18 +17,20 @@ const SMBase64 = require('smbase64');
 
 export default class SunburstContainer extends React.Component {
 
-  ROOT_LABEL_STYLE = {
-    fontSize: '100%',
-    transform: 'rotate(0,0,0)'
-  };
-
+  rootLabel;
   constructor(props) {
     super(props);
-
+    this.isUpdate = 0;
     this.state = {
       simhashData: null
     };
+  }
 
+  componentDidUpdate (){
+    if (this.isUpdate < 2) {
+      getSize();
+      this.isUpdate ++;
+    }
   }
 
   render () {
@@ -41,6 +42,7 @@ export default class SunburstContainer extends React.Component {
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
+          <div id="root-cell-tooltip">{this.rootLabel}</div>
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
             <div className="heat-map-legend-caption">Variation</div>
@@ -280,16 +282,14 @@ export default class SunburstContainer extends React.Component {
 
     const rootUTCDate = getUTCDateFormat(timestamp[0]);
     const rootUTCDateArray = rootUTCDate.split(' ');
-    const rootLabel =
-      <tspan>
-        <tspan lengthAdjust="spacingAndGlyphs" textLength="40%" x="27%">{rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}</tspan>
-        <tspan lengthAdjust="spacingAndGlyphs" textLength="30%" x="27%" dy="1.3em">{rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}</tspan>
-      </tspan>;
+    this.rootLabel = <div>
+      {rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}<br/>
+      {rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}
+    </div>;
 
-    var data = {label:rootLabel, labelStyle: this.ROOT_LABEL_STYLE, name:rootUTCDate, timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
+    var data = {name:rootUTCDate, timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
     this.setState({simhashData: data});
   }
-
 }
 
 SunburstContainer.propTypes = {

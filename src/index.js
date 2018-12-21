@@ -70,4 +70,4 @@ import React from 'react';
 
 //  If using as a component in an other project uncomment the following line
 export DiffContainer from './components/diff-container.jsx';
-export SunburstContainer from './components/sunburst-container.jsx';
+export SunburstContainer from './components/sunburst/sunburst-container.jsx';

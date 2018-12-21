@@ -51,3 +51,17 @@
 .rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {
     cursor: pointer;
 }
+
+#root-cell-tooltip {
+    position: absolute;
+    display: inline-block;
+    margin: auto;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    text-align: center;
+}
+
+.rv-hint {
+    z-index: 10;
+}
