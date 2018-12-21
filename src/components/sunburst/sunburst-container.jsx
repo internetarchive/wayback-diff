@@ -214,23 +214,6 @@ export default class SunburstContainer extends React.Component {
       }
     }
 
-    if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
-      firstLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
-      secondLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
-      thirdLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
-      fourthLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
-      fifthLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-
-
     while (firstLevel.length === 0) {
       firstLevel = secondLevel;
       secondLevel = thirdLevel;
@@ -252,6 +235,28 @@ export default class SunburstContainer extends React.Component {
     if (fourthLevel.length === 0){
       fourthLevel= fifthLevel;
       fifthLevel = [];
+    }
+
+    firstLevel.sort(function(a,b) {return (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0);} );
+    secondLevel.sort(function(a,b) {return (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0);} );
+    thirdLevel.sort(function(a,b) {return (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0);} );
+    fourthLevel.sort(function(a,b) {return (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0);} );
+    fifthLevel.sort(function(a,b) {return (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0);} );
+
+    if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
+      firstLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
+      secondLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
+      thirdLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fourthLevel.length = this.props.conf.maxSunburstLevelLength;
+    }
+    if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
+      fifthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
 
     for (i = 0; i<fifthLevel.length; i++) {
