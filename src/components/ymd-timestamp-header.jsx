@@ -182,7 +182,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+    const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
     return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})), timestamp, fetchedTimestamps, position);
   }
 
