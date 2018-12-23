@@ -4411,19 +4411,19 @@ var YmdTimestampHeader = function (_React$Component) {
           { className: 'wayback-timestamps' },
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'year-select-left', onClick: this._handleYearChange },
+            { className: 'form-control input-sm mr-sm-1', id: 'year-select-left', onClick: this._handleYearChange },
             react.createElement('optgroup', { label: 'Years and available captures' }),
             this.state.yearOptions
           ),
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'month-select-left', style: { visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }, onClick: this._getTimestamps },
+            { className: 'form-control input-sm mr-sm-1', id: 'month-select-left', style: { visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }, onClick: this._getTimestamps },
             react.createElement('optgroup', { label: 'Months and available captures' }),
             this.state.leftMonthOptions
           ),
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+!this.state.leftSnapElements] }, onClick: this._handleLeftTimestampChange },
+            { className: 'form-control input-sm mr-sm-1', id: 'timestamp-select-left', style: { visibility: this._visibilityState[+!this.state.leftSnapElements] }, onClick: this._handleLeftTimestampChange },
             react.createElement('optgroup', { label: 'Available captures' }),
             this.state.leftSnapElements
           )
@@ -4433,12 +4433,12 @@ var YmdTimestampHeader = function (_React$Component) {
           { className: 'wayback-ymd-buttons' },
           react.createElement(
             'button',
-            { className: 'btn btn-sm', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
+            { className: 'btn btn-default btn-sm', id: 'show-diff-btn', style: { visibility: 'hidden' }, onClick: this._showDiffs },
             'Show differences'
           ),
           react.createElement(
             'button',
-            { className: 'btn btn-sm', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
+            { className: 'btn btn-default btn-sm', id: 'restart-btn', style: { visibility: 'hidden' }, onClick: this._restartPressed },
             'Restart'
           )
         ),
@@ -4447,19 +4447,19 @@ var YmdTimestampHeader = function (_React$Component) {
           { className: 'wayback-timestamps' },
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+!this.state.rightSnapElements] }, onClick: this._handleRightTimestampChange },
+            { className: 'form-control input-sm mr-sm-1', id: 'timestamp-select-right', style: { visibility: this._visibilityState[+!this.state.rightSnapElements] }, onClick: this._handleRightTimestampChange },
             react.createElement('optgroup', { label: 'Available captures' }),
             this.state.rightSnapElements
           ),
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'month-select-right', style: { visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }, onClick: this._getTimestamps },
+            { className: 'form-control input-sm mr-sm-1', id: 'month-select-right', style: { visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }, onClick: this._getTimestamps },
             react.createElement('optgroup', { label: 'Months and available captures' }),
             this.state.rightMonthOptions
           ),
           react.createElement(
             'select',
-            { className: 'form-control mr-sm-1', id: 'year-select-right', onClick: this._handleYearChange },
+            { className: 'form-control input-sm mr-sm-1', id: 'year-select-right', onClick: this._handleYearChange },
             react.createElement('optgroup', { label: 'Years and available captures' }),
             this.state.yearOptions
           )
@@ -16827,11 +16827,11 @@ var cases = [
 function contours() {
   var dx = 1,
       dy = 1,
-      threshold = thresholdSturges,
+      threshold$$1 = thresholdSturges,
       smooth = smoothLinear;
 
   function contours(values) {
-    var tz = threshold(values);
+    var tz = threshold$$1(values);
 
     // Convert number of thresholds into uniform thresholds.
     if (!Array.isArray(tz)) {
@@ -16991,7 +16991,7 @@ function contours() {
   };
 
   contours.thresholds = function(_) {
-    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), contours) : threshold;
+    return arguments.length ? (threshold$$1 = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), contours) : threshold$$1;
   };
 
   contours.smooth = function(_) {
@@ -17068,7 +17068,7 @@ function contourDensity() {
       o = r * 3, // grid offset, to pad for blur
       n = (dx + o * 2) >> k, // grid width
       m = (dy + o * 2) >> k, // grid height
-      threshold = constant$5(20);
+      threshold$$1 = constant$5(20);
 
   function density(data) {
     var values0 = new Float32Array(n * m),
@@ -17091,7 +17091,7 @@ function contourDensity() {
     blurX({width: n, height: m, data: values0}, {width: n, height: m, data: values1}, r >> k);
     blurY({width: n, height: m, data: values1}, {width: n, height: m, data: values0}, r >> k);
 
-    var tz = threshold(values0);
+    var tz = threshold$$1(values0);
 
     // Convert number of thresholds into uniform thresholds.
     if (!Array.isArray(tz)) {
@@ -17161,7 +17161,7 @@ function contourDensity() {
   };
 
   density.thresholds = function(_) {
-    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), density) : threshold;
+    return arguments.length ? (threshold$$1 = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), density) : threshold$$1;
   };
 
   density.bandwidth = function(_) {
