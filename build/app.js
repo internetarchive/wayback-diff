@@ -434,7 +434,7 @@ var checkPropTypes = checkPropTypes_1;
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.6.3';
+var ReactVersion = '16.7.0';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -1745,13 +1745,51 @@ function createContext(defaultValue, calculateChangedBits) {
 }
 
 function lazy(ctor) {
-  return {
+  var lazyType = {
     $$typeof: REACT_LAZY_TYPE,
     _ctor: ctor,
     // React uses these fields to store the result.
     _status: -1,
     _result: null
   };
+
+  {
+    // In production, this would just set it on the object.
+    var defaultProps = void 0;
+    var propTypes = void 0;
+    Object.defineProperties(lazyType, {
+      defaultProps: {
+        configurable: true,
+        get: function () {
+          return defaultProps;
+        },
+        set: function (newDefaultProps) {
+          warning$1(false, 'React.lazy(...): It is not supported to assign `defaultProps` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
+          defaultProps = newDefaultProps;
+          // Match production behavior more closely:
+          Object.defineProperty(lazyType, 'defaultProps', {
+            enumerable: true
+          });
+        }
+      },
+      propTypes: {
+        configurable: true,
+        get: function () {
+          return propTypes;
+        },
+        set: function (newPropTypes) {
+          warning$1(false, 'React.lazy(...): It is not supported to assign `propTypes` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
+          propTypes = newPropTypes;
+          // Match production behavior more closely:
+          Object.defineProperty(lazyType, 'propTypes', {
+            enumerable: true
+          });
+        }
+      }
+    });
+  }
+
+  return lazyType;
 }
 
 function forwardRef(render) {
@@ -1938,16 +1976,17 @@ function validateChildKeys(node, parentType) {
  */
 function validatePropTypes(element) {
   var type = element.type;
-  var name = void 0,
-      propTypes = void 0;
+  if (type === null || type === undefined || typeof type === 'string') {
+    return;
+  }
+  var name = getComponentName(type);
+  var propTypes = void 0;
   if (typeof type === 'function') {
-    // Class or function component
-    name = type.displayName || type.name;
     propTypes = type.propTypes;
-  } else if (typeof type === 'object' && type !== null && type.$$typeof === REACT_FORWARD_REF_TYPE) {
-    // ForwardRef
-    var functionName = type.render.displayName || type.render.name || '';
-    name = type.displayName || (functionName !== '' ? 'ForwardRef(' + functionName + ')' : 'ForwardRef');
+  } else if (typeof type === 'object' && (type.$$typeof === REACT_FORWARD_REF_TYPE ||
+  // Note: Memo only checks outer props here.
+  // Inner props are checked in the reconciler.
+  type.$$typeof === REACT_MEMO_TYPE)) {
     propTypes = type.propTypes;
   } else {
     return;
@@ -2107,13 +2146,11 @@ var React = {
 
   version: ReactVersion,
 
+  unstable_ConcurrentMode: REACT_CONCURRENT_MODE_TYPE,
+  unstable_Profiler: REACT_PROFILER_TYPE,
+
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals
 };
-
-{
-  React.unstable_ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-  React.unstable_Profiler = REACT_PROFILER_TYPE;
-}
 
 
 
@@ -4170,7 +4207,7 @@ var YmdTimestampHeader = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
       }
-      var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+      var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
       return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })), timestamp, fetchedTimestamps, position);
     }
   }, {
@@ -10018,6 +10055,8 @@ var friday = weekday(5);
 var saturday = weekday(6);
 
 var sundays = sunday.range;
+var mondays = monday.range;
+var thursdays = thursday.range;
 
 var month = newInterval(function(date) {
   date.setDate(1);
@@ -10107,6 +10146,8 @@ var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
 var utcSundays = utcSunday.range;
+var utcMondays = utcMonday.range;
+var utcThursdays = utcThursday.range;
 
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
@@ -16786,11 +16827,11 @@ var cases = [
 function contours() {
   var dx = 1,
       dy = 1,
-      threshold$$1 = thresholdSturges,
+      threshold = thresholdSturges,
       smooth = smoothLinear;
 
   function contours(values) {
-    var tz = threshold$$1(values);
+    var tz = threshold(values);
 
     // Convert number of thresholds into uniform thresholds.
     if (!Array.isArray(tz)) {
@@ -16950,7 +16991,7 @@ function contours() {
   };
 
   contours.thresholds = function(_) {
-    return arguments.length ? (threshold$$1 = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), contours) : threshold$$1;
+    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), contours) : threshold;
   };
 
   contours.smooth = function(_) {
@@ -17027,7 +17068,7 @@ function contourDensity() {
       o = r * 3, // grid offset, to pad for blur
       n = (dx + o * 2) >> k, // grid width
       m = (dy + o * 2) >> k, // grid height
-      threshold$$1 = constant$5(20);
+      threshold = constant$5(20);
 
   function density(data) {
     var values0 = new Float32Array(n * m),
@@ -17050,7 +17091,7 @@ function contourDensity() {
     blurX({width: n, height: m, data: values0}, {width: n, height: m, data: values1}, r >> k);
     blurY({width: n, height: m, data: values1}, {width: n, height: m, data: values0}, r >> k);
 
-    var tz = threshold$$1(values0);
+    var tz = threshold(values0);
 
     // Convert number of thresholds into uniform thresholds.
     if (!Array.isArray(tz)) {
@@ -17120,7 +17161,7 @@ function contourDensity() {
   };
 
   density.thresholds = function(_) {
-    return arguments.length ? (threshold$$1 = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), density) : threshold$$1;
+    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$5(slice$3.call(_)) : constant$5(_), density) : threshold;
   };
 
   density.bandwidth = function(_) {
@@ -25621,7 +25662,7 @@ var SunburstContainer = function (_React$Component) {
       if (this.props.fetchSnapshotCallback) {
         promise = this.props.fetchSnapshotCallback(this.props.timestamp);
       } else {
-        var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+        var url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
         promise = fetch_with_timeout(fetch(url));
       }
       promise.then(function (response) {

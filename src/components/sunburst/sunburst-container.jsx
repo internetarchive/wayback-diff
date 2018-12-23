@@ -77,7 +77,7 @@ export default class SunburstContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype=warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+      const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + this.props.timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
       promise = fetch_with_timeout(fetch(url));
     }
     promise.then(response => {return checkResponse(response).json();})
