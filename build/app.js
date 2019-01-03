@@ -434,7 +434,7 @@ var checkPropTypes = checkPropTypes_1;
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.7.0';
+var ReactVersion = '16.6.3';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -1745,51 +1745,13 @@ function createContext(defaultValue, calculateChangedBits) {
 }
 
 function lazy(ctor) {
-  var lazyType = {
+  return {
     $$typeof: REACT_LAZY_TYPE,
     _ctor: ctor,
     // React uses these fields to store the result.
     _status: -1,
     _result: null
   };
-
-  {
-    // In production, this would just set it on the object.
-    var defaultProps = void 0;
-    var propTypes = void 0;
-    Object.defineProperties(lazyType, {
-      defaultProps: {
-        configurable: true,
-        get: function () {
-          return defaultProps;
-        },
-        set: function (newDefaultProps) {
-          warning$1(false, 'React.lazy(...): It is not supported to assign `defaultProps` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
-          defaultProps = newDefaultProps;
-          // Match production behavior more closely:
-          Object.defineProperty(lazyType, 'defaultProps', {
-            enumerable: true
-          });
-        }
-      },
-      propTypes: {
-        configurable: true,
-        get: function () {
-          return propTypes;
-        },
-        set: function (newPropTypes) {
-          warning$1(false, 'React.lazy(...): It is not supported to assign `propTypes` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
-          propTypes = newPropTypes;
-          // Match production behavior more closely:
-          Object.defineProperty(lazyType, 'propTypes', {
-            enumerable: true
-          });
-        }
-      }
-    });
-  }
-
-  return lazyType;
 }
 
 function forwardRef(render) {
@@ -1976,17 +1938,16 @@ function validateChildKeys(node, parentType) {
  */
 function validatePropTypes(element) {
   var type = element.type;
-  if (type === null || type === undefined || typeof type === 'string') {
-    return;
-  }
-  var name = getComponentName(type);
-  var propTypes = void 0;
+  var name = void 0,
+      propTypes = void 0;
   if (typeof type === 'function') {
+    // Class or function component
+    name = type.displayName || type.name;
     propTypes = type.propTypes;
-  } else if (typeof type === 'object' && (type.$$typeof === REACT_FORWARD_REF_TYPE ||
-  // Note: Memo only checks outer props here.
-  // Inner props are checked in the reconciler.
-  type.$$typeof === REACT_MEMO_TYPE)) {
+  } else if (typeof type === 'object' && type !== null && type.$$typeof === REACT_FORWARD_REF_TYPE) {
+    // ForwardRef
+    var functionName = type.render.displayName || type.render.name || '';
+    name = type.displayName || (functionName !== '' ? 'ForwardRef(' + functionName + ')' : 'ForwardRef');
     propTypes = type.propTypes;
   } else {
     return;
@@ -2146,11 +2107,13 @@ var React = {
 
   version: ReactVersion,
 
-  unstable_ConcurrentMode: REACT_CONCURRENT_MODE_TYPE,
-  unstable_Profiler: REACT_PROFILER_TYPE,
-
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals
 };
+
+{
+  React.unstable_ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+  React.unstable_Profiler = REACT_PROFILER_TYPE;
+}
 
 
 
@@ -10055,8 +10018,6 @@ var friday = weekday(5);
 var saturday = weekday(6);
 
 var sundays = sunday.range;
-var mondays = monday.range;
-var thursdays = thursday.range;
 
 var month = newInterval(function(date) {
   date.setDate(1);
@@ -10146,8 +10107,6 @@ var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
 var utcSundays = utcSunday.range;
-var utcMondays = utcMonday.range;
-var utcThursdays = utcThursday.range;
 
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
@@ -25428,7 +25387,7 @@ function getSize() {
 function _showRootInfo(size) {
   var rootInfoDiv = document.getElementById('root-cell-tooltip');
   if (rootInfoDiv) {
-    rootInfoDiv.setAttribute('style', 'top:' + size * 0.4 + 'px; width:' + size * 0.4 + 'px; height:' + size * 0.22 + 'px; font-size: ' + size * 0.004 + 'em;');
+    rootInfoDiv.setAttribute('style', 'top:44%; width:' + size * 0.4 + 'px; height:' + size * 0.22 + 'px; font-size: ' + size * 0.004 + 'em;');
   }
 }
 
@@ -25539,7 +25498,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n\n#root-cell-tooltip {\n    position: absolute;\n    display: inline-block;\n    margin: auto;\n    right: 0;\n    left: 0;\n    z-index: 10;\n    text-align: center;\n}\n\n.rv-hint {\n    z-index: 10;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n\n#root-cell-tooltip {\n    position: relative;\n    display: block;\n    margin: auto;\n    right: 0;\n    left: 0;\n    z-index: 10;\n    text-align: center;\n}\n\n.rv-hint {\n    z-index: 10;\n}\n";
 styleInject(css$3);
 
 /**

@@ -31,7 +31,7 @@ export function getSize () {
 function _showRootInfo (size) {
   let rootInfoDiv = document.getElementById('root-cell-tooltip');
   if (rootInfoDiv) {
-    rootInfoDiv.setAttribute('style', `top:${size*0.4}px; width:${size*0.4}px; height:${size*0.22}px; font-size: ${size*0.004}em;`);
+    rootInfoDiv.setAttribute('style', `top:44%; width:${size*0.4}px; height:${size*0.22}px; font-size: ${size*0.004}em;`);
   }
 }
 
