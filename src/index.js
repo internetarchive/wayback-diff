@@ -7,7 +7,7 @@ import React from 'react';
 // import DiffContainer from './components/diff-container.jsx';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import Loading from './components/loading.jsx';
-// import SunburstContainer from './components/sunburst-container.jsx';
+// import SunburstContainer from './components/sunburst/sunburst-container.jsx';
 //
 // let conf = require('./conf.json');
 //
