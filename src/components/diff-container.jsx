@@ -202,7 +202,7 @@ DiffContainer.propTypes = {
   noTimestamps: (props, propName, componentName) => {
     if (props.noTimestamps && !props.noTimestamps.isPrototypeOf(Boolean)){
       return new Error(`noTimestamps specified in '${componentName} should be boolean'.`);
-    } else if (!(props.noTimestamps in window || props.timestampA in window || props.timestampB in window)) {
+    } else if (!(props.noTimestamps || props.timestampA || props.timestampB)) {
       return new Error(`At least one of props 'timestampA' or 'timestampB' or noTimestamps must be specified in '${componentName}'.`);
     }
   }
