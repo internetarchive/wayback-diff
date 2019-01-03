@@ -200,9 +200,13 @@ DiffContainer.propTypes = {
   fetchSnapshotCallback: PropTypes.func,
 
   noTimestamps: (props, propName, componentName) => {
-    if (props.noTimestamps && !props.noTimestamps.isPrototypeOf(Boolean)){
+    //Disable linting that prompts changing "boolean" to 'boolean' because it will always return false.
+    /* eslint-disable quotes */
+    if (props.noTimestamps && !(typeof props.noTimestamps === "boolean")) {
       return new Error(`noTimestamps specified in '${componentName} should be boolean'.`);
-    } else if (!(props.noTimestamps in window || props.timestampA in window || props.timestampB in window)) {
+    }
+    /* eslint-enable quotes */
+    if (!(props.noTimestamps || props.timestampA || props.timestampB)) {
       return new Error(`At least one of props 'timestampA' or 'timestampB' or noTimestamps must be specified in '${componentName}'.`);
     }
   }
