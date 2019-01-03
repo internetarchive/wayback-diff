@@ -434,7 +434,7 @@ var checkPropTypes = checkPropTypes_1;
 
 // TODO: this is special because it gets imported during build.
 
-var ReactVersion = '16.7.0';
+var ReactVersion = '16.6.3';
 
 // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
 // nor polyfill, then a plain number is used for performance.
@@ -1745,51 +1745,13 @@ function createContext(defaultValue, calculateChangedBits) {
 }
 
 function lazy(ctor) {
-  var lazyType = {
+  return {
     $$typeof: REACT_LAZY_TYPE,
     _ctor: ctor,
     // React uses these fields to store the result.
     _status: -1,
     _result: null
   };
-
-  {
-    // In production, this would just set it on the object.
-    var defaultProps = void 0;
-    var propTypes = void 0;
-    Object.defineProperties(lazyType, {
-      defaultProps: {
-        configurable: true,
-        get: function () {
-          return defaultProps;
-        },
-        set: function (newDefaultProps) {
-          warning$1(false, 'React.lazy(...): It is not supported to assign `defaultProps` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
-          defaultProps = newDefaultProps;
-          // Match production behavior more closely:
-          Object.defineProperty(lazyType, 'defaultProps', {
-            enumerable: true
-          });
-        }
-      },
-      propTypes: {
-        configurable: true,
-        get: function () {
-          return propTypes;
-        },
-        set: function (newPropTypes) {
-          warning$1(false, 'React.lazy(...): It is not supported to assign `propTypes` to ' + 'a lazy component import. Either specify them where the component ' + 'is defined, or create a wrapping component around it.');
-          propTypes = newPropTypes;
-          // Match production behavior more closely:
-          Object.defineProperty(lazyType, 'propTypes', {
-            enumerable: true
-          });
-        }
-      }
-    });
-  }
-
-  return lazyType;
 }
 
 function forwardRef(render) {
@@ -1976,17 +1938,16 @@ function validateChildKeys(node, parentType) {
  */
 function validatePropTypes(element) {
   var type = element.type;
-  if (type === null || type === undefined || typeof type === 'string') {
-    return;
-  }
-  var name = getComponentName(type);
-  var propTypes = void 0;
+  var name = void 0,
+      propTypes = void 0;
   if (typeof type === 'function') {
+    // Class or function component
+    name = type.displayName || type.name;
     propTypes = type.propTypes;
-  } else if (typeof type === 'object' && (type.$$typeof === REACT_FORWARD_REF_TYPE ||
-  // Note: Memo only checks outer props here.
-  // Inner props are checked in the reconciler.
-  type.$$typeof === REACT_MEMO_TYPE)) {
+  } else if (typeof type === 'object' && type !== null && type.$$typeof === REACT_FORWARD_REF_TYPE) {
+    // ForwardRef
+    var functionName = type.render.displayName || type.render.name || '';
+    name = type.displayName || (functionName !== '' ? 'ForwardRef(' + functionName + ')' : 'ForwardRef');
     propTypes = type.propTypes;
   } else {
     return;
@@ -2146,11 +2107,13 @@ var React = {
 
   version: ReactVersion,
 
-  unstable_ConcurrentMode: REACT_CONCURRENT_MODE_TYPE,
-  unstable_Profiler: REACT_PROFILER_TYPE,
-
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ReactSharedInternals
 };
+
+{
+  React.unstable_ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+  React.unstable_Profiler = REACT_PROFILER_TYPE;
+}
 
 
 
@@ -10055,8 +10018,6 @@ var friday = weekday(5);
 var saturday = weekday(6);
 
 var sundays = sunday.range;
-var mondays = monday.range;
-var thursdays = thursday.range;
 
 var month = newInterval(function(date) {
   date.setDate(1);
@@ -10146,8 +10107,6 @@ var utcFriday = utcWeekday(5);
 var utcSaturday = utcWeekday(6);
 
 var utcSundays = utcSunday.range;
-var utcMondays = utcMonday.range;
-var utcThursdays = utcThursday.range;
 
 var utcMonth = newInterval(function(date) {
   date.setUTCDate(1);
@@ -25543,13 +25502,108 @@ var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    t
 styleInject(css$3);
 
 /**
+ * Convert a number to base 64 encoding.
+ * This class supports only positive integers. In case a floating point
+ * number is passed, the decimal part is stripped.
+ * 
+ * Adapted from: http://stackoverflow.com/a/6573119/192024
+ */
+class SMBase64 {
+    /**
+     * Constructor method - initialize the class
+     */
+    constructor() {
+        /**
+         * Define the list of characters used in sequence.
+         * This can be any sequence of 64 characters, whatever you prefer.
+         * 
+         * The default list below uses the traditional base64 sequence with the characters
+         * - and _ in positions 62 and 63. The last two characters have been chosen among
+         * all options because they are URL-friendly.
+         */
+        //             0       8       16      24      32      40      48      56     63
+        //             v       v       v       v       v       v       v       v      v
+        this._chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    }
+
+    /**
+     * Return list of chars.
+     */
+    get chars() {
+        return this._chars
+    }
+
+    /**
+     * Set list of chars
+     */
+    set chars(val) {
+        if (!val || typeof val != 'string' || val.length != 64) {
+            throw Error('SMBase64.chars must be a string with 64 characters')
+        }
+
+        this._chars = val;
+    }
+
+    /**
+     * Convert a number (positive integer) to base64.
+     * 
+     * Negative numbers are not supported, and decimals are stripped if present.
+     * 
+     * @param {number} number - Number to convert (positive, finite integer)
+     * @returns {string} Number represented in base64 encoding
+     */
+    fromNumber(val) {
+        if (isNaN(Number(val)) || val === null || val === Number.POSITIVE_INFINITY) {
+            throw Error('The input is not valid')
+        }
+        if (val < 0) {
+            throw Error('This function does not support negative numbers')
+        }
+
+        let rixit; 
+        let residual = Math.floor(val);
+        let result = '';
+        do {
+            rixit = residual % 64;
+            result = this._chars.charAt(rixit) + result;
+            residual = Math.floor(residual / 64);
+        } while (residual)
+
+        return result
+    }
+
+    /**
+     * Convert a base64-encoded string to a number
+     * 
+     * @param {string} str - Base64-encoded string representing a number
+     * @return {number} Decimal number
+     */
+    toNumber(str) {
+        if (!str || typeof str != 'string') {
+            throw Error('The input is not valid')
+        }
+
+        let result = 0;
+        let chr;
+        for (let e = 0; e < str.length; e++) {
+            chr = this._chars.indexOf(str.charAt(e));
+            // Skip invalid characters (-1 returned by indexOf)
+            if (~chr) {
+                result = (result * 64) + chr;
+            }
+        }
+        return result
+    }
+}
+
+var smbase64 = SMBase64;
+
+/**
  * Container of d3 Sunburst diagram
  *
  * @class SunburstContainer
  * @extends {React.Component}
  */
-
-var SMBase64 = require('smbase64');
 
 var SunburstContainer = function (_React$Component) {
   inherits(SunburstContainer, _React$Component);
@@ -25731,7 +25785,7 @@ var SunburstContainer = function (_React$Component) {
   }, {
     key: '_decodeJson',
     value: function _decodeJson(json) {
-      var base64 = new SMBase64();
+      var base64 = new smbase64();
       if (json.length) {
         for (var i = 0; i < json.length; i++) {
           json[i][1] = json[i][1].toString().replace(/=/, '');

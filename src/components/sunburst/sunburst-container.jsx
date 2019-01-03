@@ -5,6 +5,7 @@ import { similarity, handleRelativeURL, checkResponse, fetch_with_timeout, getUT
 import {getSize} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
+import SMBase64 from 'smbase64';
 
 /**
  * Container of d3 Sunburst diagram
@@ -12,8 +13,6 @@ import PropTypes from 'prop-types';
  * @class SunburstContainer
  * @extends {React.Component}
  */
-
-const SMBase64 = require('smbase64');
 
 export default class SunburstContainer extends React.Component {
 
