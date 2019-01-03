@@ -25387,7 +25387,7 @@ function getSize() {
 function _showRootInfo(size) {
   var rootInfoDiv = document.getElementById('root-cell-tooltip');
   if (rootInfoDiv) {
-    rootInfoDiv.setAttribute('style', 'top:44%; width:' + size * 0.4 + 'px; height:' + size * 0.22 + 'px; font-size: ' + size * 0.004 + 'em;');
+    rootInfoDiv.setAttribute('style', 'width:' + size * 0.4 + 'px; height:' + size * 0.22 + 'px; font-size: ' + size * 0.004 + 'em;');
   }
 }
 
@@ -25498,7 +25498,7 @@ var D3Sunburst = function (_React$Component) {
   return D3Sunburst;
 }(react.Component);
 
-var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n\n#root-cell-tooltip {\n    position: relative;\n    display: block;\n    margin: auto;\n    right: 0;\n    left: 0;\n    z-index: 10;\n    text-align: center;\n}\n\n.rv-hint {\n    z-index: 10;\n}\n";
+var css$3 = ".heat-map-legend-bar {\n    width: 10px;\n    margin: 0 1px;\n    transition: height .2s;\n}\n\n.heat-map-legend-summary {\n    display: flex;\n    align-items: center;\n    height: 20px\n}\n\n.heat-map-legend {\n    align-self: flex-end;\n    display: flex;\n    align-items: baseline;\n    font-size: 12px;\n    float: right;\n}\n\n.heat-map-legend-summary-min-caption {\n    width: 32px;\n    text-align: right;\n}\n\n.heat-map-legend-caption {\n    margin: 0 8px;\n}\n\n.heat-map-legend-summary-graphics {\n    display: flex;\n    margin: 0 8px;\n    height: 20px;\n}\n\n.sunburst-container{\n    margin: auto;\n    width: 50%;\n}\n\n.rv-sunburst {\n    margin: 0 auto;\n}\n\n#calcButton {\n    margin-left: auto;\n    margin-right: auto;\n    display: block;\n}\n\n.rv-xy-plot__series, .rv-xy-plot__series--arc-path, .rv-sunburst__series--radial__arc {\n    cursor: pointer;\n}\n\n#root-cell-tooltip {\n    top: 44%;\n    position: relative;\n    display: block;\n    margin: auto;\n    right: 0;\n    left: 0;\n    z-index: 10;\n    text-align: center;\n}\n\n.rv-hint {\n    z-index: 10;\n}\n";
 styleInject(css$3);
 
 /**

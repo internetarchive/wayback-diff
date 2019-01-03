@@ -53,6 +53,7 @@
 }
 
 #root-cell-tooltip {
+    top: 44%;
     position: relative;
     display: block;
     margin: auto;
