@@ -41,7 +41,7 @@ export default class SunburstContainer extends React.Component {
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
-          <div id="root-cell-tooltip">{this.rootLabel}</div>
+          {/*<div id="root-cell-tooltip">{this.rootLabel}</div>*/}
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
             <div className="heat-map-legend-caption">Variation</div>
