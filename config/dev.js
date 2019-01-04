@@ -8,6 +8,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import url from 'rollup-plugin-url';
 
 import cssnano from 'cssnano';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: 'src/index.js',
@@ -18,7 +19,7 @@ export default {
     sourcemap: true
   },
   plugins: [
-    // image(),
+    terser(),
     url(),
     postcss({
       extensions: [ '.css' ]
