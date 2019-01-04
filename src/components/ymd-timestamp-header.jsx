@@ -10,7 +10,6 @@ import { handleRelativeURL, fetch_with_timeout, getTwoDigitInt, getKeyByValue, s
  */
 export default class YmdTimestampHeader extends React.Component {
 
-  ABORT_CONTROLLER = new window.AbortController();
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
   _monthNames = {
@@ -25,6 +24,8 @@ export default class YmdTimestampHeader extends React.Component {
 
   constructor (props) {
     super(props);
+
+    this._abortController = new window.AbortController();
 
     let leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0, 4);
     let rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0, 4);
@@ -80,7 +81,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   componentWillUnmount () {
     this._isMountedNow = false;
-    this.ABORT_CONTROLLER.abort();
+    this._abortController.abort();
   }
 
   _handleRightTimestampChange () {
@@ -183,7 +184,7 @@ export default class YmdTimestampHeader extends React.Component {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
     const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
@@ -226,11 +227,11 @@ export default class YmdTimestampHeader extends React.Component {
       let url;
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&to=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&limit=${this.props.conf.limit}`;
-        leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
+        leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&to=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&limit=${this.props.conf.limit}`;
-        rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
+        rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
@@ -490,7 +491,7 @@ export default class YmdTimestampHeader extends React.Component {
     this.setState({showLoader: true});
     let url = handleRelativeURL(this.props.conf.sparklineURL);
     url += `?url=${encodeURIComponent(this.props.url)}&collection=web&output=json`;
-    let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this.ABORT_CONTROLLER.signal})));
+    let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
     this._exportSparklineData(fetchPromise);
   }
 

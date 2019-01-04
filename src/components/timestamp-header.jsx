@@ -9,12 +9,13 @@ import {handleRelativeURL, fetch_with_timeout, checkResponse} from '../js/utils.
  */
 export default class TimestampHeader extends React.Component {
 
-  ABORT_CONTROLLER = new window.AbortController();
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
 
   constructor(props) {
     super(props);
+
+    this._abortController = new window.AbortController();
 
     this.state = {
       cdxData: false,
@@ -42,7 +43,7 @@ export default class TimestampHeader extends React.Component {
 
   componentWillUnmount(){
     this._isMountedNow = false;
-    this.ABORT_CONTROLLER.abort();
+    this._abortController.abort();
   }
 
   _handleRightTimestampChange(){
@@ -162,7 +163,7 @@ export default class TimestampHeader extends React.Component {
       } else {
         url += `search?url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&sort=reverse`;
       }
-      this._handleFetch(fetch_with_timeout(fetch(url, { signal: this.ABORT_CONTROLLER.signal })));
+      this._handleFetch(fetch_with_timeout(fetch(url, { signal: this._abortController.signal })));
 
     }
   }
