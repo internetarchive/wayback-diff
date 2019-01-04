@@ -28,11 +28,13 @@ import { checkResponse, fetch_with_timeout } from '../js/utils.js';
 
 export default class DiffView extends React.Component {
 
-  ABORT_CONTROLLER = new window.AbortController();
   isMountedNow = false;
 
   constructor (props) {
     super(props);
+
+    this._abortController = new window.AbortController();
+
     this.state = {diffData: null};
   }
 
@@ -49,7 +51,7 @@ export default class DiffView extends React.Component {
 
   componentWillUnmount(){
     this.isMountedNow = false;
-    this.ABORT_CONTROLLER.abort();
+    this._abortController.abort();
   }
 
   /**
