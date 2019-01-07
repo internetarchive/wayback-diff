@@ -100,7 +100,7 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
-        if (jsonResponse['simhash'] === 'None') {
+        if (jsonResponse.length === 0) {
           throw Error('NoSimhash');
         }
         const json = this._decodeJson(jsonResponse);
