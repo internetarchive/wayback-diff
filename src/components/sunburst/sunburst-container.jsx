@@ -213,23 +213,29 @@ export default class SunburstContainer extends React.Component {
       }
     }
 
-    while (firstLevel.length === 0) {
+    let levelCounter = 4;
+    while (firstLevel.length === 0 && levelCounter > 0) {
       firstLevel = secondLevel;
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
+      levelCounter = levelCounter - 1;
     }
-    while (secondLevel.length === 0) {
+    levelCounter = 3;
+    while (secondLevel.length === 0 && levelCounter > 0) {
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
       fourthLevel= fifthLevel;
       fifthLevel = [];
+      levelCounter = levelCounter - 1;
     }
-    while (thirdLevel.length === 0) {
+    levelCounter = 2;
+    while (thirdLevel.length === 0 && levelCounter > 0) {
       thirdLevel = fourthLevel;
       fourthLevel = fifthLevel;
       fifthLevel = [];
+      levelCounter = levelCounter - 1;
     }
     if (fourthLevel.length === 0){
       fourthLevel= fifthLevel;
