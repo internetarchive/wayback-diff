@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
@@ -100,7 +101,7 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
-        if (jsonResponse['simhash'] === 'None') {
+        if (_.isEmpty(jsonResponse)) {
           throw Error('NoSimhash');
         }
         const json = this._decodeJson(jsonResponse);
