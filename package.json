@@ -30,6 +30,7 @@
     "enzyme-adapter-react-16": "^1.6.0",
     "eslint": "^4.19.1",
     "eslint-plugin-mocha": "^5.0.0",
+    "eslint-plugin-react": "^7.12.3",
     "rollup": "^0.67.4",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^4.0.1",
