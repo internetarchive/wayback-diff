@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
