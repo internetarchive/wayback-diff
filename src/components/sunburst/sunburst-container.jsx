@@ -90,7 +90,12 @@ export default class SunburstContainer extends React.Component {
           this.setState({timestamp: this.props.timestamp});
         }
       })
-      .catch(error => {this.errorHandled(error.message);});
+      .catch(error => {
+        if (error.message === 'Unexpected end of JSON input') {
+          this.errorHandled('NO_CAPTURES');
+        } else {
+          this.errorHandled(error.message);
+        }});
   }
 
   errorHandled (errorCode) {
