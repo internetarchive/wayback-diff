@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
@@ -21,6 +20,7 @@ export default class SunburstContainer extends React.Component {
   constructor(props) {
     super(props);
     this.isUpdate = 0;
+    this.isPending = false;
     this.state = {
       simhashData: null
     };
@@ -36,12 +36,13 @@ export default class SunburstContainer extends React.Component {
   render () {
     if (this.state.error){
       return(
-        <ErrorMessage url={this.props.url} code={this.state.error} year={this.state.timestamp ? this.state.timestamp.substring(0, 4) : this.props.timestamp.substring(0, 4)}
+        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp ? this.state.timestamp : this.props.timestamp}
           conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
+          {this.isPending ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are still being generated. For more results please try again in a moment.</p>: null}
           {/*<div id="root-cell-tooltip">{this.rootLabel}</div>*/}
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
@@ -89,7 +90,12 @@ export default class SunburstContainer extends React.Component {
           this.setState({timestamp: this.props.timestamp});
         }
       })
-      .catch(error => {this.errorHandled(error.message);});
+      .catch(error => {
+        if (error.message === 'Unexpected end of JSON input') {
+          this.errorHandled('NO_CAPTURES');
+        } else {
+          this.errorHandled(error.message);
+        }});
   }
 
   errorHandled (errorCode) {
@@ -101,8 +107,8 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
-        if (_.isEmpty(jsonResponse)) {
-          throw Error('NoSimhash');
+        if (jsonResponse['status']) {
+          throw Error(jsonResponse['message']);
         }
         const json = this._decodeJson(jsonResponse);
         this._fetchSimhashData(json);
@@ -115,7 +121,8 @@ export default class SunburstContainer extends React.Component {
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
-        var json = this._decodeJson(jsonResponse);
+        this.isPending = jsonResponse.status === 'PENDING';
+        let json = this._decodeJson(jsonResponse.captures);
         let data = this._calcDistance(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
