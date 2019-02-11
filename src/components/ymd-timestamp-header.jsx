@@ -2,6 +2,8 @@ import React from 'react';
 import '../css/diff-container.css';
 import { handleRelativeURL, fetch_with_timeout, getTwoDigitInt, getKeyByValue, selectHasValue,
   getUTCDateFormat} from '../js/utils.js';
+import Loading from './loading.jsx';
+import _ from 'lodash';
 /**
  * Display a timestamp selector
  *
@@ -113,7 +115,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-    const Loader = () => this.props.loader;
+
+    const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return (
         <Loader/>

@@ -6,6 +6,8 @@ import {getSize} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import SMBase64 from 'smbase64';
+import Loading from '../loading.jsx';
+import _ from 'lodash';
 
 /**
  * Container of d3 Sunburst diagram
@@ -64,7 +66,7 @@ export default class SunburstContainer extends React.Component {
         </div>
       );
     }
-    const Loader = () => this.props.loader;
+    const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     if (this.state.timestamp) {
       this._fetchTimestampSimhashData();
     } else {

@@ -9,6 +9,8 @@ import ChangesOnlyDiff from './changes-only-diff.jsx';
 import RawVersion from './raw-version.jsx';
 import SideBySideRawVersions from './side-by-side-raw-versions.jsx';
 import { checkResponse, fetch_with_timeout } from '../js/utils.js';
+import Loading from './loading.jsx';
+import _ from 'lodash';
 
 /**
  * @typedef DiffViewProps
@@ -65,7 +67,7 @@ export default class DiffView extends React.Component {
 
   render () {
     if (!this.state.diffData) {
-      const Loader = () => this.props.loader;
+      const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
       return <Loader/>;
     }
     return (
