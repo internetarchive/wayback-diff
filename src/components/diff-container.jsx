@@ -7,6 +7,8 @@ import DiffFooter from './footer.jsx';
 import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
+import Loading from './loading.jsx';
+import _ from 'lodash';
 
 /**
  * Display a change between two versions of a page.
@@ -135,7 +137,7 @@ export default class DiffContainer extends React.Component {
       this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
     }
 
-    const Loader = () => this.props.loader;
+    const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     return <Loader/>;
   }
 
