@@ -46,7 +46,6 @@ In the **index.js** file the following code should be included:
 import ReactDOM from 'react-dom';
 import DiffContainer from './components/diff-container.jsx';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Loading from './components/loading.jsx';
 
 
 var conf = require('./conf.json');
@@ -56,30 +55,30 @@ ReactDOM.render(
   <Switch>
     <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match, location}) =>
       <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        loader={LOADER_COMPONENT}
         timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
     } />
     <Route path='/diff/([0-9]{14})//(.+)' render={({match, location}) =>
       <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        loader={LOADER_COMPONENT}
         fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
     } />
     <Route path='/diff//([0-9]{14})/(.+)' render={({match, location}) =>
       <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        loader={LOADER_COMPONENT}
         fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
     } />
     <Route path='/diff///(.+)' render={({match, location}) =>
-      <DiffContainer url={match.params[0] + location.search} conf={conf} noTimestamps={true} fetchCDXCallback={null}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
+      <DiffContainer url={match.params[0] + location.search} conf={conf} noTimestamps={true}
+      fetchCDXCallback={null} loader={LOADER_COMPONENT}/>
     } />
     <Route path='/diff/(.+)' render={({match, location}) =>
       <DiffContainer url={match.params[0] + location.search} fetchCDXCallback={null}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={conf}/>}
+        loader={LOADER_COMPONENT} conf={conf}/>}
     />
     <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match, location}) =>
       <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
-        loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+        loader={LOADER_COMPONENT}
         conf={conf} fetchSnapshotCallback={null}/>} />
     </Switch>
   </Router>, document.getElementById('wayback-diff'));
@@ -111,7 +110,7 @@ The **fetchSnapshotCallback** which is a callback function that will be used to 
 
   If you use this prop, the **limit** conf option does not have any effect.
 
-The **loader** which is a React Component that will be shown when loading.
+The **loader** which is a React Component that will be shown when loading. If this is not set or it is null, a default loader will be used instead.
 
 The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
 
@@ -122,7 +121,7 @@ The **noTimestamps** prop which should only be set to true in the ```/diff///WEB
 
 ### SunburstContainer can receive up to five props. All of them are optional. 
 
-The **loader** which is a React Component that will be shown when loading.
+The **loader** which is a React Component that will be shown when loading. If this is not set or it is null, a default loader will be used instead.
 
 The **timestamp** which is the timestamp whose simhash will be compared with the others.
 
@@ -196,31 +195,31 @@ After importing the component you might use it like any other React component:
           <Switch>
             <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match, location}) =>
               <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                loader={LOADER_COMPONENT}
                 timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
             } />
             <Route path='/diff/([0-9]{14})//(.+)' render={({match, location}) =>
               <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                loader={LOADER_COMPONENT}
                 fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
             } />
             <Route path='/diff//([0-9]{14})/(.+)' render={({match, location}) =>
               <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                loader={LOADER_COMPONENT}
                 fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
             } />
 
             <Route path='/diff///(.+)' render={({match, location}) =>
               <DiffContainer url={match.params[0] + location.search} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}/>
+                loader={LOADER_COMPONENT}/>
             } />
             <Route path='/diff/(.+)' render={({match, location}) =>
               <DiffContainer url={match.params[0] + location.search} fetchCDXCallback={null}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />} conf={this.conf}/>}
+                loader={LOADER_COMPONENT} conf={this.conf}/>}
             />
             <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match, location}) =>
               <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
-                loader={<Loading waybackLoaderPath={'PATH_TO_LOADER_IMAGE'} />}
+                loader={LOADER_COMPONENT}
                 conf={this.conf} fetchSnapshotCallback={null}/>} 
             />
           </Switch>
