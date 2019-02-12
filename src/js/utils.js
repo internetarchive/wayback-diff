@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /*eslint-disable no-useless-escape*/
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
 /*eslint-enable no-useless-escape*/
@@ -46,8 +48,62 @@ export function hammingWeight(l) {
   return c;
 }
 
-export function similarity(simhash1, simhash2) {
-  return hammingWeight((simhash1 & simhash2)) / hammingWeight((simhash1 | simhash2));
+// export function similarity(simhash1, simhash2) {
+//   return hammingWeight((simhash1 & simhash2)) / hammingWeight((simhash1 | simhash2));
+// }
+
+/**
+ * Hamming distance between ints
+ *
+ * @param x {number}
+ * @param y {number}
+ * @returns {number}
+ */
+function distanceOfInts (x, y) {
+  return weightOfInt(x ^ y);
+}
+
+/**
+ * Hamming distance between Uint8Array
+ *
+ * @param x {number}
+ * @param y {number}
+ * @returns {number}
+ */
+function distanceOfUint8Array (x, y) {
+  return _.zip(x, y)
+    .map(([i, j]) => weightOfInt(i ^ j))
+    .reduce((acc, w) => acc + w, 0);
+}
+
+/**
+ * Hamming Distance
+ * https://en.wikipedia.org/wiki/Hamming_distance
+ *
+ * @param x
+ * @param y
+ * @returns {number}
+ */
+
+export function similarity(x, y) {
+  if (Number.isInteger(x) && Number.isInteger(y)) {
+    return distanceOfInts(x, y);
+  }
+
+  if (x instanceof Uint8Array && y instanceof Uint8Array) {
+    return distanceOfUint8Array(x, y);
+  }
+
+  throw new Error(`Unsupported types: ${typeof x} ${typeof y}`);
+}
+
+function weightOfInt (x) {
+  let sum = 0;
+  while (x !== 0) {
+    sum++;
+    x &= x - 1;
+  }
+  return sum;
 }
 
 
@@ -100,4 +156,13 @@ export function getUTCDateFormat (date) {
 
   let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
   return (niceTime.toUTCString());
+}
+
+export function b64ToArray (b64Data) {
+  const byteCharacters = atob(b64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  return new Uint8Array(byteNumbers);
 }
