@@ -40,13 +40,13 @@ export function handleRelativeURL (url) {
   return `${window.location.protocol}//${window.location.hostname}:${window.location.port}${url}`;
 }
 
-// export function hammingWeight(l) {
-//   var c;
-//   for(c = 0; l; c++) {
-//     l &= l-1;
-//   }
-//   return c;
-// }
+export function hammingWeight(l) {
+  let c;
+  for(c = 0; l; c++) {
+    l &= l-1;
+  }
+  return c;
+}
 
 export function similarity(simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
@@ -62,6 +62,37 @@ export function similarity(simhash1, simhash2) {
     }
     return weightOfUint8Array(andArray) / weightOfUint8Array(orArray);
   }
+}
+
+/**
+ * Hamming distance between ints
+ *
+ * @param x {number}
+ * @param y {number}
+ * @returns {number}
+ */
+function distanceOfInts (x, y) {
+  return weightOfInt(x ^ y);
+}
+
+function distanceOfUint8Array (x, y) {
+  return _.zip(x, y)
+    .map(([i, j]) => weightOfInt(i ^ j))
+    .reduce((acc, w) => acc + w, 0);
+}
+
+export function similarityNew(simhash1, simhash2) {
+  if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
+    //We divide with 32 because it is the output of distanceOfInts with input Number.MAX_SAFE_INTEGER
+    return distanceOfInts(simhash1, simhash2) / 32 ;
+  }
+
+  let simhash1Size= 8*atob(simhash1).length;
+  let simhash2Size = 8*atob(simhash2).length;
+  let sizes = [simhash1Size, simhash2Size];
+  let maxSize = _.max(sizes);
+  let distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
+  return distance / maxSize;
 }
 
 /**
@@ -162,7 +193,7 @@ export function getUTCDateFormat (date) {
   return (niceTime.toUTCString());
 }
 
-export function b64ToArray (b64Data) {
+function b64ToArray (b64Data) {
   const byteCharacters = atob(b64Data);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {

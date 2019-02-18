@@ -1,10 +1,11 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
-import { similarity, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat, getTwoDigitInt } from '../../js/utils.js';
+import { similarityNew, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat, getTwoDigitInt } from '../../js/utils.js';
 import {getSize} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
+import SMBase64 from 'smbase64';
 import Loading from '../loading.jsx';
 import _ from 'lodash';
 import { b64ToArray } from '../../js/utils';
@@ -121,7 +122,7 @@ export default class SunburstContainer extends React.Component {
         if (jsonResponse['status']) {
           throw Error(jsonResponse['message']);
         }
-        const json = this._decodeJson(jsonResponse);
+        const json = this._decodeCompressedJson(jsonResponse);
         this._fetchSimhashData(json);
       })
       .catch(error => {this.errorHandled(error.message);});
@@ -134,7 +135,7 @@ export default class SunburstContainer extends React.Component {
       .then(response => response.json())
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';
-        let json = this._decodeJson(jsonResponse);
+        let json = this._decodeCompressedJson(jsonResponse);
         let data = this._calcDistance(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
@@ -142,21 +143,12 @@ export default class SunburstContainer extends React.Component {
   }
 
   /*
-  The _decodeJson function assumes the task of decoding the simhash
+  The _decodeCompressedJson function assumes the task of decoding the simhash
   value received from wayback-discover-diff in base64 into a number.
   This function handles both a JSON array and a single JSON value.
    */
 
-  _decodeJson(json){
-    // let base64 = new SMBase64();
-    // if(json.length) {
-    //   for (let i = 0; i < json.length; i++) {
-    //     json[i][1] = json[i][1].toString().replace(/=/, '');
-    //     json[i][1] = base64.toNumber(json[i][1]);
-    //   }
-    //   return json;
-    // }
-
+  _decodeCompressedJson(json){
     if(json.captures) {
       let newJson = [];
       const year = json.captures[0][0];
@@ -168,7 +160,7 @@ export default class SunburstContainer extends React.Component {
             let time = json.captures[0][i][j][y][0];
             let simhashIndex = json.captures[0][i][j][y][1];
             let simhash = json.hashes[simhashIndex];//.toString().replace(/=/g, '');
-            simhash = b64ToArray(simhash);
+            // simhash = b64ToArray(simhash);
             let timestamp = `${year}${getTwoDigitInt(month)}${getTwoDigitInt(day)}${time}`;
             newJson.push([timestamp, simhash]);
           }
@@ -178,7 +170,23 @@ export default class SunburstContainer extends React.Component {
     }
 
     // json.simhash = json.simhash.toString().replace(/=/, '');
-    json.simhash = b64ToArray(json.simhash);
+    // json.simhash = b64ToArray(json.simhash);
+
+    return [this.state.timestamp, json.simhash];
+  }
+
+  _decodeUncompressedJson(json){
+    let base64 = new SMBase64();
+    if(json.length) {
+      for (let i = 0; i < json.length; i++) {
+        json[i][1] = json[i][1].toString().replace(/=/, '');
+        json[i][1] = base64.toNumber(json[i][1]);
+      }
+      return json;
+    }
+
+    json.simhash = json.simhash.toString().replace(/=/, '');
+    json.simhash = base64(json.simhash);
 
     return [this.state.timestamp, json.simhash];
   }
@@ -199,7 +207,7 @@ export default class SunburstContainer extends React.Component {
     this._mostSimilar = 0;
     this._lessSimilar = 1;
     for (var i = 0; i<json.length; i++){
-      json[i][1] = similarity(timestamp[1], json[i][1]);
+      json[i][1] = similarityNew(timestamp[1], json[i][1]);
       if (this._lessSimilar > json[i][1]) {
         this._lessSimilar = json[i][1];
       }
@@ -226,34 +234,31 @@ export default class SunburstContainer extends React.Component {
     var thirdLevel = [];
     var fourthLevel = [];
     var fifthLevel = [];
-    let step = 0.1;
 
     const colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
     let diffLevels = (this._mostSimilar - this._lessSimilar);
 
-    if (diffLevels > 0.2) {
-      step = diffLevels/5;
-    }
+    let step = diffLevels/5;
 
 
     for (var i = 0; i<json.length; i++){
-      if (json[i][1] !== 1) {
+      if (json[i][1] !== 0) {
         if (json[i][1] <= this._lessSimilar + step) {
-          fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: 1 - json[i][1], clr: colors[5], children: []});
+          firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
+            similarity: json[i][1], clr: colors[5], children: []});
         } else if (json[i][1] <= this._lessSimilar + 2 * step) {
-          fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: 1 - json[i][1], clr: colors[4], children: []});
+          secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
+            similarity: json[i][1], clr: colors[4], children: []});
         } else if (json[i][1] <= this._lessSimilar + 3*step) {
           thirdLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: 1 - json[i][1], clr: colors[3], children: []});
+            similarity: json[i][1], clr: colors[3], children: []});
         } else if (json[i][1] <= this._lessSimilar + 4*step) {
-          secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: 1 - json[i][1], clr: colors[2], children: []});
+          fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
+            similarity: json[i][1], clr: colors[2], children: []});
         } else {
-          firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: 1 - json[i][1], clr: colors[1], children: []});
+          fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
+            similarity: json[i][1], clr: colors[1], children: []});
         }
       }
     }
