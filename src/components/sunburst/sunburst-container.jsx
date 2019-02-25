@@ -1,14 +1,14 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
-import { similarityNew, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat, getTwoDigitInt } from '../../js/utils.js';
+import { similarityWithDistance, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat, getTwoDigitInt } from '../../js/utils.js';
 import {getSize} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import SMBase64 from 'smbase64';
 import Loading from '../loading.jsx';
 import _ from 'lodash';
-import { b64ToArray } from '../../js/utils';
+import { b64ToArray, similarityWithTanimoto } from '../../js/utils';
 
 /**
  * Container of d3 Sunburst diagram
@@ -177,10 +177,10 @@ export default class SunburstContainer extends React.Component {
 
   _decodeUncompressedJson(json){
     let base64 = new SMBase64();
-    if(json.length) {
-      for (let i = 0; i < json.length; i++) {
-        json[i][1] = json[i][1].toString().replace(/=/, '');
-        json[i][1] = base64.toNumber(json[i][1]);
+    if(json.captures) {
+      for (let i = 0; i < json.captures.length; i++) {
+        json.captures[i][1] = json.captures[i][1].toString().replace(/=/, '');
+        json.captures[i][1] = base64.toNumber(json.captures[i][1]);
       }
       return json;
     }
@@ -207,7 +207,7 @@ export default class SunburstContainer extends React.Component {
     this._mostSimilar = 0;
     this._lessSimilar = 1;
     for (var i = 0; i<json.length; i++){
-      json[i][1] = similarityNew(timestamp[1], json[i][1]);
+      json[i][1] = similarityWithDistance(timestamp[1], json[i][1]);
       if (this._lessSimilar > json[i][1]) {
         this._lessSimilar = json[i][1];
       }

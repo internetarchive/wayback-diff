@@ -48,7 +48,7 @@ export function hammingWeight(l) {
   return c;
 }
 
-export function similarity(simhash1, simhash2) {
+export function similarityWithTanimoto(simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
     return weight((simhash1 & simhash2)) / weight((simhash1 | simhash2));
   }
@@ -81,7 +81,7 @@ function distanceOfUint8Array (x, y) {
     .reduce((acc, w) => acc + w, 0);
 }
 
-export function similarityNew(simhash1, simhash2) {
+export function similarityWithDistance(simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
     //We divide with 32 because it is the output of distanceOfInts with input Number.MAX_SAFE_INTEGER
     return distanceOfInts(simhash1, simhash2) / 32 ;
@@ -193,7 +193,7 @@ export function getUTCDateFormat (date) {
   return (niceTime.toUTCString());
 }
 
-function b64ToArray (b64Data) {
+export function b64ToArray (b64Data) {
   const byteCharacters = atob(b64Data);
   const byteNumbers = new Array(byteCharacters.length);
   for (let i = 0; i < byteCharacters.length; i++) {
