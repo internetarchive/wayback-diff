@@ -43,7 +43,7 @@ export default class DiffView extends React.Component {
   componentWillMount () {
     const {props} = this;
     if (this._canFetch(props)) {
-      this._loadDiffData(props.page, props.a, props.b, props.diffType);
+      this._loadDiffData(props.page, props.aOrig, props.bOrig, props.diffType);
     }
   }
 
@@ -61,7 +61,7 @@ export default class DiffView extends React.Component {
    */
   componentWillReceiveProps (nextProps) {
     if (this._canFetch(nextProps) && !this._propsSpecifySameDiff(nextProps)) {
-      this._loadDiffData(nextProps.page, nextProps.a, nextProps.b, nextProps.diffType);
+      this._loadDiffData(nextProps.page, nextProps.aOrig, nextProps.bOrig, nextProps.diffType);
     }
   }
 
