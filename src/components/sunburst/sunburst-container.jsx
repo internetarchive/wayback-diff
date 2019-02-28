@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import SMBase64 from 'smbase64';
 import Loading from '../loading.jsx';
 import _ from 'lodash';
-import { b64ToArray, similarityWithTanimoto } from '../../js/utils';
+import { similarityWithTanimoto } from '../../js/utils';
 
 /**
  * Container of d3 Sunburst diagram
@@ -182,11 +182,11 @@ export default class SunburstContainer extends React.Component {
         json.captures[i][1] = json.captures[i][1].toString().replace(/=/, '');
         json.captures[i][1] = base64.toNumber(json.captures[i][1]);
       }
-      return json;
+      return json.captures;
     }
 
     json.simhash = json.simhash.toString().replace(/=/, '');
-    json.simhash = base64(json.simhash);
+    json.simhash = base64.toNumber(json.simhash);
 
     return [this.state.timestamp, json.simhash];
   }
