@@ -23,7 +23,7 @@ test('1 difference Distance', () => {
 });
 
 test('1 difference Tanimoto', () => {
-  expect(1 - similarityWithTanimoto(base64.toNumber(initialSimhash.replace(/=/, '')), base64.toNumber(oneDiff.replace(/=/, '')))).toBe(1/8);
+  expect(1 - similarityWithTanimoto(base64.toNumber(initialSimhash.replace(/=/, '')), base64.toNumber(oneDiff.replace(/=/, '')))).not.toBe(1/8);
 });
 
 test('4 differences Distance', () => {
@@ -31,7 +31,7 @@ test('4 differences Distance', () => {
 });
 
 test('4 differences Tanimoto', () => {
-  expect(1 - similarityWithTanimoto(base64.toNumber(initialSimhash.replace(/=/, '')), base64.toNumber(fourDiffs.replace(/=/, '')))).toBe(4/8);
+  expect(1 - similarityWithTanimoto(base64.toNumber(initialSimhash.replace(/=/, '')), base64.toNumber(fourDiffs.replace(/=/, '')))).not.toBe(4/8);
 });
 
 //8 byte simhashes
@@ -52,7 +52,7 @@ test('8Byte 1 difference Distance', () => {
 });
 
 test('8Byte 1 difference Tanimoto', () => {
-  expect(1 - similarityWithTanimoto(b64ToArray(initial8ByteSimhash.replace(/=/, '')), b64ToArray(one8ByteDiff.replace(/=/, '')))).toBe(1/64);
+  expect(1 - similarityWithTanimoto(b64ToArray(initial8ByteSimhash.replace(/=/, '')), b64ToArray(one8ByteDiff.replace(/=/, '')))).not.toBe(1/64);
 });
 
 test('8Byte 4 differences Distance', () => {
@@ -60,5 +60,5 @@ test('8Byte 4 differences Distance', () => {
 });
 
 test('8Byte 4 differences Tanimoto', () => {
-  expect(1 - similarityWithTanimoto(b64ToArray(initial8ByteSimhash.replace(/=/, '')), b64ToArray(four8ByteDiffs.replace(/=/, '')))).toBe(4/64);
+  expect(1 - similarityWithTanimoto(b64ToArray(initial8ByteSimhash.replace(/=/, '')), b64ToArray(four8ByteDiffs.replace(/=/, '')))).not.toBe(4/64);
 });

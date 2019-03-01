@@ -37,6 +37,6 @@ function _showRootInfo (size) {
 
 export function getDistance (hoveredCell) {
   if (hoveredCell.similarity !== -1){
-    return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
+    return (`Differences: ${hoveredCell.similarity}%`);
   }
 }
