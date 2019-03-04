@@ -1,8 +1,9 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import '../../css/diffgraph.css';
-import { similarityWithDistance, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat, getTwoDigitInt } from '../../js/utils.js';
-import {getSize} from './sunburst-container-utils.js';
+import { similarityWithDistance, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat }
+  from '../../js/utils.js';
+import {getSize, decodeCompressedJson, decodeUncompressedJson} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
@@ -120,7 +121,7 @@ export default class SunburstContainer extends React.Component {
         if (jsonResponse['status']) {
           throw Error(jsonResponse['message']);
         }
-        const json = this._decodeCompressedJson(jsonResponse);
+        let json = decodeUncompressedJson(jsonResponse, this.state.timestamp);
         this._fetchSimhashData(json);
       })
       .catch(error => {this.errorHandled(error.message);});
@@ -129,54 +130,21 @@ export default class SunburstContainer extends React.Component {
   _fetchSimhashData (timestampJson) {
     let url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' +
       this.state.timestamp.substring(0, 4);
-    if (this.props.conf.compressedSimhash) url +='&compress=1';
+    if (this.props.conf.compressedSimhash)
+      url +='&compress=1';
     fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';
         let json;
-        this.props.conf.compressedSimhash? json = this._decodeCompressedJson(jsonResponse):
-          json = this._decodeUncompressedJson(jsonResponse);
+        if (this.props.conf.compressedSimhash)
+          json = decodeCompressedJson(jsonResponse);
+        else
+          json = decodeUncompressedJson(jsonResponse);
         let data = this._calcDistance(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
       .catch(error => {this.errorHandled(error.message);});
-  }
-
-  /*
-  The _decodeCompressedJson function assumes the task of decoding the simhash
-  value received from wayback-discover-diff in base64 into a number.
-  This function handles both a JSON array and a single JSON value.
-   */
-
-  _decodeCompressedJson(json){
-    if(json.captures) {
-      let newJson = [];
-      const year = json.captures[0][0];
-      for (let i = 1; i < json.captures[0].length; i++) {
-        let month = json.captures[0][i][0];
-        for (let j = 1; j < json.captures[0][i].length; j++) {
-          let day = json.captures[0][i][j][0];
-          for (let y = 1; y < json.captures[0][i][j].length; y++) {
-            let time = json.captures[0][i][j][y][0];
-            let simhashIndex = json.captures[0][i][j][y][1];
-            let simhash = json.hashes[simhashIndex];
-            let timestamp = `${year}${getTwoDigitInt(month)}${getTwoDigitInt(day)}${time}`;
-            newJson.push([timestamp, simhash]);
-          }
-        }
-      }
-      return newJson;
-    }
-
-    return [this.state.timestamp, json.simhash];
-  }
-
-  _decodeUncompressedJson(json){
-    if(json.captures) {
-      return json.captures;
-    }
-    return [this.state.timestamp, json.simhash];
   }
 
   /*
