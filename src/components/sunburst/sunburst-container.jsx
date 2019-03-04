@@ -72,7 +72,7 @@ export default class SunburstContainer extends React.Component {
     } else {
       this._validateTimestamp();
     }
-    return (<Loader/>);
+    return <div className="loading"><Loader/></div>;
   }
 
   _validateTimestamp() {

@@ -138,7 +138,7 @@ export default class DiffContainer extends React.Component {
     }
 
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
-    return <Loader/>;
+    return <div className="loading"><Loader/></div>;
   }
 
   _handleSnapshotFetch(promise){

@@ -118,9 +118,7 @@ export default class YmdTimestampHeader extends React.Component {
 
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
-      return (
-        <Loader/>
-      );
+      return <div className="loading"><Loader/></div>;
     }
     if (!this.state.showError) {
       if (this.state.showSteps) {
