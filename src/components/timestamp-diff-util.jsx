@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import * as xpath from 'simple-xpath-position';
 
-const urlRegex = new RegExp(/\/\/web\.archive\.org\/web\/\d{14}/gm);
 var ins, del;
-
+const absoluteUrlRegex = new RegExp(/\/\/web\.archive\.org\/web\/\d{14}/gm);
+const relativeUrlRegex = new RegExp(window.location.origin+ '/web/\\d{14}', 'gm');
 export function getTimestampCleanDiff(insertions, deletions) {
 
   let domIns = document.createElement( 'html' );
@@ -64,7 +64,7 @@ export function getTimestampCleanDiff(insertions, deletions) {
   }
   console.log(ins);
   console.log(del);
-  return [domIns.outerHTML, domDel.outerHTML];
+  return {insertions: domIns.outerHTML, deletions: domDel.outerHTML};
 }
 
 function getLinkFromElement (hasLink) {
@@ -81,9 +81,13 @@ function checkTimestampInLink (element) {
     link = getLinkFromElement(element.parentNode.parentNode);
   }
   if (!_.isNil(link)) {
-    if (link.match(urlRegex)) {
+    if (link.match(absoluteUrlRegex)) {
       return element;
     }
+    if (link.match(relativeUrlRegex)) {
+      return element;
+    }
+
     element.childNodes.forEach(function (e) {
       checkTimestampInLink(e);
     });
@@ -97,8 +101,7 @@ function deleteNodes (nodeIns, nodeDel) {
 
 function removeMarkup (node, tagName) {
   if (node.tagName === tagName && node.className === 'wm-diff') {
-    // node.outerHTML = node.innerHTML;
-    node.className = 'wm-diff-cleaned';
+    node.outerHTML = node.innerHTML;
   } else {
     let parentNode = node.parentNode;
     removeMarkup(parentNode, tagName);

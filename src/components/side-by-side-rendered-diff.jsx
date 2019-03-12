@@ -36,13 +36,13 @@ export default class SideBySideRenderedDiff extends React.Component {
       <div className="side-by-side-render">
         <SandboxedHtml
           iframeLoader={this.props.iframeLoader}
-          html={cleanDiff[1] || this.props.diffData.diff}
+          html={cleanDiff.deletions || this.props.diffData.diff}
           baseUrl={this.props.page.url}
           transform={transformDeletions}
         />
         <SandboxedHtml
           iframeLoader={this.props.iframeLoader}
-          html={cleanDiff[0] || this.props.diffData.diff}
+          html={cleanDiff.insertions || this.props.diffData.diff}
           baseUrl={this.props.page.url}
           transform={transformInsertions}
         />
