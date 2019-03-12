@@ -6,8 +6,11 @@ var ins, del;
 
 export function getTimestampCleanDiff(insertions, deletions) {
 
-  let domIns = new DOMParser().parseFromString(insertions, 'text/xml');
-  let domDel = new DOMParser().parseFromString(deletions, 'text/xml');
+  let domIns = document.createElement( 'html' );
+  let domDel = document.createElement( 'html' );
+
+  domIns.innerHTML = insertions;
+  domDel.innerHTML = deletions;
 
   ins = domIns.getElementsByTagName('ins');
   del = domDel.getElementsByTagName('del');
@@ -36,16 +39,21 @@ export function getTimestampCleanDiff(insertions, deletions) {
   }
 
   let k = 0;
+  let j = 0;
   while (k < foundDel.length) {
-    let j = 0;
-    while (j< foundIns.length) {
+    while (j< foundIns.length && k < foundDel.length) {
       if (_.isEqual(foundDel[k][1], foundIns[j][1])){
-        const dirtyDelXpath= xpath.fromNode(foundDel[k][0]);
-        const dirtyInsXpath  = xpath.fromNode(foundIns[j][0]);
-        let delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
-        let insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
-        if (_.isEqual(delxpath, insxpath)){
-          deleteNodes(foundIns[j][0], foundDel[k][0]);
+        try {
+          const dirtyDelXpath = xpath.fromNode(foundDel[k][0], domDel);
+          const dirtyInsXpath = xpath.fromNode(foundIns[j][0], domIns);
+          let delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
+          let insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
+          if (_.isEqual(delxpath, insxpath)) {
+            deleteNodes(foundIns[j][0], foundDel[k][0]);
+            k++;
+          }
+        } catch (e) {
+          console.warn('Element might already be removed. Skipping..');
           k++;
           continue;
         }
@@ -56,15 +64,22 @@ export function getTimestampCleanDiff(insertions, deletions) {
   }
   console.log(ins);
   console.log(del);
-  return [new XMLSerializer().serializeToString(domIns), new XMLSerializer().serializeToString(domIns)];
+  return [domIns.outerHTML, domDel.outerHTML];
+}
+
+function getLinkFromElement (hasLink) {
+  if (!_.isNil(hasLink.src))
+    return hasLink.src;
+  if (!_.isNil(hasLink.href))
+    return hasLink.href;
+  return hasLink.action;
 }
 
 function checkTimestampInLink (element) {
-  let link;
-  if (!_.isNil(element.src))
-    link = element.src;
-  else if (!_.isNil(element.href))
-    link = element.href;
+  let link = getLinkFromElement(element);
+  if (_.isNil(link)) {
+    link = getLinkFromElement(element.parentNode.parentNode);
+  }
   if (!_.isNil(link)) {
     if (link.match(urlRegex)) {
       return element;
@@ -76,28 +91,39 @@ function checkTimestampInLink (element) {
 }
 
 function deleteNodes (nodeIns, nodeDel) {
-  removeMarkup(nodeIns, 'ins');
-  removeMarkup(nodeDel, 'del');
+  removeMarkup(nodeIns, 'INS');
+  removeMarkup(nodeDel, 'DEL');
 }
 
 function removeMarkup (node, tagName) {
   if (node.tagName === tagName && node.className === 'wm-diff') {
-    node.outerHTML = node.innerHTML;
+    // node.outerHTML = node.innerHTML;
+    node.className = 'wm-diff-cleaned';
   } else {
-    removeMarkup(node.parentElement, tagName);
+    let parentNode = node.parentNode;
+    removeMarkup(parentNode, tagName);
   }
 }
 
 function addNotNill (array, element) {
   if (!_.isNil(element)) {
-    array.push([element, getURL(element)]);
+    let url = getCleanURL(element);
+    if (_.isNil(url)) {
+      url = getCleanURL(element.parentNode.parentNode);
+    }
+    if (!_.isNil(url)) {
+      array.push([element, url]);
+    }
   }
 }
 
-function getURL (element) {
+function getCleanURL (element) {
   if (!_.isNil(element.src))
     return removeWBM(element.src);
-  return removeWBM(element.href);
+  if (!_.isNil(element.href))
+    return removeWBM(element.href);
+  if (!_.isNil(element.action))
+    return removeWBM(element.action);
 }
 
 function removeWBM (url){
