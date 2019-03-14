@@ -37,7 +37,8 @@ export default {
         'node_modules/**'
       ],
       namedExports: {
-        'node_modules/react/index.js': ['PureComponent', 'Component']
+        'node_modules/react/index.js': ['PureComponent', 'Component'],
+        'node_modules/simple-xpath-position/index.js': ['fromNode']
       }
     }),
     globals(),
