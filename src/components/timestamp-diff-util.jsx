@@ -3,7 +3,14 @@ import * as xpath from 'simple-xpath-position';
 
 const absoluteUrlRegex = new RegExp(/\/\/web\.archive\.org\/web\/\d{14}/gm);
 const relativeUrlRegex = new RegExp(window.location.origin+ '/web/\\d{14}', 'gm');
+
+/**
+ * This function will parse all of the markup added by web-monitoring-processing in order to remove any false positive
+ * markup information (for example when comparing links to the same destination but with different timestamps
+ */
 export function getTimestampCleanDiff(insertions, deletions) {
+
+  //Create new HTML DOM elements to add web-monitoring-processing's responses to
 
   let domIns = document.createElement( 'html' );
   let domDel = document.createElement( 'html' );
@@ -16,15 +23,19 @@ export function getTimestampCleanDiff(insertions, deletions) {
   let foundIns = [];
   let foundDel = [];
 
+  //Get all of web-monitoring-processing's del elements that link to a resource and have at least one child,
+  // meaning that they highlight content
   for(let i=0; i<del.length; i++) {
     if (_.isEqual(del[i].className, 'wm-diff') && del[i].childNodes.length > 0) {
       del[i].childNodes.forEach(function (child) {
         const result = checkTimestampInLink(child);
+        //constant result might be nil, so we wouldn't want to add nill values to the array
         addNotNill(foundDel, result);
       });
     }
   }
-
+  //Get all of web-monitoring-processing's ins elements that link to a resource and have at least one child,
+  // meaning that they highlight content
   for(let i=0; i<ins.length; i++) {
     if (_.isEqual(ins[i].className, 'wm-diff') && ins[i].childNodes.length > 0) {
       ins[i].childNodes.forEach(function (child) {
@@ -36,10 +47,12 @@ export function getTimestampCleanDiff(insertions, deletions) {
 
   let k = foundDel.length - 1;
   let j = foundIns.length - 1;
+  //If there are ins and del elements that link to a resource added from web-monitoring-processing
   if (foundDel.length > 0 && foundIns.length > 0) {
     while (k >= 0) {
       j = foundIns.length - 1;
       while (j >= 0) {
+        //If their linked resource is the same
         if (_.isEqual(foundDel[k][1], foundIns[j][1])) {
           try {
             const dirtyDelXpath = xpath.fromNode(foundDel[k][0], domDel);
@@ -65,10 +78,12 @@ export function getTimestampCleanDiff(insertions, deletions) {
   if (del.length > 0 && ins.length > 0) {
     k = del.length - 1;
     while (k >= 0) {
+      //If this element is not something that should have concerned us at the previous loop
       if (isNotAResource(del[k])) {
         j = ins.length - 1;
         while (j >= 0) {
           if (isNotAResource(ins[j])) {
+            //If their contents are identical
             if (_.isEqual(del[k].innerHTML, ins[j].innerHTML)) {
               try {
                 let dirtyDelXpath = xpath.fromNode(del[k], domDel);
