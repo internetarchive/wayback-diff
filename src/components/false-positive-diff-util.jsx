@@ -25,7 +25,7 @@ export function getTimestampCleanDiff(insertions, deletions) {
 
   //Get all of web-monitoring-processing's del elements that link to a resource and have at least one child,
   // meaning that they highlight content
-  for(let i=0; i<del.length; i++) {
+  for(let i=0, len = del.length; i < len; i++) {
     if (_.isEqual(del[i].className, 'wm-diff') && del[i].childNodes.length > 0) {
       del[i].childNodes.forEach(function (child) {
         const result = checkTimestampInLink(child);
@@ -36,7 +36,7 @@ export function getTimestampCleanDiff(insertions, deletions) {
   }
   //Get all of web-monitoring-processing's ins elements that link to a resource and have at least one child,
   // meaning that they highlight content
-  for(let i=0; i<ins.length; i++) {
+  for(let i=0, len = ins.length; i < len; i++) {
     if (_.isEqual(ins[i].className, 'wm-diff') && ins[i].childNodes.length > 0) {
       ins[i].childNodes.forEach(function (child) {
         const result = checkTimestampInLink(child);
@@ -185,7 +185,7 @@ function removeWBM (url){
 }
 function removeDiffXPATH (xpath, mode){
   let xpathArray = xpath.split('/');
-  for (let i = 0; i < xpathArray.length; i++) {
+  for (let i = 0, len = xpathArray.length; i < len; i++) {
     if (xpathArray[i].includes(mode+'[')){
       xpathArray.splice(i);
       return xpathArray.join('/');
@@ -198,5 +198,5 @@ function normalizeURL (url) {
   if (lowercaseString.startsWith('/www.')){
     return '/' + lowercaseString.slice(5);
   }
-  return lowercaseString;
+  return url;
 }
