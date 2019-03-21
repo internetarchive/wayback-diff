@@ -1,5 +1,6 @@
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
+import {getTimestampCleanDiff} from './false-positive-diff-util.jsx';
 
 const showRemovals = showType.bind(null, 'removals');
 const showAdditions = showType.bind(null, 'additions');
@@ -28,18 +29,20 @@ export default class SideBySideRenderedDiff extends React.Component {
       transformDeletions = showRemovals;
       transformInsertions = showAdditions;
     }
+    let cleanDiff = getTimestampCleanDiff(this.props.diffData.insertions,
+      this.props.diffData.deletions);
 
     return (
       <div className="side-by-side-render">
         <SandboxedHtml
           iframeLoader={this.props.iframeLoader}
-          html={this.props.diffData.deletions || this.props.diffData.diff}
+          html={cleanDiff.deletions || this.props.diffData.diff}
           baseUrl={this.props.page.url}
           transform={transformDeletions}
         />
         <SandboxedHtml
           iframeLoader={this.props.iframeLoader}
-          html={this.props.diffData.insertions || this.props.diffData.diff}
+          html={cleanDiff.insertions || this.props.diffData.diff}
           baseUrl={this.props.page.url}
           transform={transformInsertions}
         />
