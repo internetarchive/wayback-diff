@@ -196,7 +196,7 @@ function removeDiffXPATH (xpath, mode){
 function normalizeURL (url) {
   let lowercaseString = url.toLowerCase();
   if (lowercaseString.startsWith('/www.')){
-    return '/' + lowercaseString.slice(5);
+    return '/' + url.slice(5);
   }
   return url;
 }
