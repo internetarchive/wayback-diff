@@ -1,5 +1,6 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
+import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
 import { similarityWithDistance, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat }
   from '../../js/utils.js';
@@ -26,6 +27,7 @@ export default class SunburstContainer extends React.Component {
     this.state = {
       simhashData: null
     };
+    this._clusters = [];
   }
 
   componentDidUpdate (){
@@ -141,35 +143,47 @@ export default class SunburstContainer extends React.Component {
           json = decodeCompressedJson(jsonResponse);
         else
           json = decodeUncompressedJson(jsonResponse);
-        let data = this._calcDistance(json, timestampJson);
+        let data = this._calcDistanceAndScales(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
       .catch(error => {this.errorHandled(error.message);});
   }
 
   /*
-  _calcDistance receives two JSONs. The first variable contains
+  _calcDistanceAndScales receives two JSONs. The first variable contains
   all the timestamps for the selected year and webpage and their
   simhash values and the second one the selected timestamp and
   its simhash value.
 
   It returns a JSON variable containing all the timestamps for
   the selected year and webpage and their similarity index to
-  the selected timestamp. Also, it saves the highest and the
-  lowest similarity index into instance variables.
+  the selected timestamp. Also, it generates the clusters which will be
+  used to insert the timestamps into the diagram.
    */
 
-  _calcDistance(json, timestamp){
-    this._mostSimilar = 0;
-    this._lessSimilar = 1;
-    for (var i = 0; i<json.length; i++){
-      json[i][1] = Math.round(similarityWithDistance(timestamp[1], json[i][1]) * 100);
-      if (this._lessSimilar > json[i][1] && json[i][1] !== 0) {
-        this._lessSimilar = json[i][1];
+  _calcDistanceAndScales(json, timestamp){
+    let tempSimilarity = [];
+    for (let i = 0; i<json.length; i++){
+      let similarity = similarityWithDistance(timestamp[1], json[i][1]);
+      json[i][1] = similarity * 100;
+      //Get an array with all the non-zero distance values
+      if (similarity !== 0) {
+        tempSimilarity.push(similarity * 100);
       }
-      if (this._mostSimilar< json[i][1]) {
-        this._mostSimilar = json[i][1];
-      }
+    }
+    //Create the scale cluster
+    let scale = scaleCluster()
+      .domain(tempSimilarity)
+      .range([1, 2, 3, 4, 5]);
+    //Get the clusters
+    this._clusters = scale.clusters();
+    /*
+    If the clusters are less than 5, push as many cells as needed,
+    with 101 which can never be reached, in order to avoid undefined
+    variable errors.
+    */
+    while (this._clusters.length < 5) {
+      this._clusters.push(101);
     }
     return json;
   }
@@ -193,25 +207,21 @@ export default class SunburstContainer extends React.Component {
 
     const colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
-    let diffLevels = (this._mostSimilar - this._lessSimilar);
-
-    let step = diffLevels/5;
-
-    for (var i = 0; i<json.length; i++){
+    for (let i = 0; i<json.length; i++){
       if (json[i][1] !== 0) {
-        if (json[i][1] <= this._lessSimilar + step) {
+        if (json[i][1] <= this._clusters[0]) {
           firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
             similarity: json[i][1], clr: colors[1], children: []});
-        } else if (json[i][1] <= this._lessSimilar + 2 * step) {
+        } else if (json[i][1] <= this._clusters[1]) {
           secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
             similarity: json[i][1], clr: colors[2], children: []});
-        } else if (json[i][1] <= this._lessSimilar + 3*step) {
+        } else if (json[i][1] <= this._clusters[2]) {
           thirdLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
             similarity: json[i][1], clr: colors[3], children: []});
-        } else if (json[i][1] <= this._lessSimilar + 4*step) {
+        } else if (json[i][1] <= this._clusters[3]) {
           fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
             similarity: json[i][1], clr: colors[4], children: []});
-        } else {
+        } else if (json[i][1] <= this._clusters[4]) {
           fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
             similarity: json[i][1], clr: colors[5], children: []});
         }
@@ -269,22 +279,22 @@ export default class SunburstContainer extends React.Component {
       fifthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
 
-    for (i = 0; i<fifthLevel.length; i++) {
+    for (let i = 0; i<fifthLevel.length; i++) {
       let mod = i % fourthLevel.length;
       fourthLevel[mod].children.push(fifthLevel[i]);
       fourthLevel[mod].bigness = '';
     }
-    for (i = 0; i<fourthLevel.length; i++) {
+    for (let i = 0; i<fourthLevel.length; i++) {
       let mod = i%thirdLevel.length;
       thirdLevel[mod].children.push(fourthLevel[i]);
       thirdLevel[mod].bigness = '';
     }
-    for (i = 0; i<thirdLevel.length; i++) {
+    for (let i = 0; i<thirdLevel.length; i++) {
       let mod = i%secondLevel.length;
       secondLevel[mod].children.push(thirdLevel[i]);
       secondLevel[mod].bigness = '';
     }
-    for (i = 0; i<secondLevel.length; i++) {
+    for (let i = 0; i<secondLevel.length; i++) {
       let mod = i%firstLevel.length;
       firstLevel[mod].children.push(secondLevel[i]);
       firstLevel[mod].bigness = '';
