@@ -68,7 +68,7 @@ export default class DiffView extends React.Component {
   render () {
     if (!this.state.diffData) {
       const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
-      return <Loader/>;
+      return <div className="loading"><Loader/></div>;
     }
     return (
       <div className="diff-view">
