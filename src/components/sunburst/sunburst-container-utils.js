@@ -1,3 +1,5 @@
+import { getTwoDigitInt } from '../../js/utils';
+
 export function  buildValue(hoveredCell) {
   const {radius, angle, angle0} = hoveredCell;
   const truedAngle = (angle + angle0) / 2;
@@ -37,6 +39,38 @@ function _showRootInfo (size) {
 
 export function getDistance (hoveredCell) {
   if (hoveredCell.similarity !== -1){
-    return (`Differences: ${Math.round(hoveredCell.similarity * 100)}%`);
+    return (`Differences: ${hoveredCell.similarity}%`);
   }
+}
+
+/*
+The _decodeCompressedJson function assumes the task of decoding the simhash
+value received from wayback-discover-diff in base64 into a number.
+This function handles both a JSON array and a single JSON value.
+ */
+
+export function decodeCompressedJson(json){
+  let newJson = [];
+  const year = json.captures[0][0];
+  for (let i = 1; i < json.captures[0].length; i++) {
+    let month = json.captures[0][i][0];
+    for (let j = 1; j < json.captures[0][i].length; j++) {
+      let day = json.captures[0][i][j][0];
+      for (let y = 1; y < json.captures[0][i][j].length; y++) {
+        let time = json.captures[0][i][j][y][0];
+        let simhashIndex = json.captures[0][i][j][y][1];
+        let simhash = json.hashes[simhashIndex];
+        let timestamp = `${year}${getTwoDigitInt(month)}${getTwoDigitInt(day)}${time}`;
+        newJson.push([timestamp, simhash]);
+      }
+    }
+  }
+  return newJson;
+}
+
+export function decodeUncompressedJson(json, initTimestamp = null){
+  if(json.captures) {
+    return json.captures;
+  }
+  return [initTimestamp, json.simhash];
 }

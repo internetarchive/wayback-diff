@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /*eslint-disable no-useless-escape*/
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
 /*eslint-enable no-useless-escape*/
@@ -39,15 +41,104 @@ export function handleRelativeURL (url) {
 }
 
 export function hammingWeight(l) {
-  var c;
+  let c;
   for(c = 0; l; c++) {
     l &= l-1;
   }
   return c;
 }
 
-export function similarity(simhash1, simhash2) {
-  return hammingWeight((simhash1 & simhash2)) / hammingWeight((simhash1 | simhash2));
+export function similarityWithTanimoto(simhash1, simhash2) {
+  if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
+    return weight((simhash1 & simhash2)) / weight((simhash1 | simhash2));
+  }
+
+  if (simhash1 instanceof Uint8Array && simhash2 instanceof Uint8Array) {
+    let andArray = [];
+    let orArray = [];
+    for (let i = 0; i < simhash1.length; i++) {
+      andArray.push(simhash1[i] & simhash2[i]);
+      orArray.push(simhash1[i] | simhash2[i]);
+    }
+    return weightOfUint8Array(andArray) / weightOfUint8Array(orArray);
+  }
+}
+
+/**
+ * Hamming distance between ints
+ *
+ * @param x {number}
+ * @param y {number}
+ * @returns {number}
+ */
+function distanceOfInts (x, y) {
+  return weightOfInt(x ^ y);
+}
+
+function distanceOfUint8Array (x, y) {
+  return _.zip(x, y)
+    .map(([i, j]) => weightOfInt(i ^ j))
+    .reduce((acc, w) => acc + w, 0);
+}
+
+export function similarityWithDistance(simhash1, simhash2) {
+  if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
+    //We divide with 32 because it is the output of distanceOfInts with input Number.MAX_SAFE_INTEGER
+    return distanceOfInts(simhash1, simhash2) / 32 ;
+  }
+
+  let simhash1Size= 8*atob(simhash1).length;
+  let simhash2Size = 8*atob(simhash2).length;
+  let sizes = [simhash1Size, simhash2Size];
+  let maxSize = _.max(sizes);
+  let distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
+  return distance / maxSize;
+}
+
+/**
+ * Hamming weight of number
+ *
+ * @private
+ * @param x {number}
+ * @returns {number}
+ */
+function weightOfInt (x) {
+  let sum = 0;
+  while (x !== 0) {
+    sum++;
+    x &= x - 1;
+  }
+  return sum;
+}
+
+/**
+ * Hamming weight of uint8array
+ *
+ * @private
+ * @param x
+ * @returns {number}
+ */
+function weightOfUint8Array (x) {
+  return x.reduce((acc, i) => weightOfInt(i) + acc, 0);
+}
+
+/**
+ * Hamming Weight
+ * https://en.wikipedia.org/wiki/Hamming_weight
+ *
+ * @param x
+ * @returns {number}
+ */
+export function weight (x) {
+  if (Number.isInteger(x)) {
+    return weightOfInt(x);
+  }
+
+  if (x instanceof Uint8Array) {
+    return weightOfUint8Array(x);
+  }
+
+  throw new Error('Unsupported type');
 }
 
 
@@ -100,4 +191,13 @@ export function getUTCDateFormat (date) {
 
   let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
   return (niceTime.toUTCString());
+}
+
+export function b64ToArray (b64Data) {
+  const byteCharacters = atob(b64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  return new Uint8Array(byteNumbers);
 }
