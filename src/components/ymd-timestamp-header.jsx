@@ -362,16 +362,16 @@ export default class YmdTimestampHeader extends React.Component {
     return (
       <div className="wayback-ymd-timestamp">
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="year-select-left" onClick={this._handleYearChange}>
-            <optgroup label="Years and available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="year-select-left" onChange={this._handleYearChange}>
+            <option value="" disabled selected>Years and available captures</option>
             {this.state.yearOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}} onClick={this._getTimestamps}>
-            <optgroup label="Months and available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}} onChange={this._getTimestamps}>
+            <option value="" disabled selected>Months and available captures</option>
             {this.state.leftMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+!this.state.leftSnapElements]}} onClick={this._handleLeftTimestampChange}>
-            <optgroup label="Available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+!this.state.leftSnapElements]}} onChange={this._handleLeftTimestampChange}>
+            <option value="" disabled selected>Available captures</option>
             {this.state.leftSnapElements}
           </select>
         </div>
@@ -381,16 +381,16 @@ export default class YmdTimestampHeader extends React.Component {
           <button className="btn btn-default btn-sm" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
         </div>
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onClick={this._handleRightTimestampChange}>
-            <optgroup label="Available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onChange={this._handleRightTimestampChange}>
+            <option value="" disabled selected>Available captures</option>
             {this.state.rightSnapElements}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}} onClick={this._getTimestamps}>
-            <optgroup label="Months and available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}} onChange={this._getTimestamps}>
+            <option value="" disabled selected>Months and available captures</option>
             {this.state.rightMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="year-select-right" onClick={this._handleYearChange}>
-            <optgroup label="Years and available captures"/>
+          <select className="form-control input-sm mr-sm-1" id="year-select-right" onChange={this._handleYearChange}>
+            <option value="" disabled selected>Years and available captures</option>
             {this.state.yearOptions}
           </select>
         </div>
