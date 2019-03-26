@@ -180,7 +180,7 @@ function getWBMCleanURL (element) {
 
 function removeWBM (url){
   let urlArray = url.split('/');
-  urlArray = urlArray.slice(6);
+  urlArray = urlArray.slice(7);
   return urlArray.join('/');
 }
 function removeDiffXPATH (xpath, mode){
