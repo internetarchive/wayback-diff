@@ -1,10 +1,10 @@
 # Wayback-diff
 
-This React project is a fork of [EDGI](https://envirodatagov.org/)'s web monitoring project UI to enable analysts to quickly assess changes to monitored government websites: https://github.com/edgi-govdata-archiving/web-monitoring-ui.
-It aims to query EDGI's [web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server directly and render the differences between two different web captures at the Internet Archive [Wayback Machine](https://web.archive.org).
+This React project is a fork of [EDGI](https://envirodatagov.org/)'s [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project to enable analysts to quickly assess changes to monitored government websites.
+It works with EDGI's [web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server and the Internet Archive's [Wayback Machine](https://web.archive.org) to render the differences between two captures of the same web page.
 
-In addition, this project contains a `Sunburst` component to illustrate the differences of a capture
-compared to other captures of the same year at the Wayback Machine.
+In addition, this project contains a `Sunburst` component to illustrate the differences of a web page capture
+compared to other captures for the same year at the Wayback Machine.
 
 ##### Table of Contents  
 [Installation and Requirements](#inst)  
