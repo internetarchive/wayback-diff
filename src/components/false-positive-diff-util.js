@@ -9,7 +9,6 @@ const relativeUrlRegex = new RegExp(window.location.origin+ '/web/\\d{14}', 'gm'
  * markup information (for example when comparing links to the same destination but with different timestamps
  */
 export function getTimestampCleanDiff(insertions, deletions) {
-
   //Create new HTML DOM elements to add web-monitoring-processing's responses to
 
   let domIns = document.createElement( 'html' );
@@ -75,35 +74,34 @@ export function getTimestampCleanDiff(insertions, deletions) {
     }
   }
 
+  del = _.filter(del, isNotAResource);
+  ins = _.filter(ins, isNotAResource);
+
   if (del.length > 0 && ins.length > 0) {
     k = del.length - 1;
     while (k >= 0) {
       //If this element is not something that should have concerned us at the previous loop
-      if (isNotAResource(del[k])) {
-        j = ins.length - 1;
-        while (j >= 0) {
-          if (isNotAResource(ins[j])) {
-            //If their contents are identical
-            if (_.isEqual(del[k].innerHTML, ins[j].innerHTML)) {
-              try {
-                let dirtyDelXpath = xpath.fromNode(del[k], domDel);
-                let dirtyInsXpath = xpath.fromNode(ins[j], domIns);
-                let delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
-                let insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
-                if (_.isEqual(delxpath, insxpath)) {
-                  deleteNodes(ins[j], del[k]);
-                  break;
-                } else {
-                  j--;
-                }
-              } catch (e) {
-                console.warn('Element might already be removed. Skipping..');
-                break;
-              }
+      j = ins.length - 1;
+      while (j >= 0) {
+        //If their contents are identical
+        if (_.isEqual(del[k].innerHTML, ins[j].innerHTML)) {
+          try {
+            let dirtyDelXpath = xpath.fromNode(del[k], domDel);
+            let dirtyInsXpath = xpath.fromNode(ins[j], domIns);
+            let delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
+            let insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
+            if (_.isEqual(delxpath, insxpath)) {
+              deleteNodes(ins[j], del[k]);
+              break;
+            } else {
+              j--;
             }
+          } catch (e) {
+            console.warn('Element might already be removed. Skipping..');
+            break;
           }
-          j--;
         }
+        j--;
       }
       k--;
       j = ins.length - 1;
@@ -185,13 +183,13 @@ export function removeWBM (url){
 }
 
 // mode can be 'ins' or 'del'
+// Example input xpath: '/body[1]/div[2]/p[2]/a[1]/ins[1]'
+// Example output xpath: '/body[1]/div[2]/p[2]/a[1]'
 export function removeDiffXPATH (xpath, mode){
-  let xpathArray = xpath.split('/');
-  for (let i = 0, len = xpathArray.length; i < len; i++) {
-    if (xpathArray[i].includes(mode+'[')){
-      xpathArray.splice(i);
-      return xpathArray.join('/');
-    }
+  const target = '/' + mode + '[';
+  const loc = xpath.indexOf(target);
+  if (loc >= -1) {
+    return xpath.substring(0, loc);
   }
 }
 
