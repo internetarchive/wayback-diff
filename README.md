@@ -1,5 +1,4 @@
-Wayback-diff
-************
+# Wayback-diff
 
 This component is a fork of [EDGI](https://envirodatagov.org/)'s web monitoring project UI to enable analysts to quickly assess changes to monitored government websites: https://github.com/edgi-govdata-archiving/web-monitoring-ui.
 It aims to query EDGI's [web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server directly and render the differences between two different web captures at the Internet Archive [Wayback Machine](https://web.archive.org).
@@ -7,10 +6,14 @@ It aims to query EDGI's [web-monitoring-processing](https://github.com/edgi-govd
 In addition, this component contains a `Sunburst` component to illustrate the differences of a capture
 compared to other captures of the same year at the Wayback Machine.
 
-.. contents::
+##### Table of Contents  
+[Installation and Requirements](#inst)  
+[Usage](#usage)<br />
+[Build the project](#build)
 
-Installation and Requirements
-=============================
+<a id="inst" />
+
+## Installation and Requirements
 
 Install node dependencies with: `yarn install`
 
@@ -20,8 +23,9 @@ This component uses Bootstrap 3, so make sure to include it in your entry point 
 
 You need to have a CORS-enabled browser for this component to work stand alone.
 
-Usage
-=====
+<a id="usage" />
+
+## Usage
 
 Run the server with: `yarn start`
 
@@ -42,7 +46,7 @@ Example request: http://localhost:3000/diff/20170223193029/20171212125810/archiv
 
 Example request: http://localhost:3000/diagram/iskme.org/2018/20180813072115
 
-# Running as a React app
+### Running as a React app
 You must render a DiffContainer component. It can receive up to seven props. See props for more info.
 
 In the **index.js** file the following code should be included:
@@ -89,7 +93,7 @@ ReactDOM.render(
   </Router>, document.getElementById('wayback-diff'));
 ```
 
-# Use it as a component in an other project
+### Use it as a component in an other project
 
 In order to use this app as a component in another React app you should include the following in
 [index.js](https://github.com/internetarchive/wayback-diff/blob/master/src/index.js):
@@ -99,8 +103,9 @@ export DiffContainer from './components/diff-container.jsx';
 export SunburstContainer from './components/sunburst-container.jsx';
 ```
 
-# Props 
-### DiffContainer can receive up to eight props. All of them are optional. 
+#### Props 
+
+##### DiffContainer can receive up to eight props. All of them are optional. 
 
 The **conf** prop receives a JSON file that contains the configuration of the wayback-diff component.
 
@@ -123,7 +128,7 @@ The **url** prop is the webpage for which the snapshots are shown.
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
 
-### SunburstContainer can receive up to five props. All of them are optional. 
+##### SunburstContainer can receive up to five props. All of them are optional. 
 
 The **loader** prop is a React Component that displays when loading. If this is not set or it is null, a default loader is used instead.
 
@@ -140,7 +145,7 @@ The **fetchSnapshotCallback** which is a callback function used to fetch the sna
 - The callback function should return a fetch Promise.
 
 
-# conf.json
+##### conf.json
 
 The configuration file should have the following format:
 
@@ -160,13 +165,13 @@ The configuration file should have the following format:
 }
 ```
 
+<a id="build"/>
+
 ## Build the project
 
-Run
+Run `yarn build:dev`
 
-`yarn build:dev`
-
-## Install the library
+### Install the library
 
 To install the component library, inside your new project directory you should run:
 
@@ -183,7 +188,7 @@ If you are installing this component as a library from this Github repository:
 yarn add https://github.com/ftsalamp/wayback-diff
 ```
 
-## Import the component
+### Import the component
 
 In the file you want to use the wayback-diff component use the following code to import it:
 
@@ -191,7 +196,7 @@ In the file you want to use the wayback-diff component use the following code to
 import {DiffContainer, SunburstContainer} from 'wayback-diff';
 ```
 
-## Use the component
+### Use the component
 
 After importing the component you might use it like any other React component:
 
@@ -231,6 +236,6 @@ After importing the component you might use it like any other React component:
 }/>
 ```
 
-# Example project
+### Example project
 
 If you need an example on how to use the component check out [this repository](https://github.com/ftsalamp/wayback-diff-test)
