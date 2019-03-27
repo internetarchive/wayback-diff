@@ -112,7 +112,7 @@ export function getTimestampCleanDiff(insertions, deletions) {
   return {insertions: domIns.outerHTML, deletions: domDel.outerHTML};
 }
 
-function getLinkFromElement (hasLink) {
+export function getLinkFromElement (hasLink) {
   if (!_.isNil(hasLink.src))
     return hasLink.src;
   if (!_.isNil(hasLink.href))
@@ -120,11 +120,11 @@ function getLinkFromElement (hasLink) {
   return hasLink.action;
 }
 
-function isNotAResource (element) {
+export function isNotAResource (element) {
   return (!element.src && !element.href && !element.action);
 }
 
-function checkTimestampInLink (element) {
+export function checkTimestampInLink (element) {
   let link = getLinkFromElement(element);
   if (_.isNil(link)) {
     link = getLinkFromElement(element.parentNode.parentNode);
@@ -169,7 +169,7 @@ function addNotNill (array, element) {
   }
 }
 
-function getWBMCleanURL (element) {
+export function getWBMCleanURL (element) {
   if (!_.isNil(element.src))
     return removeWBM(element.src);
   if (!_.isNil(element.href))
@@ -178,12 +178,14 @@ function getWBMCleanURL (element) {
     return removeWBM(element.action);
 }
 
-function removeWBM (url){
+export function removeWBM (url){
   let urlArray = url.split('/');
   urlArray = urlArray.slice(7);
   return urlArray.join('/');
 }
-function removeDiffXPATH (xpath, mode){
+
+// mode can be 'ins' or 'del'
+export function removeDiffXPATH (xpath, mode){
   let xpathArray = xpath.split('/');
   for (let i = 0, len = xpathArray.length; i < len; i++) {
     if (xpathArray[i].includes(mode+'[')){
@@ -193,7 +195,7 @@ function removeDiffXPATH (xpath, mode){
   }
 }
 
-function normalizeURL (url) {
+export function normalizeURL (url) {
   let lowercaseString = url.toLowerCase();
   if (lowercaseString.startsWith('/www.')){
     return '/' + url.slice(5);

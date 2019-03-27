@@ -1,6 +1,6 @@
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
-import {getTimestampCleanDiff} from './false-positive-diff-util.jsx';
+import {getTimestampCleanDiff} from './false-positive-diff-util.js';
 
 const showRemovals = showType.bind(null, 'removals');
 const showAdditions = showType.bind(null, 'additions');
