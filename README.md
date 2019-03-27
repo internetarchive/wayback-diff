@@ -1,24 +1,29 @@
-# Wayback-diff
+Wayback-diff
+************
 
-## **[Wayback-diff](https://github.com/ftsalamp/wayback-diff)**
+This component is a fork of [EDGI](https://envirodatagov.org/)'s web monitoring project UI to enable analysts to quickly assess changes to monitored government websites: https://github.com/edgi-govdata-archiving/web-monitoring-ui.
+It aims to query EDGI's [web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server directly and render the differences between two different web captures at the Internet Archive [Wayback Machine](https://web.archive.org).
 
-This project uses a lot of code from the [web-monitoring-ui](https://github.com/edgi-govdata-archiving/web-monitoring-ui) project. It aims to query the web-monitoring-processing server directly and then render the changes depending on the parameters given.
+In addition, this component contains a `Sunburst` component to illustrate the differences of a capture
+compared to other captures of the same year at the Wayback Machine.
 
-# Installation
+.. contents::
 
-Install node dependencies with `yarn`
+Installation and Requirements
+=============================
 
-`yarn install`
+Install node dependencies with: `yarn install`
 
-# Usage
+[web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server must be running with CORS mechanism enabled.
 
-In order for this app to run, the responding web-monitoring-processing server must have a CORS mechanism enabled.
+This component uses Bootstrap 3, so make sure to include it in your entry point HTML document.
 
-In addition, this component uses Bootstrap, so make sure to include it in your entry point HTML document.
+You need to have a CORS-enabled browser for this component to work stand alone.
 
-You also need to have a CORS-enabled browser for this component to work.
+Usage
+=====
 
-Run the server with the command `yarn start`
+Run the server with: `yarn start`
 
 There are three types of URL calls:
  
@@ -86,9 +91,8 @@ ReactDOM.render(
 
 # Use it as a component in an other project
 
-## Add code
-
-In order to use this app as a component in an other React app you should include in the **index.js** file the following code:
+In order to use this app as a component in another React app you should include the following in
+[index.js](https://github.com/internetarchive/wayback-diff/blob/master/src/index.js):
 
 ```Javascript
 export DiffContainer from './components/diff-container.jsx';
@@ -98,11 +102,11 @@ export SunburstContainer from './components/sunburst-container.jsx';
 # Props 
 ### DiffContainer can receive up to eight props. All of them are optional. 
 
-The **conf** prop that receives a JSON file that contains the configuration of the wayback-diff component.
+The **conf** prop receives a JSON file that contains the configuration of the wayback-diff component.
 
-The **fetchCDXCallback** which is a callback function that will be used to fetch the snapshots available from the CDX server.
+The **fetchCDXCallback** prop is a callback function used to fetch the snapshots available from the CDX server.
 
-The **fetchSnapshotCallback** which is a callback function that will be used to fetch the snapshots from the Wayback Machine.
+The **fetchSnapshotCallback** prop is a callback function that is used to fetch the snapshots from the Wayback Machine.
 
 - If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
 
@@ -110,26 +114,26 @@ The **fetchSnapshotCallback** which is a callback function that will be used to 
 
   If you use this prop, the **limit** conf option does not have any effect.
 
-The **loader** which is a React Component that will be shown when loading. If this is not set or it is null, a default loader will be used instead.
+The **loader** prop is a React Component that displays when loading. If this is not set or it is null, a default loader is used instead.
 
-The **timestampA** and **timestampB** which are the timestamps extracted from the URL.
+The **timestampA** and **timestampB** props are the timestamps extracted from the URL.
 
-The **url** which is the webpage for which the snapshots are shown.
+The **url** prop is the webpage for which the snapshots are shown.
 
 The **noTimestamps** prop which should only be set to true in the ```/diff///WEBPAGE``` path schema.
 
 
 ### SunburstContainer can receive up to five props. All of them are optional. 
 
-The **loader** which is a React Component that will be shown when loading. If this is not set or it is null, a default loader will be used instead.
+The **loader** prop is a React Component that displays when loading. If this is not set or it is null, a default loader is used instead.
 
-The **timestamp** which is the timestamp whose simhash will be compared with the others.
+The **timestamp** which is the timestamp whose simhash is compared to others.
 
-The **url** which is the webpage for which the the simhashes will be compared.
+The **url** which is the webpage for which the the simhashes to be compared.
 
 The **conf** which is a JSON file that contains the configuration of the wayback-diff component.
 
-The **fetchSnapshotCallback** which is a callback function that will be used to fetch the snapshots from the Wayback Machine. This is used to validate the timestamp in the URL.
+The **fetchSnapshotCallback** which is a callback function used to fetch the snapshots from the Wayback Machine. This is used to validate the timestamp in the URL.
 
 - If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
 
@@ -192,42 +196,41 @@ import {DiffContainer, SunburstContainer} from 'wayback-diff';
 After importing the component you might use it like any other React component:
 
 ```Javascript
- <Router>
-          <Switch>
-            <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match, location}) =>
-              <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
-                loader={LOADER_COMPONENT}
-                timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
-            } />
-            <Route path='/diff/([0-9]{14})//(.+)' render={({match, location}) =>
-              <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
-                loader={LOADER_COMPONENT}
-                fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
-            } />
-            <Route path='/diff//([0-9]{14})/(.+)' render={({match, location}) =>
-              <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
-                loader={LOADER_COMPONENT}
-                fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
-            } />
-
-            <Route path='/diff///(.+)' render={({match, location}) =>
-              <DiffContainer url={match.params[0] + location.search} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
-                loader={LOADER_COMPONENT}/>
-            } />
-            <Route path='/diff/(.+)' render={({match, location}) =>
-              <DiffContainer url={match.params[0] + location.search} fetchCDXCallback={null}
-                loader={LOADER_COMPONENT} conf={this.conf}/>}
-            />
-            <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match, location}) =>
-              <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
-                loader={LOADER_COMPONENT}
-                conf={this.conf} fetchSnapshotCallback={null}/>} 
-            />
-          </Switch>
-        </Router>
+  <Router>
+    <Switch>
+      <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match, location}) =>
+        <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
+          loader={LOADER_COMPONENT}
+          timestampB={match.params[1]} fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null} />
+        } />
+      <Route path='/diff/([0-9]{14})//(.+)' render={({match, location}) =>
+        <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
+          loader={LOADER_COMPONENT}
+          fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+        } />
+      <Route path='/diff//([0-9]{14})/(.+)' render={({match, location}) =>
+        <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
+          loader={LOADER_COMPONENT}
+          fetchCDXCallback={null} conf={this.conf} fetchSnapshotCallback={null}/>
+      } />
+      <Route path='/diff///(.+)' render={({match, location}) =>
+        <DiffContainer url={match.params[0] + location.search} conf={this.conf} noTimestamps={true} fetchCDXCallback={null}
+          loader={LOADER_COMPONENT}/>
+      } />
+      <Route path='/diff/(.+)' render={({match, location}) =>
+        <DiffContainer url={match.params[0] + location.search} fetchCDXCallback={null}
+          loader={LOADER_COMPONENT} conf={this.conf}/>}
+      />
+      <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match, location}) =>
+        <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
+          loader={LOADER_COMPONENT}
+          conf={this.conf} fetchSnapshotCallback={null}/>} 
+      />
+    </Switch>
+  </Router>
 }/>
 ```
 
 # Example project
 
-If you need an example on how to use the component check [this repository out](https://github.com/ftsalamp/wayback-diff-test)
+If you need an example on how to use the component check out [this repository](https://github.com/ftsalamp/wayback-diff-test)
