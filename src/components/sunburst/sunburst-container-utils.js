@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { getTwoDigitInt } from '../../js/utils';
 
 export function  buildValue(hoveredCell) {
@@ -39,7 +40,7 @@ function _showRootInfo (size) {
 
 export function getDistance (hoveredCell) {
   if (hoveredCell.similarity !== -1){
-    return (`Differences: ${hoveredCell.similarity}%`);
+    return (`Differences: ${_.round(hoveredCell.similarity, 2)}%`);
   }
 }
 

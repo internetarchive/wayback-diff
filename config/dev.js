@@ -31,6 +31,12 @@ export default {
       presets: [ [ 'es2015', { modules: false } ], 'stage-0', 'react' ],
       plugins: [ 'external-helpers' ]
     }),
+    replace({ 'process.env.NODE_ENV': JSON.stringify('development'),
+      'process.env': JSON.stringify(process.env)}),
+    resolve({
+      browser: true,
+      main: true
+    }),
     cjs({
       exclude: 'node_modules/process-es6/**',
       include: [
@@ -41,12 +47,6 @@ export default {
         'node_modules/simple-xpath-position/index.js': ['fromNode']
       }
     }),
-    globals(),
-    replace({ 'process.env.NODE_ENV': JSON.stringify('development'),
-      'process.env': JSON.stringify(process.env)}),
-    resolve({
-      browser: true,
-      main: true
-    })
+    globals()
   ]
 };
