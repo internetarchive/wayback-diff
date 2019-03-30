@@ -363,12 +363,14 @@ export default class YmdTimestampHeader extends React.Component {
     return (
       <div className="wayback-ymd-timestamp">
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="year-select-left" onChange={this._handleYearChange}>
-            <option value="" disabled selected>Years and available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="year-select-left"
+            onChange={this._handleYearChange} title="Years and available captures">
+            <option value="" disabled selected>Year</option>
             {this.state.yearOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}} onChange={this._getTimestamps}>
-            <option value="" disabled selected>Months and available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}}
+            onChange={this._getTimestamps} title="Months and available captures">
+            <option value="" disabled selected>Month</option>
             {this.state.leftMonthOptions}
           </select>
           <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+!this.state.leftSnapElements]}} onChange={this._handleLeftTimestampChange}>
@@ -386,12 +388,14 @@ export default class YmdTimestampHeader extends React.Component {
             <option value="" disabled selected>Available captures</option>
             {this.state.rightSnapElements}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}} onChange={this._getTimestamps}>
-            <option value="" disabled selected>Months and available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}}
+            onChange={this._getTimestamps} title="Months and available captures">
+            <option value="" disabled selected>Month</option>
             {this.state.rightMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="year-select-right" onChange={this._handleYearChange}>
-            <option value="" disabled selected>Years and available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="year-select-right"
+            onChange={this._handleYearChange} title="Years and available captures">
+            <option value="" disabled selected>Year</option>
             {this.state.yearOptions}
           </select>
         </div>
