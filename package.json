@@ -1,6 +1,6 @@
 {
   "name": "wayback-diff",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "private": true,
   "main": "build/app.js",
   "dependencies": {
