@@ -138,6 +138,7 @@ export default class YmdTimestampHeader extends React.Component {
         );
       }
       if (this.state.cdxData) {
+        this._areRequestedTimestampsSelected();
         return (
           <div className="timestamp-header-view">
             {this._showInfo()}
@@ -150,6 +151,49 @@ export default class YmdTimestampHeader extends React.Component {
       return (
         <Loader/>
       );
+    }
+  }
+
+  _areRequestedTimestampsSelected () {
+    if (!this._shouldValidateTimestamp) {
+      let leftTimestamp = parseInt(this.state.timestampA);
+      let rightTimestamp = parseInt(this.state.timestampB);
+
+      let lastLeftFromCDX = parseInt(this.state.leftSnaps[this.state.leftSnaps.length - 1][0]);
+      let lastRightFromCDX = parseInt(this.state.rightSnaps[this.state.rightSnaps.length - 1][0]);
+
+      let newLeft, newRight;
+
+      if (leftTimestamp > lastLeftFromCDX) {
+        newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+      }
+
+      if (rightTimestamp > lastRightFromCDX) {
+        newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+      }
+
+      if (newLeft && newRight) {
+        this.setState({
+          leftSnapElements: [...this.state.leftSnapElements, newLeft],
+          rightSnapElements: [...this.state.rightSnapElements, newRight],
+          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
+          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']]
+        });
+        this._leftTimestampIndex = this.state.leftSnapElements.length + 1;
+        this._rightTimestampIndex = this.state.rightSnapElements.length + 1;
+      } else if (newLeft) {
+        this.setState({
+          leftSnapElements: [...this.state.leftSnapElements, newLeft],
+          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']]
+        });
+        this._leftTimestampIndex = this.state.leftSnapElements.length + 1;
+      } else if (newRight) {
+        this.setState({
+          rightSnapElements: [...this.state.rightSnapElements, newRight],
+          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']]
+        });
+        this._rightTimestampIndex = this.state.rightSnapElements.length + 1;
+      }
     }
   }
 
