@@ -1,4 +1,5 @@
 import React from 'react';
+import IframeLoader from './iframe-loader';
 
 /**
  * @typedef {Object} SandboxedHtmlProps
@@ -19,13 +20,8 @@ import React from 'react';
 export default class SandboxedHtml extends React.PureComponent {
   constructor (props) {
     super(props);
+    this.loaderRef = React.createRef();
     this._frame = null;
-  }
-
-
-  shouldComponentUpdate(){
-    this.addLoaderImg();
-    return true;
   }
 
   componentDidMount () {
@@ -38,11 +34,13 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   render () {
-    return <iframe height={window.innerHeight} onLoad={()=>{this.handleHeight();
-      this.removeLoaderImg();}}
-    sandbox="allow-same-origin allow-forms allow-scripts"
-    ref={frame => this._frame = frame}
-    />;
+    return <div>
+      <iframe height={window.innerHeight} width={'100%'} onLoad={()=>{this.handleHeight(); this.removeLoaderImg();}}
+        sandbox="allow-same-origin allow-forms allow-scripts"
+        ref={frame => this._frame = frame}
+      />
+      <IframeLoader ref={this.loaderRef} loader={this.props.loader}/>
+    </div>;
   }
 
   _updateContent () {
@@ -70,21 +68,14 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   removeLoaderImg () {
-    this._frame.loaderImage.parentNode.removeChild(this._frame.loaderImage);
+    this.loaderRef.current.setLoaderStyle(null);
   }
 
   addLoaderImg () {
     let width = this._frame.contentDocument.scrollingElement.offsetWidth;
-
     let centerX = this._frame.offsetLeft + width / 2;
-
-    var elem = document.createElement('img');
-    elem.className = 'waybackDiffIframeLoader';
-    var cssText = 'position:absolute;left:'+centerX+'px;top:50%;';
-    elem.setAttribute('style', cssText);
-    elem.src = this.props.iframeLoader;
-    document.body.appendChild(elem);
-    this._frame.loaderImage = elem;
+    let loaderCSS = {position:'absolute',left:centerX + 'px',top:'50%'};
+    this.loaderRef.current.setLoaderStyle(loaderCSS);
   }
 }
 

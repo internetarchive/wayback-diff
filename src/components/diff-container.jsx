@@ -165,7 +165,7 @@ export default class DiffContainer extends React.Component {
 
       return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        loader={this.props.loader} iframeLoader={this.props.conf.iframeLoader} errorHandledCallback={this.errorHandled}/>);
+        loader={this.props.loader} errorHandledCallback={this.errorHandled}/>);
     }
   }
 

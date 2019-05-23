@@ -129,7 +129,7 @@ export default class DiffView extends React.Component {
     case diffTypes.SIDE_BY_SIDE_RENDERED.value:
       return (
         <SideBySideRenderedDiff diffData={this.state.diffData} page={this.props.page}
-          iframeLoader={this.props.iframeLoader}/>
+          loader={this.props.loader}/>
       );
     case diffTypes.OUTGOING_LINKS.value:
       return (

@@ -426,13 +426,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _showDiffs () {
-
-    let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
-
-    while (loaders.length > 0) {
-      loaders[0].parentNode.removeChild(loaders[0]);
-    }
-
     let timestampAelement = document.getElementById('timestamp-select-left');
     let timestampA = '';
     if (timestampAelement.style.visibility !== 'hidden') {
