@@ -1,5 +1,5 @@
 import React from 'react';
-import IframeLoader from './iframe-loader';
+import IframeLoader from './iframe-loader.jsx';
 
 /**
  * @typedef {Object} SandboxedHtmlProps
