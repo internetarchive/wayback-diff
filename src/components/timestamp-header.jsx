@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import {handleRelativeURL, fetch_with_timeout, checkResponse} from '../js/utils.js';
+import {fetch_with_timeout, checkResponse} from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -122,7 +122,8 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
+    const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
+                        window.location.origin);
     return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
   }
 
@@ -157,11 +158,14 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url = handleRelativeURL(this.props.conf.cdxServer);
+      let url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+      url.searchParams.append('url', this.props.url);
+      url.searchParams.append('status', '200');
+      url.searchParams.append('fl', 'timestamp,digest');
+      url.searchParams.append('output', 'json');
+      url.searchParams.append('sort', 'reverse');
       if (this.props.conf.limit){
-        url += `search?url=${encodeURIComponent(this.props.url)}&status=200&limit=${this.props.conf.limit}&fl=timestamp,digest&output=json&sort=reverse`;
-      } else {
-        url += `search?url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&sort=reverse`;
+        url.searchParams.append('limit', this.props.conf.limit);
       }
       this._handleFetch(fetch_with_timeout(fetch(url, { signal: this._abortController.signal })));
 

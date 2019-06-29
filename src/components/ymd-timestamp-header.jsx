@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import { handleRelativeURL, fetch_with_timeout, getTwoDigitInt, getKeyByValue, selectHasValue,
+import { fetch_with_timeout, getTwoDigitInt, getKeyByValue, selectHasValue,
   getUTCDateFormat} from '../js/utils.js';
 import Loading from './loading.jsx';
 import _ from 'lodash';
@@ -239,7 +239,14 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) + '&closest=' + timestamp + '&filter=!mimetype:warc/revisit&format=json&sort=closest&limit=1&fl=timestamp';
+    let url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+    url.searchParams.append('url', this.props.url);
+    url.searchParams.append('closest', timestamp);
+    url.searchParams.append('filter', '!mimetype:warc/revisit');
+    url.searchParams.append('format', 'json');
+    url.searchParams.append('sort', 'closest');
+    url.searchParams.append('limit', '1');
+    url.searchParams.append('fl', 'timestamp');
     return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})), timestamp, fetchedTimestamps, position);
   }
 
@@ -282,11 +289,25 @@ export default class YmdTimestampHeader extends React.Component {
     } else {
       let url;
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&to=${this.state.leftYear}${getTwoDigitInt(this._leftMonthIndex)}&limit=${this.props.conf.limit}`;
+        url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+        url.searchParams.append('url', this.props.url);
+        url.searchParams.append('status', '200');
+        url.searchParams.append('fl', 'timestamp,digest');
+        url.searchParams.append('output', 'json');
+        url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
+        url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
+        url.searchParams.append('limit', this.props.conf.limit);
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        url = `${handleRelativeURL(this.props.conf.cdxServer)}search?&url=${encodeURIComponent(this.props.url)}&status=200&fl=timestamp,digest&output=json&from=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&to=${this.state.rightYear}${getTwoDigitInt(this._rightMonthIndex)}&limit=${this.props.conf.limit}`;
+        url = new URL(this.props.conf.cdxServer + 'search')
+        url.searchParams.append('url', this.props.url);
+        url.searchParams.append('status', '200');
+        url.searchParams.append('fl', 'timestamp,digest');
+        url.searchParams.append('output', 'json');
+        url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
+        url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
+        url.searchParams.append('limit', this.props.conf.limit);
         rightFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
     }
@@ -531,8 +552,10 @@ export default class YmdTimestampHeader extends React.Component {
 
   _fetchSparklineData () {
     this.setState({showLoader: true});
-    let url = handleRelativeURL(this.props.conf.sparklineURL);
-    url += `?url=${encodeURIComponent(this.props.url)}&collection=web&output=json`;
+    let url = new URL(this.props.conf.sparklineURL, window.location.origin);
+    url.searchParams.append('url', this.props.url);
+    url.searchParams.append('collection', 'web');
+    url.searchParams.append('output', 'json');
     let fetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
     this._exportSparklineData(fetchPromise);
   }
