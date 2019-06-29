@@ -199,7 +199,7 @@ export default class DiffView extends React.Component {
         .catch(error => error)
         .then(data => this.setState({diffData: data}));
     }
-    var url = new URL(this.props.webMonitoringProcessingURL} + '/' + diffTypes[diffType].diffService);
+    var url = new URL(this.props.webMonitoringProcessingURL + '/' + diffTypes[diffType].diffService);
     url.searchParams.append('strict_urls', 'WBM');
     url.searchParams.append('format', 'json');
     url.searchParams.append('pass_headers', 'cookie');
