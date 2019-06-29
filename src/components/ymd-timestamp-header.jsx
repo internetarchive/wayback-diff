@@ -300,7 +300,7 @@ export default class YmdTimestampHeader extends React.Component {
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer + 'search')
+        url = new URL(this.props.conf.cdxServer + 'search', window.location.origin)
         url.searchParams.append('url', this.props.url);
         url.searchParams.append('status', '200');
         url.searchParams.append('fl', 'timestamp,digest');

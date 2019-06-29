@@ -87,7 +87,8 @@ export default class SunburstContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      let url = new URL(this.props.conf.cdxServer + 'search');
+      let url = new URL(this.props.conf.cdxServer + 'search',
+                        window.location.origin);
       url.searchParams.append('url', this.props.url);
       url.searchParams.append('closest', this.props.timestamp);
       url.searchParams.append('filter', '!mimetype:warc/revisit');
