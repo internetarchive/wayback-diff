@@ -22,8 +22,10 @@
     "start": "react-scripts start",
     "build": "rollup -c config/dev.js",
     "build:dev": "rollup -c config/dev.js -w",
+    "pretest": "yarn run lint",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "./node_modules/.bin/eslint ./src"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

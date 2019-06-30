@@ -19,9 +19,8 @@ jobs:
           name: Build
           command: yarn build
       - run:
-          name: Run linter
-          command: eslint src/
-      - run:
+          # Note that eslint run before every test run due to `pretest` in
+          # `package.json`.
           name: Test
           command: CI=true yarn test
 
