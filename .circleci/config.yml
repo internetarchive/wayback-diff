@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/wayback-diff
+    docker:
+      - image: circleci/node:10.15.3
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-2-{{ checksum "package-lock.json" }}
+      - run:
+          name: Dependencies
+          command: npm ci
+      - save_cache:
+          key: dependency-cache-2-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Build
+          command: npm run build-production
+      - run:
+          name: Run linter
+          command: eslint src/
+      - run:
+          name: Test
+          command: CI=true yarn test
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
