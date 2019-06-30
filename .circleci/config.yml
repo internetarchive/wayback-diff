@@ -10,7 +10,7 @@ jobs:
           key: dependency-cache-2-{{ checksum "yarn.lock" }}
       - run:
           name: Dependencies
-          command: yarn install
+          command: yarn install --dev
       - save_cache:
           key: dependency-cache-2-{{ checksum "yarn.lock" }}
           paths:
