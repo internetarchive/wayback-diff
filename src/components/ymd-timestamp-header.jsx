@@ -390,19 +390,13 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _getShortUTCDateFormat (date) {
-    let year = parseInt(date.substring(0, 4), 10);
-    let month = parseInt(date.substring(4, 6), 10) - 1;
-    let day = parseInt(date.substring(6, 8), 10);
-    var shortTime = new Date(Date.UTC(year, month, day));
-    shortTime = shortTime.toUTCString();
-    shortTime = shortTime.split(' ');
-    let retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
-    return (retTime);
-  }
-
-  _getYear (date) {
-    return parseInt(date.substring(0, 4), 10);
+  /** Input: "20190504221015" Output: "Sat, 04 May 2019" */
+  _getShortUTCDateFormat (timestamp) {
+    const year = parseInt(timestamp.substring(0, 4), 10);
+    const month = parseInt(timestamp.substring(4, 6), 10) - 1;
+    const day = parseInt(timestamp.substring(6, 8), 10);
+    const utcDateTime = new Date(Date.UTC(year, month, day));
+    return utcDateTime.toUTCString().split(' ').slice(0,4).join(' ');
   }
 
   _restartPressed () {
