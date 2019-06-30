@@ -10,14 +10,14 @@ jobs:
           key: dependency-cache-2-{{ checksum "yarn.lock" }}
       - run:
           name: Dependencies
-          command: npm ci
+          command: yarn install
       - save_cache:
           key: dependency-cache-2-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
       - run:
           name: Build
-          command: npm run build-production
+          command: yarn build
       - run:
           name: Run linter
           command: eslint src/
