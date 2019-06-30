@@ -379,11 +379,9 @@ export default class YmdTimestampHeader extends React.Component {
   _prepareSparklineOptionElements (data) {
     if (data) {
       let options = [];
+      const limit = parseInt(this.props.conf.limit);
       for (let i = data.length-1; i >= 0; i--) {
-        let count = data[i][1];
-        if (count > parseInt(this.props.conf.limit)) {
-          count = this.props.conf.limit;
-        }
+        const count = Math.min(data[i][1], limit);
         options.push(<option key={i} value={data[i][0]}>{`${data[i][0]} (${count})`}</option>);
       }
       return options;
