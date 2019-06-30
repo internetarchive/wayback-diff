@@ -525,11 +525,8 @@ export default class YmdTimestampHeader extends React.Component {
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
     let first = this._getShortUTCDateFormat(firstTimestamp);
     let last = this._getShortUTCDateFormat(lastTimestamp);
-    const numberWithCommas = (x) => {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
     return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection
-      of {numberWithCommas(count)} dating from {first} to {last}.</p>);
+      of {count.toLocaleString()} dating from {first} to {last}.</p>);
   }
 
   _fetchSparklineData () {
