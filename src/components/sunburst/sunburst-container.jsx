@@ -2,7 +2,7 @@ import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
-import { similarityWithDistance, handleRelativeURL, checkResponse, fetch_with_timeout, getUTCDateFormat }
+import { similarityWithDistance, checkResponse, fetch_with_timeout, getUTCDateFormat }
   from '../../js/utils.js';
 import {getSize, decodeCompressedJson, decodeUncompressedJson} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
@@ -87,9 +87,14 @@ export default class SunburstContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      const url = handleRelativeURL(this.props.conf.cdxServer) + 'search?url=' + encodeURIComponent(this.props.url) +
-        '&closest=' + this.props.timestamp +
-        '&filter=!mimetype:warc/revisit&sort=closest&limit=1&fl=timestamp';
+      let url = new URL(this.props.conf.cdxServer + 'search',
+                        window.location.origin);
+      url.searchParams.append('url', this.props.url);
+      url.searchParams.append('closest', this.props.timestamp);
+      url.searchParams.append('filter', '!mimetype:warc/revisit');
+      url.searchParams.append('sort', 'closest');
+      url.searchParams.append('limit', '1');
+      url.searchParams.append('fl', 'timestamp');
       promise = fetch_with_timeout(fetch(url));
     }
     promise.then(response => {return checkResponse(response).json();})

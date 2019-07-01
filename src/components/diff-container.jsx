@@ -4,7 +4,7 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import {isStrUrl, handleRelativeURL, checkResponse, fetch_with_timeout} from '../js/utils.js';
+import {isStrUrl, checkResponse, fetch_with_timeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
@@ -133,7 +133,8 @@ export default class DiffContainer extends React.Component {
     if (this.props.fetchSnapshotCallback){
       this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
     }else {
-      const url = handleRelativeURL(this.props.conf.snapshotsPrefix) + timestamp + '/' + encodeURIComponent(this.props.url);
+      const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
+                          window.location.origin);
       this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
     }
 
@@ -160,10 +161,13 @@ export default class DiffContainer extends React.Component {
 
   prepareDiffView(){
     if (!this.state.error){
-      let urlA = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampA + '/' + encodeURIComponent(this.props.url);
-      let urlB = handleRelativeURL(this.props.conf.snapshotsPrefix) + this.state.timestampB + '/' + encodeURIComponent(this.props.url);
-
-      return(<DiffView webMonitoringProcessingURL={handleRelativeURL(this.props.conf.webMonitoringProcessingURL)}
+      const urlA = new URL(this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + encodeURIComponent(this.props.url),
+                           window.location.origin);
+      const urlB = new URL(this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + encodeURIComponent(this.props.url),
+                           window.location.origin);
+      const webMonURL = new URL(this.props.conf.webMonitoringProcessingURL,
+                                window.location.origin);
+      return(<DiffView webMonitoringProcessingURL={webMonURL}
         page={{url: encodeURIComponent(this.props.url)}} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
         loader={this.props.loader} errorHandledCallback={this.errorHandled}/>);
     }
