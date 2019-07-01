@@ -21,20 +21,24 @@ export default class DiffContainer extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      showDiff: false,
       timestampA: this.props.timestampA,
       timestampB: this.props.timestampB
     };
     this._oneFrame = null;
     this.errorHandled = this.errorHandled.bind(this);
-    this.changeTimestamps = this.changeTimestamps.bind(this);
+    this.getTimestamps = this.getTimestamps.bind(this);
     this.prepareDiffView = this.prepareDiffView.bind(this);
   }
 
-  changeTimestamps(timestampA, timestampB){
-    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+  getTimestamps(timestampA, timestampB){
+    if (timestampA !== this.state.timestampA || timestampB !== this.state.timestampB) {
+      window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+    }
     this.setState({
       fetchedRaw: null,
       error: null,
+      showDiff: true,
       timestampA: timestampA,
       timestampB: timestampB});
   }
@@ -52,10 +56,10 @@ export default class DiffContainer extends React.Component {
         <ErrorMessage url={this.props.url} code={this.state.error}/>);
     }
     if (!this.state.timestampA && !this.state.timestampB) {
-      if (this.props.noTimestamps){
+      if (this.props.noTimestamps) {
         return (
           <div className="diffcontainer-view">
-            <YmdTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
+            <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
               isInitial={true} errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
@@ -64,7 +68,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <YmdTimestampHeader isInitial={true} {...this.props}
             errorHandledCallback={this.errorHandled}
-            changeTimestampsCallback={this.changeTimestamps}/>
+            getTimestampsCallback={this.getTimestamps}/>
         </div>
       );
     }
@@ -72,18 +76,18 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader isInitial={false}
-            {...this.props} changeTimestampsCallback={this.changeTimestamps}
+            {...this.props} getTimestampsCallback={this.getTimestamps}
             errorHandledCallback={this.errorHandled}/>
-          {this.prepareDiffView()}
+          {(this.state.showDiff? this.prepareDiffView(): null)}
           <DiffFooter/>
         </div>);
     }
     if (this.state.timestampA) {
       return (
         <div className="diffcontainer-view">
-          <YmdTimestampHeader {...this.props} changeTimestampsCallback={this.changeTimestamps}
+          <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
             isInitial={false} errorHandledCallback={this.errorHandled}/>
-          {this._showOneSnapshot(true, this.state.timestampA)}
+          {(this.state.showDiff? this._showOneSnapshot(true, this.state.timestampA): null)}
         </div>);
     }
     if (this.state.timestampB) {
@@ -91,8 +95,8 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <YmdTimestampHeader isInitial={false} {...this.props}
             errorHandledCallback={this.errorHandled}
-            changeTimestampsCallback={this.changeTimestamps}/>
-          {this._showOneSnapshot(false, this.state.timestampB)}
+            getTimestampsCallback={this.getTimestamps}/>
+          {(this.state.showDiff? this._showOneSnapshot(false, this.state.timestampB): null)}
         </div>);
     }
   }
@@ -107,7 +111,6 @@ export default class DiffContainer extends React.Component {
   }
 
   _showOneSnapshot (isLeft, timestamp) {
-    this._timestampsValidated = true;
     if(this.state.fetchedRaw){
       if (isLeft){
         return(
