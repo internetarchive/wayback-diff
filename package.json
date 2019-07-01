@@ -23,7 +23,7 @@
     "build": "rollup -c config/dev.js",
     "build:dev": "rollup -c config/dev.js -w",
     "pretest": "yarn run lint",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test --env=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
     "eject": "react-scripts eject",
     "lint": "./node_modules/.bin/eslint ./src"
   },
