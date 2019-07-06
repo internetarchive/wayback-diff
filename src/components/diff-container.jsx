@@ -32,15 +32,33 @@ export default class DiffContainer extends React.Component {
   }
 
   getTimestamps(timestampA, timestampB){
-    if (timestampA !== this.state.timestampA || timestampB !== this.state.timestampB) {
-      window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+    if (timestampA || timestampB) {
+      if (timestampA && timestampB == null) {
+        timestampB = '';
+        this.setState({
+          fetchedRaw: null,
+          error: null,
+          showDiff: true,
+          timestampA: timestampA});
+      } else if (timestampB && timestampA == null) {
+        timestampA = '';
+        this.setState({
+          fetchedRaw: null,
+          error: null,
+          showDiff: true,
+          timestampB: timestampB});
+      } else {
+        this.setState({
+          fetchedRaw: null,
+          error: null,
+          showDiff: true,
+          timestampA: timestampA,
+          timestampB: timestampB});
+      }
+      if (timestampA !== this.state.timestampA || timestampB !== this.state.timestampB) {
+        window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+      }
     }
-    this.setState({
-      fetchedRaw: null,
-      error: null,
-      showDiff: true,
-      timestampA: timestampA,
-      timestampB: timestampB});
   }
 
   errorHandled (errorCode) {

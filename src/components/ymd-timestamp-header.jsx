@@ -209,7 +209,7 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _checkTimestamps () {
+  _checkTimestamps (side = null) {
     this._shouldValidateTimestamp = false;
     var fetchedTimestamps = {a: '', b: ''};
     if (this.state.timestampA && this.state.timestampB) {
@@ -240,6 +240,13 @@ export default class YmdTimestampHeader extends React.Component {
             this.setState({finishedValidating: true});
           }
         }).catch(error => {this._errorHandled(error.message);});
+    } else {
+      if (side === 'left') {
+        this.setState({finishedValidating: true, showLoader: false, leftSnapElements: null, leftSnaps: null});
+      } else if (side === 'right') {
+        this.setState({finishedValidating: true, showLoader: false, rightSnapElements: null, rightSnaps: null});
+      }
+      this.setState({finishedValidating: true, showLoader: false});
     }
   }
 
@@ -352,14 +359,14 @@ export default class YmdTimestampHeader extends React.Component {
                   if (data && data.length > 0) {
                     this._prepareCDXData(leftData, data);
                   } else {
-                    this._checkTimestamps();
+                    this._checkTimestamps('right');
                   }
                 });
             } else {
               this._prepareCDXData(data, null);
             }
           } else {
-            this._checkTimestamps();
+            this._checkTimestamps('left');
           }
         })
         .catch(error => {this._errorHandled(error.message);});
@@ -369,7 +376,7 @@ export default class YmdTimestampHeader extends React.Component {
           if (data && data.length > 0) {
             this._prepareCDXData(null, data);
           } else {
-            this._checkTimestamps();
+            this._checkTimestamps('right');
           }
         });
     }
@@ -390,9 +397,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (leftData) {
       leftData.shift();
     }
-    if (this.state.timestampA && this.state.timestampB) {
-      this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
-    }
+    this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
       cdxData: true,
       leftSnaps: leftData,
@@ -530,14 +535,14 @@ export default class YmdTimestampHeader extends React.Component {
     if (this._isShowing('timestamp-select-left')) {
       if (this._leftTimestampIndex !== -1) {
         document.getElementById('timestamp-select-left').selectedIndex = this._leftTimestampIndex;
-      } else {
+      } else if (this.state.timestampA){
         document.getElementById('timestamp-select-left').value = this.state.timestampA;
       }
     }
     if (this._isShowing('timestamp-select-right')) {
       if (this._rightTimestampIndex !== -1) {
         document.getElementById('timestamp-select-right').selectedIndex = this._rightTimestampIndex;
-      } else {
+      } else if (this.state.timestampB){
         document.getElementById('timestamp-select-right').value = this.state.timestampB;
       }
     }
