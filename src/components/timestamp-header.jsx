@@ -160,7 +160,6 @@ export default class TimestampHeader extends React.Component {
     } else {
       let url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
       url.searchParams.append('url', this.props.url);
-      url.searchParams.append('status', '200');
       url.searchParams.append('fl', 'timestamp,digest');
       url.searchParams.append('output', 'json');
       url.searchParams.append('sort', 'reverse');

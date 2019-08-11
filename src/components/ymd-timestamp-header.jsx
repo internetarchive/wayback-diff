@@ -258,7 +258,6 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('closest', timestamp);
     url.searchParams.append('filter', '!mimetype:warc/revisit');
-    url.searchParams.append('filter', 'statuscode:200');
     url.searchParams.append('format', 'json');
     url.searchParams.append('sort', 'closest');
     url.searchParams.append('limit', '1');
@@ -312,7 +311,6 @@ export default class YmdTimestampHeader extends React.Component {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
         url.searchParams.append('url', this.props.url);
-        url.searchParams.append('filter', 'statuscode:200');
         url.searchParams.append('fl', 'timestamp,digest');
         url.searchParams.append('output', 'json');
         url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
@@ -323,7 +321,6 @@ export default class YmdTimestampHeader extends React.Component {
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         url = new URL(this.props.conf.cdxServer + 'search', window.location.origin)
         url.searchParams.append('url', this.props.url);
-        url.searchParams.append('filter', 'statuscode:200');
         url.searchParams.append('fl', 'timestamp,digest');
         url.searchParams.append('output', 'json');
         url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
