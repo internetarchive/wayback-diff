@@ -51,7 +51,7 @@ import React from 'react';
 //     pathname = pathname.substring(0, pathname.length - 2);
 //   }
 //   let domain = pathname.split('/').pop();
-//   let url = `${this.conf.cdxServer}search?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
+//   let url = `${this.conf.cdxServer}?url=${domain}/&status=200&fl=timestamp,digest&output=json`;
 //   return fetch(url);
 // }
 

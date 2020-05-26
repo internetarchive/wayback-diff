@@ -158,7 +158,7 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+      let url = new URL(this.props.conf.cdxServer, window.location.origin);
       url.searchParams.append('url', this.props.url);
       url.searchParams.append('fl', 'timestamp,digest');
       url.searchParams.append('output', 'json');
