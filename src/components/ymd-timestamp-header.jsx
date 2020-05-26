@@ -254,7 +254,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    let url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+    let url = new URL(this.props.conf.cdxServer, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('closest', timestamp);
     url.searchParams.append('filter', '!mimetype:warc/revisit');
@@ -309,7 +309,7 @@ export default class YmdTimestampHeader extends React.Component {
     } else {
       let url;
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer + 'search', window.location.origin);
+        url = new URL(this.props.conf.cdxServer, window.location.origin);
         url.searchParams.append('url', this.props.url);
         url.searchParams.append('fl', 'timestamp,digest');
         url.searchParams.append('output', 'json');
@@ -319,7 +319,7 @@ export default class YmdTimestampHeader extends React.Component {
         leftFetchPromise = this._handleFetch(fetch_with_timeout(fetch(url, {signal: this._abortController.signal})));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer + 'search', window.location.origin)
+        url = new URL(this.props.conf.cdxServer, window.location.origin);
         url.searchParams.append('url', this.props.url);
         url.searchParams.append('fl', 'timestamp,digest');
         url.searchParams.append('output', 'json');
