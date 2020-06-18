@@ -9,9 +9,7 @@ import React from 'react';
 export default class NoSnapshotURL extends React.Component {
   render () {
     return (
-      <div>
-        <h1>No capture is selected, please pick one from the list.</h1>
-      </div>
+      <h1>No capture is selected, please pick one from the list.</h1>
     )
   }
 }
