@@ -6,30 +6,30 @@ import {
 
 export const diffTypes = {
   RAW_FROM_CONTENT: {
-    description: '“From” Version',
+    description: '“From” Version'
   },
   RAW_TO_CONTENT: {
-    description: '“To” Version',
+    description: '“To” Version'
   },
   RAW_SIDE_BY_SIDE: {
-    description: 'Side-by-side Content',
+    description: 'Side-by-side Content'
   },
   HIGHLIGHTED_TEXT: {
     description: 'Highlighted Text',
-    diffService: 'html_text_dmp',
+    diffService: 'html_text_dmp'
   },
   HIGHLIGHTED_SOURCE: {
     description: 'Highlighted Source',
-    diffService: 'html_source_dmp',
+    diffService: 'html_source_dmp'
   },
   HIGHLIGHTED_RENDERED: {
     description: 'Highlighted Rendered',
-    diffService: 'html_token',
+    diffService: 'html_token'
   },
   SIDE_BY_SIDE_RENDERED: {
     description: 'Side-by-Side Rendered',
     diffService: 'html_token',
-    options: {include: 'all'}
+    options: { include: 'all' }
   },
   OUTGOING_LINKS: {
     description: 'Outgoing Links',
@@ -37,11 +37,11 @@ export const diffTypes = {
   },
   CHANGES_ONLY_TEXT: {
     description: 'Changes Only Text',
-    diffService: 'html_text_dmp',
+    diffService: 'html_text_dmp'
   },
   CHANGES_ONLY_SOURCE: {
     description: 'Changes Only Source',
-    diffService: 'html_source_dmp',
+    diffService: 'html_source_dmp'
   }
 };
 
@@ -57,19 +57,19 @@ const diffTypesByMediaType = {
     diffTypes.SIDE_BY_SIDE_RENDERED,
     diffTypes.OUTGOING_LINKS,
     diffTypes.CHANGES_ONLY_TEXT,
-    diffTypes.CHANGES_ONLY_SOURCE,
+    diffTypes.CHANGES_ONLY_SOURCE
   ],
 
   'text/*': [
     diffTypes.HIGHLIGHTED_SOURCE,
-    diffTypes.CHANGES_ONLY_SOURCE,
+    diffTypes.CHANGES_ONLY_SOURCE
   ],
 
   '*/*': [
     diffTypes.RAW_SIDE_BY_SIDE,
     diffTypes.RAW_FROM_CONTENT,
-    diffTypes.RAW_TO_CONTENT,
-  ],
+    diffTypes.RAW_TO_CONTENT
+  ]
 };
 
 /**
@@ -82,13 +82,12 @@ export function diffTypesFor (mediaType) {
   let type = null;
   if (typeof mediaType === 'string' && mediaType.startsWith('.')) {
     type = mediaTypeForExtension(mediaType) || unknownType;
-  }
-  else {
+  } else {
     type = parseMediaType(mediaType);
   }
 
-  return diffTypesByMediaType[type.mediaType]
-    || diffTypesByMediaType[type.genericType]
-    || diffTypesByMediaType[unknownType.mediaType]
-    || [];
+  return diffTypesByMediaType[type.mediaType] ||
+        diffTypesByMediaType[type.genericType] ||
+        diffTypesByMediaType[unknownType.mediaType] ||
+        [];
 }

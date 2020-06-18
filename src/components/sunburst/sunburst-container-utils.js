@@ -1,28 +1,23 @@
 import _ from 'lodash';
 import { getTwoDigitInt } from '../../js/utils';
 
-export function  buildValue(hoveredCell) {
-  const {radius, angle, angle0} = hoveredCell;
+export function buildValue (hoveredCell) {
+  const { radius, angle, angle0 } = hoveredCell;
   const truedAngle = (angle + angle0) / 2;
-  const temp = {
+  return {
     x: radius * Math.cos(truedAngle),
     y: radius * Math.sin(truedAngle)
   };
-
-  return temp;
 }
 
 export function getSize () {
+  const w = window.innerWidth || document.documentElement.clientWidth ||
+    document.body.clientWidth;
 
-  const w = window.innerWidth
-    || document.documentElement.clientWidth
-    || document.body.clientWidth;
-
-  const h = window.innerHeight
-    || document.documentElement.clientHeight
-    || document.body.clientHeight;
+  const h = window.innerHeight || document.documentElement.clientHeight ||
+    document.body.clientHeight;
   let size;
-  if (h<w){
+  if (h < w) {
     size = h*0.45;
   } else {
     size = w*0.45;

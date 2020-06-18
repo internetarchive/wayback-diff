@@ -45,37 +45,37 @@ export default function MediaType (type, subtype) {
     genericType: `${type}/*`,
     mediaType: `${type}/${subtype || '*'}`,
     type,
-    subtype,
+    subtype
   });
 }
 
 // TODO: remove this when we have content types for everything in the DB
 export const mediaTypeForExtension = {
   '.html': htmlType,
-  '.pdf':  MediaType('application', 'pdf'),
+  '.pdf': MediaType('application', 'pdf'),
   '.wsdl': MediaType('application', 'wsdl+xml'),
-  '.xml':  MediaType('application', 'xml'),
-  '.ksh':  MediaType('text', '*'),
-  '.ics':  MediaType('text', 'calendar'),
-  '.txt':  MediaType('text', 'plain'),
-  '.rss':  MediaType('application', 'rss+xml'),
-  '.jpg':  MediaType('image', 'jpeg'),
-  '.obj':  MediaType('application', 'x-tgif'),
-  '.doc':  MediaType('application', 'msword'),
-  '.zip':  MediaType('application', 'zip'),
+  '.xml': MediaType('application', 'xml'),
+  '.ksh': MediaType('text', '*'),
+  '.ics': MediaType('text', 'calendar'),
+  '.txt': MediaType('text', 'plain'),
+  '.rss': MediaType('application', 'rss+xml'),
+  '.jpg': MediaType('image', 'jpeg'),
+  '.obj': MediaType('application', 'x-tgif'),
+  '.doc': MediaType('application', 'msword'),
+  '.zip': MediaType('application', 'zip'),
   '.atom': MediaType('application', 'atom+xml'),
-  '.xlb':  MediaType('application', 'excel'),
-  '.pwz':  MediaType('application', 'powerpoint'),
-  '.gif':  MediaType('image', 'gif'),
-  '.rtf':  MediaType('application', 'rtf'),
-  '.csv':  MediaType('text', 'csv'),
-  '.xls':  MediaType('application', 'vnd.ms-excel'),
+  '.xlb': MediaType('application', 'excel'),
+  '.pwz': MediaType('application', 'powerpoint'),
+  '.gif': MediaType('image', 'gif'),
+  '.rtf': MediaType('application', 'rtf'),
+  '.csv': MediaType('text', 'csv'),
+  '.xls': MediaType('application', 'vnd.ms-excel'),
   '.xlsx': MediaType('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-  '.png':  MediaType('image', 'png'),
+  '.png': MediaType('image', 'png'),
   '.docx': MediaType('application', 'vnd.openxmlformats-officedocument.wordprocessingml.document'),
   '.jpeg': MediaType('image', 'jpeg'),
-  '.mp3':  MediaType('audio', 'mpeg'),
-  '.ai':   MediaType('application', 'postscript'),
+  '.mp3': MediaType('audio', 'mpeg'),
+  '.ai': MediaType('application', 'postscript')
 };
 
 // Maps various media types representing the same thing to a canonical type.
@@ -85,7 +85,7 @@ const canonicalTypes = {
   'application/xml+html': htmlType,
   'text/webviewhtml': htmlType,
   'text/x-server-parsed-html': htmlType,
-  'text/xhtml': htmlType,
+  'text/xhtml': htmlType
 };
 
 /**
@@ -97,11 +97,9 @@ const canonicalTypes = {
 export function parseMediaType (mediaType, canonicalize = true) {
   if (mediaType == null) {
     mediaType = '*/*';
-  }
-  else if (mediaType.mediaType) {
+  } else if (mediaType.mediaType) {
     return mediaType;
-  }
-  else if (!(typeof mediaType === 'string')) {
+  } else if (!(typeof mediaType === 'string')) {
     throw new TypeError(`The 'mediaType' argument must be a string, not \`${mediaType}\``);
   }
 
@@ -109,9 +107,9 @@ export function parseMediaType (mediaType, canonicalize = true) {
   let parsed = MediaType(parts[1], parts[2]);
 
   if (canonicalize) {
-    let canonicalType = canonicalTypes[parsed.mediaType];
+    const canonicalType = canonicalTypes[parsed.mediaType];
     if (canonicalType) {
-      parsed = Object.create(canonicalType, {exactType: {value: parsed}});
+      parsed = Object.create(canonicalType, { exactType: { value: parsed } });
     }
   }
 

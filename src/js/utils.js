@@ -4,7 +4,6 @@ import _ from 'lodash';
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
 /*eslint-enable no-useless-escape*/
 
-
 function hasWhiteSpace(s) {
   return s.indexOf(' ') >= 0;
 }
@@ -13,12 +12,12 @@ function looksLikeUrl(str) {
   return !!str.match(urlRegex);
 }
 
-function startsWith(str, start) {
+function startsWith (str, start) {
   return str.indexOf(start) === 0;
 }
 
 /*eslint-disable no-mixed-operators*/
-export function isStrUrl(str = '') {
+export function isStrUrl (str = '') {
   const processedValue = str.toLocaleLowerCase();
   return (
     startsWith(processedValue, 'ftp://') ||
@@ -30,8 +29,8 @@ export function isStrUrl(str = '') {
 
 export function hammingWeight(l) {
   let c;
-  for(c = 0; l; c++) {
-    l &= l-1;
+  for (c = 0; l; c++) {
+    l &= l - 1;
   }
   return c;
 }
@@ -74,12 +73,10 @@ export function similarityWithDistance(simhash1, simhash2) {
     //We divide with 32 because it is the output of distanceOfInts with input Number.MAX_SAFE_INTEGER
     return distanceOfInts(simhash1, simhash2) / 32 ;
   }
-
-  let simhash1Size= 8*atob(simhash1).length;
-  let simhash2Size = 8*atob(simhash2).length;
-  let sizes = [simhash1Size, simhash2Size];
-  let maxSize = _.max(sizes);
-  let distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
+  const simhash1Size = 8*atob(simhash1).length;
+  const simhash2Size = 8*atob(simhash2).length;
+  const maxSize = _.max([simhash1Size, simhash2Size]);
+  const distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
   return distance / maxSize;
 }
 
@@ -148,8 +145,8 @@ export function fetch_with_timeout(promise) {
   });
 }
 
-export function getTwoDigitInt(n){
-  if (typeof n === 'string'){
+export function getTwoDigitInt (n) {
+  if (typeof n === 'string') {
     return n;
   }
   return n > 9 ? '' + n: '0' + n;
@@ -170,14 +167,14 @@ export function selectHasValue(select, value) {
 }
 
 export function getUTCDateFormat (date) {
-  let year = parseInt(date.substring(0, 4), 10);
-  let month = parseInt(date.substring(4, 6), 10) - 1;
-  let day = parseInt(date.substring(6, 8), 10);
-  let hour = parseInt(date.substring(8, 10), 10);
-  let minutes = parseInt(date.substring(10, 12), 10);
-  let seconds = parseInt(date.substring(12, 14), 10);
+  const year = parseInt(date.substring(0, 4), 10);
+  const month = parseInt(date.substring(4, 6), 10) - 1;
+  const day = parseInt(date.substring(6, 8), 10);
+  const hour = parseInt(date.substring(8, 10), 10);
+  const minutes = parseInt(date.substring(10, 12), 10);
+  const seconds = parseInt(date.substring(12, 14), 10);
 
-  let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
+  const niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
   return (niceTime.toUTCString());
 }
 
