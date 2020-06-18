@@ -132,12 +132,12 @@ export function checkResponse (response) {
   }
 }
 
-export function fetchWithTimeout (promise) {
+export function fetchWithTimeout (url, params) {
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
       reject(new Error('timeout'));
     }, 45000);
-    promise.then(resolve, reject);
+    fetch(url, params).then(resolve, reject);
   });
 }
 

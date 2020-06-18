@@ -190,8 +190,8 @@ export default class DiffView extends React.Component {
     this.setState({diffData: null});
     if (!diffTypes[diffType].diffService) {
       return Promise.all([
-        fetchWithTimeout(fetch(a.uri, {mode: 'cors'})),
-        fetchWithTimeout(fetch(b.uri, {mode: 'cors'}))
+        fetchWithTimeout(a.uri, {mode: 'cors'}),
+        fetchWithTimeout(b.uri, {mode: 'cors'})
       ])
         .then(([rawA, rawB]) => {
           return {raw: true, rawA, rawB};
@@ -206,7 +206,7 @@ export default class DiffView extends React.Component {
     url.searchParams.append('include', 'all');
     url.searchParams.append('a', a);
     url.searchParams.append('b', b);
-    fetchWithTimeout(fetch(url, {credentials: 'include'}))
+    fetchWithTimeout(url, {credentials: 'include'})
       .then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((data) => {

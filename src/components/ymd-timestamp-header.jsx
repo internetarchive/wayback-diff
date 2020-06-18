@@ -262,7 +262,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('sort', 'closest');
     url.searchParams.append('limit', '1');
     url.searchParams.append('fl', 'timestamp');
-    return this._handleTimestampValidationFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetchWithTimeout(url, {signal: this._abortController.signal}), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
@@ -316,7 +316,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        leftFetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+        leftFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         url = new URL(this.props.conf.cdxServer, window.location.origin);
@@ -326,7 +326,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        rightFetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+        rightFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
       }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
@@ -575,7 +575,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
-    let fetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+    let fetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
     this._exportSparklineData(fetchPromise);
   }
 
