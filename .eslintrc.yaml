@@ -3,9 +3,16 @@ env:
   es6: true
   node: true
   jest: true
-extends: 'eslint:recommended'
+
+extends:
+  - "plugin:react/recommended"
+  - "plugin:mocha/recommended"
+  - 'standard'
+
 parser: 'babel-eslint'
+
 parserOptions:
+  ecmaVersion: 2019
   ecmaFeatures:
     classes: true
     experimentalObjectRestSpread: true
@@ -33,3 +40,7 @@ rules:
   semi:
     - error
     - always
+
+settings:
+  react:
+    version: 16.6.3
