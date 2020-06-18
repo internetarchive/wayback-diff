@@ -2,7 +2,7 @@ import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
-import { similarityWithDistance, checkResponse, fetch_with_timeout, getUTCDateFormat }
+import { similarityWithDistance, checkResponse, fetchWithTimeout, getUTCDateFormat }
   from '../../js/utils.js';
 import {getSize, decodeCompressedJson, decodeUncompressedJson} from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
@@ -94,7 +94,7 @@ export default class SunburstContainer extends React.Component {
       url.searchParams.append('sort', 'closest');
       url.searchParams.append('limit', '1');
       url.searchParams.append('fl', 'timestamp');
-      promise = fetch_with_timeout(fetch(url));
+      promise = fetchWithTimeout(fetch(url));
     }
     promise.then(response => {return checkResponse(response).json();})
       .then(data => {
@@ -121,7 +121,7 @@ export default class SunburstContainer extends React.Component {
   _fetchTimestampSimhashData () {
     const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) +
       '&timestamp='+ this.state.timestamp;
-    fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
+    fetchWithTimeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         if (jsonResponse['status']) {
@@ -138,7 +138,7 @@ export default class SunburstContainer extends React.Component {
       this.state.timestamp.substring(0, 4);
     if (this.props.conf.compressedSimhash)
       url +='&compress=1';
-    fetch_with_timeout(fetch(url)).then(response => {return checkResponse(response);})
+    fetchWithTimeout(fetch(url)).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';

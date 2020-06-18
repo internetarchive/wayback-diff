@@ -39,8 +39,8 @@ export function similarityWithTanimoto (simhash1, simhash2) {
     return weight((simhash1 & simhash2)) / weight((simhash1 | simhash2));
   }
   if (simhash1 instanceof Uint8Array && simhash2 instanceof Uint8Array) {
-    let andArray = [];
-    let orArray = [];
+    const andArray = [];
+    const orArray = [];
     for (let i = 0; i < simhash1.length; i++) {
       andArray.push(simhash1[i] & simhash2[i]);
       orArray.push(simhash1[i] | simhash2[i]);
@@ -132,7 +132,7 @@ export function checkResponse (response) {
   }
 }
 
-export function fetch_with_timeout (promise) {
+export function fetchWithTimeout (promise) {
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
       reject(new Error('timeout'));

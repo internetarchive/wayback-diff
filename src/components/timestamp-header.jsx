@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff-container.css';
-import {fetch_with_timeout, checkResponse} from '../js/utils.js';
+import {fetchWithTimeout, checkResponse} from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -124,7 +124,7 @@ export default class TimestampHeader extends React.Component {
     }
     const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
                         window.location.origin);
-    return this._handleTimestampValidationFetch(fetch_with_timeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetchWithTimeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
@@ -166,8 +166,7 @@ export default class TimestampHeader extends React.Component {
       if (this.props.conf.limit){
         url.searchParams.append('limit', this.props.conf.limit);
       }
-      this._handleFetch(fetch_with_timeout(fetch(url, { signal: this._abortController.signal })));
-
+      this._handleFetch(fetchWithTimeout(fetch(url, { signal: this._abortController.signal })));
     }
   }
 

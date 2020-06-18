@@ -4,7 +4,7 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import {isStrUrl, checkResponse, fetch_with_timeout} from '../js/utils.js';
+import {isStrUrl, checkResponse, fetchWithTimeout} from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
@@ -156,7 +156,7 @@ export default class DiffContainer extends React.Component {
     }else {
       const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
                           window.location.origin);
-      this._handleSnapshotFetch(fetch_with_timeout(fetch(url)));
+      this._handleSnapshotFetch(fetchWithTimeout(fetch(url)));
     }
 
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;

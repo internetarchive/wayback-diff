@@ -45,7 +45,7 @@ This function handles both a JSON array and a single JSON value.
  */
 
 export function decodeCompressedJson (json) {
-  let newJson = [];
+  const newJson = [];
   const year = json.captures[0][0];
   for (let i = 1; i < json.captures[0].length; i++) {
     const month = json.captures[0][i][0];

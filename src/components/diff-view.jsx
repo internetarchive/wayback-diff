@@ -8,7 +8,7 @@ import SideBySideRenderedDiff from './side-by-side-rendered-diff.jsx';
 import ChangesOnlyDiff from './changes-only-diff.jsx';
 import RawVersion from './raw-version.jsx';
 import SideBySideRawVersions from './side-by-side-raw-versions.jsx';
-import { checkResponse, fetch_with_timeout } from '../js/utils.js';
+import { checkResponse, fetchWithTimeout } from '../js/utils.js';
 import Loading from './loading.jsx';
 import _ from 'lodash';
 
@@ -190,8 +190,8 @@ export default class DiffView extends React.Component {
     this.setState({diffData: null});
     if (!diffTypes[diffType].diffService) {
       return Promise.all([
-        fetch_with_timeout(fetch(a.uri, {mode: 'cors'})),
-        fetch_with_timeout(fetch(b.uri, {mode: 'cors'}))
+        fetchWithTimeout(fetch(a.uri, {mode: 'cors'})),
+        fetchWithTimeout(fetch(b.uri, {mode: 'cors'}))
       ])
         .then(([rawA, rawB]) => {
           return {raw: true, rawA, rawB};
@@ -206,7 +206,7 @@ export default class DiffView extends React.Component {
     url.searchParams.append('include', 'all');
     url.searchParams.append('a', a);
     url.searchParams.append('b', b);
-    fetch_with_timeout(fetch(url, {credentials: 'include'}))
+    fetchWithTimeout(fetch(url, {credentials: 'include'}))
       .then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((data) => {

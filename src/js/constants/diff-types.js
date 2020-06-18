@@ -45,7 +45,7 @@ export const diffTypes = {
   }
 };
 
-for (let key in diffTypes) {
+for (const key in diffTypes) {
   diffTypes[key].value = key;
 }
 

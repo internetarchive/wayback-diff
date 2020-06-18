@@ -10,14 +10,14 @@ const relativeUrlRegex = new RegExp(window.location.origin + '/web/\\d{14}', 'gm
  */
 export function getTimestampCleanDiff (insertions, deletions) {
   // Create new HTML DOM elements to add web-monitoring-processing's responses to
-  let domIns = document.createElement('html');
-  let domDel = document.createElement('html');
+  const domIns = document.createElement('html');
+  const domDel = document.createElement('html');
   domIns.innerHTML = insertions;
   domDel.innerHTML = deletions;
   let ins = domIns.getElementsByTagName('ins');
   let del = domDel.getElementsByTagName('del');
-  let foundIns = [];
-  let foundDel = [];
+  const foundIns = [];
+  const foundDel = [];
 
   // Get all of web-monitoring-processing's del elements that link to a
   // resource and have at least one child, meaning that they highlight content
@@ -150,7 +150,7 @@ function removeMarkup (node) {
   if (node.className === 'wm-diff') {
     node.outerHTML = node.innerHTML;
   } else {
-    let parentNode = node.parentNode;
+    const parentNode = node.parentNode;
     removeMarkup(parentNode);
   }
 }
