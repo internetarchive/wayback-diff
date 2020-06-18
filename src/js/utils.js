@@ -1,14 +1,14 @@
 import _ from 'lodash';
 
-/*eslint-disable no-useless-escape*/
+/* eslint-disable no-useless-escape */
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
-/*eslint-enable no-useless-escape*/
+/* eslint-enable no-useless-escape */
 
-function hasWhiteSpace(s) {
+function hasWhiteSpace (s) {
   return s.indexOf(' ') >= 0;
 }
 
-function looksLikeUrl(str) {
+function looksLikeUrl (str) {
   return !!str.match(urlRegex);
 }
 
@@ -16,18 +16,17 @@ function startsWith (str, start) {
   return str.indexOf(start) === 0;
 }
 
-/*eslint-disable no-mixed-operators*/
 export function isStrUrl (str = '') {
   const processedValue = str.toLocaleLowerCase();
   return (
-    startsWith(processedValue, 'ftp://') ||
+    (startsWith(processedValue, 'ftp://') ||
     startsWith(processedValue, 'http://') ||
     startsWith(processedValue, 'https://') ||
-    looksLikeUrl(processedValue) && !hasWhiteSpace(processedValue)
+    looksLikeUrl(processedValue)) && !hasWhiteSpace(processedValue)
   ) && !startsWith(processedValue, 'site:');
 }
 
-export function hammingWeight(l) {
+export function hammingWeight (l) {
   let c;
   for (c = 0; l; c++) {
     l &= l - 1;
@@ -35,11 +34,10 @@ export function hammingWeight(l) {
   return c;
 }
 
-export function similarityWithTanimoto(simhash1, simhash2) {
+export function similarityWithTanimoto (simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
     return weight((simhash1 & simhash2)) / weight((simhash1 | simhash2));
   }
-
   if (simhash1 instanceof Uint8Array && simhash2 instanceof Uint8Array) {
     let andArray = [];
     let orArray = [];
@@ -68,13 +66,14 @@ function distanceOfUint8Array (x, y) {
     .reduce((acc, w) => acc + w, 0);
 }
 
-export function similarityWithDistance(simhash1, simhash2) {
+export function similarityWithDistance (simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
-    //We divide with 32 because it is the output of distanceOfInts with input Number.MAX_SAFE_INTEGER
-    return distanceOfInts(simhash1, simhash2) / 32 ;
+    // We divide with 32 because it is the output of distanceOfInts with input
+    // Number.MAX_SAFE_INTEGER
+    return distanceOfInts(simhash1, simhash2) / 32;
   }
-  const simhash1Size = 8*atob(simhash1).length;
-  const simhash2Size = 8*atob(simhash2).length;
+  const simhash1Size = 8 * atob(simhash1).length;
+  const simhash2Size = 8 * atob(simhash2).length;
   const maxSize = _.max([simhash1Size, simhash2Size]);
   const distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
   return distance / maxSize;
@@ -118,16 +117,13 @@ export function weight (x) {
   if (Number.isInteger(x)) {
     return weightOfInt(x);
   }
-
   if (x instanceof Uint8Array) {
     return weightOfUint8Array(x);
   }
-
   throw new Error('Unsupported type');
 }
 
-
-export function checkResponse(response) {
+export function checkResponse (response) {
   if (response) {
     if (!response.ok) {
       throw Error(response.status);
@@ -136,9 +132,9 @@ export function checkResponse(response) {
   }
 }
 
-export function fetch_with_timeout(promise) {
-  return new Promise(function(resolve, reject) {
-    setTimeout(function() {
+export function fetch_with_timeout (promise) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
       reject(new Error('timeout'));
     }, 45000);
     promise.then(resolve, reject);
@@ -149,21 +145,19 @@ export function getTwoDigitInt (n) {
   if (typeof n === 'string') {
     return n;
   }
-  return n > 9 ? '' + n: '0' + n;
+  return n > 9 ? '' + n : '0' + n;
 }
 
 export function getKeyByValue (obj, value) {
   return Object.keys(obj).find(key => obj[key] === value);
 }
 
-export function selectHasValue(select, value) {
-  let obj = document.getElementById(select);
-
+export function selectHasValue (select, value) {
+  const obj = document.getElementById(select);
   if (obj !== null) {
     return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
-  } else {
-    return false;
   }
+  return false;
 }
 
 export function getUTCDateFormat (date) {
