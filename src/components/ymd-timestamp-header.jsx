@@ -39,25 +39,19 @@ export default class YmdTimestampHeader extends React.Component {
       leftYear: leftYear,
       rightYear: rightYear,
       showSteps: this.props.isInitial,
+      showRestartBtn: false,
+      showDiffBtn: false,
       timestampAttempt: 0
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
-
     this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
-
     this._restartPressed = this._restartPressed.bind(this);
-
     this._showDiffs = this._showDiffs.bind(this);
-
     this._errorHandled = this._errorHandled.bind(this);
-
     this._showMonths = this._showMonths.bind(this);
-
     this._getTimestamps = this._getTimestamps.bind(this);
-
     this._handleYearChange = this._handleYearChange.bind(this);
-
   }
 
   componentDidMount () {
@@ -91,8 +85,10 @@ export default class YmdTimestampHeader extends React.Component {
   _handleRightTimestampChange () {
     this._rightTimestampIndex = document.getElementById('timestamp-select-right').selectedIndex;
     if (this._isShowing('timestamp-select-left')) {
-      this._showElement('restart-btn');
-      this._showElement('show-diff-btn');
+      this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true
+      });
       const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex - 1][1];
       let allowedSnapshots = this.state.leftSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -105,8 +101,10 @@ export default class YmdTimestampHeader extends React.Component {
   _handleLeftTimestampChange () {
     this._leftTimestampIndex = document.getElementById('timestamp-select-left').selectedIndex;
     if (this._isShowing('timestamp-select-right')) {
-      this._showElement('restart-btn');
-      this._showElement('show-diff-btn');
+      this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true
+      });
       const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex - 1][1];
       let allowedSnapshots = this.state.rightSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -117,7 +115,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
@@ -438,8 +435,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _restartPressed () {
-    this._hideAndCollapseElement('restart-btn');
     this.setState({
+      showRestartBtn: false,
       leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
       rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
     });
@@ -465,9 +462,8 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
         </div>
         <div className="wayback-ymd-buttons">
-          <button className="btn btn-default btn-sm" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
-          </button>
-          <button className="btn btn-default btn-sm" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
+          {(this.state.showDiffBtn ? <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> : null)}
+          {(this.state.showRestartBtn ? <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> : null)}
         </div>
         <div className="wayback-timestamps">
           <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onChange={this._handleRightTimestampChange}>
@@ -646,7 +642,7 @@ export default class YmdTimestampHeader extends React.Component {
   _getTimestamps (e) {
     this._fetchCDXData();
     let elemToShow;
-    if (e.target.id === 'month-select-left'){
+    if (e.target.id === 'month-select-left') {
       elemToShow = 'timestamp-select-left';
       this._leftTimestampIndex = 0;
     } else {
@@ -655,13 +651,12 @@ export default class YmdTimestampHeader extends React.Component {
     }
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
-    this._showElement('show-diff-btn');
     this.setState({
+      showDiffBtn: true,
       timestampA: null,
       timestampB: null
     });
   }
-
 
   _showElement (elementID) {
     let element = document.getElementById(elementID);
@@ -712,7 +707,9 @@ export default class YmdTimestampHeader extends React.Component {
       this._rightMonthIndex = 0;
     }
     this._hideElement(elemToHide);
-    this._hideElement('show-diff-btn');
+    this.setState({
+      showDiffBtn: false
+      });
     let elemToShow;
     if (e.target.id === 'year-select-left'){
       elemToShow = 'month-select-left';
@@ -733,8 +730,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (this._isShowing('month-select-right')){
       const monthRight = document.getElementById('month-select-right').value;
       this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
-    }
-    else if (this.state.timestampB) {
+    } else if (this.state.timestampB) {
       this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
     }
   }
