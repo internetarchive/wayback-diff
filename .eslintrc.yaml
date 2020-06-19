@@ -22,6 +22,8 @@ plugins:
   - mocha
   - react
 rules:
+  # this could be used to find problematic code
+  # complexity: ["error", 3]
   no-console:
     - error
     - allow:
