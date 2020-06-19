@@ -76,5 +76,6 @@ blue-diff-footer{
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
+    min-height: 60px;
 }
 
