@@ -102,8 +102,7 @@ function transformSource (source, transformer) {
  */
 function setDocumentBase (document, baseUrl) {
   if (baseUrl) {
-    const base = document.querySelector('base')
-      || document.createElement('base');
+    const base = document.querySelector('base') || document.createElement('base');
     base.href = baseUrl;
 
     // <meta charset> tags don't work unless they are first, so if one is
@@ -115,11 +114,9 @@ function setDocumentBase (document, baseUrl) {
     }
     if (beforeElement) {
       beforeElement.parentNode.insertBefore(base, beforeElement);
-    }
-    else {
+    } else {
       document.head.appendChild(base);
     }
   }
-
   return document;
 }

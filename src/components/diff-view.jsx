@@ -1,6 +1,6 @@
 import React from 'react';
 import '../css/diff.css';
-import {diffTypes} from '../js/constants/diff-types';
+import { diffTypes } from '../js/constants/diff-types';
 
 import HighlightedTextDiff from './highlighted-text-diff.jsx';
 import InlineRenderedDiff from './inline-rendered-diff.jsx';
@@ -37,21 +37,21 @@ export default class DiffView extends React.Component {
 
     this._abortController = new window.AbortController();
 
-    this.state = {diffData: null};
+    this.state = { diffData: null };
   }
 
   componentWillMount () {
-    const {props} = this;
+    const { props } = this;
     if (this._canFetch(props)) {
       this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.isMountedNow = true;
   }
 
-  componentWillUnmount(){
+  componentWillUnmount () {
     this.isMountedNow = false;
     this._abortController.abort();
   }
@@ -79,17 +79,13 @@ export default class DiffView extends React.Component {
   }
 
   renderNoChangeMessage () {
-
     const className = 'diff-view__alert alert alert-warning';
-
     if (this.state.diffData.change_count === 0) {
-
       return <div className={className}>
               There were <strong>no changes for this diff type</strong>. (Other diff
               types may show changes.)
       </div>;
     }
-
     return null;
   }
 
@@ -167,9 +163,8 @@ export default class DiffView extends React.Component {
    */
   _propsSpecifySameDiff (newProps, props) {
     props = props || this.props;
-    return props.a === newProps.a
-      && props.b === newProps.b
-      && props.diffType === newProps.diffType;
+    return props.a === newProps.a && props.b === newProps.b &&
+      props.diffType === newProps.diffType;
   }
 
   /**
@@ -187,17 +182,17 @@ export default class DiffView extends React.Component {
     // const fromList = this.props.pages && this.props.pages.find(
     //     (page: Page) => page.uuid === pageId);
     // Promise.resolve(fromList || this.context.api.getDiff(pageId, aId, bId, changeDiffTypes[diffType]))
-    this.setState({diffData: null});
+    this.setState({ diffData: null });
     if (!diffTypes[diffType].diffService) {
       return Promise.all([
-        fetchWithTimeout(fetch(a.uri, {mode: 'cors'})),
-        fetchWithTimeout(fetch(b.uri, {mode: 'cors'}))
+        fetchWithTimeout(a.uri, { mode: 'cors' }),
+        fetchWithTimeout(b.uri, { mode: 'cors' })
       ])
         .then(([rawA, rawB]) => {
-          return {raw: true, rawA, rawB};
+          return { raw: true, rawA, rawB };
         })
         .catch(error => error)
-        .then(data => this.setState({diffData: data}));
+        .then(data => this.setState({ diffData: data }));
     }
     var url = new URL(this.props.webMonitoringProcessingURL + '/' + diffTypes[diffType].diffService);
     url.searchParams.append('strict_urls', 'WBM');
@@ -206,7 +201,7 @@ export default class DiffView extends React.Component {
     url.searchParams.append('include', 'all');
     url.searchParams.append('a', a);
     url.searchParams.append('b', b);
-    fetchWithTimeout(fetch(url, {credentials: 'include'}))
+    fetchWithTimeout(url, { credentials: 'include' })
       .then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((data) => {
@@ -214,13 +209,13 @@ export default class DiffView extends React.Component {
           diffData: data
         });
       })
-      .catch(error => {this._errorHandled(error.message);});
+      .catch(error => { this._errorHandled(error.message); });
   }
 
-  _errorHandled(error) {
+  _errorHandled (error) {
     if (this.isMountedNow) {
       this.props.errorHandledCallback(error);
-      this.setState({showError: true});
+      this.setState({ showError: true });
     }
   }
 }

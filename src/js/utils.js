@@ -26,14 +26,6 @@ export function isStrUrl (str = '') {
   ) && !startsWith(processedValue, 'site:');
 }
 
-export function hammingWeight (l) {
-  let c;
-  for (c = 0; l; c++) {
-    l &= l - 1;
-  }
-  return c;
-}
-
 export function similarityWithTanimoto (simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
     return weight((simhash1 & simhash2)) / weight((simhash1 | simhash2));
@@ -113,7 +105,7 @@ function weightOfUint8Array (x) {
  * @param x
  * @returns {number}
  */
-export function weight (x) {
+function weight (x) {
   if (Number.isInteger(x)) {
     return weightOfInt(x);
   }
@@ -132,12 +124,12 @@ export function checkResponse (response) {
   }
 }
 
-export function fetchWithTimeout (promise) {
+export function fetchWithTimeout (url, params) {
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
       reject(new Error('timeout'));
     }, 45000);
-    promise.then(resolve, reject);
+    fetch(url, params).then(resolve, reject);
   });
 }
 

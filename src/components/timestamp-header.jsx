@@ -124,7 +124,7 @@ export default class TimestampHeader extends React.Component {
     }
     const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
                         window.location.origin);
-    return this._handleTimestampValidationFetch(fetchWithTimeout(fetch(url, {redirect: 'follow'})), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetchWithTimeout(url, {redirect: 'follow'}), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch(promise, timestamp, fetchedTimestamps, position){
@@ -166,7 +166,7 @@ export default class TimestampHeader extends React.Component {
       if (this.props.conf.limit){
         url.searchParams.append('limit', this.props.conf.limit);
       }
-      this._handleFetch(fetchWithTimeout(fetch(url, { signal: this._abortController.signal })));
+      this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
     }
   }
 

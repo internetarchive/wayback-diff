@@ -94,7 +94,7 @@ export default class SunburstContainer extends React.Component {
       url.searchParams.append('sort', 'closest');
       url.searchParams.append('limit', '1');
       url.searchParams.append('fl', 'timestamp');
-      promise = fetchWithTimeout(fetch(url));
+      promise = fetchWithTimeout(url);
     }
     promise.then(response => {return checkResponse(response).json();})
       .then(data => {
@@ -121,7 +121,7 @@ export default class SunburstContainer extends React.Component {
   _fetchTimestampSimhashData () {
     const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) +
       '&timestamp='+ this.state.timestamp;
-    fetchWithTimeout(fetch(url)).then(response => {return checkResponse(response);})
+    fetchWithTimeout(url).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         if (jsonResponse['status']) {
@@ -138,7 +138,7 @@ export default class SunburstContainer extends React.Component {
       this.state.timestamp.substring(0, 4);
     if (this.props.conf.compressedSimhash)
       url +='&compress=1';
-    fetchWithTimeout(fetch(url)).then(response => {return checkResponse(response);})
+    fetchWithTimeout(url).then(response => {return checkResponse(response);})
       .then(response => response.json())
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';

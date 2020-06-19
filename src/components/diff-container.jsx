@@ -156,7 +156,7 @@ export default class DiffContainer extends React.Component {
     }else {
       const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
                           window.location.origin);
-      this._handleSnapshotFetch(fetchWithTimeout(fetch(url)));
+      this._handleSnapshotFetch(fetchWithTimeout(url));
     }
 
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;

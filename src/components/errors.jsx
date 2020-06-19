@@ -1,5 +1,5 @@
 import React from 'react';
-import { checkResponse, fetchWithTimeout, getUTCDateFormat} from '../js/utils';
+import { checkResponse, fetchWithTimeout, getUTCDateFormat } from '../js/utils';
 
 /**
  * Display an error message depending on props
@@ -11,11 +11,9 @@ export default class ErrorMessage extends React.Component {
 
   constructor (props) {
     super(props);
-
     this._calculateSimhash = this._calculateSimhash.bind(this);
     this._errorHandled = this._errorHandled.bind(this);
     this._reloadPage = this._reloadPage.bind(this);
-
   }
 
   render () {
@@ -51,7 +49,7 @@ export default class ErrorMessage extends React.Component {
 
   _calculateSimhash () {
     const url = `${this.props.conf.waybackDiscoverDiff}/calculate-simhash?url=${encodeURIComponent(this.props.url)}&year=${this.props.timestamp.substring(0, 4)}`;
-    fetchWithTimeout(fetch(url)).then(response => {return checkResponse(response);})
+    fetchWithTimeout(url).then(response => {return checkResponse(response);})
       .then(() => {setTimeout(this._reloadPage, 10000);})
       .catch(error => {this._errorHandled(error.message);});
   }

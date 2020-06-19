@@ -1,7 +1,7 @@
 import React from 'react';
 import '../css/diff-container.css';
 import { fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue,
-  getUTCDateFormat} from '../js/utils.js';
+  getUTCDateFormat } from '../js/utils.js';
 import Loading from './loading.jsx';
 import _ from 'lodash';
 
@@ -12,7 +12,6 @@ import _ from 'lodash';
  * @extends {React.Component}
  */
 export default class YmdTimestampHeader extends React.Component {
-
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
   _monthNames = {
@@ -39,25 +38,19 @@ export default class YmdTimestampHeader extends React.Component {
       leftYear: leftYear,
       rightYear: rightYear,
       showSteps: this.props.isInitial,
+      showRestartBtn: false,
+      showDiffBtn: false,
       timestampAttempt: 0
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
-
     this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
-
     this._restartPressed = this._restartPressed.bind(this);
-
     this._showDiffs = this._showDiffs.bind(this);
-
     this._errorHandled = this._errorHandled.bind(this);
-
     this._showMonths = this._showMonths.bind(this);
-
     this._getTimestamps = this._getTimestamps.bind(this);
-
     this._handleYearChange = this._handleYearChange.bind(this);
-
   }
 
   componentDidMount () {
@@ -91,8 +84,10 @@ export default class YmdTimestampHeader extends React.Component {
   _handleRightTimestampChange () {
     this._rightTimestampIndex = document.getElementById('timestamp-select-right').selectedIndex;
     if (this._isShowing('timestamp-select-left')) {
-      this._showElement('restart-btn');
-      this._showElement('show-diff-btn');
+      this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true
+      });
       const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex - 1][1];
       let allowedSnapshots = this.state.leftSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -105,8 +100,10 @@ export default class YmdTimestampHeader extends React.Component {
   _handleLeftTimestampChange () {
     this._leftTimestampIndex = document.getElementById('timestamp-select-left').selectedIndex;
     if (this._isShowing('timestamp-select-right')) {
-      this._showElement('restart-btn');
-      this._showElement('show-diff-btn');
+      this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true
+      });
       const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex - 1][1];
       let allowedSnapshots = this.state.rightSnaps;
       allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
@@ -117,7 +114,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-
     const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
@@ -157,10 +153,8 @@ export default class YmdTimestampHeader extends React.Component {
 
   _areRequestedTimestampsSelected () {
     if (this.state.finishedValidating) {
-
       let leftTimestamp = parseInt(this.state.timestampA);
       let rightTimestamp = parseInt(this.state.timestampB);
-
       let lastLeftFromCDX, lastRightFromCDX, newLeft, newRight;
 
       if (isNaN(leftTimestamp)) {
@@ -211,17 +205,17 @@ export default class YmdTimestampHeader extends React.Component {
 
   _checkTimestamps (side = null) {
     this._shouldValidateTimestamp = false;
-    var fetchedTimestamps = {a: '', b: ''};
+    var fetchedTimestamps = { a: '', b: '' };
     if (this.state.timestampA && this.state.timestampB) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
-        .then(() => {return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b');})
+        .then(() => { return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b'); })
         .then(() => {
           if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
-            this.setState({finishedValidating: true});
+            this.setState({ finishedValidating: true });
           }
-        }).catch(error => {this._errorHandled(error.message);});
+        }).catch(error => { this._errorHandled(error.message); });
     } else if (this.state.timestampA) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
         .then(() => {
@@ -242,11 +236,11 @@ export default class YmdTimestampHeader extends React.Component {
         }).catch(error => {this._errorHandled(error.message);});
     } else {
       if (side === 'left') {
-        this.setState({finishedValidating: true, showLoader: false, leftSnapElements: null, leftSnaps: null});
+        this.setState({ leftSnapElements: null, leftSnaps: null });
       } else if (side === 'right') {
-        this.setState({finishedValidating: true, showLoader: false, rightSnapElements: null, rightSnaps: null});
+        this.setState({ rightSnapElements: null, rightSnaps: null });
       }
-      this.setState({finishedValidating: true, showLoader: false});
+      this.setState({ finishedValidating: true, showLoader: false });
     }
   }
 
@@ -262,7 +256,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('sort', 'closest');
     url.searchParams.append('limit', '1');
     url.searchParams.append('fl', 'timestamp');
-    return this._handleTimestampValidationFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(fetchWithTimeout(url, { signal: this._abortController.signal }), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
@@ -273,11 +267,11 @@ export default class YmdTimestampHeader extends React.Component {
           if (timestamp !== fetchedTimestamps[position]) {
             this._redirectToValidatedTimestamps = true;
           }
-        }
-        else {
+        } else {
           this._errorHandled('404');
-        }})
-      .catch(error => {this.errorHandled(error.message);});
+        }
+      })
+      .catch(error => { this.errorHandled(error.message); });
   }
 
   _setNewURL (fetchedTimestampA, fetchedTimestampB) {
@@ -289,8 +283,13 @@ export default class YmdTimestampHeader extends React.Component {
       fetchedTimestampB = '';
     }
     window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
-    this.setState({timestampA: fetchedTimestampA, timestampB: fetchedTimestampB,
-      finishedValidating: true, timestampAttempt: this.state.timestampAttempt + 1, showLoader: false});
+    this.setState({
+      timestampA: fetchedTimestampA,
+      timestampB: fetchedTimestampB,
+      finishedValidating: true,
+      timestampAttempt: this.state.timestampAttempt + 1,
+      showLoader: false
+    });
     if (this.state.leftSnaps) {
       this._leftTimestampIndex = this.state.leftSnaps.indexOf(fetchedTimestampA);
     }
@@ -300,7 +299,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _fetchCDXData () {
-    this.setState({showLoader: true});
+    this.setState({ showLoader: true });
     let leftFetchPromise;
     let rightFetchPromise;
     this._saveMonthsIndex();
@@ -316,7 +315,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        leftFetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+        leftFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         url = new URL(this.props.conf.cdxServer, window.location.origin);
@@ -326,7 +325,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        rightFetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+        rightFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
       }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
@@ -366,7 +365,7 @@ export default class YmdTimestampHeader extends React.Component {
             this._checkTimestamps('left');
           }
         })
-        .catch(error => {this._errorHandled(error.message);});
+        .catch(error => { this._errorHandled(error.message); });
     } else if (rightFetchPromise) {
       rightFetchPromise
         .then((data) => {
@@ -377,7 +376,6 @@ export default class YmdTimestampHeader extends React.Component {
           }
         });
     }
-
   }
 
   _errorHandled (error) {
@@ -420,7 +418,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (data) {
       let options = [];
       const limit = parseInt(this.props.conf.limit);
-      for (let i = data.length-1; i >= 0; i--) {
+      for (let i = data.length - 1; i >= 0; i--) {
         const count = Math.min(data[i][1], limit);
         options.push(<option key={i} value={data[i][0]}>{`${data[i][0]} (${count})`}</option>);
       }
@@ -434,12 +432,12 @@ export default class YmdTimestampHeader extends React.Component {
     const month = parseInt(timestamp.substring(4, 6), 10) - 1;
     const day = parseInt(timestamp.substring(6, 8), 10);
     const utcDateTime = new Date(Date.UTC(year, month, day));
-    return utcDateTime.toUTCString().split(' ').slice(0,4).join(' ');
+    return utcDateTime.toUTCString().split(' ').slice(0, 4).join(' ');
   }
 
   _restartPressed () {
-    this._hideAndCollapseElement('restart-btn');
     this.setState({
+      showRestartBtn: false,
       leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
       rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
     });
@@ -465,9 +463,8 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
         </div>
         <div className="wayback-ymd-buttons">
-          <button className="btn btn-default btn-sm" id="show-diff-btn" style={{visibility:'hidden'}} onClick={this._showDiffs}>Show differences
-          </button>
-          <button className="btn btn-default btn-sm" id="restart-btn" style={{visibility:'hidden'}} onClick={this._restartPressed}>Restart</button>
+          {(this.state.showDiffBtn ? <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> : null)}
+          {(this.state.showRestartBtn ? <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> : null)}
         </div>
         <div className="wayback-timestamps">
           <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onChange={this._handleRightTimestampChange}>
@@ -491,23 +488,15 @@ export default class YmdTimestampHeader extends React.Component {
 
   _showOpenLinks () {
     if (!this.state.showSteps || this.state.showDiff) {
-      if (this.state.timestampA) {
-        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-          id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
-      }
-      if (this.state.timestampB) {
-        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-          id="timestamp-right" target="_blank" rel="noopener">
-          Open in new window</a>);
-      }
-      let div = (
+      return (
         <div>
-          {aLeft}
-          {aRight}
+          {(this.state.timestampA ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+            id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a> : null)}
+          {(this.state.timestampB ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+            id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a> : null)}
           <br/>
         </div>
       );
-      return div;
     }
   }
 
@@ -523,23 +512,25 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB = timestampBelement.value;
     }
     this.props.getTimestampsCallback(timestampA, timestampB);
-    this.setState({showDiff: true,
+    this.setState({
+      showDiff: true,
       timestampA: timestampA,
-      timestampB: timestampB});
+      timestampB: timestampB
+    });
   }
 
   _selectValues () {
     if (this._isShowing('timestamp-select-left')) {
       if (this._leftTimestampIndex !== -1) {
         document.getElementById('timestamp-select-left').selectedIndex = this._leftTimestampIndex;
-      } else if (this.state.timestampA){
+      } else if (this.state.timestampA) {
         document.getElementById('timestamp-select-left').value = this.state.timestampA;
       }
     }
     if (this._isShowing('timestamp-select-right')) {
       if (this._rightTimestampIndex !== -1) {
         document.getElementById('timestamp-select-right').selectedIndex = this._rightTimestampIndex;
-      } else if (this.state.timestampB){
+      } else if (this.state.timestampB) {
         document.getElementById('timestamp-select-right').value = this.state.timestampB;
       }
     }
@@ -556,10 +547,8 @@ export default class YmdTimestampHeader extends React.Component {
     } else {
       monthRight.selectedIndex = 0;
     }
-
     document.getElementById('year-select-left').value = this.state.leftYear;
     document.getElementById('year-select-right').value = this.state.rightYear;
-
   }
 
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
@@ -575,7 +564,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
-    let fetchPromise = this._handleFetch(fetchWithTimeout(fetch(url, {signal: this._abortController.signal})));
+    let fetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
     this._exportSparklineData(fetchPromise);
   }
 
@@ -588,11 +577,10 @@ export default class YmdTimestampHeader extends React.Component {
           this._errorHandled('404');
         }
       })
-      .catch(error => {this._errorHandled(error.message);});
+      .catch(error => { this._errorHandled(error.message); });
   }
 
   _prepareSparklineData (data) {
-
     const snapshots = data['years'];
     let yearSum = new Array(snapshots.length);
     let j = 0;
@@ -646,7 +634,7 @@ export default class YmdTimestampHeader extends React.Component {
   _getTimestamps (e) {
     this._fetchCDXData();
     let elemToShow;
-    if (e.target.id === 'month-select-left'){
+    if (e.target.id === 'month-select-left') {
       elemToShow = 'timestamp-select-left';
       this._leftTimestampIndex = 0;
     } else {
@@ -655,13 +643,12 @@ export default class YmdTimestampHeader extends React.Component {
     }
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
-    this._showElement('show-diff-btn');
     this.setState({
+      showDiffBtn: true,
       timestampA: null,
       timestampB: null
     });
   }
-
 
   _showElement (elementID) {
     let element = document.getElementById(elementID);
@@ -691,7 +678,7 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _showInfo(){
+  _showInfo () {
     return (
       <div>
         {this.state.headerInfo}
@@ -703,23 +690,21 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleYearChange (e) {
-    let elemToHide;
-    if (e.target.id === 'year-select-left'){
-      elemToHide = 'timestamp-select-left';
+    if (e.target.id === 'year-select-left') {
+      this._hideElement('timestamp-select-left');
       this._leftMonthIndex = 0;
     } else {
-      elemToHide = 'timestamp-select-right';
+      this._hideElement('timestamp-select-right');
       this._rightMonthIndex = 0;
     }
-    this._hideElement(elemToHide);
-    this._hideElement('show-diff-btn');
-    let elemToShow;
-    if (e.target.id === 'year-select-left'){
-      elemToShow = 'month-select-left';
+    this.setState({
+      showDiffBtn: false
+    });
+    if (e.target.id === 'year-select-left') {
+      this._showElement('month-select-left');
     } else {
-      elemToShow = 'month-select-right';
+      this._showElement('month-select-right');
     }
-    this._showElement(elemToShow);
     this._showMonths();
   }
 
@@ -730,11 +715,10 @@ export default class YmdTimestampHeader extends React.Component {
     } else if (this.state.timestampA) {
       this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
     }
-    if (this._isShowing('month-select-right')){
+    if (this._isShowing('month-select-right')) {
       const monthRight = document.getElementById('month-select-right').value;
       this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
-    }
-    else if (this.state.timestampB) {
+    } else if (this.state.timestampB) {
       this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
     }
   }
