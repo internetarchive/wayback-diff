@@ -4,7 +4,6 @@ import { shallow } from '../../enzyme';
 import ErrorMessage from '../errors';
 
 describe('Error component tests', () => {
-
   it('renders 404 error', () => {
     const errorCode = '404';
     const url = 'url';
@@ -25,7 +24,7 @@ describe('Error component tests', () => {
 
   it('renders generic Error message', () => {
     let rndCode = Math.floor(Math.random() * Math.floor(600));
-    while (rndCode === 404) {rndCode = Math.floor(Math.random() * Math.floor(600));}
+    while (rndCode === 404) { rndCode = Math.floor(Math.random() * Math.floor(600)); }
     const errorCode = `${rndCode}`;
     const url = 'url';
     const wrapper = shallow(<ErrorMessage code={errorCode} url={url}/>);
