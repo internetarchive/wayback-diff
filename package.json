@@ -1,6 +1,6 @@
 {
   "name": "wayback-diff",
-  "version": "0.2.28",
+  "version": "0.2.29",
   "private": true,
   "main": "build/app.js",
   "dependencies": {
@@ -25,7 +25,7 @@
     "pretest": "yarn run lint",
     "test": "react-scripts test --env=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
     "eject": "react-scripts eject",
-    "lint": "./node_modules/.bin/eslint ./src"
+    "lint": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
