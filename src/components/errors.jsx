@@ -8,7 +8,6 @@ import { checkResponse, fetchWithTimeout, getUTCDateFormat } from '../js/utils';
  * @extends {React.Component}
  */
 export default class ErrorMessage extends React.Component {
-
   constructor (props) {
     super(props);
     this._calculateSimhash = this._calculateSimhash.bind(this);
@@ -49,9 +48,9 @@ export default class ErrorMessage extends React.Component {
 
   _calculateSimhash () {
     const url = `${this.props.conf.waybackDiscoverDiff}/calculate-simhash?url=${encodeURIComponent(this.props.url)}&year=${this.props.timestamp.substring(0, 4)}`;
-    fetchWithTimeout(url).then(response => {return checkResponse(response);})
-      .then(() => {setTimeout(this._reloadPage, 10000);})
-      .catch(error => {this._errorHandled(error.message);});
+    fetchWithTimeout(url).then(response => { return checkResponse(response); })
+      .then(() => { setTimeout(this._reloadPage, 10000); })
+      .catch(error => { this._errorHandled(error.message); });
   }
 
   _errorHandled (error) {

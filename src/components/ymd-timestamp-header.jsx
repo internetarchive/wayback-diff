@@ -15,8 +15,18 @@ export default class YmdTimestampHeader extends React.Component {
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
   _monthNames = {
-    1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May',
-    6: 'June', 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December'
   };
   _leftMonthIndex = -1;
   _rightMonthIndex = -1;
@@ -114,7 +124,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-    const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
+    const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
     }
@@ -222,18 +232,18 @@ export default class YmdTimestampHeader extends React.Component {
           if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
-            this.setState({finishedValidating: true});
+            this.setState({ finishedValidating: true });
           }
-        }).catch(error => {this._errorHandled(error.message);});
+        }).catch(error => { this._errorHandled(error.message); });
     } else if (this.state.timestampB) {
       this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b')
         .then(() => {
           if (this._redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
-            this.setState({finishedValidating: true});
+            this.setState({ finishedValidating: true });
           }
-        }).catch(error => {this._errorHandled(error.message);});
+        }).catch(error => { this._errorHandled(error.message); });
     } else {
       if (side === 'left') {
         this.setState({ leftSnapElements: null, leftSnaps: null });
@@ -315,7 +325,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        leftFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
+        leftFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         url = new URL(this.props.conf.cdxServer, window.location.origin);
@@ -325,7 +335,7 @@ export default class YmdTimestampHeader extends React.Component {
         url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
         url.searchParams.append('limit', this.props.conf.limit);
-        rightFetchPromise = this._handleFetch(fetchWithTimeout(url, {signal: this._abortController.signal}));
+        rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
     }
     this._exportCDXData(leftFetchPromise, rightFetchPromise);
@@ -381,7 +391,7 @@ export default class YmdTimestampHeader extends React.Component {
   _errorHandled (error) {
     if (this._isMountedNow) {
       this.props.errorHandledCallback(error);
-      this.setState({showError: true});
+      this.setState({ showError: true });
     }
   }
 
@@ -452,12 +462,12 @@ export default class YmdTimestampHeader extends React.Component {
             <option value="" disabled selected>Year</option>
             {this.state.yearOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{visibility: this._visibilityState[+(this._leftMonthIndex === -1)]}}
+          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
             onChange={this._getTimestamps} title="Months and available captures">
             <option value="" disabled selected>Month</option>
             {this.state.leftMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{visibility: this._visibilityState[+!this.state.leftSnapElements]}} onChange={this._handleLeftTimestampChange}>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{ visibility: this._visibilityState[+!this.state.leftSnapElements] }} onChange={this._handleLeftTimestampChange}>
             <option value="" disabled selected>Available captures</option>
             {this.state.leftSnapElements}
           </select>
@@ -467,11 +477,11 @@ export default class YmdTimestampHeader extends React.Component {
           {(this.state.showRestartBtn ? <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> : null)}
         </div>
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{visibility: this._visibilityState[+!this.state.rightSnapElements]}} onChange={this._handleRightTimestampChange}>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{ visibility: this._visibilityState[+!this.state.rightSnapElements] }} onChange={this._handleRightTimestampChange}>
             <option value="" disabled selected>Available captures</option>
             {this.state.rightSnapElements}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{visibility: this._visibilityState[+(this._rightMonthIndex === -1)]}}
+          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
             onChange={this._getTimestamps} title="Months and available captures">
             <option value="" disabled selected>Month</option>
             {this.state.rightMonthOptions}
@@ -559,7 +569,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _fetchSparklineData () {
-    this.setState({showLoader: true});
+    this.setState({ showLoader: true });
     let url = new URL(this.props.conf.sparklineURL, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
