@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
 
@@ -18,6 +19,13 @@ const showAdditions = showType.bind(null, 'additions');
  * @param {SideBySideRenderedDiffProps} props
  */
 export default class SideBySideRenderedDiff extends React.Component {
+
+  static propTypes = {
+    diffData: PropTypes.object,
+    page: PropTypes.object,
+    loader: PropTypes.object
+  };
+
   render () {
     // The newest version of this diff includes separate, more accurate
     // versions to show for each side, but the old one needs transformations.

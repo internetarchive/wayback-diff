@@ -9,7 +9,6 @@ import IframeLoader from './iframe-loader.jsx';
  *           function to apply to the document before rendering.
  */
 
-
 /**
  * Display HTML source code or document in a sandboxed frame.
  *
@@ -35,7 +34,7 @@ export default class SandboxedHtml extends React.PureComponent {
 
   render () {
     return <div>
-      <iframe height={window.innerHeight} width={'100%'} onLoad={()=>{this.handleHeight(); this.removeLoaderImg();}}
+      <iframe height={window.innerHeight} width={'100%'} onLoad={() => { this.handleHeight(); this.removeLoaderImg(); }}
         sandbox="allow-same-origin allow-forms allow-scripts"
         ref={frame => this._frame = frame}
       />
@@ -70,7 +69,7 @@ export default class SandboxedHtml extends React.PureComponent {
   addLoaderImg () {
     let width = this._frame.contentDocument.scrollingElement.offsetWidth;
     let centerX = this._frame.offsetLeft + width / 2;
-    let loaderCSS = {position:'absolute',left:centerX + 'px',top:'50%'};
+    let loaderCSS = { position: 'absolute', left: centerX + 'px', top: '50%' };
     this.loaderRef.current.setLoaderStyle(loaderCSS);
   }
 }

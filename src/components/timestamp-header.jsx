@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import { fetchWithTimeout, checkResponse } from '../js/utils.js';
@@ -10,6 +11,17 @@ import { fetchWithTimeout, checkResponse } from '../js/utils.js';
 export default class TimestampHeader extends React.Component {
   _isMountedNow = false;
   _shouldValidateTimestamp = true;
+
+  static propTypes = {
+    url: PropTypes.object,
+    timestampA: PropTypes.string,
+    timestampB: PropTypes.string,
+    conf: PropTypes.object,
+    fetchCDXCallback: PropTypes.func,
+    fetchSnapshotCallback: PropTypes.func,
+    changeTimestampsCallback: PropTypes.func,
+    isInitial: PropTypes.bool
+  };
 
   constructor (props) {
     super(props);
@@ -229,25 +241,25 @@ export default class TimestampHeader extends React.Component {
   }
 
   _getUTCDateFormat (date) {
-    let year = parseInt(date.substring(0, 4), 10);
-    let month = parseInt(date.substring(4, 6), 10) - 1;
-    let day = parseInt(date.substring(6, 8), 10);
-    let hour = parseInt(date.substring(8, 10), 10);
-    let minutes = parseInt(date.substring(10, 12), 10);
-    let seconds = parseInt(date.substring(12, 14), 10);
+    const year = parseInt(date.substring(0, 4), 10);
+    const month = parseInt(date.substring(4, 6), 10) - 1;
+    const day = parseInt(date.substring(6, 8), 10);
+    const hour = parseInt(date.substring(8, 10), 10);
+    const minutes = parseInt(date.substring(10, 12), 10);
+    const seconds = parseInt(date.substring(12, 14), 10);
 
-    let niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
+    const niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
     return (niceTime.toUTCString());
   }
 
   _getShortUTCDateFormat (date) {
-    let year = parseInt(date.substring(0, 4), 10);
-    let month = parseInt(date.substring(4, 6), 10) - 1;
-    let day = parseInt(date.substring(6, 8), 10);
+    const year = parseInt(date.substring(0, 4), 10);
+    const month = parseInt(date.substring(4, 6), 10) - 1;
+    const day = parseInt(date.substring(6, 8), 10);
     var shortTime = new Date(Date.UTC(year, month, day));
     shortTime = shortTime.toUTCString();
     shortTime = shortTime.split(' ');
-    let retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
+    const retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
     return (retTime);
   }
 

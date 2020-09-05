@@ -43,11 +43,11 @@ export default class ChangesOnlyDiff extends React.Component {
  * @returns {Array.<[number, string]>}
  */
 function getContextualDiff (newDiff, currentValue, index, diff) {
-  let [itemType, itemText] = currentValue;
+  const [itemType, itemText] = currentValue;
   if (itemType !== 0) return newDiff.concat([currentValue]);
 
   // Determine whether there is content that actually needs trimming
-  let lines = itemText.split('\n');
+  const lines = itemText.split('\n');
   const singleLine = lines.length === 1;
   if (!singleLine && lines.length <= maxContextLines) {
     return newDiff.concat([currentValue]);
@@ -67,12 +67,10 @@ function getContextualDiff (newDiff, currentValue, index, diff) {
   // ...and actually do the trimming
   let newEntries = [];
   if (hasPreviousChange) {
-    const newText = [];
-
+    let newText = [];
     if (singleLine) {
       newText.push(lines[0].slice(0, maxContextLineLength));
-    }
-    else {
+    } else {
       const newLines = lines
         .slice(0, maxContextLines)
         .map(line => {
