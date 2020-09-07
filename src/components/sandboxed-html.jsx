@@ -21,7 +21,7 @@ export default class SandboxedHtml extends React.PureComponent {
   static propTypes = {
     loader: PropTypes.object,
     html: PropTypes.string,
-    transform: PropTypes.funct,
+    transform: PropTypes.func,
     baseUrl: PropTypes.string
   };
 

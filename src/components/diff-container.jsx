@@ -158,7 +158,7 @@ export default class DiffContainer extends React.Component {
     } else {
       const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
         window.location.origin);
-      this._handleSnapshotFetch(fetchWithTimeout(url));
+      this._handleSnapshotFetch(fetchWithTimeout(url.toString()));
     }
 
     const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
@@ -190,8 +190,9 @@ export default class DiffContainer extends React.Component {
         window.location.origin);
       const webMonURL = new URL(this.props.conf.webMonitoringProcessingURL,
         window.location.origin);
-      return (<DiffView webMonitoringProcessingURL={webMonURL}
-        page={{ url: encodeURIComponent(this.props.url) }} diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
+      return (<DiffView webMonitoringProcessingURL={webMonURL.toString()}
+        page={{ url: encodeURIComponent(this.props.url) }}
+        diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
         loader={this.props.loader} errorHandledCallback={this.errorHandled}/>);
     }
   }
