@@ -1,8 +1,13 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 import Loading from './loading.jsx';
 
 export default class IframeLoader extends React.PureComponent {
+  static propTypes = {
+    loader: PropTypes.object
+  };
+
   constructor (props) {
     super(props);
     this.state = { loaderStyle: null };

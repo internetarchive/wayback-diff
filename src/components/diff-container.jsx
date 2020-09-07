@@ -38,21 +38,24 @@ export default class DiffContainer extends React.Component {
           fetchedRaw: null,
           error: null,
           showDiff: true,
-          timestampA: timestampA });
+          timestampA: timestampA
+        });
       } else if (timestampB && timestampA == null) {
         timestampA = '';
         this.setState({
           fetchedRaw: null,
           error: null,
           showDiff: true,
-          timestampB: timestampB });
+          timestampB: timestampB
+        });
       } else {
         this.setState({
           fetchedRaw: null,
           error: null,
           showDiff: true,
           timestampA: timestampA,
-          timestampB: timestampB });
+          timestampB: timestampB
+        });
       }
       if (timestampA !== this.state.timestampA || timestampB !== this.state.timestampB) {
         window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
@@ -194,8 +197,8 @@ export default class DiffContainer extends React.Component {
   }
 
   _handleHeight () {
-    let offsetHeight = this._oneFrame.contentDocument.documentElement.scrollHeight;
-    let offsetWidth = this._oneFrame.contentDocument.documentElement.scrollWidth;
+    const offsetHeight = this._oneFrame.contentDocument.documentElement.scrollHeight;
+    const offsetWidth = this._oneFrame.contentDocument.documentElement.scrollWidth;
     if (offsetHeight > 0.1 * this._oneFrame.height) {
       this._oneFrame.height = offsetHeight + (offsetHeight * 0.01);
     } else {

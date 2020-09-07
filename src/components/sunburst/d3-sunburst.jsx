@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Sunburst, Hint } from 'react-vis';
 import '../../../node_modules/react-vis/dist/style.css';
@@ -21,6 +22,12 @@ const tipStyle = {
 const boxStyle = { height: '10px', width: '10px' };
 
 export default class D3Sunburst extends React.Component {
+  static propTypes = {
+    simhashData: PropTypes.object,
+    url: PropTypes.string,
+    urlPrefix: PropTypes.string
+  };
+
   state = {
     hoveredCell: false
   };
@@ -53,7 +60,7 @@ export default class D3Sunburst extends React.Component {
 
   _cellClick (node) {
     if (node.timestamp !== this.props.simhashData.timestamp) {
-      let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
+      const url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
       window.open(url, '_blank');
     }
   }

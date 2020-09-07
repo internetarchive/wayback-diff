@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DiffItem from './diff-item.jsx';
 import List from './list.jsx';
@@ -17,6 +18,11 @@ const maxContextLineLength = 300;
  * @param {string} props.className
  */
 export default class ChangesOnlyDiff extends React.Component {
+  static propTypes = {
+    diffData: PropTypes.object,
+    className: PropTypes.string
+  };
+
   render () {
     const changesOnly = this.props.diffData.diff.reduce(
       getContextualDiff, []);
@@ -65,9 +71,9 @@ function getContextualDiff (newDiff, currentValue, index, diff) {
   }
 
   // ...and actually do the trimming
-  let newEntries = [];
+  const newEntries = [];
   if (hasPreviousChange) {
-    let newText = [];
+    const newText = [];
     if (singleLine) {
       newText.push(lines[0].slice(0, maxContextLineLength));
     } else {
@@ -93,8 +99,7 @@ function getContextualDiff (newDiff, currentValue, index, diff) {
 
     if (singleLine) {
       newText.push(lines[0].slice(-maxContextLineLength));
-    }
-    else {
+    } else {
       const newLines = lines
         .slice(0, maxContextLines)
         .map((line, index, lines) => {

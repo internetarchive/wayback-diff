@@ -13,6 +13,7 @@ export default class TimestampHeader extends React.Component {
   _shouldValidateTimestamp = true;
 
   static propTypes = {
+    loader: PropTypes.object,
     url: PropTypes.object,
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
@@ -20,6 +21,7 @@ export default class TimestampHeader extends React.Component {
     fetchCDXCallback: PropTypes.func,
     fetchSnapshotCallback: PropTypes.func,
     changeTimestampsCallback: PropTypes.func,
+    errorHandledCallback: PropTypes.func,
     isInitial: PropTypes.bool
   };
 
@@ -141,8 +143,7 @@ export default class TimestampHeader extends React.Component {
     return promise
       .then(response => { return checkResponse(response); })
       .then(response => {
-        let url = response.url;
-        fetchedTimestamps[position] = url.split('/')[4];
+        fetchedTimestamps[position] = response.url.split('/')[4];
         if (timestamp !== fetchedTimestamps[position]) {
           this._redirectToValidatedTimestamps = true;
         }
@@ -168,7 +169,7 @@ export default class TimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url = new URL(this.props.conf.cdxServer, window.location.origin);
+      const url = new URL(this.props.conf.cdxServer, window.location.origin);
       url.searchParams.append('url', this.props.url);
       url.searchParams.append('fl', 'timestamp,digest');
       url.searchParams.append('output', 'json');
@@ -210,6 +211,7 @@ export default class TimestampHeader extends React.Component {
       this.setState({ showError: true });
     }
   }
+
   _prepareData (data) {
     data.shift();
     this.setState({
@@ -229,7 +231,7 @@ export default class TimestampHeader extends React.Component {
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
     for (let i = 0; i < data.length; i++) {
-      let utcTime = this._getUTCDateFormat(data[i][0]);
+      const utcTime = this._getUTCDateFormat(data[i][0]);
       var year = this._getYear(data[i][0]);
       if (year < yearGroup) {
         yearGroup = year;
@@ -268,12 +270,11 @@ export default class TimestampHeader extends React.Component {
   }
 
   _restartPressed () {
-    let initialData = this.state.cdxData;
     this.setState({
-      leftSnaps: initialData,
-      rightSnaps: initialData,
-      leftSnapElements: this._prepareOptionElements(initialData),
-      rightSnapElements: this._prepareOptionElements(initialData)
+      leftSnaps: this.state.cdxData,
+      rightSnaps: this.state.cdxData,
+      leftSnapElements: this._prepareOptionElements(this.state.cdxData),
+      rightSnapElements: this._prepareOptionElements(this.sate.cdxData)
     });
   }
 
@@ -307,38 +308,38 @@ export default class TimestampHeader extends React.Component {
     if (!this.props.isInitial) {
       if (this.props.timestampA) {
         var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-          id="timestamp-left" target="_blank" rel="noopener"> Open in new window</a>);
+          id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>);
       }
       if (this.props.timestampB) {
         var aRight = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-          id="timestamp-right" target="_blank" rel="noopener">
+          id="timestamp-right" target="_blank" rel="noopener noreferrer">
           Open in new window</a>);
       }
-      let div = (
+      return (
         <div>
           {aLeft}
           {aRight}
           <br/>
         </div>
       );
-      return div;
     }
   }
 
   _notFound () {
-    return (<div className="alert alert-warning" role="alert">The Wayback Machine doesn't have {this.props.url} archived.</div>);
+    return (<div className="alert alert-warning" role="alert">
+      The Wayback Machine has not archived {this.props.url}.
+    </div>);
   }
 
   _showDiffs () {
-    let loaders = document.getElementsByClassName('waybackDiffIframeLoader');
-
+    const loaders = document.getElementsByClassName('waybackDiffIframeLoader');
     while (loaders.length > 0) {
       loaders[0].parentNode.removeChild(loaders[0]);
     }
-
-    let timestampA = document.getElementById('timestamp-select-left').value;
-    let timestampB = document.getElementById('timestamp-select-right').value;
-    this.props.changeTimestampsCallback(timestampA, timestampB);
+    this.props.changeTimestampsCallback(
+      document.getElementById('timestamp-select-left').value,
+      document.getElementById('timestamp-select-right').value
+    );
     this.setState({ showDiff: true });
   }
 
@@ -351,8 +352,8 @@ export default class TimestampHeader extends React.Component {
 
   _getHeaderInfo (data) {
     if (data) {
-      let first = this._getShortUTCDateFormat(data[0][0]);
-      let last = this._getShortUTCDateFormat(data[data.length - 1][0]);
+      const first = this._getShortUTCDateFormat(data[0][0]);
+      const last = this._getShortUTCDateFormat(data[data.length - 1][0]);
       const numberWithCommas = (x) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       };

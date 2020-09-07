@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import IframeLoader from './iframe-loader.jsx';
 
@@ -17,6 +18,13 @@ import IframeLoader from './iframe-loader.jsx';
  * @params {SandboxedHtmlProps} props
  */
 export default class SandboxedHtml extends React.PureComponent {
+  static propTypes = {
+    loader: PropTypes.object,
+    html: PropTypes.string,
+    transform: PropTypes.funct,
+    baseUrl: PropTypes.string
+  };
+
   constructor (props) {
     super(props);
     this.loaderRef = React.createRef();
@@ -43,7 +51,7 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   _updateContent () {
-    let source = transformSource(this.props.html, document => {
+    const source = transformSource(this.props.html, document => {
       if (this.props.transform) {
         document = this.props.transform(document) || document;
       }
@@ -54,7 +62,7 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   handleHeight () {
-    let offsetHeight = this._frame.contentDocument.documentElement.scrollHeight;
+    const offsetHeight = this._frame.contentDocument.documentElement.scrollHeight;
     if (offsetHeight > 0.1 * this._frame.height) {
       this._frame.height = offsetHeight + (offsetHeight * 0.01);
     } else {
@@ -67,10 +75,11 @@ export default class SandboxedHtml extends React.PureComponent {
   }
 
   addLoaderImg () {
-    let width = this._frame.contentDocument.scrollingElement.offsetWidth;
-    let centerX = this._frame.offsetLeft + width / 2;
-    let loaderCSS = { position: 'absolute', left: centerX + 'px', top: '50%' };
-    this.loaderRef.current.setLoaderStyle(loaderCSS);
+    const width = this._frame.contentDocument.scrollingElement.offsetWidth;
+    const centerX = this._frame.offsetLeft + width / 2;
+    this.loaderRef.current.setLoaderStyle(
+      { position: 'absolute', left: centerX + 'px', top: '50%' }
+    );
   }
 }
 

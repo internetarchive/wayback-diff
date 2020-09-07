@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
-import { fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue,
-  getUTCDateFormat } from '../js/utils.js';
+import {
+  fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue, getUTCDateFormat
+} from '../js/utils.js';
 import Loading from './loading.jsx';
 import _ from 'lodash';
 
@@ -14,6 +15,11 @@ import _ from 'lodash';
  */
 export default class YmdTimestampHeader extends React.Component {
   static propTypes = {
+    loader: PropTypes.object,
+    fetchSnapshotCallback: PropTypes.func,
+    fetchCDXCallback: PropTypes.func,
+    errorHandledCallback: PropTypes.func,
+    getTimestampsCallback: PropTypes.func,
     _isMountedNow: PropTypes.bool,
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
@@ -275,7 +281,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    let url = new URL(this.props.conf.cdxServer, window.location.origin);
+    const url = new URL(this.props.conf.cdxServer, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('closest', timestamp);
     url.searchParams.append('filter', '!mimetype:warc/revisit');

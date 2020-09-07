@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
 
@@ -16,6 +17,12 @@ import SandboxedHtml from './sandboxed-html.jsx';
  * @param {RawVersionProps} props
  */
 export default class RawVersion extends React.Component {
+  static propTypes = {
+    content: PropTypes.string,
+    page: PropTypes.object,
+    version: PropTypes.string
+  };
+
   render () {
     if (this.props.content && /^[\s\n\r]*</.test(this.props.content)) {
       return (

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DiffItem from './diff-item.jsx';
 import List from './list.jsx';
@@ -12,6 +13,11 @@ import List from './list.jsx';
  * @param {string} props.className
  */
 export default class HighlightedTextDiff extends React.Component {
+  static propTypes = {
+    diffData: PropTypes.object,
+    className: PropTypes.string
+  };
+
   render () {
     return (
       <List

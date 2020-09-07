@@ -86,7 +86,7 @@ export default class SunburstContainer extends React.Component {
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      let url = new URL(this.props.conf.cdxServer, window.location.origin);
+      const url = new URL(this.props.conf.cdxServer, window.location.origin);
       url.searchParams.append('url', this.props.url);
       url.searchParams.append('closest', this.props.timestamp);
       url.searchParams.append('filter', '!mimetype:warc/revisit');
@@ -124,11 +124,12 @@ export default class SunburstContainer extends React.Component {
     fetchWithTimeout(url).then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((jsonResponse) => {
-        if (jsonResponse['status']) {
-          throw Error(jsonResponse['message']);
+        if (jsonResponse.status) {
+          throw Error(jsonResponse.message);
         }
-        let json = decodeUncompressedJson(jsonResponse, this.state.timestamp);
-        this._fetchSimhashData(json);
+        this._fetchSimhashData(
+          decodeUncompressedJson(jsonResponse, this.state.timestamp)
+        );
       })
       .catch(error => { this.errorHandled(error.message); });
   }
@@ -142,8 +143,12 @@ export default class SunburstContainer extends React.Component {
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';
         let json;
-        if (this.props.conf.compressedSimhash) { json = decodeCompressedJson(jsonResponse); } else { json = decodeUncompressedJson(jsonResponse); }
-        let data = this._calcDistanceAndScales(json, timestampJson);
+        if (this.props.conf.compressedSimhash) {
+          json = decodeCompressedJson(jsonResponse);
+        } else {
+          json = decodeUncompressedJson(jsonResponse);
+        }
+        const data = this._calcDistanceAndScales(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
       .catch(error => { this.errorHandled(error.message); });
@@ -162,9 +167,9 @@ export default class SunburstContainer extends React.Component {
    */
 
   _calcDistanceAndScales (json, timestamp) {
-    let tempSimilarity = [];
+    const tempSimilarity = [];
     for (let i = 0; i < json.length; i++) {
-      let similarity = similarityWithDistance(timestamp[1], json[i][1]);
+      const similarity = similarityWithDistance(timestamp[1], json[i][1]);
       json[i][1] = similarity * 100;
       // Get an array with all the non-zero distance values
       if (similarity !== 0) {
@@ -172,7 +177,7 @@ export default class SunburstContainer extends React.Component {
       }
     }
     // Create the scale cluster
-    let scale = scaleCluster()
+    const scale = scaleCluster()
       .domain(tempSimilarity)
       .range([1, 2, 3, 4, 5]);
     // Get the clusters
@@ -210,40 +215,50 @@ export default class SunburstContainer extends React.Component {
     for (let i = 0; i < json.length; i++) {
       if (json[i][1] !== 0) {
         if (json[i][1] <= this._clusters[0]) {
-          firstLevel.push({ name: getUTCDateFormat(json[i][0]),
+          firstLevel.push({
+            name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
             bigness: 10,
             similarity: json[i][1],
             clr: colors[1],
-            children: [] });
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[1]) {
-          secondLevel.push({ name: getUTCDateFormat(json[i][0]),
+          secondLevel.push({
+            name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
             bigness: 10,
             similarity: json[i][1],
             clr: colors[2],
-            children: [] });
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[2]) {
-          thirdLevel.push({ name: getUTCDateFormat(json[i][0]),
+          thirdLevel.push({
+            name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
             bigness: 10,
             similarity: json[i][1],
             clr: colors[3],
-            children: [] });
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[3]) {
-          fourthLevel.push({ name: getUTCDateFormat(json[i][0]),
+          fourthLevel.push({
+            name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
             bigness: 10,
             similarity: json[i][1],
             clr: colors[4],
-            children: [] });
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[4]) {
-          fifthLevel.push({ name: getUTCDateFormat(json[i][0]),
+          fifthLevel.push({
+            name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
             bigness: 10,
             similarity: json[i][1],
             clr: colors[5],
-            children: [] });
+            children: []
+          });
         }
       }
     }
@@ -300,22 +315,22 @@ export default class SunburstContainer extends React.Component {
     }
 
     for (let i = 0; i < fifthLevel.length; i++) {
-      let mod = i % fourthLevel.length;
+      const mod = i % fourthLevel.length;
       fourthLevel[mod].children.push(fifthLevel[i]);
       fourthLevel[mod].bigness = '';
     }
     for (let i = 0; i < fourthLevel.length; i++) {
-      let mod = i % thirdLevel.length;
+      const mod = i % thirdLevel.length;
       thirdLevel[mod].children.push(fourthLevel[i]);
       thirdLevel[mod].bigness = '';
     }
     for (let i = 0; i < thirdLevel.length; i++) {
-      let mod = i % secondLevel.length;
+      const mod = i % secondLevel.length;
       secondLevel[mod].children.push(thirdLevel[i]);
       secondLevel[mod].bigness = '';
     }
     for (let i = 0; i < secondLevel.length; i++) {
-      let mod = i % firstLevel.length;
+      const mod = i % firstLevel.length;
       firstLevel[mod].children.push(secondLevel[i]);
       firstLevel[mod].bigness = '';
     }

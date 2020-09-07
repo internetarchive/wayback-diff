@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
 
@@ -15,9 +16,13 @@ import SandboxedHtml from './sandboxed-html.jsx';
  * @param {InlineRenderedDiffProps} props
  */
 export default class InlineRenderedDiff extends React.Component {
+  static propTypes = {
+    diffData: PropTypes.object,
+    page: PropTypes.object
+  };
+
   render () {
     const diff = this.props.diffData.combined || this.props.diffData.diff;
-
     return (
       <div className="inline-render">
         <SandboxedHtml html={diff} baseUrl={this.props.page.url} />
