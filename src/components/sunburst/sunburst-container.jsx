@@ -4,7 +4,7 @@ import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
 import { similarityWithDistance, checkResponse, fetchWithTimeout, getUTCDateFormat }
   from '../../js/utils.js';
-import {getSize, decodeCompressedJson, decodeUncompressedJson} from './sunburst-container-utils.js';
+import { getSize, decodeCompressedJson, decodeUncompressedJson } from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
@@ -18,9 +18,8 @@ import _ from 'lodash';
  */
 
 export default class SunburstContainer extends React.Component {
-
   rootLabel;
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.isUpdate = 0;
     this.isPending = false;
@@ -30,37 +29,37 @@ export default class SunburstContainer extends React.Component {
     this._clusters = [];
   }
 
-  componentDidUpdate (){
+  componentDidUpdate () {
     if (this.isUpdate < 2) {
       getSize();
-      this.isUpdate ++;
+      this.isUpdate++;
     }
   }
 
   render () {
-    if (this.state.error){
-      return(
-        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp ?
-          this.state.timestamp : this.props.timestamp}
+    if (this.state.error) {
+      return (
+        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp
+          ? this.state.timestamp : this.props.timestamp}
         conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
           {this.isPending ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
-            still being generated. For more results please try again in a moment.</p>: null}
-          {/*<div id="root-cell-tooltip">{this.rootLabel}</div>*/}
+            still being generated. For more results please try again in a moment.</p> : null}
+          {/* <div id="root-cell-tooltip">{this.rootLabel}</div> */}
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
             <div className="heat-map-legend-caption">Variation</div>
             <div className="heat-map-legend-summary">
               <div className="heat-map-legend-summary-min-caption">Low</div>
               <div className="heat-map-legend-summary-graphics">
-                <div className="heat-map-legend-bar" style={{backgroundColor: 'rgb(241, 231, 119)', height: '4px'}}/>
-                <div className="heat-map-legend-bar" style={{backgroundColor: 'rgb(197, 213, 108)', height: '5px'}}/>
-                <div className="heat-map-legend-bar" style={{backgroundColor: 'rgb(159, 197, 99)', height: '6px'}}/>
-                <div className="heat-map-legend-bar" style={{backgroundColor: 'rgb(141, 184, 101)', height: '7px'}}/>
-                <div className="heat-map-legend-bar" style={{backgroundColor: 'rgb(107, 151, 117)', height: '8px'}}/>
+                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(241, 231, 119)', height: '4px' }}/>
+                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(197, 213, 108)', height: '5px' }}/>
+                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(159, 197, 99)', height: '6px' }}/>
+                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(141, 184, 101)', height: '7px' }}/>
+                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(107, 151, 117)', height: '8px' }}/>
               </div>
               <div className="heat-map-legend-summary-max-caption">High</div>
             </div>
@@ -73,7 +72,7 @@ export default class SunburstContainer extends React.Component {
         </div>
       );
     }
-    const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
+    const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.timestamp) {
       this._fetchTimestampSimhashData();
     } else {
@@ -82,12 +81,12 @@ export default class SunburstContainer extends React.Component {
     return <div className="loading"><Loader/></div>;
   }
 
-  _validateTimestamp() {
+  _validateTimestamp () {
     let promise;
     if (this.props.fetchSnapshotCallback) {
       promise = this.props.fetchSnapshotCallback(this.props.timestamp);
     } else {
-      let url = new URL(this.props.conf.cdxServer, window.location.origin);
+      const url = new URL(this.props.conf.cdxServer, window.location.origin);
       url.searchParams.append('url', this.props.url);
       url.searchParams.append('closest', this.props.timestamp);
       url.searchParams.append('filter', '!mimetype:warc/revisit');
@@ -96,14 +95,14 @@ export default class SunburstContainer extends React.Component {
       url.searchParams.append('fl', 'timestamp');
       promise = fetchWithTimeout(url);
     }
-    promise.then(response => {return checkResponse(response).json();})
+    promise.then(response => { return checkResponse(response).json(); })
       .then(data => {
         if (this.props.timestamp !== `${data}`) {
-          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + data + '/'
-            + this.props.url);
-          this.setState({timestamp: `${data}`});
+          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + data + '/' +
+            this.props.url);
+          this.setState({ timestamp: `${data}` });
         } else {
-          this.setState({timestamp: this.props.timestamp});
+          this.setState({ timestamp: this.props.timestamp });
         }
       })
       .catch(error => {
@@ -111,46 +110,48 @@ export default class SunburstContainer extends React.Component {
           this.errorHandled('NO_CAPTURES');
         } else {
           this.errorHandled(error.message);
-        }});
+        }
+      });
   }
 
   errorHandled (errorCode) {
-    this.setState({error: errorCode});
+    this.setState({ error: errorCode });
   }
 
   _fetchTimestampSimhashData () {
     const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) +
-      '&timestamp='+ this.state.timestamp;
-    fetchWithTimeout(url).then(response => {return checkResponse(response);})
+      '&timestamp=' + this.state.timestamp;
+    fetchWithTimeout(url).then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((jsonResponse) => {
-        if (jsonResponse['status']) {
-          throw Error(jsonResponse['message']);
+        if (jsonResponse.status) {
+          throw Error(jsonResponse.message);
         }
-        let json = decodeUncompressedJson(jsonResponse, this.state.timestamp);
-        this._fetchSimhashData(json);
+        this._fetchSimhashData(
+          decodeUncompressedJson(jsonResponse, this.state.timestamp)
+        );
       })
-      .catch(error => {this.errorHandled(error.message);});
+      .catch(error => { this.errorHandled(error.message); });
   }
 
   _fetchSimhashData (timestampJson) {
     let url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' +
       this.state.timestamp.substring(0, 4);
-    if (this.props.conf.compressedSimhash)
-      url +='&compress=1';
-    fetchWithTimeout(url).then(response => {return checkResponse(response);})
+    if (this.props.conf.compressedSimhash) { url += '&compress=1'; }
+    fetchWithTimeout(url).then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((jsonResponse) => {
         this.isPending = jsonResponse.status === 'PENDING';
         let json;
-        if (this.props.conf.compressedSimhash)
+        if (this.props.conf.compressedSimhash) {
           json = decodeCompressedJson(jsonResponse);
-        else
+        } else {
           json = decodeUncompressedJson(jsonResponse);
-        let data = this._calcDistanceAndScales(json, timestampJson);
+        }
+        const data = this._calcDistanceAndScales(json, timestampJson);
         this._createLevels(data, timestampJson);
       })
-      .catch(error => {this.errorHandled(error.message);});
+      .catch(error => { this.errorHandled(error.message); });
   }
 
   /*
@@ -165,21 +166,21 @@ export default class SunburstContainer extends React.Component {
   used to insert the timestamps into the diagram.
    */
 
-  _calcDistanceAndScales(json, timestamp){
-    let tempSimilarity = [];
-    for (let i = 0; i<json.length; i++){
-      let similarity = similarityWithDistance(timestamp[1], json[i][1]);
+  _calcDistanceAndScales (json, timestamp) {
+    const tempSimilarity = [];
+    for (let i = 0; i < json.length; i++) {
+      const similarity = similarityWithDistance(timestamp[1], json[i][1]);
       json[i][1] = similarity * 100;
-      //Get an array with all the non-zero distance values
+      // Get an array with all the non-zero distance values
       if (similarity !== 0) {
         tempSimilarity.push(similarity * 100);
       }
     }
-    //Create the scale cluster
-    let scale = scaleCluster()
+    // Create the scale cluster
+    const scale = scaleCluster()
       .domain(tempSimilarity)
       .range([1, 2, 3, 4, 5]);
-    //Get the clusters
+    // Get the clusters
     this._clusters = scale.clusters();
     /*
     If the clusters are less than 5, push as many cells as needed,
@@ -202,7 +203,7 @@ export default class SunburstContainer extends React.Component {
   for the same year.
    */
 
-  _createLevels(json, timestamp) {
+  _createLevels (json, timestamp) {
     var firstLevel = [];
     var secondLevel = [];
     var thirdLevel = [];
@@ -211,23 +212,53 @@ export default class SunburstContainer extends React.Component {
 
     const colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
-    for (let i = 0; i<json.length; i++){
+    for (let i = 0; i < json.length; i++) {
       if (json[i][1] !== 0) {
         if (json[i][1] <= this._clusters[0]) {
-          firstLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: json[i][1], clr: colors[1], children: []});
+          firstLevel.push({
+            name: getUTCDateFormat(json[i][0]),
+            timestamp: json[i][0],
+            bigness: 10,
+            similarity: json[i][1],
+            clr: colors[1],
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[1]) {
-          secondLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: json[i][1], clr: colors[2], children: []});
+          secondLevel.push({
+            name: getUTCDateFormat(json[i][0]),
+            timestamp: json[i][0],
+            bigness: 10,
+            similarity: json[i][1],
+            clr: colors[2],
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[2]) {
-          thirdLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: json[i][1], clr: colors[3], children: []});
+          thirdLevel.push({
+            name: getUTCDateFormat(json[i][0]),
+            timestamp: json[i][0],
+            bigness: 10,
+            similarity: json[i][1],
+            clr: colors[3],
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[3]) {
-          fourthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: json[i][1], clr: colors[4], children: []});
+          fourthLevel.push({
+            name: getUTCDateFormat(json[i][0]),
+            timestamp: json[i][0],
+            bigness: 10,
+            similarity: json[i][1],
+            clr: colors[4],
+            children: []
+          });
         } else if (json[i][1] <= this._clusters[4]) {
-          fifthLevel.push({name: getUTCDateFormat(json[i][0]), timestamp: json[i][0], bigness: 10,
-            similarity: json[i][1], clr: colors[5], children: []});
+          fifthLevel.push({
+            name: getUTCDateFormat(json[i][0]),
+            timestamp: json[i][0],
+            bigness: 10,
+            similarity: json[i][1],
+            clr: colors[5],
+            children: []
+          });
         }
       }
     }
@@ -237,7 +268,7 @@ export default class SunburstContainer extends React.Component {
       firstLevel = secondLevel;
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
-      fourthLevel= fifthLevel;
+      fourthLevel = fifthLevel;
       fifthLevel = [];
       levelCounter = levelCounter - 1;
     }
@@ -245,7 +276,7 @@ export default class SunburstContainer extends React.Component {
     while (secondLevel.length === 0 && levelCounter > 0) {
       secondLevel = thirdLevel;
       thirdLevel = fourthLevel;
-      fourthLevel= fifthLevel;
+      fourthLevel = fifthLevel;
       fifthLevel = [];
       levelCounter = levelCounter - 1;
     }
@@ -256,16 +287,16 @@ export default class SunburstContainer extends React.Component {
       fifthLevel = [];
       levelCounter = levelCounter - 1;
     }
-    if (fourthLevel.length === 0){
-      fourthLevel= fifthLevel;
+    if (fourthLevel.length === 0) {
+      fourthLevel = fifthLevel;
       fifthLevel = [];
     }
 
-    firstLevel = _.sortBy(firstLevel, [function(o) { return o.timestamp; }]);
-    secondLevel = _.sortBy(secondLevel, [function(o) { return o.timestamp; }]);
-    thirdLevel = _.sortBy(thirdLevel, [function(o) { return o.timestamp; }]);
-    fourthLevel = _.sortBy(fourthLevel, [function(o) { return o.timestamp; }]);
-    fifthLevel = _.sortBy(fifthLevel, [function(o) { return o.timestamp; }]);
+    firstLevel = _.sortBy(firstLevel, [function (o) { return o.timestamp; }]);
+    secondLevel = _.sortBy(secondLevel, [function (o) { return o.timestamp; }]);
+    thirdLevel = _.sortBy(thirdLevel, [function (o) { return o.timestamp; }]);
+    fourthLevel = _.sortBy(fourthLevel, [function (o) { return o.timestamp; }]);
+    fifthLevel = _.sortBy(fifthLevel, [function (o) { return o.timestamp; }]);
 
     if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
       firstLevel.length = this.props.conf.maxSunburstLevelLength;
@@ -283,23 +314,23 @@ export default class SunburstContainer extends React.Component {
       fifthLevel.length = this.props.conf.maxSunburstLevelLength;
     }
 
-    for (let i = 0; i<fifthLevel.length; i++) {
-      let mod = i % fourthLevel.length;
+    for (let i = 0; i < fifthLevel.length; i++) {
+      const mod = i % fourthLevel.length;
       fourthLevel[mod].children.push(fifthLevel[i]);
       fourthLevel[mod].bigness = '';
     }
-    for (let i = 0; i<fourthLevel.length; i++) {
-      let mod = i%thirdLevel.length;
+    for (let i = 0; i < fourthLevel.length; i++) {
+      const mod = i % thirdLevel.length;
       thirdLevel[mod].children.push(fourthLevel[i]);
       thirdLevel[mod].bigness = '';
     }
-    for (let i = 0; i<thirdLevel.length; i++) {
-      let mod = i%secondLevel.length;
+    for (let i = 0; i < thirdLevel.length; i++) {
+      const mod = i % secondLevel.length;
       secondLevel[mod].children.push(thirdLevel[i]);
       secondLevel[mod].bigness = '';
     }
-    for (let i = 0; i<secondLevel.length; i++) {
-      let mod = i%firstLevel.length;
+    for (let i = 0; i < secondLevel.length; i++) {
+      const mod = i % firstLevel.length;
       firstLevel[mod].children.push(secondLevel[i]);
       firstLevel[mod].bigness = '';
     }
@@ -311,8 +342,8 @@ export default class SunburstContainer extends React.Component {
       {rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}
     </div>;
 
-    var data = {name:rootUTCDate, timestamp: timestamp[0], clr: colors[0], children:firstLevel, similarity: -1};
-    this.setState({simhashData: data});
+    var data = { name: rootUTCDate, timestamp: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
+    this.setState({ simhashData: data });
   }
 }
 

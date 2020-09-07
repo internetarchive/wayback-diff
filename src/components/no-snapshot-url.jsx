@@ -10,6 +10,6 @@ export default class NoSnapshotURL extends React.Component {
   render () {
     return (
       <h1>No capture is selected, please pick one from the list.</h1>
-    )
+    );
   }
 }

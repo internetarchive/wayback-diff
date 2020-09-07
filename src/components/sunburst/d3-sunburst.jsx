@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import {Sunburst, Hint} from 'react-vis';
+import { Sunburst, Hint } from 'react-vis';
 import '../../../node_modules/react-vis/dist/style.css';
-import {buildValue, getDistance, getSize} from './sunburst-container-utils.js';
+import { buildValue, getDistance, getSize } from './sunburst-container-utils.js';
 
 /**
  * Display a d3 Sunburst diagram
@@ -18,9 +19,14 @@ const tipStyle = {
   padding: '5px'
 };
 
-const boxStyle = {height: '10px', width: '10px'};
+const boxStyle = { height: '10px', width: '10px' };
 
 export default class D3Sunburst extends React.Component {
+  static propTypes = {
+    simhashData: PropTypes.object,
+    url: PropTypes.string,
+    urlPrefix: PropTypes.string
+  };
 
   state = {
     hoveredCell: false
@@ -33,14 +39,14 @@ export default class D3Sunburst extends React.Component {
   }
 
   render () {
-    const {hoveredCell} = this.state;
+    const { hoveredCell } = this.state;
 
     return (
       <Sunburst
-        style={{stroke: '#fff'}}
-        onValueMouseOver={v => this.setState({hoveredCell: (v.x && v.y) ? v : false})}
-        onValueMouseOut={() => this.setState({hoveredCell: false})}
-        onValueClick={node => {this._cellClick(node);}}
+        style={{ stroke: '#fff' }}
+        onValueMouseOver={v => this.setState({ hoveredCell: (v.x && v.y) ? v : false })}
+        onValueMouseOut={() => this.setState({ hoveredCell: false })}
+        onValueClick={node => { this._cellClick(node); }}
         data={this.props.simhashData}
         padAngle={() => 0.02}
         width={getSize()}
@@ -52,10 +58,9 @@ export default class D3Sunburst extends React.Component {
     );
   }
 
-
   _cellClick (node) {
     if (node.timestamp !== this.props.simhashData.timestamp) {
-      let url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
+      const url = this.props.urlPrefix + node.timestamp + '/' + this.props.simhashData.timestamp + '/' + this.props.url;
       window.open(url, '_blank');
     }
   }
@@ -64,7 +69,7 @@ export default class D3Sunburst extends React.Component {
     if (hoveredCell.timestamp !== this.props.simhashData.timestamp) {
       return <Hint value={buildValue(hoveredCell)}>
         <div style={tipStyle}>
-          <div style={{...boxStyle, background: hoveredCell.clr}}/>
+          <div style={{ ...boxStyle, background: hoveredCell.clr }}/>
           {getDistance(hoveredCell)}
           <br/>
           {hoveredCell.name}

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 /**
@@ -7,6 +8,11 @@ import React from 'react';
  * @extends {React.Component}
  */
 export default class DiffItem extends React.Component {
+  static propTypes = {
+    data: PropTypes.object,
+    onSelect: PropTypes.func
+  };
+
   render () {
     const { data, onSelect } = this.props;
 
@@ -15,7 +21,7 @@ export default class DiffItem extends React.Component {
     // styles with the class and remove the "styles" object entirely.
     const styles = {};
     let diffTypeClass = 'unchanged';
-    let [itemType, itemText] = data;
+    const [itemType, itemText] = data;
 
     // this data comes from https://github.com/edgi-govdata-archiving/go-calc-diff
     // it may be necessary to adjust the "data.Type" inspections based on differ

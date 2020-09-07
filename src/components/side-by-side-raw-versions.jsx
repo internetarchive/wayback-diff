@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
 
@@ -17,6 +18,13 @@ import SandboxedHtml from './sandboxed-html.jsx';
  * @param {SideBySideRawVersionsProps} props
  */
 export default class SideBySideRawVersions extends React.Component {
+  static propTypes = {
+    page: PropTypes.object,
+    diffData: PropTypes.object,
+    a: PropTypes.string,
+    b: PropTypes.string
+  };
+
   render () {
     return (
       <div className="side-by-side-render">

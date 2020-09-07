@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import SandboxedHtml from './sandboxed-html.jsx';
 
@@ -18,6 +19,12 @@ const showAdditions = showType.bind(null, 'additions');
  * @param {SideBySideRenderedDiffProps} props
  */
 export default class SideBySideRenderedDiff extends React.Component {
+  static propTypes = {
+    diffData: PropTypes.object,
+    page: PropTypes.object,
+    loader: PropTypes.object
+  };
+
   render () {
     // The newest version of this diff includes separate, more accurate
     // versions to show for each side, but the old one needs transformations.
@@ -83,9 +90,9 @@ function removeChangeElements (type, sourceDocument) {
 
     const parents = new Set();
     elements.forEach(element => {
-      if (element.parentNode
-          && element.childElementCount === 0
-          && /^[\s\n\r]*$/.test(element.textContent)) {
+      if (element.parentNode &&
+          element.childElementCount === 0 &&
+          /^[\s\n\r]*$/.test(element.textContent)) {
         parents.add(element.parentNode);
         element.parentNode.removeChild(element);
       }
@@ -113,7 +120,7 @@ function removeChangeElements (type, sourceDocument) {
  *                                      elements within
  */
 function activateInertChangeElements (viewType, sourceDocument) {
-  if ( viewType === 'additions') {
+  if (viewType === 'additions') {
     return;
   }
 

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 // Basic list component taken from http://github.com/datatogether/context
@@ -5,6 +6,12 @@ import React from 'react';
 // data array, creating an item component for each item in the array, passing
 // it a prop "data" with the array element.
 export default class List extends React.Component {
+  static propTypes = {
+    data: PropTypes.object,
+    onSelectItem: PropTypes.func,
+    className: PropTypes.string
+  };
+
   // const List = (props) => {
   render () {
     // This strange props destructuring is so props.component

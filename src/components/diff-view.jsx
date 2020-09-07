@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff.css';
 import { diffTypes } from '../js/constants/diff-types';
@@ -29,8 +30,17 @@ import _ from 'lodash';
  */
 
 export default class DiffView extends React.Component {
-
   isMountedNow = false;
+
+  static propTypes = {
+    a: PropTypes.object, // TODO check this, potential optimization.
+    b: PropTypes.object,
+    diffType: PropTypes.string,
+    loader: PropTypes.object,
+    webMonitoringProcessingURL: PropTypes.string,
+    errorHandledCallback: PropTypes.func,
+    page: PropTypes.object
+  };
 
   constructor (props) {
     super(props);
@@ -67,7 +77,7 @@ export default class DiffView extends React.Component {
 
   render () {
     if (!this.state.diffData) {
-      const Loader = () => _.isNil(this.props.loader)? <Loading/>: this.props.loader;
+      const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
       return <div className="loading"><Loader/></div>;
     }
     return (
@@ -202,7 +212,7 @@ export default class DiffView extends React.Component {
     url.searchParams.append('a', a);
     url.searchParams.append('b', b);
     fetchWithTimeout(url, { credentials: 'include' })
-      .then(response => {return checkResponse(response);})
+      .then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((data) => {
         this.setState({
