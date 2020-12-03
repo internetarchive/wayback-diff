@@ -1,7 +1,7 @@
 import isNil from 'lodash/isNil';
 import filter from 'lodash/filter';
 import isEqual from 'lodash/isEqual';
-import * as xpath from 'simple-xpath-position';
+import { fromNode } from 'simple-xpath-position';
 
 const absoluteUrlRegex = new RegExp(/\/\/web\.archive\.org\/web\/\d{14}/gm);
 const relativeUrlRegex = new RegExp(window.location.origin + '/web/\\d{14}', 'gm');
@@ -54,8 +54,8 @@ export function getTimestampCleanDiff (insertions, deletions) {
         // If their linked resource is the same
         if (isEqual(foundDel[k][1], foundIns[j][1])) {
           try {
-            const dirtyDelXpath = xpath.fromNode(foundDel[k][0], domDel);
-            const dirtyInsXpath = xpath.fromNode(foundIns[j][0], domIns);
+            const dirtyDelXpath = fromNode(foundDel[k][0], domDel);
+            const dirtyInsXpath = fromNode(foundIns[j][0], domIns);
             const delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
             const insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
             if (isEqual(delxpath, insxpath)) {
@@ -86,8 +86,8 @@ export function getTimestampCleanDiff (insertions, deletions) {
         // If their contents are identical
         if (isEqual(del[k].innerHTML, ins[j].innerHTML)) {
           try {
-            const dirtyDelXpath = xpath.fromNode(del[k], domDel);
-            const dirtyInsXpath = xpath.fromNode(ins[j], domIns);
+            const dirtyDelXpath = fromNode(del[k], domDel);
+            const dirtyInsXpath = fromNode(ins[j], domIns);
             const delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
             const insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
             if (isEqual(delxpath, insxpath)) {
