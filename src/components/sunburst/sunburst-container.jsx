@@ -8,7 +8,8 @@ import { getSize, decodeCompressedJson, decodeUncompressedJson } from './sunburs
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
+import sortBy from 'lodash/sortBy';
 
 /**
  * Container of d3 Sunburst diagram
@@ -72,7 +73,7 @@ export default class SunburstContainer extends React.Component {
         </div>
       );
     }
-    const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.timestamp) {
       this._fetchTimestampSimhashData();
     } else {
@@ -292,11 +293,11 @@ export default class SunburstContainer extends React.Component {
       fifthLevel = [];
     }
 
-    firstLevel = _.sortBy(firstLevel, [function (o) { return o.timestamp; }]);
-    secondLevel = _.sortBy(secondLevel, [function (o) { return o.timestamp; }]);
-    thirdLevel = _.sortBy(thirdLevel, [function (o) { return o.timestamp; }]);
-    fourthLevel = _.sortBy(fourthLevel, [function (o) { return o.timestamp; }]);
-    fifthLevel = _.sortBy(fifthLevel, [function (o) { return o.timestamp; }]);
+    firstLevel = sortBy(firstLevel, [function (o) { return o.timestamp; }]);
+    secondLevel = sortBy(secondLevel, [function (o) { return o.timestamp; }]);
+    thirdLevel = sortBy(thirdLevel, [function (o) { return o.timestamp; }]);
+    fourthLevel = sortBy(fourthLevel, [function (o) { return o.timestamp; }]);
+    fifthLevel = sortBy(fifthLevel, [function (o) { return o.timestamp; }]);
 
     if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
       firstLevel.length = this.props.conf.maxSunburstLevelLength;

@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import max from 'lodash/max';
+import zip from 'lodash/zip';
 
 /* eslint-disable no-useless-escape */
 const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
@@ -53,7 +54,7 @@ function distanceOfInts (x, y) {
 }
 
 function distanceOfUint8Array (x, y) {
-  return _.zip(x, y)
+  return zip(x, y)
     .map(([i, j]) => weightOfInt(i ^ j))
     .reduce((acc, w) => acc + w, 0);
 }
@@ -66,7 +67,7 @@ export function similarityWithDistance (simhash1, simhash2) {
   }
   const simhash1Size = 8 * atob(simhash1).length;
   const simhash2Size = 8 * atob(simhash2).length;
-  const maxSize = _.max([simhash1Size, simhash2Size]);
+  const maxSize = max([simhash1Size, simhash2Size]);
   const distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
   return distance / maxSize;
 }
