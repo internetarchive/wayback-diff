@@ -5,7 +5,7 @@ import {
   fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue, getUTCDateFormat
 } from '../js/utils.js';
 import Loading from './loading.jsx';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
 
 /**
  * Display a timestamp selector
@@ -147,7 +147,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-    const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
     }

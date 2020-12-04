@@ -8,7 +8,7 @@ import { isStrUrl, checkResponse, fetchWithTimeout } from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
 
 /**
  * Display a change between two versions of a page.
@@ -161,7 +161,7 @@ export default class DiffContainer extends React.Component {
       this._handleSnapshotFetch(fetchWithTimeout(url.toString()));
     }
 
-    const Loader = () => _.isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     return <div className="loading"><Loader/></div>;
   }
 
