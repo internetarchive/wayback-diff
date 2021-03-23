@@ -10,8 +10,8 @@ import '../css/diff-container.css';
 export default class DiffFooter extends React.Component {
   render () {
     return (
-      <p id={'diff-footer'}><yellow-diff-footer>Yellow</yellow-diff-footer>
-        indicates content deletion. <blue-diff-footer>Blue</blue-diff-footer>
+      <p id={'diff-footer'}><yellow-diff-footer>Yellow</yellow-diff-footer> 
+        indicates content deletion. <blue-diff-footer>Blue</blue-diff-footer> 
         indicates content addition.
       </p>
     );
