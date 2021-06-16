@@ -28,8 +28,8 @@ export default {
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
-      presets: [ [ 'es2015', { modules: false } ], 'stage-0', 'react' ],
-      plugins: [ 'external-helpers' ]
+      presets: [ '@babel/env', '@babel/preset-react' ],
+      plugins: [ '@babel/plugin-proposal-export-default-from' ]
     }),
     replace({ 'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env': JSON.stringify(process.env)}),
