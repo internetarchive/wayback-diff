@@ -9,31 +9,40 @@ import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
 import isNil from 'lodash/isNil';
+import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
 
-/**
- * Container of d3 Sunburst diagram
- *
- * @class SunburstContainer
- * @extends {React.Component}
- */
+const barStyle1 = { backgroundColor: 'rgb(241, 231, 119)', height: '4px' };
+const barStyle2 = { backgroundColor: 'rgb(197, 213, 108)', height: '6px' };
+const barStyle3 = { backgroundColor: 'rgb(159, 197, 99)', height: '8px' };
+const barStyle4 = { backgroundColor: 'rgb(141, 184, 101)', height: '10px' };
+const barStyle5 = { backgroundColor: 'rgb(107, 151, 117)', height: '12px' };
 
 export default class SunburstContainer extends React.Component {
-  rootLabel;
+  static displayName = 'SunburstContainer';
+
+  static propTypes = {
+    timestamp: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    conf: PropTypes.object.isRequired,
+    fetchSnapshotCallback: PropTypes.func,
+    loader: PropTypes.element
+  };
+
   constructor (props) {
     super(props);
-    this.isUpdate = 0;
-    this.isPending = false;
     this.state = {
+      isUpdate: 0,
+      isPending: false,
       simhashData: null
     };
     this._clusters = [];
   }
 
   componentDidUpdate () {
-    if (this.isUpdate < 2) {
+    if (this.state.isUpdate < 2) {
       getSize();
-      this.isUpdate++;
+      this.setState({ isUpdate: this.state.isUpdate + 1 });
     }
   }
 
@@ -47,29 +56,28 @@ export default class SunburstContainer extends React.Component {
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
-          {this.isPending ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
+          {this.state.isPending ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
             still being generated. For more results please try again in a moment.</p> : null}
-          {/* <div id="root-cell-tooltip">{this.rootLabel}</div> */}
-          <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url} simhashData={this.state.simhashData}/>
+          <div>This diagram illustrates the differences of <a 
+            href={`/web/*/${this.props.url}`}>{this.props.url}</a> capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>
+              {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}
+              {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
+          <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url}
+            simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
             <div className="heat-map-legend-caption">Variation</div>
             <div className="heat-map-legend-summary">
               <div className="heat-map-legend-summary-min-caption">Low</div>
               <div className="heat-map-legend-summary-graphics">
-                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(241, 231, 119)', height: '4px' }}/>
-                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(197, 213, 108)', height: '5px' }}/>
-                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(159, 197, 99)', height: '6px' }}/>
-                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(141, 184, 101)', height: '7px' }}/>
-                <div className="heat-map-legend-bar" style={{ backgroundColor: 'rgb(107, 151, 117)', height: '8px' }}/>
+                <div className="heat-map-legend-bar" style={ barStyle1 }/>
+                <div className="heat-map-legend-bar" style={ barStyle2 }/>
+                <div className="heat-map-legend-bar" style={ barStyle3 }/>
+                <div className="heat-map-legend-bar" style={ barStyle4 }/>
+                <div className="heat-map-legend-bar" style={ barStyle5 }/>
               </div>
               <div className="heat-map-legend-summary-max-caption">High</div>
             </div>
           </div>
-          <br/>
-          <div>This diagram illustrates the differences of
-            capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>
-            {getUTCDateFormat(this.state.timestamp)}</a> of {this.props.url} compared
-            to other {this.state.timestamp.substring(0, 4)} captures.</div>
         </div>
       );
     }
@@ -98,10 +106,10 @@ export default class SunburstContainer extends React.Component {
     }
     promise.then(response => { return checkResponse(response).json(); })
       .then(data => {
-        if (this.props.timestamp !== `${data}`) {
-          window.history.pushState({}, '', this.props.conf.diffgraphPrefix + data + '/' +
-            this.props.url);
-          this.setState({ timestamp: `${data}` });
+        const ts = data.toString();
+        if (this.props.timestamp !== ts) {
+          window.history.pushState({}, '', `${this.props.conf.diffgraphPrefix}${ts}/${this.props.url}`);
+          this.setState({ timestamp: ts });
         } else {
           this.setState({ timestamp: this.props.timestamp });
         }
@@ -120,8 +128,7 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchTimestampSimhashData () {
-    const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) +
-      '&timestamp=' + this.state.timestamp;
+    const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.state.timestamp;
     fetchWithTimeout(url).then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((jsonResponse) => {
@@ -136,13 +143,14 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchSimhashData (timestampJson) {
-    let url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' +
-      this.state.timestamp.substring(0, 4);
-    if (this.props.conf.compressedSimhash) { url += '&compress=1'; }
+    let url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.state.timestamp.substring(0, 4);
+    if (this.props.conf.compressedSimhash) {
+      url += '&compress=1';
+    }
     fetchWithTimeout(url).then(response => { return checkResponse(response); })
       .then(response => response.json())
       .then((jsonResponse) => {
-        this.isPending = jsonResponse.status === 'PENDING';
+        this.setState({ isPending: jsonResponse.status === 'PENDING' });
         let json;
         if (this.props.conf.compressedSimhash) {
           json = decodeCompressedJson(jsonResponse);
@@ -150,23 +158,23 @@ export default class SunburstContainer extends React.Component {
           json = decodeUncompressedJson(jsonResponse);
         }
         const data = this._calcDistanceAndScales(json, timestampJson);
-        this._createLevels(data, timestampJson);
+        if (!isEmpty(data)) {
+          this._createLevels(data, timestampJson);
+        }
       })
       .catch(error => { this.errorHandled(error.message); });
   }
 
   /*
-  _calcDistanceAndScales receives two JSONs. The first variable contains
-  all the timestamps for the selected year and webpage and their
-  simhash values and the second one the selected timestamp and
-  its simhash value.
+  _calcDistanceAndScales receives two JSONs. The first contains all the
+  timestamps for the selected year and webpage and their simhash values and
+  the second one the selected timestamp and its simhash value.
 
   It returns a JSON variable containing all the timestamps for
   the selected year and webpage and their similarity index to
   the selected timestamp. Also, it generates the clusters which will be
   used to insert the timestamps into the diagram.
    */
-
   _calcDistanceAndScales (json, timestamp) {
     const tempSimilarity = [];
     for (let i = 0; i < json.length; i++) {
@@ -177,39 +185,35 @@ export default class SunburstContainer extends React.Component {
         tempSimilarity.push(similarity * 100);
       }
     }
-    // Create the scale cluster
-    const scale = scaleCluster()
-      .domain(tempSimilarity)
-      .range([1, 2, 3, 4, 5]);
-    // Get the clusters
-    this._clusters = scale.clusters();
-    /*
-    If the clusters are less than 5, push as many cells as needed,
-    with 101 which can never be reached, in order to avoid undefined
-    variable errors.
-    */
+    if (isEmpty(tempSimilarity)) {
+      this.errorHandled('NO_DIFFERENT_CAPTURES');
+      return;
+    }
+    this.setState({ countCaptures: tempSimilarity.length });
+    this._clusters = scaleCluster().domain(tempSimilarity)
+                                   .range([1, 2, 3, 4, 5])
+                                   .clusters();
+    // If the clusters are less than 5, push as many cells as needed, with 101
+    // which can never be reached, in order to avoid undefined var errors.
     while (this._clusters.length < 5) {
       this._clusters.push(101);
     }
     return json;
   }
 
-  /*
-  This function receives the JSON fetched from wayback-discover-diff
+  /* This function receives the JSON fetched from wayback-discover-diff
   and produces the data tree required for the Sunburst diagram.
 
   It separates the snapshots into 5 or less "difference steps"
   depending on the minimum and maximum percentage of difference
   between the selected snapshot and the rest of the snapshots
-  for the same year.
-   */
-
+  for the same year. */
   _createLevels (json, timestamp) {
-    var firstLevel = [];
-    var secondLevel = [];
-    var thirdLevel = [];
-    var fourthLevel = [];
-    var fifthLevel = [];
+    let firstLevel = [];
+    let secondLevel = [];
+    let thirdLevel = [];
+    let fourthLevel = [];
+    let fifthLevel = [];
 
     const colors = ['#dddddd', '#f1e777', '#c5d56c', '#8db865', '#6b9775', '#4d7a83'];
 
@@ -336,23 +340,14 @@ export default class SunburstContainer extends React.Component {
       firstLevel[mod].bigness = '';
     }
 
-    const rootUTCDate = getUTCDateFormat(timestamp[0]);
-    const rootUTCDateArray = rootUTCDate.split(' ');
-    this.rootLabel = <div>
-      {rootUTCDateArray[0]} {rootUTCDateArray[1]} {rootUTCDateArray[2]} {rootUTCDateArray[3]}<br/>
-      {rootUTCDateArray[4]} {rootUTCDateArray[5]} {rootUTCDateArray[6]}
-    </div>;
-
-    var data = { name: rootUTCDate, timestamp: timestamp[0], clr: colors[0], children: firstLevel, similarity: -1 };
-    this.setState({ simhashData: data });
+    this.setState({
+      simhashData: {
+        name: getUTCDateFormat(timestamp[0]),
+        timestamp: timestamp[0],
+        clr: colors[0],
+        children: firstLevel,
+        similarity: -1
+      }
+    });
   }
 }
-
-SunburstContainer.propTypes = {
-
-  timestamp: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  conf: PropTypes.object.isRequired,
-  fetchSnapshotCallback: PropTypes.func,
-  loader: PropTypes.element
-};

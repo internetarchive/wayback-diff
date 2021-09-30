@@ -7,7 +7,7 @@ import '../css/diff-container.css';
  * @class DiffFooter
  * @extends {React.Component}
  */
-export default class DiffFooter extends React.Component {
+export default class DiffFooter extends React.PureComponent {
   render () {
     return (
       <p id={'diff-footer'}><yellow-diff-footer>Yellow</yellow-diff-footer> indicates

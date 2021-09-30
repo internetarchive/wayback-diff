@@ -8,7 +8,7 @@ import { checkResponse, fetchWithTimeout, getUTCDateFormat } from '../js/utils';
  * @class ErrorMessage
  * @extends {React.Component}
  */
-export default class ErrorMessage extends React.Component {
+export default class ErrorMessage extends React.PureComponent {
   static propTypes = {
     code: PropTypes.string,
     url: PropTypes.string,
@@ -25,42 +25,53 @@ export default class ErrorMessage extends React.Component {
   }
 
   render () {
-    console.warn(this.props.code);
-    if (this.props.code === '404') {
-      return (
-        <div className='alert alert-warning' role='alert'>
-          The Wayback Machine has not archived {this.props.url}.
-        </div>
-      );
-    } else if (this.props.code === 'CAPTURE_NOT_FOUND') {
-      return (
-        <div>
-          <div className='alert alert-warning' role='alert'>
-            There are no data available for {this.props.url} and timestamp {getUTCDateFormat(this.props.timestamp)}.
-          </div>
-          <button className="btn btn-sm" id="calcButton" onClick={this._calculateSimhash}>Calculate now</button>
-        </div>
-      );
-    } else if (this.props.code === 'NOT_CAPTURED') {
-      return (
-        <div>
-          <div className='alert alert-warning' role='alert'>
-            The Wayback Machine has no similarity data for {this.props.url} and year {this.props.timestamp.substring(0, 4)}.
-          </div>
-          <button className="btn btn-sm" id="calcButton" onClick={this._calculateSimhash}>Calculate now</button>
-        </div>
-      );
-    } else if (this.props.code === 'NO_CAPTURES') {
-      return (
-        <div className='alert alert-warning' role='alert'>
-          The Wayback Machine has not archived {this.props.url} for year {this.props.timestamp.substring(0, 4)}.
-        </div>
-      );
+    let msg = '';
+    let back = false;
+    let simhash = false;
+    const year = this.props.timestamp.substring(0, 4);
+    switch (this.props.code) {
+    case '404':
+      msg = `The Wayback Machine has not archived ${this.props.url}.`;
+      back = true;
+      simhash = false;
+      break;
+    case 'CAPTURE_NOT_FOUND':
+      msg = `There are no data available for ${this.props.url} and timestamp ${getUTCDateFormat(this.props.timestamp)}.`;
+      back = true;
+      simhash = true;
+      break;
+    case 'NOT_CAPTURED':
+      msg = `The Wayback Machine has no similarity data for ${this.props.url} and year ${year}.`;
+      back = true;
+      simhash = true;
+      break;
+    case 'NO_CAPTURES':
+      msg = `The Wayback Machine has not archived ${this.props.url} for year ${year}.`;
+      back = true;
+      simhash = false;
+      break;
+    case 'NO_DIFFERENT_CAPTURES':
+      msg = `There aren't any different captures for ${this.props.url} for year ${year} to display their similarity.`;
+      back = true;
+      simhash = false;
+      break;
+    default:
+      msg = 'The Wayback Machine is not available at the moment. Please try again later.';
+      back = true;
+      simhash = false;
     }
+
     return (
-      <div className='alert alert-warning' role='alert'>
-        The Wayback Machine is not available at the moment. Please try again later.
-      </div>
+      <>
+        <div className='alert alert-warning' role='alert'>{ msg }</div>
+        { simhash
+          ? <button className="btn btn-sm" id="calcButton"
+            onClick={ this._calculateSimhash }>Calculate now</button>
+          : null }
+        { back
+          ? <button className="btn btn-sm" onClick={() => window.history.back()}>&laquo; Go back</button>
+          : null }
+      </>
     );
   }
 
