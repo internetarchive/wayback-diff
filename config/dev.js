@@ -1,6 +1,6 @@
 // Rollup plugins.
 import babel from 'rollup-plugin-babel';
-import cjs from 'rollup-plugin-commonjs';
+import commonjs from 'rollup-plugin-commonjs';
 import globals from 'rollup-plugin-node-globals';
 import postcss from 'rollup-plugin-postcss';
 import replace from 'rollup-plugin-replace';
@@ -37,14 +37,15 @@ export default {
       browser: true,
       main: true
     }),
-    cjs({
-      exclude: 'node_modules/process-es6/**',
+    commonjs({
       include: [
         'node_modules/**'
       ],
+      exclude: 'node_modules/process-es6/**',
       namedExports: {
         'node_modules/react/index.js': ['PureComponent', 'Component'],
-        'node_modules/simple-xpath-position/index.js': ['fromNode']
+        'node_modules/simple-xpath-position/index.js': ['fromNode'],
+        'node_modules/react-is/index.js': ['isValidElementType']
       }
     }),
     globals()
