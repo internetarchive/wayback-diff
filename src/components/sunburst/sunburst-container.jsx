@@ -50,18 +50,21 @@ export default class SunburstContainer extends React.Component {
     if (this.state.error) {
       return (
         <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp
-          ? this.state.timestamp : this.props.timestamp}
+          ? this.state.timestamp
+          : this.props.timestamp}
         conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
-          {this.state.isPending ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
-            still being generated. For more results please try again in a moment.</p> : null}
-          <div>This diagram illustrates the differences of <a 
+          {this.state.isPending
+            ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
+            still being generated. For more results please try again in a moment.</p>
+            : null}
+          <div>This diagram illustrates the differences of <a
             href={`/web/*/${this.props.url}`}>{this.props.url}</a> capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>
-              {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}
-              {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
+            {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}
+          {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url}
             simhashData={this.state.simhashData}/>
           <div className="heat-map-legend">
@@ -191,8 +194,8 @@ export default class SunburstContainer extends React.Component {
     }
     this.setState({ countCaptures: tempSimilarity.length });
     this._clusters = scaleCluster().domain(tempSimilarity)
-                                   .range([1, 2, 3, 4, 5])
-                                   .clusters();
+      .range([1, 2, 3, 4, 5])
+      .clusters();
     // If the clusters are less than 5, push as many cells as needed, with 101
     // which can never be reached, in order to avoid undefined var errors.
     while (this._clusters.length < 5) {

@@ -9,6 +9,6 @@ const compressedResult = decodeCompressedJson(compressedJson);
 uncompressedResult.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
 compressedResult.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
 
-test('uncompress simhash sorted response', () => {
+test('uncompress simhash sorted response', function () {
   expect(uncompressedResult).toEqual(compressedResult);
 });

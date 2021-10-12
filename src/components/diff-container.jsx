@@ -137,7 +137,7 @@ export default class DiffContainer extends React.Component {
           <div className={'side-by-side-render'}>
             <iframe height={window.innerHeight} onLoad={() => { this._handleHeight(); }}
               srcDoc={this.state.fetchedRaw}
-              ref={frame => this._oneFrame = frame}
+              ref={(frame) => { this._oneFrame = frame; }}
             />
             <NoSnapshotURL/>
           </div>
@@ -148,7 +148,7 @@ export default class DiffContainer extends React.Component {
           <NoSnapshotURL/>
           <iframe height={window.innerHeight} onLoad={() => { this._handleHeight(); }}
             srcDoc={this.state.fetchedRaw}
-            ref={frame => this._oneFrame = frame}
+            ref={(frame) => { this._oneFrame = frame; }}
           />
         </div>
       );
@@ -169,7 +169,7 @@ export default class DiffContainer extends React.Component {
     promise
       .then(response => { return checkResponse(response); })
       .then(response => {
-        var contentType = response.headers.get('content-type');
+        const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('text/html')) {
           return response.text();
         } else {

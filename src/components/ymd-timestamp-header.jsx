@@ -238,7 +238,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   _checkTimestamps (side = null) {
     this._shouldValidateTimestamp = false;
-    var fetchedTimestamps = { a: '', b: '' };
+    const fetchedTimestamps = { a: '', b: '' };
     if (this.state.timestampA && this.state.timestampB) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
         .then(() => { return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b'); })
@@ -523,10 +523,14 @@ export default class YmdTimestampHeader extends React.Component {
     if (!this.state.showSteps || this.state.showDiff) {
       return (
         <div>
-          {(this.state.timestampA ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-            id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a> : null)}
-          {(this.state.timestampB ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-            id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a> : null)}
+          {(this.state.timestampA
+            ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+              id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+            : null)}
+          {(this.state.timestampB
+            ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+              id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
+            : null)}
           <br/>
         </div>
       );

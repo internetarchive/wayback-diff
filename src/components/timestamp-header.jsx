@@ -104,7 +104,7 @@ export default class TimestampHeader extends React.Component {
 
   _checkTimestamps () {
     this._shouldValidateTimestamp = false;
-    var fetchedTimestamps = { a: '', b: '' };
+    const fetchedTimestamps = { a: '', b: '' };
     if (this.state.timestampA && this.state.timestampB) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
         .then(() => { return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b'); })
@@ -225,14 +225,14 @@ export default class TimestampHeader extends React.Component {
   }
 
   _prepareOptionElements (data) {
-    var initialSnapshots = [];
+    const initialSnapshots = [];
     if (data.length > 0) {
       var yearGroup = this._getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
     for (let i = 0; i < data.length; i++) {
       const utcTime = this._getUTCDateFormat(data[i][0]);
-      var year = this._getYear(data[i][0]);
+      const year = this._getYear(data[i][0]);
       if (year < yearGroup) {
         yearGroup = year;
         initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
@@ -258,7 +258,7 @@ export default class TimestampHeader extends React.Component {
     const year = parseInt(date.substring(0, 4), 10);
     const month = parseInt(date.substring(4, 6), 10) - 1;
     const day = parseInt(date.substring(6, 8), 10);
-    var shortTime = new Date(Date.UTC(year, month, day));
+    let shortTime = new Date(Date.UTC(year, month, day));
     shortTime = shortTime.toUTCString();
     shortTime = shortTime.split(' ');
     const retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
