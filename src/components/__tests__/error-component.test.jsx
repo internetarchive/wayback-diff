@@ -3,8 +3,8 @@ import React from 'react';
 import { shallow } from '../../enzyme';
 import ErrorMessage from '../errors';
 
-describe('Error component tests', () => {
-  it('renders 404 error', () => {
+describe('Error component tests', function () {
+  it('renders 404 error', function () {
     const errorCode = '404';
     const url = 'url';
     const wrapper = shallow(<ErrorMessage code={errorCode} url={url}/>);
@@ -14,7 +14,7 @@ describe('Error component tests', () => {
     expect(wrapper.find('.alert-warning')).toHaveLength(1);
   });
 
-  it('renders not found Error message', () => {
+  it('renders not found Error message', function () {
     const errorCode = '404';
     const url = 'url';
     const wrapper = shallow(<ErrorMessage code={errorCode} url={url}/>);
@@ -24,7 +24,7 @@ describe('Error component tests', () => {
     );
   });
 
-  it('renders generic Error message', () => {
+  it('renders generic Error message', function () {
     let rndCode = Math.floor(Math.random() * Math.floor(600));
     while (rndCode === 404) { rndCode = Math.floor(Math.random() * Math.floor(600)); }
     const errorCode = `${rndCode}`;

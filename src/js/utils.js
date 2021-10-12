@@ -2,7 +2,7 @@ import max from 'lodash/max';
 import zip from 'lodash/zip';
 
 /* eslint-disable no-useless-escape */
-const urlRegex = new RegExp(/[\w\.]{2,256}\.[a-z]{2,4}/gi);
+const urlRegex = /[\w\.]{2,256}\.[a-z]{2,4}/gi;
 /* eslint-enable no-useless-escape */
 
 function hasWhiteSpace (s) {

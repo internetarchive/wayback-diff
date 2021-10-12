@@ -44,7 +44,7 @@ export default class SandboxedHtml extends React.PureComponent {
     return <div>
       <iframe height={window.innerHeight} width={'100%'} onLoad={() => { this.handleHeight(); this.removeLoaderImg(); }}
         sandbox="allow-same-origin allow-forms allow-scripts"
-        ref={frame => this._frame = frame}
+        ref={(frame) => { this._frame = frame; }}
       />
       <IframeLoader ref={this.loaderRef} loader={this.props.loader}/>
     </div>;

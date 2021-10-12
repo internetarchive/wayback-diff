@@ -11,7 +11,7 @@ export default class DiffFooter extends React.PureComponent {
   render () {
     return (
       <p id={'diff-footer'}><yellow-diff-footer>Yellow</yellow-diff-footer> indicates
-        content deletion. <blue-diff-footer>Blue</blue-diff-footer> indicates 
+        content deletion. <blue-diff-footer>Blue</blue-diff-footer> indicates
         content addition.
       </p>
     );
