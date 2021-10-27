@@ -49,8 +49,9 @@ export default class DiffView extends React.Component {
 
     this.state = { diffData: null };
   }
-
-  componentWillMount () {
+  
+  //This is a workaround. Need to update this method in future
+  UNSAFE_componentWillMount () {
     const { props } = this;
     if (this._canFetch(props)) {
       this._loadDiffData(props.page, props.a, props.b, props.diffType);
@@ -68,8 +69,9 @@ export default class DiffView extends React.Component {
 
   /**
    * @param {DiffViewProps} nextProps
+   * This is a workaround. Need to update this method in future
    */
-  componentWillReceiveProps (nextProps) {
+   UNSAFE_componentWillReceiveProps (nextProps) {
     if (this._canFetch(nextProps) && !this._propsSpecifySameDiff(nextProps)) {
       this._loadDiffData(nextProps.page, nextProps.a, nextProps.b, nextProps.diffType);
     }
