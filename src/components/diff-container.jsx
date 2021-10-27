@@ -73,7 +73,7 @@ export default class DiffContainer extends React.Component {
     }
     if (this.state.error) {
       return (
-        <ErrorMessage url={this.props.url} code={this.state.error}/>);
+        <ErrorMessage url={this.props.url} timestamp={this.state.timestampA} code={this.state.error}/>);
     }
     if (!this.state.timestampA && !this.state.timestampB) {
       if (this.props.noTimestamps) {
