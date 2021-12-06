@@ -28,7 +28,7 @@ export default class ErrorMessage extends React.PureComponent {
     let msg = '';
     let back = false;
     let simhash = false;
-    const year = ''
+    let year = '';
     if (this.props.timestamp !== undefined) {
       year = this.props.timestamp.substring(0, 4);
     }
