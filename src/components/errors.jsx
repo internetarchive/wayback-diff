@@ -28,7 +28,10 @@ export default class ErrorMessage extends React.PureComponent {
     let msg = '';
     let back = false;
     let simhash = false;
-    const year = this.props.timestamp.substring(0, 4);
+    let year = '';
+    if (this.props.timestamp !== undefined) {
+      year = this.props.timestamp.substring(0, 4);
+    }
     switch (this.props.code) {
     case '404':
       msg = `The Wayback Machine has not archived ${this.props.url}.`;
