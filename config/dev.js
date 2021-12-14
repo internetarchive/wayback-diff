@@ -11,7 +11,7 @@ import cssnano from 'cssnano';
 import { terser } from 'rollup-plugin-terser';
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index-build.js',
   output: {
     name: 'waybackDiff',
     file: 'build/app.js',
