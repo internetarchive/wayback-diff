@@ -332,6 +332,20 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
+  /**
+   * Fetch captures for a specific YYYYMM.
+   */
+  createCDXRequest (dt) {
+    const url = new URL(this.props.conf.cdxServer, window.location.origin);
+    url.searchParams.append('url', this.props.url);
+    url.searchParams.append('fl', 'timestamp,digest');
+    url.searchParams.append('output', 'json');
+    url.searchParams.append('from', dt);
+    url.searchParams.append('to', dt);
+    url.searchParams.append('limit', this.props.conf.limit);
+    return url;
+  }
+
   _fetchCDXData () {
     this.setState({ showLoader: true });
     let leftFetchPromise;
@@ -340,25 +354,16 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url;
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer, window.location.origin);
-        url.searchParams.append('url', this.props.url);
-        url.searchParams.append('fl', 'timestamp,digest');
-        url.searchParams.append('output', 'json');
-        url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
-        url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
-        url.searchParams.append('limit', this.props.conf.limit);
+        const url = this.createCDXRequest(
+          this.state.leftYear + getTwoDigitInt(this._leftMonthIndex)
+        );
         leftFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer, window.location.origin);
-        url.searchParams.append('url', this.props.url);
-        url.searchParams.append('fl', 'timestamp,digest');
-        url.searchParams.append('output', 'json');
-        url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
-        url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
-        url.searchParams.append('limit', this.props.conf.limit);
+        const url = this.createCDXRequest(
+          this.state.rightYear + getTwoDigitInt(this._rightMonthIndex)
+        );
         rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
     }
