@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue, getUTCDateFormat
+  fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue,
+  getUTCDateFormat, getShortUTCDateFormat
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -459,15 +460,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  /** Input: "20190504221015" Output: "Sat, 04 May 2019" */
-  _getShortUTCDateFormat (timestamp) {
-    const year = parseInt(timestamp.substring(0, 4), 10);
-    const month = parseInt(timestamp.substring(4, 6), 10) - 1;
-    const day = parseInt(timestamp.substring(6, 8), 10);
-    const utcDateTime = new Date(Date.UTC(year, month, day));
-    return utcDateTime.toUTCString().split(' ').slice(0, 4).join(' ');
-  }
-
   _restartPressed () {
     this.setState({
       showRestartBtn: false,
@@ -589,8 +581,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
-    const first = this._getShortUTCDateFormat(firstTimestamp);
-    const last = this._getShortUTCDateFormat(lastTimestamp);
+    const first = getShortUTCDateFormat(firstTimestamp);
+    const last = getShortUTCDateFormat(lastTimestamp);
     return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection
       of {count.toLocaleString()} dating from {first} to {last}.</p>);
   }

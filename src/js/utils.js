@@ -165,6 +165,19 @@ export function getUTCDateFormat (date) {
   return (niceTime.toUTCString());
 }
 
+/** Input: "20190504221015" Output: "Sat, 04 May 2019" */
+export function getShortUTCDateFormat (timestamp) {
+  const year = parseInt(timestamp.substring(0, 4), 10);
+  const month = parseInt(timestamp.substring(4, 6), 10) - 1;
+  const day = parseInt(timestamp.substring(6, 8), 10);
+  const utcDateTime = new Date(Date.UTC(year, month, day));
+  return utcDateTime.toUTCString().split(' ').slice(0, 4).join(' ');
+}
+
+export function getYear (ts) {
+  return parseInt(ts.substring(0, 4), 10);
+}
+
 export function b64ToArray (b64Data) {
   const byteCharacters = atob(b64Data);
   const byteNumbers = new Array(byteCharacters.length);

@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
-import { fetchWithTimeout, checkResponse } from '../js/utils.js';
+import { fetchWithTimeout, checkResponse, getUTCDateFormat,
+    getShortUTCDateFormat, getYear } from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -227,12 +228,12 @@ export default class TimestampHeader extends React.Component {
   _prepareOptionElements (data) {
     const initialSnapshots = [];
     if (data.length > 0) {
-      var yearGroup = this._getYear(data[0][0]);
+      var yearGroup = getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
     }
     for (let i = 0; i < data.length; i++) {
-      const utcTime = this._getUTCDateFormat(data[i][0]);
-      const year = this._getYear(data[i][0]);
+      const utcTime = getUTCDateFormat(data[i][0]);
+      const year = getYear(data[i][0]);
       if (year < yearGroup) {
         yearGroup = year;
         initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
@@ -240,33 +241,6 @@ export default class TimestampHeader extends React.Component {
       initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
     }
     return initialSnapshots;
-  }
-
-  _getUTCDateFormat (date) {
-    const year = parseInt(date.substring(0, 4), 10);
-    const month = parseInt(date.substring(4, 6), 10) - 1;
-    const day = parseInt(date.substring(6, 8), 10);
-    const hour = parseInt(date.substring(8, 10), 10);
-    const minutes = parseInt(date.substring(10, 12), 10);
-    const seconds = parseInt(date.substring(12, 14), 10);
-
-    const niceTime = new Date(Date.UTC(year, month, day, hour, minutes, seconds));
-    return (niceTime.toUTCString());
-  }
-
-  _getShortUTCDateFormat (date) {
-    const year = parseInt(date.substring(0, 4), 10);
-    const month = parseInt(date.substring(4, 6), 10) - 1;
-    const day = parseInt(date.substring(6, 8), 10);
-    let shortTime = new Date(Date.UTC(year, month, day));
-    shortTime = shortTime.toUTCString();
-    shortTime = shortTime.split(' ');
-    const retTime = shortTime[0] + ' ' + shortTime[1] + ' ' + shortTime[2] + ' ' + shortTime[3];
-    return (retTime);
-  }
-
-  _getYear (date) {
-    return parseInt(date.substring(0, 4), 10);
   }
 
   _restartPressed () {
@@ -352,8 +326,8 @@ export default class TimestampHeader extends React.Component {
 
   _getHeaderInfo (data) {
     if (data) {
-      const first = this._getShortUTCDateFormat(data[0][0]);
-      const last = this._getShortUTCDateFormat(data[data.length - 1][0]);
+      const first = getShortUTCDateFormat(data[0][0]);
+      const last = getShortUTCDateFormat(data[data.length - 1][0]);
       const numberWithCommas = (x) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
       };
