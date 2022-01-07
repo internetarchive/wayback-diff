@@ -8,6 +8,21 @@ import {
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
 
+const monthNames = {
+  1: 'January',
+  2: 'February',
+  3: 'March',
+  4: 'April',
+  5: 'May',
+  6: 'June',
+  7: 'July',
+  8: 'August',
+  9: 'September',
+  10: 'October',
+  11: 'November',
+  12: 'December'
+};
+
 /**
  * Display a timestamp selector
  *
@@ -32,21 +47,6 @@ export default class YmdTimestampHeader extends React.Component {
   _isMountedNow = false;
 
   _shouldValidateTimestamp = true;
-
-  _monthNames = {
-    1: 'January',
-    2: 'February',
-    3: 'March',
-    4: 'April',
-    5: 'May',
-    6: 'June',
-    7: 'July',
-    8: 'August',
-    9: 'September',
-    10: 'October',
-    11: 'November',
-    12: 'December'
-  };
 
   _leftMonthIndex = -1;
 
@@ -332,6 +332,20 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
+  /**
+   * Fetch captures for a specific YYYYMM.
+   */
+  createCDXRequest (dt) {
+    const url = new URL(this.props.conf.cdxServer, window.location.origin);
+    url.searchParams.append('url', this.props.url);
+    url.searchParams.append('fl', 'timestamp,digest');
+    url.searchParams.append('output', 'json');
+    url.searchParams.append('from', dt);
+    url.searchParams.append('to', dt);
+    url.searchParams.append('limit', this.props.conf.limit);
+    return url;
+  }
+
   _fetchCDXData () {
     this.setState({ showLoader: true });
     let leftFetchPromise;
@@ -340,25 +354,16 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.props.fetchCDXCallback) {
       leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
     } else {
-      let url;
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer, window.location.origin);
-        url.searchParams.append('url', this.props.url);
-        url.searchParams.append('fl', 'timestamp,digest');
-        url.searchParams.append('output', 'json');
-        url.searchParams.append('from', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
-        url.searchParams.append('to', this.state.leftYear + getTwoDigitInt(this._leftMonthIndex));
-        url.searchParams.append('limit', this.props.conf.limit);
+        const url = this.createCDXRequest(
+          this.state.leftYear + getTwoDigitInt(this._leftMonthIndex)
+        );
         leftFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        url = new URL(this.props.conf.cdxServer, window.location.origin);
-        url.searchParams.append('url', this.props.url);
-        url.searchParams.append('fl', 'timestamp,digest');
-        url.searchParams.append('output', 'json');
-        url.searchParams.append('from', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
-        url.searchParams.append('to', this.state.rightYear + getTwoDigitInt(this._rightMonthIndex));
-        url.searchParams.append('limit', this.props.conf.limit);
+        const url = this.createCDXRequest(
+          this.state.rightYear + getTwoDigitInt(this._rightMonthIndex)
+        );
         rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
     }
@@ -473,17 +478,23 @@ export default class YmdTimestampHeader extends React.Component {
       <div className="wayback-ymd-timestamp">
         <div className="wayback-timestamps">
           <select className="form-control input-sm mr-sm-1" id="year-select-left"
-            onChange={this._handleYearChange} title="Years and available captures">
-            <option value="" disabled selected>Year</option>
+            onChange={this._handleYearChange} title="Years and available captures"
+            defaultValue="">
+            <option value="" disabled>Year</option>
             {this.state.yearOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-left" style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
-            onChange={this._getTimestamps} title="Months and available captures">
-            <option value="" disabled selected>Month</option>
+          <select className="form-control input-sm mr-sm-1" id="month-select-left"
+            style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
+            onChange={this._getTimestamps} title="Months and available captures"
+            defaultValue="">
+            <option value="" disabled>Month</option>
             {this.state.leftMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left" style={{ visibility: this._visibilityState[+!this.state.leftSnapElements] }} onChange={this._handleLeftTimestampChange}>
-            <option value="" disabled selected>Available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-left"
+            style={{ visibility: this._visibilityState[+!this.state.leftSnapElements] }}
+            onChange={this._handleLeftTimestampChange}
+            defaultValue="">
+            <option value="" disabled>Available captures</option>
             {this.state.leftSnapElements}
           </select>
         </div>
@@ -492,18 +503,24 @@ export default class YmdTimestampHeader extends React.Component {
           {(this.state.showRestartBtn ? <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> : null)}
         </div>
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right" style={{ visibility: this._visibilityState[+!this.state.rightSnapElements] }} onChange={this._handleRightTimestampChange}>
-            <option value="" disabled selected>Available captures</option>
+          <select className="form-control input-sm mr-sm-1" id="timestamp-select-right"
+            style={{ visibility: this._visibilityState[+!this.state.rightSnapElements] }}
+            onChange={this._handleRightTimestampChange}
+            defaultValue="">
+            <option value="" disabled>Available captures</option>
             {this.state.rightSnapElements}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-right" style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
-            onChange={this._getTimestamps} title="Months and available captures">
-            <option value="" disabled selected>Month</option>
+          <select className="form-control input-sm mr-sm-1" id="month-select-right"
+            style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
+            onChange={this._getTimestamps} title="Months and available captures"
+            defaultValue="">
+            <option value="" disabled>Month</option>
             {this.state.rightMonthOptions}
           </select>
           <select className="form-control input-sm mr-sm-1" id="year-select-right"
-            onChange={this._handleYearChange} title="Years and available captures">
-            <option value="" disabled selected>Year</option>
+            onChange={this._handleYearChange} title="Years and available captures"
+            defaultValue="">
+            <option value="" disabled>Year</option>
             {this.state.yearOptions}
           </select>
         </div>
@@ -566,13 +583,13 @@ export default class YmdTimestampHeader extends React.Component {
     const monthLeft = document.getElementById('month-select-left');
     const monthRight = document.getElementById('month-select-right');
 
-    if (selectHasValue(monthLeft.id, this._monthNames[this._leftMonthIndex])) {
-      monthLeft.value = this._monthNames[this._leftMonthIndex];
+    if (selectHasValue(monthLeft.id, monthNames[this._leftMonthIndex])) {
+      monthLeft.value = monthNames[this._leftMonthIndex];
     } else {
       monthLeft.selectedIndex = 0;
     }
-    if (selectHasValue(monthRight.id, this._monthNames[this._rightMonthIndex])) {
-      monthRight.value = this._monthNames[this._rightMonthIndex];
+    if (selectHasValue(monthRight.id, monthNames[this._rightMonthIndex])) {
+      monthRight.value = monthNames[this._rightMonthIndex];
     } else {
       monthRight.selectedIndex = 0;
     }
@@ -653,7 +670,7 @@ export default class YmdTimestampHeader extends React.Component {
       const monthData = [];
       for (let i = 0; i < data.length; i++) {
         if (data[i] > 0) {
-          monthData.push([this._monthNames[i + 1], data[i]]);
+          monthData.push([monthNames[i + 1], data[i]]);
         }
       }
       return monthData;
@@ -741,13 +758,13 @@ export default class YmdTimestampHeader extends React.Component {
   _saveMonthsIndex () {
     if (this._isShowing('month-select-left')) {
       const monthLeft = document.getElementById('month-select-left').value;
-      this._leftMonthIndex = parseInt(getKeyByValue(this._monthNames, monthLeft));
+      this._leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
     } else if (this.state.timestampA) {
       this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
     }
     if (this._isShowing('month-select-right')) {
       const monthRight = document.getElementById('month-select-right').value;
-      this._rightMonthIndex = parseInt(getKeyByValue(this._monthNames, monthRight));
+      this._rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
     } else if (this.state.timestampB) {
       this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
     }

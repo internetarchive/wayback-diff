@@ -38,6 +38,12 @@ export default class ErrorMessage extends React.PureComponent {
       back = true;
       simhash = false;
       break;
+    case '422':
+      // https://github.com/edgi-govdata-archiving/web-monitoring-diff/blob/be748a7f0bbdd4251f680e22d3e433d1be93f858/web_monitoring_diff/server/server.py#L568
+      msg = `The captures of ${this.props.url} cannot be compared. Note that we support only HTML capture comparison.`;
+      back = true;
+      simhash = false;
+      break;
     case 'CAPTURE_NOT_FOUND':
       msg = `There are no data available for ${this.props.url} and timestamp ${getUTCDateFormat(this.props.timestamp)}.`;
       back = true;
