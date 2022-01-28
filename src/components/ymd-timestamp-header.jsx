@@ -702,13 +702,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _hideAndCollapseElement (elementID) {
-    const element = document.getElementById(elementID);
-    if (element.style.display !== 'none') {
-      element.style.display = 'none';
-    }
-  }
-
   _showInfo () {
     return (
       <div>
