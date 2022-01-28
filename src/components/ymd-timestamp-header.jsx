@@ -58,8 +58,8 @@ export default class YmdTimestampHeader extends React.Component {
 
     this._abortController = new window.AbortController();
 
-    const leftYear = (this.props.timestampA === undefined) ? null : this.props.timestampA.substring(0, 4);
-    const rightYear = (this.props.timestampB === undefined) ? null : this.props.timestampB.substring(0, 4);
+    const leftYear = (this.props.timestampA === undefined) ? '' : this.props.timestampA.substring(0, 4);
+    const rightYear = (this.props.timestampB === undefined) ? '' : this.props.timestampB.substring(0, 4);
 
     this.state = {
       timestampA: this.props.timestampA,
@@ -473,7 +473,7 @@ export default class YmdTimestampHeader extends React.Component {
         <div className="wayback-timestamps">
           <select className="form-control input-sm mr-sm-1" id="year-select-left"
             onChange={this._handleYearChange} title="Years and available captures"
-            defaultValue="">
+            value={this.state.leftYear}>
             <option value="" disabled>Year</option>
             {this.state.yearOptions}
           </select>
@@ -513,7 +513,7 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
           <select className="form-control input-sm mr-sm-1" id="year-select-right"
             onChange={this._handleYearChange} title="Years and available captures"
-            defaultValue="">
+            value={this.state.rightYear}>
             <option value="" disabled>Year</option>
             {this.state.yearOptions}
           </select>
@@ -587,8 +587,6 @@ export default class YmdTimestampHeader extends React.Component {
     } else {
       monthRight.selectedIndex = 0;
     }
-    document.getElementById('year-select-left').value = this.state.leftYear;
-    document.getElementById('year-select-right').value = this.state.rightYear;
   }
 
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
@@ -642,19 +640,20 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
-  _showMonths () {
-    const leftYear = document.getElementById('year-select-left').value;
-    const rightYear = document.getElementById('year-select-right').value;
-
-    const leftMonths = this.state.sparkline[leftYear];
-    const rightMonths = this.state.sparkline[rightYear];
-
-    const leftMonthsData = this._getMonthData(leftMonths);
-    const rightMonthsData = this._getMonthData(rightMonths);
-
+  _showMonths (leftYear, rightYear) {
+    if (isNil(leftYear)) {
+      leftYear = this.state.leftYear;
+    }
+    if (isNil(rightYear)) {
+      rightYear = this.state.rightYear;
+    }
+    const leftMonthsData = this._getMonthData(
+      this.state.sparkline[leftYear]
+    );
+    const rightMonthsData = this._getMonthData(
+      this.state.sparkline[rightYear]
+    );
     this.setState({
-      leftYear: leftYear,
-      rightYear: rightYear,
       leftMonthOptions: this._monthOptions(leftMonthsData),
       rightMonthOptions: this._monthOptions(rightMonthsData)
     });
@@ -732,19 +731,22 @@ export default class YmdTimestampHeader extends React.Component {
     if (e.target.id === 'year-select-left') {
       this._hideElement('timestamp-select-left');
       this._leftMonthIndex = 0;
+      this._showElement('month-select-left');
+      this.setState({
+        leftYear: e.target.value,
+        showDiffBtn: false
+      });
+      this._showMonths(e.target.value, null);
     } else {
       this._hideElement('timestamp-select-right');
       this._rightMonthIndex = 0;
-    }
-    this.setState({
-      showDiffBtn: false
-    });
-    if (e.target.id === 'year-select-left') {
-      this._showElement('month-select-left');
-    } else {
       this._showElement('month-select-right');
+      this.setState({
+        rightYear: e.target.value,
+        showDiffBtn: false
+      });
+      this._showMonths(null, e.target.value);
     }
-    this._showMonths();
   }
 
   _saveMonthsIndex () {
