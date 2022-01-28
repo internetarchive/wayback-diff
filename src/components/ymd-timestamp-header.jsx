@@ -36,17 +36,12 @@ export default class YmdTimestampHeader extends React.Component {
     fetchCDXCallback: PropTypes.func,
     errorHandledCallback: PropTypes.func,
     getTimestampsCallback: PropTypes.func,
-    _isMountedNow: PropTypes.bool,
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
     conf: PropTypes.object,
     url: PropTypes.string,
     isInitial: PropTypes.bool
   };
-
-  _isMountedNow = false;
-
-  _shouldValidateTimestamp = true;
 
   _leftMonthIndex = -1;
 
@@ -74,7 +69,9 @@ export default class YmdTimestampHeader extends React.Component {
       showSteps: this.props.isInitial,
       showRestartBtn: false,
       showDiffBtn: false,
-      timestampAttempt: 0
+      timestampAttempt: 0,
+      isMounted: false,
+      shouldValidateTimestamp: true
     };
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
@@ -88,12 +85,12 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidMount () {
-    this._isMountedNow = true;
+    this.setState({ isMounted: true });
   }
 
   componentDidUpdate () {
     if (this.state.cdxData) {
-      if (this._shouldValidateTimestamp) {
+      if (this.state.shouldValidateTimestamp) {
         this._checkTimestamps();
       }
       if (!this.state.sparkline && !this.state.showLoader) {
@@ -111,7 +108,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentWillUnmount () {
-    this._isMountedNow = false;
+    this.setState({ isMounted: false });
     this._abortController.abort();
   }
 
@@ -238,7 +235,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _checkTimestamps (side = null) {
-    this._shouldValidateTimestamp = false;
+    this.setState({ shouldValidateTimestamp: false });
     const fetchedTimestamps = { a: '', b: '' };
     if (this.state.timestampA && this.state.timestampB) {
       this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
@@ -418,7 +415,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _errorHandled (error) {
-    if (this._isMountedNow) {
+    if (this.state.isMounted) {
       this.props.errorHandledCallback(error);
       this.setState({ showError: true });
     }
