@@ -120,8 +120,7 @@ export default class YmdTimestampHeader extends React.Component {
         showDiffBtn: true
       });
       const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex - 1][1];
-      let allowedSnapshots = this.state.leftSnaps;
-      allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+      const allowedSnapshots = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
         leftSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
@@ -136,8 +135,7 @@ export default class YmdTimestampHeader extends React.Component {
         showDiffBtn: true
       });
       const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex - 1][1];
-      let allowedSnapshots = this.state.rightSnaps;
-      allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+      const allowedSnapshots = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
         rightSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
@@ -184,24 +182,22 @@ export default class YmdTimestampHeader extends React.Component {
 
   _areRequestedTimestampsSelected () {
     if (this.state.finishedValidating) {
-      const leftTimestamp = parseInt(this.state.timestampA);
-      const rightTimestamp = parseInt(this.state.timestampB);
-      let lastLeftFromCDX, lastRightFromCDX, newLeft, newRight;
+      let newLeft, newRight;
 
-      if (isNaN(leftTimestamp)) {
+      if (isNaN(this.state.timestampA)) {
         newLeft = null;
       } else {
-        lastLeftFromCDX = parseInt(this.state.leftSnaps[this.state.leftSnaps.length - 1][0]);
-        if (leftTimestamp > lastLeftFromCDX) {
+        const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
+        if (this.state.timestampA > lastLeftFromCDX) {
           newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
         }
       }
 
-      if (isNaN(rightTimestamp)) {
+      if (isNaN(this.state.timestampB)) {
         newRight = null;
       } else {
-        lastRightFromCDX = parseInt(this.state.rightSnaps[this.state.rightSnaps.length - 1][0]);
-        if (rightTimestamp > lastRightFromCDX) {
+        const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
+        if (this.state.timestampB > lastRightFromCDX) {
           newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
         }
       }
@@ -343,6 +339,18 @@ export default class YmdTimestampHeader extends React.Component {
     return url;
   }
 
+  _handleFetch (promise) {
+    return promise
+      .then(function (response) {
+        if (response) {
+          if (!response.ok) {
+            throw Error(response.status);
+          }
+          return response.json();
+        }
+      });
+  }
+
   _fetchCDXData () {
     this.setState({ showLoader: true });
     let leftFetchPromise;
@@ -364,22 +372,7 @@ export default class YmdTimestampHeader extends React.Component {
         rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
     }
-    this._exportCDXData(leftFetchPromise, rightFetchPromise);
-  }
 
-  _handleFetch (promise) {
-    return promise
-      .then(function (response) {
-        if (response) {
-          if (!response.ok) {
-            throw Error(response.status);
-          }
-          return response.json();
-        }
-      });
-  }
-
-  _exportCDXData (leftFetchPromise, rightFetchPromise) {
     if (leftFetchPromise) {
       leftFetchPromise
         .then((data) => {
