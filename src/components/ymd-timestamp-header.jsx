@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, getTwoDigitInt, getKeyByValue, selectHasValue,
+  fetchWithTimeout, twoDigits, getKeyByValue, selectHasValue,
   getUTCDateFormat, getShortUTCDateFormat
 } from '../js/utils.js';
 import Loading from './loading.jsx';
@@ -356,13 +356,13 @@ export default class YmdTimestampHeader extends React.Component {
     } else {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         const url = this.createCDXRequest(
-          this.state.leftYear + getTwoDigitInt(this._leftMonthIndex)
+          this.state.leftYear + twoDigits(this._leftMonthIndex)
         );
         leftFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         const url = this.createCDXRequest(
-          this.state.rightYear + getTwoDigitInt(this._rightMonthIndex)
+          this.state.rightYear + twoDigits(this._rightMonthIndex)
         );
         rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
       }
@@ -443,26 +443,23 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _prepareOptionElements (data) {
-    if (data) {
-      const initialSnapshots = [];
-      for (let i = 0; i < data.length; i++) {
-        const utcTime = getUTCDateFormat(data[i][0]);
-        initialSnapshots.push(<option key={i} value={data[i][0]}>{utcTime}</option>);
-      }
-      return initialSnapshots;
-    }
+    return (
+      data &&
+      data.map((item, index) => {
+        return <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>;
+      })
+    );
   }
 
-  _prepareSparklineOptionElements (data) {
-    if (data) {
-      const options = [];
-      const limit = parseInt(this.props.conf.limit);
-      for (let i = data.length - 1; i >= 0; i--) {
-        const count = Math.min(data[i][1], limit);
-        options.push(<option key={i} value={data[i][0]}>{`${data[i][0]} (${count})`}</option>);
-      }
-      return options;
-    }
+  _monthOptions (data) {
+    const limit = parseInt(this.props.conf.limit);
+    return (
+      data &&
+      data.slice(0).reverse().map((item, index) => {
+        const count = Math.min(item[1], limit);
+        return <option key={index} value={item[0]}>{`${item[0]} (${count})`}</option>;
+      })
+    );
   }
 
   _restartPressed () {
@@ -639,10 +636,11 @@ export default class YmdTimestampHeader extends React.Component {
       }
       j++;
     }
+
     this.setState({
       showLoader: false,
       sparkline: snapshots,
-      yearOptions: this._prepareSparklineOptionElements(yearSum),
+      yearOptions: this._monthOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)
     });
   }
@@ -660,21 +658,18 @@ export default class YmdTimestampHeader extends React.Component {
     this.setState({
       leftYear: leftYear,
       rightYear: rightYear,
-      leftMonthOptions: this._prepareSparklineOptionElements(leftMonthsData),
-      rightMonthOptions: this._prepareSparklineOptionElements(rightMonthsData)
+      leftMonthOptions: this._monthOptions(leftMonthsData),
+      rightMonthOptions: this._monthOptions(rightMonthsData)
     });
   }
 
   _getMonthData (data) {
-    if (data) {
-      const monthData = [];
-      for (let i = 0; i < data.length; i++) {
-        if (data[i] > 0) {
-          monthData.push([monthNames[i + 1], data[i]]);
-        }
-      }
-      return monthData;
-    }
+    return (
+      data &&
+      data.filter(item => item > 0).map((item, index) => {
+        return [monthNames[index + 1], item];
+      })
+    );
   }
 
   _getTimestamps (e) {
