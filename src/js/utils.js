@@ -13,7 +13,7 @@ function looksLikeUrl (str) {
   return !!str.match(urlRegex);
 }
 
-export function isStrUrl (str = '') {
+export function isUrl (str = '') {
   const val = str.toLocaleLowerCase();
   return (
     (val.startsWith('ftp://') || val.startsWith('http://') ||

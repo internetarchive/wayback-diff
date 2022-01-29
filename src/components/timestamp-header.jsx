@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
-import { fetchWithTimeout, checkResponse, getUTCDateFormat,
-    getShortUTCDateFormat, getYear } from '../js/utils.js';
+import {
+  fetchWithTimeout, checkResponse, getUTCDateFormat, getShortUTCDateFormat, getYear
+} from '../js/utils.js';
 /**
  * Display a timestamp selector
  *
@@ -61,8 +62,7 @@ export default class TimestampHeader extends React.Component {
 
   _handleRightTimestampChange () {
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-right').selectedIndex][1];
-    let allowedSnapshots = this.state.cdxData;
-    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+    const allowedSnapshots = this.state.cdxData.filter(hash => hash[1] !== selectedDigest);
     this.setState({
       leftSnaps: allowedSnapshots,
       leftSnapElements: this._prepareOptionElements(allowedSnapshots)
@@ -71,8 +71,7 @@ export default class TimestampHeader extends React.Component {
 
   _handleLeftTimestampChange () {
     const selectedDigest = this.state.cdxData[document.getElementById('timestamp-select-left').selectedIndex][1];
-    let allowedSnapshots = this.state.cdxData;
-    allowedSnapshots = allowedSnapshots.filter(hash => hash[1] !== selectedDigest);
+    const allowedSnapshots = this.state.cdxData.filter(hash => hash[1] !== selectedDigest);
     this.setState({
       rightSnaps: allowedSnapshots,
       rightSnapElements: this._prepareOptionElements(allowedSnapshots)
@@ -228,17 +227,17 @@ export default class TimestampHeader extends React.Component {
   _prepareOptionElements (data) {
     const initialSnapshots = [];
     if (data.length > 0) {
-      var yearGroup = getYear(data[0][0]);
+      let yearGroup = getYear(data[0][0]);
       initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
-    }
-    for (let i = 0; i < data.length; i++) {
-      const utcTime = getUTCDateFormat(data[i][0]);
-      const year = getYear(data[i][0]);
-      if (year < yearGroup) {
-        yearGroup = year;
-        initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
+      for (let i = 0; i < data.length; i++) {
+        const utcTime = getUTCDateFormat(data[i][0]);
+        const year = getYear(data[i][0]);
+        if (year < yearGroup) {
+          yearGroup = year;
+          initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
+        }
+        initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
       }
-      initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
     }
     return initialSnapshots;
   }
@@ -280,19 +279,16 @@ export default class TimestampHeader extends React.Component {
 
   _showOpenLinks () {
     if (!this.props.isInitial) {
-      if (this.props.timestampA) {
-        var aLeft = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-          id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>);
-      }
-      if (this.props.timestampB) {
-        var aRight = (<a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-          id="timestamp-right" target="_blank" rel="noopener noreferrer">
-          Open in new window</a>);
-      }
       return (
         <div>
-          {aLeft}
-          {aRight}
+          {this.props.timestampA &&
+            <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+              id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+          }
+          {this.props.timestampB &&
+            <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+              id="timestamp-right" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+          }
           <br/>
         </div>
       );
