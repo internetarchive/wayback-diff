@@ -4,7 +4,7 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import { isStrUrl, checkResponse, fetchWithTimeout } from '../js/utils.js';
+import { isUrl, checkResponse, fetchWithTimeout } from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
@@ -68,7 +68,7 @@ export default class DiffContainer extends React.Component {
   }
 
   render () {
-    if (this._urlIsInvalid()) {
+    if (!isUrl(this.props.url)) {
       return this._invalidURL();
     }
     if (this.state.error) {
@@ -98,7 +98,7 @@ export default class DiffContainer extends React.Component {
           <YmdTimestampHeader isInitial={false}
             {...this.props} getTimestampsCallback={this.getTimestamps}
             errorHandledCallback={this.errorHandled}/>
-          {(this.state.showDiff ? this.prepareDiffView() : null)}
+          {this.state.showDiff && this.prepareDiffView()}
           <DiffFooter/>
         </div>);
     }
@@ -107,7 +107,7 @@ export default class DiffContainer extends React.Component {
         <div className="diffcontainer-view">
           <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
             isInitial={false} errorHandledCallback={this.errorHandled}/>
-          {(this.state.showDiff ? this._showOneSnapshot(true, this.state.timestampA) : null)}
+          {this.state.showDiff && this._showOneSnapshot(true, this.state.timestampA)}
         </div>);
     }
     if (this.state.timestampB) {
@@ -116,7 +116,7 @@ export default class DiffContainer extends React.Component {
           <YmdTimestampHeader isInitial={false} {...this.props}
             errorHandledCallback={this.errorHandled}
             getTimestampsCallback={this.getTimestamps}/>
-          {(this.state.showDiff ? this._showOneSnapshot(false, this.state.timestampB) : null)}
+          {this.state.showDiff && this._showOneSnapshot(false, this.state.timestampB)}
         </div>);
     }
   }
@@ -208,10 +208,6 @@ export default class DiffContainer extends React.Component {
     if (offsetWidth > this._oneFrame.clientWidth) {
       this._oneFrame.width = offsetWidth;
     }
-  }
-
-  _urlIsInvalid () {
-    return (!isStrUrl(this.props.url));
   }
 
   _invalidURL () {
