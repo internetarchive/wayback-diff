@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { checkResponse, fetchWithTimeout, getUTCDateFormat } from '../js/utils';
+import { checkResponse, fetchWithTimeout } from '../js/utils';
 
 /**
  * Display an error message depending on props
@@ -26,60 +26,58 @@ export default class ErrorMessage extends React.PureComponent {
 
   render () {
     let msg = '';
-    let back = false;
     let simhash = false;
     let year = '';
     if (this.props.timestamp !== undefined) {
       year = this.props.timestamp.substring(0, 4);
     }
+
     switch (this.props.code) {
     case '404':
       msg = `The Wayback Machine has not archived ${this.props.url}.`;
-      back = true;
       simhash = false;
       break;
     case '422':
       // https://github.com/edgi-govdata-archiving/web-monitoring-diff/blob/be748a7f0bbdd4251f680e22d3e433d1be93f858/web_monitoring_diff/server/server.py#L568
       msg = `The captures of ${this.props.url} cannot be compared. Note that we support only HTML capture comparison.`;
-      back = true;
       simhash = false;
       break;
     case 'CAPTURE_NOT_FOUND':
-      msg = `There are no data available for ${this.props.url} and timestamp ${getUTCDateFormat(this.props.timestamp)}.`;
-      back = true;
+      msg = `There are no data available for ${this.props.url} at ${this.props.timestamp}.`;
       simhash = true;
       break;
     case 'NOT_CAPTURED':
       msg = `The Wayback Machine has no similarity data for ${this.props.url} and year ${year}.`;
-      back = true;
       simhash = true;
       break;
     case 'NO_CAPTURES':
       msg = `The Wayback Machine has not archived ${this.props.url} for year ${year}.`;
-      back = true;
       simhash = false;
       break;
     case 'NO_DIFFERENT_CAPTURES':
       msg = `There aren't any different captures for ${this.props.url} for year ${year} to display their similarity.`;
-      back = true;
+      simhash = false;
+      break;
+    // Occurs when AJAX fetch for CDX is canceled.
+    case '_this4.errorHandled is not a function': // Chrome
+    case 'NetworkError when attempting to fetch resource.': // FF
+    case 'Load failed': // Safari
+      msg = `The capture of ${this.props.url} at ${this.props.timestamp} cannot be used for comparisons. Its possible it is a redirect.`;
       simhash = false;
       break;
     default:
-      msg = 'The Wayback Machine is not available at the moment. Please try again later.';
-      back = true;
+      msg = 'We are sorry but there is a problem comparing these captures. Please try two different ones.';
       simhash = false;
     }
 
     return (
       <>
         <div className='alert alert-warning' role='alert'>{ msg }</div>
-        { simhash
-          ? <button className="btn btn-sm" id="calcButton"
+        { simhash &&
+          <button className="btn btn-sm" id="calcButton"
             onClick={ this._calculateSimhash }>Calculate now</button>
-          : null }
-        { back
-          ? <button className="btn btn-sm" onClick={() => window.history.back()}>&laquo; Go back</button>
-          : null }
+        }
+        <button className="btn btn-sm" onClick={() => window.history.back()}>&laquo; Go back</button>
       </>
     );
   }
