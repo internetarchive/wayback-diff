@@ -13,18 +13,12 @@ function looksLikeUrl (str) {
   return !!str.match(urlRegex);
 }
 
-function startsWith (str, start) {
-  return str.indexOf(start) === 0;
-}
-
-export function isStrUrl (str = '') {
-  const processedValue = str.toLocaleLowerCase();
+export function isUrl (str = '') {
+  const val = str.toLocaleLowerCase();
   return (
-    (startsWith(processedValue, 'ftp://') ||
-    startsWith(processedValue, 'http://') ||
-    startsWith(processedValue, 'https://') ||
-    looksLikeUrl(processedValue)) && !hasWhiteSpace(processedValue)
-  ) && !startsWith(processedValue, 'site:');
+    (val.startsWith('ftp://') || val.startsWith('http://') ||
+     val.startsWith('https://') || looksLikeUrl(val)) && !hasWhiteSpace(val)
+  ) && !val.startsWith('site:');
 }
 
 export function similarityWithTanimoto (simhash1, simhash2) {
@@ -134,7 +128,7 @@ export function fetchWithTimeout (url, params) {
   });
 }
 
-export function getTwoDigitInt (n) {
+export function twoDigits (n) {
   if (typeof n === 'string') {
     return n;
   }

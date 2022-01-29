@@ -1,5 +1,5 @@
 import round from 'lodash/round';
-import { getTwoDigitInt } from '../../js/utils';
+import { twoDigits } from '../../js/utils';
 
 export function buildValue (hoveredCell) {
   const { radius, angle, angle0 } = hoveredCell;
@@ -55,7 +55,7 @@ export function decodeCompressedJson (json) {
         const time = json.captures[0][i][j][y][0];
         const simhashIndex = json.captures[0][i][j][y][1];
         const simhash = json.hashes[simhashIndex];
-        const timestamp = `${year}${getTwoDigitInt(month)}${getTwoDigitInt(day)}${time}`;
+        const timestamp = `${year}${twoDigits(month)}${twoDigits(day)}${time}`;
         newJson.push([timestamp, simhash]);
       }
     }

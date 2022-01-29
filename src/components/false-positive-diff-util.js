@@ -152,8 +152,7 @@ function removeMarkup (node) {
   if (node.className === 'wm-diff') {
     node.outerHTML = node.innerHTML;
   } else {
-    const parentNode = node.parentNode;
-    removeMarkup(parentNode);
+    removeMarkup(node.parentNode);
   }
 }
 
@@ -181,26 +180,23 @@ export function getWBMCleanURL (element) {
   }
 }
 
+// Remove http://web.archive.org/web/20190325071045/ prefix
 export function removeWBM (url) {
-  let urlArray = url.split('/');
-  urlArray = urlArray.slice(7);
-  return urlArray.join('/');
+  return url.split('/').slice(7).join('/');
 }
 
 // mode can be 'ins' or 'del'
 // Example input xpath: '/body[1]/div[2]/p[2]/a[1]/ins[1]'
 // Example output xpath: '/body[1]/div[2]/p[2]/a[1]'
 export function removeDiffXPATH (xpath, mode) {
-  const target = '/' + mode + '[';
-  const loc = xpath.indexOf(target);
+  const loc = xpath.indexOf('/' + mode + '[');
   if (loc >= -1) {
     return xpath.substring(0, loc);
   }
 }
 
 export function normalizeURL (url) {
-  const lowercaseString = url.toLowerCase();
-  if (lowercaseString.startsWith('/www.')) {
+  if (url.toLowerCase().startsWith('/www.')) {
     return '/' + url.slice(5);
   }
   return url;
