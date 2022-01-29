@@ -17,7 +17,7 @@ export default class IframeLoader extends React.PureComponent {
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     return (
       <div style={this.state.loaderStyle}>
-        {this.state.loaderStyle ? <Loader/> : null}
+        {this.state.loaderStyle && <Loader/>}
       </div>
     );
   }

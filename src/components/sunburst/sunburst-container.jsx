@@ -57,10 +57,9 @@ export default class SunburstContainer extends React.Component {
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
-          {this.state.isPending
-            ? <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
-            still being generated. For more results please try again in a moment.</p>
-            : null}
+          {this.state.isPending &&
+            <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
+            still being generated. For more results please try again in a moment.</p>}
           <div>This diagram illustrates the differences of <a
             href={`/web/*/${this.props.url}`}>{this.props.url}</a> capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>
             {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}

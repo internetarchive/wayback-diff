@@ -53,7 +53,7 @@ export default class D3Sunburst extends React.Component {
         height={getSize()}
         getSize={d => d.bigness}
         getColor={d => d.clr}>
-        {hoveredCell ? this._showInfoLabel(hoveredCell) : null}
+        {hoveredCell && this._showInfoLabel(hoveredCell)}
       </Sunburst>
     );
   }

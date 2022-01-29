@@ -273,7 +273,9 @@ export default class YmdTimestampHeader extends React.Component {
 
   _validateTimestamp (timestamp, fetchedTimestamps, position) {
     if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
+      return this._handleTimestampValidationFetch(
+        this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position
+      );
     }
     const url = new URL(this.props.conf.cdxServer, window.location.origin);
     url.searchParams.append('url', this.props.url);
@@ -283,7 +285,9 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('sort', 'closest');
     url.searchParams.append('limit', '1');
     url.searchParams.append('fl', 'timestamp');
-    return this._handleTimestampValidationFetch(fetchWithTimeout(url, { signal: this._abortController.signal }), timestamp, fetchedTimestamps, position);
+    return this._handleTimestampValidationFetch(
+      fetchWithTimeout(url, { signal: this._abortController.signal }), timestamp, fetchedTimestamps, position
+    );
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
@@ -486,8 +490,8 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
         </div>
         <div className="wayback-ymd-buttons">
-          {(this.state.showDiffBtn ? <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> : null)}
-          {(this.state.showRestartBtn ? <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> : null)}
+          {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
+          {this.state.showRestartBtn && <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> }
         </div>
         <div className="wayback-timestamps">
           <select className="form-control input-sm mr-sm-1" id="timestamp-select-right"
@@ -519,14 +523,14 @@ export default class YmdTimestampHeader extends React.Component {
     if (!this.state.showSteps || this.state.showDiff) {
       return (
         <div>
-          {(this.state.timestampA
-            ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-              id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
-            : null)}
-          {(this.state.timestampB
-            ? <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-              id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
-            : null)}
+          {this.state.timestampA &&
+             <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+               id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+          }
+          {this.state.timestampB &&
+             <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+               id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
+          }
           <br/>
         </div>
       );
