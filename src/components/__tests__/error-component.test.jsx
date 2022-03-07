@@ -32,7 +32,7 @@ describe('Error component tests', function () {
     const wrapper = shallow(<ErrorMessage code={errorCode} url={url}/>);
 
     expect(wrapper.find('.alert-warning').text()).toEqual(
-      'The Wayback Machine is not available at the moment. Please try again later.'
+      'We are sorry but there is a problem comparing these captures. Please try two different ones.'
     );
   });
 });
