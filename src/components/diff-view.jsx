@@ -212,7 +212,7 @@ export default class DiffView extends React.Component {
     url.searchParams.append('a', a);
     url.searchParams.append('b', b);
     fetchWithTimeout(url, { credentials: 'include' })
-      .then(response => { return checkResponse(response); })
+      .then(checkResponse)
       .then(response => response.json())
       .then((data) => {
         this.setState({
