@@ -167,7 +167,7 @@ export default class DiffContainer extends React.Component {
 
   _handleSnapshotFetch (promise) {
     promise
-      .then(response => { return checkResponse(response); })
+      .then(checkResponse)
       .then(response => {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('text/html')) {

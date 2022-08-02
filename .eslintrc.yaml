@@ -12,7 +12,7 @@ extends:
 parser: 'babel-eslint'
 
 parserOptions:
-  ecmaVersion: 2019
+  ecmaVersion: 2020
   ecmaFeatures:
     classes: true
     experimentalObjectRestSpread: true
@@ -22,8 +22,7 @@ plugins:
   - mocha
   - react
 rules:
-  # this could be used to find problematic code
-  # complexity: ["error", 3]
+  complexity: ["warn", 10]
   no-console:
     - error
     - allow:
@@ -45,4 +44,4 @@ rules:
 
 settings:
   react:
-    version: 16.6.3
+    version: 17.0.2

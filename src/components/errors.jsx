@@ -84,7 +84,7 @@ export default class ErrorMessage extends React.PureComponent {
 
   _calculateSimhash () {
     const url = `${this.props.conf.waybackDiscoverDiff}/calculate-simhash?url=${encodeURIComponent(this.props.url)}&year=${this.props.timestamp.substring(0, 4)}`;
-    fetchWithTimeout(url).then(response => { return checkResponse(response); })
+    fetchWithTimeout(url).then(checkResponse)
       .then(() => { setTimeout(this._reloadPage, 10000); })
       .catch(error => { this._errorHandled(error.message); });
   }
