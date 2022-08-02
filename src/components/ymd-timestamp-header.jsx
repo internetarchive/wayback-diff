@@ -3,7 +3,7 @@ import React from 'react';
 import '../css/diff-container.css';
 import {
   fetchWithTimeout, twoDigits, getKeyByValue, selectHasValue,
-  getUTCDateFormat, getShortUTCDateFormat
+  getUTCDateFormat, getShortUTCDateFormat, checkResponse
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -291,7 +291,9 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
-    return this._handleFetch(promise)
+    return promise
+      .then(checkResponse)
+      .then(response => response.json())
       .then(data => {
         if (data) {
           fetchedTimestamps[position] = `${data}`;
@@ -343,37 +345,31 @@ export default class YmdTimestampHeader extends React.Component {
     return url;
   }
 
-  _handleFetch (promise) {
-    return promise
-      .then(function (response) {
-        if (response) {
-          if (!response.ok) {
-            throw Error(response.status);
-          }
-          return response.json();
-        }
-      });
-  }
-
   _fetchCDXData () {
     this.setState({ showLoader: true });
     let leftFetchPromise;
     let rightFetchPromise;
     this._saveMonthsIndex();
     if (this.props.fetchCDXCallback) {
-      leftFetchPromise = this._handleFetch(this.props.fetchCDXCallback());
+      leftFetchPromise = this.props.fetchCDXCallback()
+        .then(checkResponse)
+        .then(response => response.json());
     } else {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         const url = this.createCDXRequest(
           this.state.leftYear + twoDigits(this._leftMonthIndex)
         );
-        leftFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
+        leftFetchPromise = fetchWithTimeout(url, { signal: this._abortController.signal })
+          .then(checkResponse)
+          .then(response => response.json());
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
         const url = this.createCDXRequest(
           this.state.rightYear + twoDigits(this._rightMonthIndex)
         );
-        rightFetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
+        rightFetchPromise = fetchWithTimeout(url, { signal: this._abortController.signal })
+          .then(checkResponse)
+          .then(response => response.json());
       }
     }
 
@@ -599,12 +595,9 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
-    const fetchPromise = this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
-    this._exportSparklineData(fetchPromise);
-  }
-
-  _exportSparklineData (promise) {
-    promise
+    fetchWithTimeout(url, { signal: this._abortController.signal })
+      .then(checkResponse)
+      .then(response => response.json())
       .then((data) => {
         if (data) {
           this._prepareSparklineData(data);
