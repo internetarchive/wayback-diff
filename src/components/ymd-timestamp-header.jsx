@@ -115,13 +115,11 @@ export default class YmdTimestampHeader extends React.Component {
   _handleRightTimestampChange () {
     this._rightTimestampIndex = document.getElementById('timestamp-select-right').selectedIndex;
     if (this._isShowing('timestamp-select-left')) {
-      this.setState({
-        showRestartBtn: true,
-        showDiffBtn: true
-      });
       const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex - 1][1];
       const allowedSnapshots = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true,
         leftSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
@@ -130,13 +128,11 @@ export default class YmdTimestampHeader extends React.Component {
   _handleLeftTimestampChange () {
     this._leftTimestampIndex = document.getElementById('timestamp-select-left').selectedIndex;
     if (this._isShowing('timestamp-select-right')) {
-      this.setState({
-        showRestartBtn: true,
-        showDiffBtn: true
-      });
       const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex - 1][1];
       const allowedSnapshots = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
+        showRestartBtn: true,
+        showDiffBtn: true,
         rightSnapElements: this._prepareOptionElements(allowedSnapshots)
       });
     }
@@ -342,7 +338,9 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('from', dt);
     url.searchParams.append('to', dt);
     url.searchParams.append('limit', this.props.conf.limit);
-    return url;
+    return fetchWithTimeout(url, { signal: this._abortController.signal })
+      .then(checkResponse)
+      .then(response => response.json());
   }
 
   _fetchCDXData () {
@@ -356,20 +354,14 @@ export default class YmdTimestampHeader extends React.Component {
         .then(response => response.json());
     } else {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        const url = this.createCDXRequest(
+        leftFetchPromise = this.createCDXRequest(
           this.state.leftYear + twoDigits(this._leftMonthIndex)
         );
-        leftFetchPromise = fetchWithTimeout(url, { signal: this._abortController.signal })
-          .then(checkResponse)
-          .then(response => response.json());
       }
       if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        const url = this.createCDXRequest(
+        rightFetchPromise = this.createCDXRequest(
           this.state.rightYear + twoDigits(this._rightMonthIndex)
         );
-        rightFetchPromise = fetchWithTimeout(url, { signal: this._abortController.signal })
-          .then(checkResponse)
-          .then(response => response.json());
       }
     }
 
