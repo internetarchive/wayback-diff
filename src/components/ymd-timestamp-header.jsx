@@ -89,12 +89,12 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidUpdate () {
+    if (!this.state.sparkline && !this.state.showLoader) {
+      this._fetchSparklineData();
+    }
     if (this.state.cdxData) {
       if (this.state.shouldValidateTimestamp) {
         this._checkTimestamps();
-      }
-      if (!this.state.sparkline && !this.state.showLoader) {
-        this._fetchSparklineData();
       }
       if (!this.state.showLoader) {
         this._selectValues();
@@ -154,7 +154,6 @@ export default class YmdTimestampHeader extends React.Component {
             </div>
           );
         }
-        this._fetchSparklineData();
         return (
           <Loader/>
         );
