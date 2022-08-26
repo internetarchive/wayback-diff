@@ -80,13 +80,13 @@ export default class DiffContainer extends React.Component {
         return (
           <div className="diffcontainer-view">
             <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
-              isInitial={true} errorHandledCallback={this.errorHandled}/>
+              errorHandledCallback={this.errorHandled}/>
             {this._showNoTimestamps()}
           </div>);
       }
       return (
         <div className="diffcontainer-view">
-          <YmdTimestampHeader isInitial={true} {...this.props}
+          <YmdTimestampHeader {...this.props}
             errorHandledCallback={this.errorHandled}
             getTimestampsCallback={this.getTimestamps}/>
         </div>
@@ -95,7 +95,7 @@ export default class DiffContainer extends React.Component {
     if (this.state.timestampA && this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <YmdTimestampHeader isInitial={false}
+          <YmdTimestampHeader
             {...this.props} getTimestampsCallback={this.getTimestamps}
             errorHandledCallback={this.errorHandled}/>
           {this.state.showDiff && this.prepareDiffView()}
@@ -106,14 +106,14 @@ export default class DiffContainer extends React.Component {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
-            isInitial={false} errorHandledCallback={this.errorHandled}/>
+            errorHandledCallback={this.errorHandled}/>
           {this.state.showDiff && this._showOneSnapshot(true, this.state.timestampA)}
         </div>);
     }
     if (this.state.timestampB) {
       return (
         <div className="diffcontainer-view">
-          <YmdTimestampHeader isInitial={false} {...this.props}
+          <YmdTimestampHeader {...this.props}
             errorHandledCallback={this.errorHandled}
             getTimestampsCallback={this.getTimestamps}/>
           {this.state.showDiff && this._showOneSnapshot(false, this.state.timestampB)}
