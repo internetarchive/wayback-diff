@@ -39,8 +39,7 @@ export default class YmdTimestampHeader extends React.Component {
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
     conf: PropTypes.object,
-    url: PropTypes.string,
-    isInitial: PropTypes.bool
+    url: PropTypes.string
   };
 
   _leftMonthIndex = -1;
@@ -66,7 +65,6 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB: this.props.timestampB,
       leftYear: leftYear,
       rightYear: rightYear,
-      showSteps: this.props.isInitial,
       showRestartBtn: false,
       showDiffBtn: false,
       timestampAttempt: 0,
@@ -152,21 +150,7 @@ export default class YmdTimestampHeader extends React.Component {
       return <div className="loading"><Loader/></div>;
     }
     if (!this.state.showError && this.state.timestampAttempt < 2) {
-      if (this.state.showSteps) {
-        if (this.state.yearOptions) {
-          return (
-            <div className="timestamp-header-view">
-              {this._showInfo()}
-              {this._showTimestampSelector()}
-              {this._showOpenLinks()}
-            </div>
-          );
-        }
-        return (
-          <Loader/>
-        );
-      }
-      if (this.state.cdxData) {
+      if (this.state.yearOptions || this.state.cdxData) {
         return (
           <div className="timestamp-header-view">
             {this._showInfo()}
@@ -513,7 +497,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _showOpenLinks () {
-    if (!this.state.showSteps || this.state.showDiff) {
+    if (this.state.timestampA && this.state.timestampB) {
       return (
         <div>
           {this.state.timestampA &&
@@ -543,7 +527,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
     this.props.getTimestampsCallback(timestampA, timestampB);
     this.setState({
-      showDiff: true,
       timestampA: timestampA,
       timestampB: timestampB
     });
@@ -657,7 +640,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   handleLeftMonthChange (e) {
     this._fetchCDXData();
-    let elemToShow = 'timestamp-select-left';
+    const elemToShow = 'timestamp-select-left';
     this._leftTimestampIndex = 0;
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
@@ -670,7 +653,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   handleRightMonthChange (e) {
     this._fetchCDXData();
-    let elemToShow = 'timestamp-select-right';
+    const elemToShow = 'timestamp-select-right';
     this._rightTimestampIndex = 0;
     document.getElementById(elemToShow).selectedIndex = '0';
     this._showElement(elemToShow);
