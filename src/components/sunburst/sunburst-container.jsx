@@ -83,6 +83,7 @@ export default class SunburstContainer extends React.Component {
         </div>
       );
     }
+    // TODO Must move this outside here.
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.timestamp) {
       this._fetchTimestampSimhashData();
@@ -226,7 +227,6 @@ export default class SunburstContainer extends React.Component {
           firstLevel.push({
             name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
-            bigness: 10,
             similarity: json[i][1],
             clr: colors[1],
             children: []
@@ -235,7 +235,6 @@ export default class SunburstContainer extends React.Component {
           secondLevel.push({
             name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
-            bigness: 10,
             similarity: json[i][1],
             clr: colors[2],
             children: []
@@ -244,7 +243,6 @@ export default class SunburstContainer extends React.Component {
           thirdLevel.push({
             name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
-            bigness: 10,
             similarity: json[i][1],
             clr: colors[3],
             children: []
@@ -253,7 +251,6 @@ export default class SunburstContainer extends React.Component {
           fourthLevel.push({
             name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
-            bigness: 10,
             similarity: json[i][1],
             clr: colors[4],
             children: []
@@ -262,7 +259,6 @@ export default class SunburstContainer extends React.Component {
           fifthLevel.push({
             name: getUTCDateFormat(json[i][0]),
             timestamp: json[i][0],
-            bigness: 10,
             similarity: json[i][1],
             clr: colors[5],
             children: []
