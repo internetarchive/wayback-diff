@@ -1,14 +1,4 @@
-import round from 'lodash/round';
 import { twoDigits } from '../../js/utils';
-
-export function buildValue (hoveredCell) {
-  const { radius, angle, angle0 } = hoveredCell;
-  const truedAngle = (angle + angle0) / 2;
-  return {
-    x: radius * Math.cos(truedAngle),
-    y: radius * Math.sin(truedAngle)
-  };
-}
 
 export function getSize () {
   const w = window.innerWidth || document.documentElement.clientWidth ||
@@ -29,12 +19,6 @@ function _showRootInfo (size) {
   const rootInfoDiv = document.getElementById('root-cell-tooltip');
   if (rootInfoDiv) {
     rootInfoDiv.setAttribute('style', `top:${size * 0.4}px; width:${size * 0.4}px; height:${size * 0.22}px; font-size: ${size * 0.004}em;`);
-  }
-}
-
-export function getDistance (hoveredCell) {
-  if (hoveredCell.similarity !== -1) {
-    return (`Differences: ${round(hoveredCell.similarity, 2)}%`);
   }
 }
 
