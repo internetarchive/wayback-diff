@@ -1,6 +1,6 @@
 {
   "name": "wayback-diff",
-  "version": "0.2.40",
+  "version": "0.2.41",
   "private": true,
   "main": "build/app.js",
   "dependencies": {
@@ -37,9 +37,9 @@
     "@babel/preset-react": "^7.18",
     "babel-eslint": "^10.1.0",
     "babel-plugin-css-modules-transform": "^1.6.1",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "cssnano": "^5.1.0",
     "enzyme": "^3.7.0",
-    "enzyme-adapter-react-16": "^1.15.6",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.26",

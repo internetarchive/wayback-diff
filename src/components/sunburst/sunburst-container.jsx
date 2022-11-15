@@ -66,18 +66,20 @@ export default class SunburstContainer extends React.Component {
           {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
           <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url}
             simhashData={this.state.simhashData}/>
-          <div className="heat-map-legend">
-            <div className="heat-map-legend-caption">Variation</div>
-            <div className="heat-map-legend-summary">
-              <div className="heat-map-legend-summary-min-caption">Low</div>
-              <div className="heat-map-legend-summary-graphics">
-                <div className="heat-map-legend-bar" style={ barStyle1 }/>
-                <div className="heat-map-legend-bar" style={ barStyle2 }/>
-                <div className="heat-map-legend-bar" style={ barStyle3 }/>
-                <div className="heat-map-legend-bar" style={ barStyle4 }/>
-                <div className="heat-map-legend-bar" style={ barStyle5 }/>
+          <div style={{ clear: 'both' }}>
+            <div className="heat-map-legend">
+              <div className="heat-map-legend-caption">Variation</div>
+              <div className="heat-map-legend-summary">
+                <div className="heat-map-legend-summary-min-caption">Low</div>
+                <div className="heat-map-legend-summary-graphics">
+                  <div className="heat-map-legend-bar" style={ barStyle1 }/>
+                  <div className="heat-map-legend-bar" style={ barStyle2 }/>
+                  <div className="heat-map-legend-bar" style={ barStyle3 }/>
+                  <div className="heat-map-legend-bar" style={ barStyle4 }/>
+                  <div className="heat-map-legend-bar" style={ barStyle5 }/>
+                </div>
+                <div className="heat-map-legend-summary-max-caption">High</div>
               </div>
-              <div className="heat-map-legend-summary-max-caption">High</div>
             </div>
           </div>
         </div>
