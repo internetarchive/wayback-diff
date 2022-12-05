@@ -63,15 +63,15 @@ export default class D3Sunburst extends React.Component {
       .attr('d', arc)
       .style('stroke', '#fff')
       .style('fill', function (d) { return d.data.clr; })
-      .on('mouseover', function (d) {
+      .on('mouseover', function (e, d) {
         d3.select(this).style('cursor', 'pointer').style('stroke', 'black');
         component.setState({ hint: getDistance(d.data) });
       })
-      .on('mouseleave', function (d) {
+      .on('mouseleave', function (e, d) {
         d3.select(this).style('cursor', 'default').style('stroke', '');
         component.setState({ hint: '' });
       })
-      .on('click', function (d) {
+      .on('click', function (e, d) {
         if (d.data.timestamp !== component.props.simhashData.timestamp) {
           const url = component.props.urlPrefix + d.data.timestamp + '/' + component.props.simhashData.timestamp + '/' + component.props.url;
           window.open(url, '_blank');
