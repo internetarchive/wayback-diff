@@ -39,7 +39,6 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.26",
     "eslint-plugin-mocha": "^10.0",
-    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1",
     "eslint-plugin-react": "^7.29.3",
     "jsdom": "^19.0.0",

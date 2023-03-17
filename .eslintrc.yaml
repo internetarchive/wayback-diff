@@ -1,13 +1,11 @@
 env:
   browser: true
   es6: true
-  node: true
   jest: true
 
 extends:
   - "plugin:react/recommended"
   - "plugin:mocha/recommended"
-  - 'standard'
 
 parser: 'babel-eslint'
 
@@ -19,7 +17,9 @@ parserOptions:
     jsx: true
   sourceType: module
 plugins:
+  - import
   - mocha
+  - promise
   - react
 rules:
   complexity: ["warn", 10]
