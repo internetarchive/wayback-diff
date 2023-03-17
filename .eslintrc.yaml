@@ -7,7 +7,7 @@ extends:
   - "plugin:react/recommended"
   - "plugin:mocha/recommended"
 
-parser: 'babel-eslint'
+parser: '@babel/eslint-parser'
 
 parserOptions:
   ecmaVersion: 2020
@@ -15,6 +15,10 @@ parserOptions:
     classes: true
     experimentalObjectRestSpread: true
     jsx: true
+  babelOptions:
+    presets: ["@babel/preset-react"]
+    plugins: ["@babel/plugin-proposal-export-default-from"]
+  requireConfigFile: false
   sourceType: module
 plugins:
   - import
