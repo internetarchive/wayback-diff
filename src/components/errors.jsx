@@ -21,7 +21,6 @@ export default class ErrorMessage extends React.PureComponent {
     super(props);
     this._calculateSimhash = this._calculateSimhash.bind(this);
     this._errorHandled = this._errorHandled.bind(this);
-    this._reloadPage = this._reloadPage.bind(this);
   }
 
   render () {
@@ -85,15 +84,11 @@ export default class ErrorMessage extends React.PureComponent {
   _calculateSimhash () {
     const url = `${this.props.conf.waybackDiscoverDiff}/calculate-simhash?url=${encodeURIComponent(this.props.url)}&year=${this.props.timestamp.substring(0, 4)}`;
     fetchWithTimeout(url).then(checkResponse)
-      .then(() => { setTimeout(this._reloadPage, 10000); })
+      .then(() => { setTimeout(function () { window.location.reload(true) }, 10000); })
       .catch(error => { this._errorHandled(error.message); });
   }
 
   _errorHandled (error) {
     this.props.errorHandledCallback(error);
-  }
-
-  _reloadPage () {
-    window.location.reload(true);
   }
 }
