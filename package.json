@@ -17,8 +17,8 @@
   },
   "scripts": {
     "start": "HOST=vbanos-dev.us.archive.org PORT=8093 react-scripts start",
-    "build": "rollup -c config/dev.js",
-    "build:dev": "rollup -c config/dev.js -w",
+    "build": "rollup -c config/rollup.mjs",
+    "build:dev": "rollup -c config/rollup.mjs -w",
     "test": "react-scripts test --env=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
     "lint": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx"
   },
@@ -43,13 +43,12 @@
     "jsdom": "^19.0.0",
     "postcss": "^8.4.19",
     "react-scripts": "^5.0.1",
-    "rollup": "3.0.0-8",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-globals": "^1.2.1",
-    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup": "3.19.1",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-url": "^8.0.1",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-url": "3.0.1",
     "smbase64": "^1.0.2"
   },
   "browserslist": [
