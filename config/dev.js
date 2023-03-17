@@ -1,5 +1,5 @@
 // Rollup plugins.
-import babel from 'rollup-plugin-babel';
+import { babel } from '@rollup/plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import globals from 'rollup-plugin-node-globals';
 import postcss from 'rollup-plugin-postcss';
@@ -8,7 +8,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import url from 'rollup-plugin-url';
 
 import cssnano from 'cssnano';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 
 export default {
   input: 'src/index-build.js',
