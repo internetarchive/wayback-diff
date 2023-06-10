@@ -50,15 +50,12 @@ export default class DiffView extends React.Component {
     this.state = { diffData: null };
   }
 
-  UNSAFE_componentWillMount () {
+  componentDidMount () {
+    this.isMountedNow = true;
     const { props } = this;
     if (this._canFetch(props)) {
       this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
-  }
-
-  componentDidMount () {
-    this.isMountedNow = true;
   }
 
   componentWillUnmount () {
@@ -66,12 +63,10 @@ export default class DiffView extends React.Component {
     this._abortController.abort();
   }
 
-  /**
-   * @param {DiffViewProps} nextProps
-   */
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (this._canFetch(nextProps) && !this._propsSpecifySameDiff(nextProps)) {
-      this._loadDiffData(nextProps.page, nextProps.a, nextProps.b, nextProps.diffType);
+  componentDidUpdate (prevProps) {
+    const { props } = this;
+    if (this._canFetch(props) && !this._propsSpecifySameDiff(props)) {
+      this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
   }
 
