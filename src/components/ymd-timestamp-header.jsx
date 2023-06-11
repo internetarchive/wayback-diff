@@ -63,6 +63,8 @@ export default class YmdTimestampHeader extends React.Component {
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
+    this.monthSelectLeft = React.createRef();
+    this.monthSelectRight = React.createRef();
 
     this.state = {
       timestampA: this.props.timestampA,
@@ -455,7 +457,8 @@ export default class YmdTimestampHeader extends React.Component {
             <option value="" disabled>Year</option>
             {this.state.yearOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-left"
+          <select className="form-control input-sm mr-sm-1 month-select"
+            ref={this.monthSelectLeft}
             style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
             onChange={this.handleLeftMonthChange} title="Months and available captures"
             defaultValue="">
@@ -484,7 +487,8 @@ export default class YmdTimestampHeader extends React.Component {
             <option value="" disabled>Available captures</option>
             {this.state.rightSnapElements}
           </select>
-          <select className="form-control input-sm mr-sm-1" id="month-select-right"
+          <select className="form-control input-sm mr-sm-1 month-select"
+            ref={this.monthSelectRight}
             style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
             onChange={this.handleRightMonthChange} title="Months and available captures"
             defaultValue="">
@@ -546,15 +550,16 @@ export default class YmdTimestampHeader extends React.Component {
         this.timestampSelectRight.current.value = this.state.timestampB;
       }
     }
-    const monthLeft = document.getElementById('month-select-left');
-    const monthRight = document.getElementById('month-select-right');
+    const monthLeft = this.monthSelectLeft.current;
+    const monthRight = this.monthSelectRight.current;
 
-    if (selectHasValue(monthLeft.id, monthNames[this._leftMonthIndex])) {
+    // TODO maybe we could delete selectHasValue
+    if (selectHasValue(monthLeft, monthNames[this._leftMonthIndex])) {
       monthLeft.value = monthNames[this._leftMonthIndex];
     } else {
       monthLeft.selectedIndex = 0;
     }
-    if (selectHasValue(monthRight.id, monthNames[this._rightMonthIndex])) {
+    if (selectHasValue(monthRight, monthNames[this._rightMonthIndex])) {
       monthRight.value = monthNames[this._rightMonthIndex];
     } else {
       monthRight.selectedIndex = 0;
@@ -690,15 +695,16 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
+  // TODO maybe there is some redundancy here.
   _saveMonthsIndex () {
     if (this._leftMonthIndex !== -1) {
-      const monthLeft = document.getElementById('month-select-left').value;
+      const monthLeft = this.monthSelectLeft.current.value;
       this._leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
     } else if (this.state.timestampA) {
       this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
     }
     if (this._rightMonthIndex !== -1) {
-      const monthRight = document.getElementById('month-select-right').value;
+      const monthRight = this.monthSelectRight.current.value;
       this._rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
     } else if (this.state.timestampB) {
       this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));

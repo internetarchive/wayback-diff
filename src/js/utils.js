@@ -139,8 +139,7 @@ export function getKeyByValue (obj, value) {
   return Object.keys(obj).find(key => obj[key] === value);
 }
 
-export function selectHasValue (select, value) {
-  const obj = document.getElementById(select);
+export function selectHasValue (obj, value) {
   if (obj !== null) {
     return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
   }
