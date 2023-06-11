@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/wayback-diff
     docker:
-      - image: circleci/node:14.17.1
+      - image: circleci/node:16.16.0
     steps:
       - checkout
       - restore_cache:
