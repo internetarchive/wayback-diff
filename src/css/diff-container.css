@@ -25,9 +25,9 @@ blue-diff-footer{
     margin-right: auto;
 }
 
-#timestamp-select-left, #timestamp-select-right,
+.timestamp-select,
 #year-select-left, #year-select-right,
-#month-select-right, #month-select-left{
+.month-select {
     width: auto;
     padding-left: 1px;
     padding-right: 1px;
