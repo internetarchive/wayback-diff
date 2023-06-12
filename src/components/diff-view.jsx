@@ -65,7 +65,7 @@ export default class DiffView extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { props } = this;
-    if (this._canFetch(props) && !this._propsSpecifySameDiff(props)) {
+    if (this._canFetch(props) && !this._propsSpecifySameDiff(props, prevProps)) {
       this._loadDiffData(props.page, props.a, props.b, props.diffType);
     }
   }
