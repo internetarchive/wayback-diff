@@ -51,8 +51,6 @@ export default class YmdTimestampHeader extends React.Component {
 
   _rightTimestampIndex = -1;
 
-  _visibilityState = ['visible', 'hidden'];
-
   constructor (props) {
     super(props);
 
@@ -459,37 +457,37 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
           <select className="form-control input-sm mr-sm-1 month-select"
             ref={this.monthSelectLeft}
-            style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
             onChange={this.handleLeftMonthChange} title="Months and available captures"
             defaultValue="">
             <option value="" disabled>Month</option>
             {this.state.leftMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1 timestamp-select"
-            ref={this.timestampSelectLeft}
-            style={{ visibility: this._visibilityState[+!this.state.leftSnapElements] }}
-            onChange={this._handleLeftTimestampChange}
-            defaultValue="">
-            <option value="" disabled>Available captures</option>
-            {this.state.leftSnapElements}
-          </select>
+          { !isEmpty(this.state.leftSnapElements) &&
+            <select className="form-control input-sm mr-sm-1 timestamp-select"
+              ref={this.timestampSelectLeft}
+              onChange={this._handleLeftTimestampChange}
+              defaultValue="">
+              <option value="" disabled>Available captures</option>
+              {this.state.leftSnapElements}
+            </select>
+          }
         </div>
         <div className="wayback-ymd-buttons">
           {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
           {this.state.showRestartBtn && <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> }
         </div>
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1 timestamp-select"
-            ref={this.timestampSelectRight}
-            style={{ visibility: this._visibilityState[+!this.state.rightSnapElements] }}
-            onChange={this._handleRightTimestampChange}
-            defaultValue="">
-            <option value="" disabled>Available captures</option>
-            {this.state.rightSnapElements}
-          </select>
+          { !isEmpty(this.state.rightSnapElements) &&
+            <select className="form-control input-sm mr-sm-1 timestamp-select"
+              ref={this.timestampSelectRight}
+              onChange={this._handleRightTimestampChange}
+              defaultValue="">
+              <option value="" disabled>Available captures</option>
+              {this.state.rightSnapElements}
+            </select>
+          }
           <select className="form-control input-sm mr-sm-1 month-select"
             ref={this.monthSelectRight}
-            style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
             onChange={this.handleRightMonthChange} title="Months and available captures"
             defaultValue="">
             <option value="" disabled>Month</option>
@@ -645,7 +643,6 @@ export default class YmdTimestampHeader extends React.Component {
   handleLeftMonthChange (e) {
     this._fetchCDXData();
     this._leftTimestampIndex = 0;
-    this.timestampSelectLeft.current.selectedIndex = 0;
     this.setState({
       showDiffBtn: true,
       timestampA: null,
@@ -656,7 +653,6 @@ export default class YmdTimestampHeader extends React.Component {
   handleRightMonthChange (e) {
     this._fetchCDXData();
     this._rightTimestampIndex = 0;
-    this.timestampSelectRight.current.selectedIndex = 0;
     this.setState({
       showDiffBtn: true,
       timestampA: null,
