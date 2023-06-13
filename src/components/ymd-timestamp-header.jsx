@@ -164,46 +164,27 @@ export default class YmdTimestampHeader extends React.Component {
 
   _areRequestedTimestampsSelected () {
     if (this.state.finishedValidating) {
-      let newLeft, newRight;
-
-      if (isNaN(this.state.timestampA)) {
-        newLeft = null;
-      } else {
+      if (!isNaN(this.state.timestampA)) {
         const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
         if (this.state.timestampA > lastLeftFromCDX) {
-          newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+          const newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+          this.setState({
+            leftSnapElements: [...this.state.leftSnapElements, newLeft],
+            leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
+            finishedValidating: false
+          });
         }
       }
-
-      if (isNaN(this.state.timestampB)) {
-        newRight = null;
-      } else {
+      if (!isNaN(this.state.timestampB)) {
         const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
         if (this.state.timestampB > lastRightFromCDX) {
-          newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+          const newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+          this.setState({
+            rightSnapElements: [...this.state.rightSnapElements, newRight],
+            rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
+            finishedValidating: false
+          });
         }
-      }
-
-      if (newLeft && newRight) {
-        this.setState({
-          leftSnapElements: [...this.state.leftSnapElements, newLeft],
-          rightSnapElements: [...this.state.rightSnapElements, newRight],
-          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
-          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
-          finishedValidating: false
-        });
-      } else if (newLeft) {
-        this.setState({
-          leftSnapElements: [...this.state.leftSnapElements, newLeft],
-          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
-          finishedValidating: false
-        });
-      } else if (newRight) {
-        this.setState({
-          rightSnapElements: [...this.state.rightSnapElements, newRight],
-          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
-          finishedValidating: false
-        });
       }
     }
   }
@@ -594,12 +575,8 @@ export default class YmdTimestampHeader extends React.Component {
     if (isNil(rightYear)) {
       rightYear = this.state.rightYear;
     }
-    const leftMonthsData = this._getMonthData(
-      this.state.sparkline[leftYear]
-    );
-    const rightMonthsData = this._getMonthData(
-      this.state.sparkline[rightYear]
-    );
+    const leftMonthsData = this._getMonthData(this.state.sparkline[leftYear]);
+    const rightMonthsData = this._getMonthData(this.state.sparkline[rightYear]);
     this.setState({
       leftMonthOptions: this._monthOptions(leftMonthsData),
       rightMonthOptions: this._monthOptions(rightMonthsData)
