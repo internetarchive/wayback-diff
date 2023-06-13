@@ -576,12 +576,15 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _getMonthData (data) {
-    return (
-      data &&
-      data.filter(item => item > 0).map((item, index) => {
-        return [monthNames[index + 1], item];
-      })
-    );
+    if(!isEmpty(data)) {
+      const out = [];
+      for (let i=0; i<=11; i++) {
+        if (data[i] > 0) {
+          out.push([monthNames[i+1], data[i]]);
+        }
+      }
+      return out;
+    }
   }
 
   handleLeftMonthChange (e) {
