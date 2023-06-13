@@ -44,14 +44,7 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   _leftMonthIndex = -1;
-
   _rightMonthIndex = -1;
-
-  _leftTimestampIndex = -1;
-
-  _rightTimestampIndex = -1;
-
-  _visibilityState = ['visible', 'hidden'];
 
   constructor (props) {
     super(props);
@@ -125,9 +118,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleRightTimestampChange () {
-    this._rightTimestampIndex = this.timestampSelectRight.current.selectedIndex;
     if (!isEmpty(this.state.leftSnapElements)) {
-      const selectedDigest = this.state.rightSnaps[this._rightTimestampIndex - 1][1];
+      const selectedDigest = this.state.rightSnaps[this.timestampSelectRight.current.selectedIndex - 1][1];
       const allowedSnapshots = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
         showRestartBtn: true,
@@ -138,9 +130,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleLeftTimestampChange () {
-    this._leftTimestampIndex = this.timestampSelectLeft.current.selectedIndex;
     if (!isEmpty(this.state.rightSnapElements)) {
-      const selectedDigest = this.state.leftSnaps[this._leftTimestampIndex - 1][1];
+      const selectedDigest = this.state.leftSnaps[this.timestampSelectLeft.current.selectedIndex - 1][1];
       const allowedSnapshots = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
         showRestartBtn: true,
@@ -161,7 +152,17 @@ export default class YmdTimestampHeader extends React.Component {
           <div className="timestamp-header-view">
             {this._showInfo()}
             {this._showTimestampSelector()}
-            {this._showOpenLinks()}
+            <div>
+              {this.state.timestampA &&
+                <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+                  id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+              }
+              {this.state.timestampB &&
+                <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+                  id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
+              }
+              <br />
+            </div>
           </div>
         );
       }
@@ -173,50 +174,27 @@ export default class YmdTimestampHeader extends React.Component {
 
   _areRequestedTimestampsSelected () {
     if (this.state.finishedValidating) {
-      let newLeft, newRight;
-
-      if (isNaN(this.state.timestampA)) {
-        newLeft = null;
-      } else {
+      if (!isNaN(this.state.timestampA)) {
         const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
         if (this.state.timestampA > lastLeftFromCDX) {
-          newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+          const newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+          this.setState({
+            leftSnapElements: [...this.state.leftSnapElements, newLeft],
+            leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
+            finishedValidating: false
+          });
         }
       }
-
-      if (isNaN(this.state.timestampB)) {
-        newRight = null;
-      } else {
+      if (!isNaN(this.state.timestampB)) {
         const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
         if (this.state.timestampB > lastRightFromCDX) {
-          newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+          const newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+          this.setState({
+            rightSnapElements: [...this.state.rightSnapElements, newRight],
+            rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
+            finishedValidating: false
+          });
         }
-      }
-
-      if (newLeft && newRight) {
-        this.setState({
-          leftSnapElements: [...this.state.leftSnapElements, newLeft],
-          rightSnapElements: [...this.state.rightSnapElements, newRight],
-          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
-          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
-          finishedValidating: false
-        });
-        this._leftTimestampIndex = this.state.leftSnapElements.length + 1;
-        this._rightTimestampIndex = this.state.rightSnapElements.length + 1;
-      } else if (newLeft) {
-        this.setState({
-          leftSnapElements: [...this.state.leftSnapElements, newLeft],
-          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
-          finishedValidating: false
-        });
-        this._leftTimestampIndex = this.state.leftSnapElements.length + 1;
-      } else if (newRight) {
-        this.setState({
-          rightSnapElements: [...this.state.rightSnapElements, newRight],
-          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
-          finishedValidating: false
-        });
-        this._rightTimestampIndex = this.state.rightSnapElements.length + 1;
       }
     }
   }
@@ -314,12 +292,6 @@ export default class YmdTimestampHeader extends React.Component {
       timestampAttempt: this.state.timestampAttempt + 1,
       showLoader: false
     });
-    if (this.state.leftSnaps) {
-      this._leftTimestampIndex = this.state.leftSnaps.indexOf(fetchedTimestampA);
-    }
-    if (this.state.rightSnaps) {
-      this._rightTimestampIndex = this.state.rightSnaps.indexOf(fetchedTimestampB);
-    }
   }
 
   /**
@@ -459,37 +431,37 @@ export default class YmdTimestampHeader extends React.Component {
           </select>
           <select className="form-control input-sm mr-sm-1 month-select"
             ref={this.monthSelectLeft}
-            style={{ visibility: this._visibilityState[+(this._leftMonthIndex === -1)] }}
             onChange={this.handleLeftMonthChange} title="Months and available captures"
             defaultValue="">
             <option value="" disabled>Month</option>
             {this.state.leftMonthOptions}
           </select>
-          <select className="form-control input-sm mr-sm-1 timestamp-select"
-            ref={this.timestampSelectLeft}
-            style={{ visibility: this._visibilityState[+!this.state.leftSnapElements] }}
-            onChange={this._handleLeftTimestampChange}
-            defaultValue="">
-            <option value="" disabled>Available captures</option>
-            {this.state.leftSnapElements}
-          </select>
+          { !isEmpty(this.state.leftSnapElements) &&
+            <select className="form-control input-sm mr-sm-1 timestamp-select"
+              ref={this.timestampSelectLeft}
+              onChange={this._handleLeftTimestampChange}
+              defaultValue="">
+              <option value="" disabled>Available captures</option>
+              {this.state.leftSnapElements}
+            </select>
+          }
         </div>
         <div className="wayback-ymd-buttons">
           {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
           {this.state.showRestartBtn && <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> }
         </div>
         <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1 timestamp-select"
-            ref={this.timestampSelectRight}
-            style={{ visibility: this._visibilityState[+!this.state.rightSnapElements] }}
-            onChange={this._handleRightTimestampChange}
-            defaultValue="">
-            <option value="" disabled>Available captures</option>
-            {this.state.rightSnapElements}
-          </select>
+          { !isEmpty(this.state.rightSnapElements) &&
+            <select className="form-control input-sm mr-sm-1 timestamp-select"
+              ref={this.timestampSelectRight}
+              onChange={this._handleRightTimestampChange}
+              defaultValue="">
+              <option value="" disabled>Available captures</option>
+              {this.state.rightSnapElements}
+            </select>
+          }
           <select className="form-control input-sm mr-sm-1 month-select"
             ref={this.monthSelectRight}
-            style={{ visibility: this._visibilityState[+(this._rightMonthIndex === -1)] }}
             onChange={this.handleRightMonthChange} title="Months and available captures"
             defaultValue="">
             <option value="" disabled>Month</option>
@@ -506,24 +478,6 @@ export default class YmdTimestampHeader extends React.Component {
     );
   }
 
-  _showOpenLinks () {
-    if (this.state.timestampA && this.state.timestampB) {
-      return (
-        <div>
-          {this.state.timestampA &&
-             <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-               id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
-          }
-          {this.state.timestampB &&
-             <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-               id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
-          }
-          <br/>
-        </div>
-      );
-    }
-  }
-
   _showDiffs () {
     const timestampA = this.timestampSelectLeft.current.value;
     const timestampB = this.timestampSelectRight.current.value;
@@ -536,19 +490,11 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _selectValues () {
-    if (!isEmpty(this.state.leftSnapElements)) {
-      if (this._leftTimestampIndex !== -1) {
-        this.timestampSelectLeft.current.selectedIndex = this._leftTimestampIndex;
-      } else if (this.state.timestampA) {
-        this.timestampSelectLeft.current.value = this.state.timestampA;
-      }
+    if (!isEmpty(this.state.leftSnapElements) && this.state.timestampA) {
+      this.timestampSelectLeft.current.value = this.state.timestampA;
     }
-    if (!isEmpty(this.state.rightSnapElements)) {
-      if (this._rightTimestampIndex !== -1) {
-        this.timestampSelectRight.current.selectedIndex = this._rightTimestampIndex;
-      } else if (this.state.timestampB) {
-        this.timestampSelectRight.current.value = this.state.timestampB;
-      }
+    if (!isEmpty(this.state.rightSnapElements) && this.state.timestampB) {
+      this.timestampSelectRight.current.value = this.state.timestampB;
     }
     const monthLeft = this.monthSelectLeft.current;
     const monthRight = this.monthSelectRight.current;
@@ -621,12 +567,8 @@ export default class YmdTimestampHeader extends React.Component {
     if (isNil(rightYear)) {
       rightYear = this.state.rightYear;
     }
-    const leftMonthsData = this._getMonthData(
-      this.state.sparkline[leftYear]
-    );
-    const rightMonthsData = this._getMonthData(
-      this.state.sparkline[rightYear]
-    );
+    const leftMonthsData = this._getMonthData(this.state.sparkline[leftYear]);
+    const rightMonthsData = this._getMonthData(this.state.sparkline[rightYear]);
     this.setState({
       leftMonthOptions: this._monthOptions(leftMonthsData),
       rightMonthOptions: this._monthOptions(rightMonthsData)
@@ -634,18 +576,19 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _getMonthData (data) {
-    return (
-      data &&
-      data.filter(item => item > 0).map((item, index) => {
-        return [monthNames[index + 1], item];
-      })
-    );
+    if(!isEmpty(data)) {
+      const out = [];
+      for (let i=0; i<=11; i++) {
+        if (data[i] > 0) {
+          out.push([monthNames[i+1], data[i]]);
+        }
+      }
+      return out;
+    }
   }
 
   handleLeftMonthChange (e) {
     this._fetchCDXData();
-    this._leftTimestampIndex = 0;
-    this.timestampSelectLeft.current.selectedIndex = 0;
     this.setState({
       showDiffBtn: true,
       timestampA: null,
@@ -655,8 +598,6 @@ export default class YmdTimestampHeader extends React.Component {
 
   handleRightMonthChange (e) {
     this._fetchCDXData();
-    this._rightTimestampIndex = 0;
-    this.timestampSelectRight.current.selectedIndex = 0;
     this.setState({
       showDiffBtn: true,
       timestampA: null,
