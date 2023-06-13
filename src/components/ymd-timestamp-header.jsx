@@ -152,7 +152,17 @@ export default class YmdTimestampHeader extends React.Component {
           <div className="timestamp-header-view">
             {this._showInfo()}
             {this._showTimestampSelector()}
-            {this._showOpenLinks()}
+            <div>
+              {this.state.timestampA &&
+                <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+                  id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+              }
+              {this.state.timestampB &&
+                <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+                  id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
+              }
+              <br />
+            </div>
           </div>
         );
       }
@@ -466,24 +476,6 @@ export default class YmdTimestampHeader extends React.Component {
         </div>
       </div>
     );
-  }
-
-  _showOpenLinks () {
-    if (this.state.timestampA && this.state.timestampB) {
-      return (
-        <div>
-          {this.state.timestampA &&
-             <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-               id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
-          }
-          {this.state.timestampB &&
-             <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-               id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
-          }
-          <br/>
-        </div>
-      );
-    }
   }
 
   _showDiffs () {
