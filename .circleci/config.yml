@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/wayback-diff
     docker:
-      - image: cimg/node:20.6
+      - image: cimg/node:16.13.0
     steps:
       - checkout
       - restore_cache:
