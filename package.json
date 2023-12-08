@@ -39,7 +39,7 @@
     "eslint-plugin-promise": "^6.1",
     "eslint-plugin-react": "^7.31",
     "jsdom": "^22.0.0",
-    "postcss": "^8.4.24",
+    "postcss": "^8.4.31",
     "react-scripts": "^5.0.1",
     "rollup": "3.25.1",
     "@rollup/plugin-babel": "^6.0.3",
