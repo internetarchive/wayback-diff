@@ -21,11 +21,11 @@
     "lint": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx"
   },
   "devDependencies": {
-    "@babel/core": "^7.22",
-    "@babel/eslint-parser": "^7.22",
-    "@babel/plugin-proposal-export-default-from": "^7.18",
-    "@babel/preset-env": "^7.22",
-    "@babel/preset-react": "^7.22",
+    "@babel/core": "^7.23",
+    "@babel/eslint-parser": "^7.23",
+    "@babel/plugin-proposal-export-default-from": "^7.23",
+    "@babel/preset-env": "^7.23",
+    "@babel/preset-react": "^7.23",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
