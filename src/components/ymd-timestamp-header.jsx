@@ -51,8 +51,9 @@ export default class YmdTimestampHeader extends React.Component {
 
     this._abortController = new window.AbortController();
 
-    const leftYear = (this.props.timestampA === undefined) ? '' : this.props.timestampA.substring(0, 4);
-    const rightYear = (this.props.timestampB === undefined) ? '' : this.props.timestampB.substring(0, 4);
+    const { timestampA, timestampB } = this.props;
+    const leftYear = timestampA ? timestampA.substring(0, 4) : '';
+    const rightYear = timestampB ? timestampB.substring(0, 4) : '';
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
@@ -60,10 +61,10 @@ export default class YmdTimestampHeader extends React.Component {
     this.monthSelectRight = React.createRef();
 
     this.state = {
-      timestampA: this.props.timestampA,
-      timestampB: this.props.timestampB,
-      leftYear: leftYear,
-      rightYear: rightYear,
+      timestampA,
+      timestampB,
+      leftYear,
+      rightYear,
       showRestartBtn: false,
       showDiffBtn: false,
       timestampAttempt: 0,
@@ -97,16 +98,15 @@ export default class YmdTimestampHeader extends React.Component {
     if (!this.state.sparkline && !this.state.showLoader) {
       this._fetchSparklineData();
     }
-    if (this.state.cdxData) {
-      if (this.state.shouldValidateTimestamp) {
-        this._checkTimestamps();
-      }
-      if (!this.state.showLoader) {
-        this._selectValues();
-        if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
-          if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
-            this._showMonths();
-          }
+    if (this.state.cdxData && this.state.shouldValidateTimestamp) {
+      this._checkTimestamps();
+    }
+
+    if (this.state.cdxData && !this.state.showLoader) {
+      this._selectValues();
+      if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
+        if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
+          this._showMonths();
         }
       }
     }
@@ -142,7 +142,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   render () {
-    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const { loader, conf, url } = this.props;
+    const Loader = () => isNil(loader) ? <Loading/> : loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
     }
@@ -154,11 +155,11 @@ export default class YmdTimestampHeader extends React.Component {
             {this._showTimestampSelector()}
             <div>
               {this.state.timestampA &&
-                <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+                <a href={conf.snapshotsPrefix + this.state.timestampA + '/' + url}
                   id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
               }
               {this.state.timestampB &&
-                <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+                <a href={conf.snapshotsPrefix + this.state.timestampB + '/' + url}
                   id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
               }
               <br />
@@ -202,34 +203,36 @@ export default class YmdTimestampHeader extends React.Component {
   _checkTimestamps (side = null) {
     this.setState({ shouldValidateTimestamp: false });
     const fetchedTimestamps = { a: '', b: '' };
+
+    const validateAndSetState = (timestamp, key) => {
+      return this._validateTimestamp(timestamp, fetchedTimestamps, key)
+        .then(() => {
+          if (this._redirectToValidatedTimestamps) {
+            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
+          } else {
+            this.setState({ finishedValidating: true });
+          }
+        })
+        .catch(error => {
+          this._errorHandled(error.message);
+        });
+    };
+
     if (this.state.timestampA && this.state.timestampB) {
-      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
-        .then(() => { return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b'); })
-        .then(() => {
-          if (this._redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
+      Promise.all([
+        validateAndSetState(this.state.timestampA, 'a'),
+        validateAndSetState(this.state.timestampB, 'b')
+      ]).finally(() => {
+        this.setState({ finishedValidating: true });
+      });
     } else if (this.state.timestampA) {
-      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
-        .then(() => {
-          if (this._redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
+      validateAndSetState(this.state.timestampA, 'a').finally(() => {
+        this.setState({ finishedValidating: true });
+      });
     } else if (this.state.timestampB) {
-      this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b')
-        .then(() => {
-          if (this._redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
+      validateAndSetState(this.state.timestampB, 'b').finally(() => {
+        this.setState({ finishedValidating: true });
+      });
     } else {
       if (side === 'left') {
         this.setState({ leftSnapElements: null, leftSnaps: null });
@@ -241,13 +244,15 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _validateTimestamp (timestamp, fetchedTimestamps, position) {
-    if (this.props.fetchSnapshotCallback) {
+    const { fetchSnapshotCallback, conf } = this.props;
+
+    if (fetchSnapshotCallback) {
       return this._handleTimestampValidationFetch(
-        this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position
+        fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position
       );
     }
-    const url = new URL(this.props.conf.cdxServer, window.location.origin);
-    url.searchParams.append('url', this.props.url);
+    const url = new URL(conf.cdxServer, window.location.origin);
+    url.searchParams.append('url', url);
     url.searchParams.append('closest', timestamp);
     url.searchParams.append('filter', '!mimetype:warc/revisit');
     url.searchParams.append('format', 'json');
@@ -277,6 +282,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _setNewURL (fetchedTimestampA, fetchedTimestampB) {
+    const { conf, url } = this.props;
     this._redirectToValidatedTimestamps = false;
     if (fetchedTimestampA === undefined) {
       fetchedTimestampA = '';
@@ -284,7 +290,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (fetchedTimestampB === undefined) {
       fetchedTimestampB = '';
     }
-    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    window.history.pushState({}, '', conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + url);
     this.setState({
       timestampA: fetchedTimestampA,
       timestampB: fetchedTimestampB,
@@ -484,8 +490,8 @@ export default class YmdTimestampHeader extends React.Component {
 
     this.props.getTimestampsCallback(timestampA, timestampB);
     this.setState({
-      timestampA: timestampA,
-      timestampB: timestampB
+      timestampA,
+      timestampB
     });
   }
 

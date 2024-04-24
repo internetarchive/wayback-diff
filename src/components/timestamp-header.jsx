@@ -131,12 +131,13 @@ export default class TimestampHeader extends React.Component {
   }
 
   _validateTimestamp (timestamp, fetchedTimestamps, position) {
-    if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
+    const { fetchSnapshotCallback, conf, url } = this.props;
+
+    if (fetchSnapshotCallback) {
+      return this._handleTimestampValidationFetch(fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
     }
-    const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
-      window.location.origin);
-    return this._handleTimestampValidationFetch(fetchWithTimeout(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
+    const targetUrl = new URL(conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(url), window.location.origin);
+    return this._handleTimestampValidationFetch(fetchWithTimeout(targetUrl, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);
   }
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
@@ -224,21 +225,21 @@ export default class TimestampHeader extends React.Component {
     });
   }
 
-  _prepareOptionElements (data) {
+  _prepareOptionElements(data) {
     const initialSnapshots = [];
-    if (data.length > 0) {
-      let yearGroup = getYear(data[0][0]);
-      initialSnapshots.push(<optgroup key={-1} label={yearGroup}/>);
-      for (let i = 0; i < data.length; i++) {
-        const utcTime = getUTCDateFormat(data[i][0]);
-        const year = getYear(data[i][0]);
-        if (year < yearGroup) {
-          yearGroup = year;
-          initialSnapshots.push(<optgroup key={-i + 2} label={yearGroup}/>);
-        }
-        initialSnapshots.push(<option key = {i} value = {data[i][0]}>{utcTime}</option>);
+    let yearGroup = null;
+
+    data.forEach((snapshot, index) => {
+      const utcTime = getUTCDateFormat(snapshot[0]);
+      const year = getYear(snapshot[0]);
+
+      if (year !== yearGroup) {
+        yearGroup = year;
+        initialSnapshots.push(<optgroup key={`group-${index}`} label={yearGroup} />);
       }
-    }
+
+      initialSnapshots.push(<option key={`option-${index}`} value={snapshot[0]}>{utcTime}</option>);
+    });
     return initialSnapshots;
   }
 
