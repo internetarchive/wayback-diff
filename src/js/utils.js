@@ -5,10 +5,6 @@ import zip from 'lodash/zip';
 const urlRegex = /[\w\.]{2,256}\.[a-z]{2,4}/gi;
 /* eslint-enable no-useless-escape */
 
-function hasWhiteSpace (s) {
-  return s.indexOf(' ') >= 0;
-}
-
 function looksLikeUrl (str) {
   return !!str.match(urlRegex);
 }
@@ -17,7 +13,7 @@ export function isUrl (str = '') {
   const val = str.toLocaleLowerCase();
   return (
     (val.startsWith('ftp://') || val.startsWith('http://') ||
-     val.startsWith('https://') || looksLikeUrl(val)) && !hasWhiteSpace(val)
+     val.startsWith('https://') || looksLikeUrl(val)) && !val.includes(' ')
   ) && !val.startsWith('site:');
 }
 
@@ -173,9 +169,5 @@ export function getYear (ts) {
 
 export function b64ToArray (b64Data) {
   const byteCharacters = atob(b64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  return new Uint8Array(byteNumbers);
+  return Uint8Array.from(byteCharacters, char => char.charCodeAt(0));
 }

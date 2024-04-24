@@ -9,10 +9,7 @@ const ErrorMessage = ({ code, url, timestamp, conf, errorHandledCallback }) => {
 
   let msg = 'We are sorry but there is a problem comparing these captures. Please try two different ones.';
   let simhash = false;
-  let year = '';
-  if (timestamp !== undefined) {
-    year = timestamp.substring(0, 4);
-  }
+  let year = timestamp ? timestamp.substring(0, 4) : '';
 
   const calculateSimhash = useCallback(() => {
     const targetUrl = `${conf.waybackDiscoverDiff}/calculate-simhash?url=${encodeURIComponent(url)}&year=${timestamp.substring(0, 4)}`;

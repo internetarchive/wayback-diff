@@ -31,64 +31,42 @@ export default class DiffContainer extends React.Component {
   }
 
   getTimestamps (timestampA, timestampB) {
-    if (timestampA || timestampB) {
-      if (timestampA && timestampB == null) {
-        timestampB = '';
-        this.setState({
-          fetchedRaw: null,
-          error: null,
-          showDiff: true,
-          timestampA: timestampA
-        });
-      } else if (timestampB && timestampA == null) {
-        timestampA = '';
-        this.setState({
-          fetchedRaw: null,
-          error: null,
-          showDiff: true,
-          timestampB: timestampB
-        });
-      } else {
-        this.setState({
-          fetchedRaw: null,
-          error: null,
-          showDiff: true,
-          timestampA: timestampA,
-          timestampB: timestampB
-        });
-      }
+    if (timestampA !== undefined || timestampB !== undefined) {
+      this.setState({
+        fetchedRaw: null,
+        error: null,
+        showDiff: true,
+        timestampA: timestampA || '',
+        timestampB: timestampB || ''
+      });
+
       if (timestampA !== this.state.timestampA || timestampB !== this.state.timestampB) {
-        window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
+        const url = this.props.conf.urlPrefix + (timestampA || '') + '/' + (timestampB || '') + '/' + this.props.url;
+        window.history.pushState({}, '', url);
       }
     }
   }
 
-  errorHandled (errorCode) {
+  errorHandled = (errorCode) => {
     this.setState({ error: errorCode });
   }
 
   render () {
-    if (!isUrl(this.props.url)) {
+    const { url, noTimestamps, fetchSnapshotCallback, conf, loader } = this.props;
+
+    if (!isUrl(url)) {
       return this._invalidURL();
     }
     if (this.state.error) {
       return (
-        <ErrorMessage url={this.props.url} timestamp={this.state.timestampA} code={this.state.error}/>);
+        <ErrorMessage url={url} timestamp={this.state.timestampA} code={this.state.error}/>);
     }
     if (!this.state.timestampA && !this.state.timestampB) {
-      if (this.props.noTimestamps) {
-        return (
-          <div className="diffcontainer-view">
-            <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
-              errorHandledCallback={this.errorHandled}/>
-            {this._showNoTimestamps()}
-          </div>);
-      }
       return (
         <div className="diffcontainer-view">
-          <YmdTimestampHeader {...this.props}
-            errorHandledCallback={this.errorHandled}
-            getTimestampsCallback={this.getTimestamps}/>
+          <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
+            errorHandledCallback={this.errorHandled}/>
+          {noTimestamps && this._showNoTimestamps()}
         </div>
       );
     }
@@ -132,24 +110,16 @@ export default class DiffContainer extends React.Component {
 
   _showOneSnapshot (isLeft, timestamp) {
     if (this.state.fetchedRaw) {
-      if (isLeft) {
-        return (
-          <div className={'side-by-side-render'}>
-            <iframe height={window.innerHeight} onLoad={() => { this._handleHeight(); }}
-              srcDoc={this.state.fetchedRaw}
-              ref={(frame) => { this._oneFrame = frame; }}
-            />
-            <NoSnapshotURL/>
-          </div>
-        );
-      }
+      const iframeProps = {
+        height: window.innerHeight,
+        onLoad: () => { this._handleHeight(); },
+        srcDoc: this.state.fetchedRaw,
+        ref: (frame) => { this._oneFrame = frame; }
+      };
       return (
         <div className={'side-by-side-render'}>
-          <NoSnapshotURL/>
-          <iframe height={window.innerHeight} onLoad={() => { this._handleHeight(); }}
-            srcDoc={this.state.fetchedRaw}
-            ref={(frame) => { this._oneFrame = frame; }}
-          />
+          {isLeft ? <iframe {...iframeProps} /> : <NoSnapshotURL/>}
+          {isLeft ? <NoSnapshotURL/> : <iframe {...iframeProps} />}
         </div>
       );
     }

@@ -36,8 +36,7 @@ export function decodeCompressedJson (json) {
     for (let j = 1; j < json.captures[0][i].length; j++) {
       const day = json.captures[0][i][j][0];
       for (let y = 1; y < json.captures[0][i][j].length; y++) {
-        const time = json.captures[0][i][j][y][0];
-        const simhashIndex = json.captures[0][i][j][y][1];
+        const [time, simhashIndex] = json.captures[0][i][j][y];
         const simhash = json.hashes[simhashIndex];
         const timestamp = `${year}${twoDigits(month)}${twoDigits(day)}${time}`;
         newJson.push([timestamp, simhash]);
