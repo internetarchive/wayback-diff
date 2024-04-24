@@ -10,7 +10,7 @@
     "prop-types": "^15.8.1",
     "react": "17",
     "react-dom": "17",
-    "react-router-dom": "5.3.0",
+    "react-router-dom": "5.3.4",
     "simple-xpath-position": "^2.0.2"
   },
   "scripts": {
