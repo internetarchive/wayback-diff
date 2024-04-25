@@ -47,25 +47,26 @@ export default class SunburstContainer extends React.Component {
   }
 
   render () {
+    const { url, conf } = this.props;
+
     if (this.state.error) {
       return (
-        <ErrorMessage url={this.props.url} code={this.state.error} timestamp={this.state.timestamp
+        <ErrorMessage url={url} code={this.state.error} timestamp={this.state.timestamp
           ? this.state.timestamp
           : this.props.timestamp}
-        conf={this.props.conf} errorHandledCallback={this.errorHandled}/>);
+        conf={conf} errorHandledCallback={this.errorHandled}/>);
     }
     if (this.state.simhashData) {
       return (
         <div className="sunburst-container">
           {this.state.isPending &&
-            <p>The Simhash data for {this.props.url} and year {this.state.timestamp.substring(0, 4)} are
+            <p>The Simhash data for {url} and year {this.state.timestamp.substring(0, 4)} are
             still being generated. For more results please try again in a moment.</p>}
           <div>This diagram illustrates the differences of <a
-            href={`/web/*/${this.props.url}`}>{this.props.url}</a> capture <a href={this.props.conf.snapshotsPrefix + this.state.timestamp + '/' + this.props.url}>
+            href={`/web/*/${url}`}>{url}</a> capture <a href={conf.snapshotsPrefix + this.state.timestamp + '/' + url}>
             {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}
           {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
-          <D3Sunburst urlPrefix={this.props.conf.urlPrefix} url={this.props.url}
-            simhashData={this.state.simhashData}/>
+          <D3Sunburst urlPrefix={conf.urlPrefix} url={url} simhashData={this.state.simhashData}/>
           <div style={{ clear: 'both' }}>
             <div className="heat-map-legend">
               <div className="heat-map-legend-caption">Variation</div>
@@ -96,13 +97,14 @@ export default class SunburstContainer extends React.Component {
   }
 
   _validateTimestamp () {
+    const { url, conf, fetchSnapshotCallback, timestamp } = this.props;
     let promise;
-    if (this.props.fetchSnapshotCallback) {
-      promise = this.props.fetchSnapshotCallback(this.props.timestamp);
+    if (fetchSnapshotCallback) {
+      promise = fetchSnapshotCallback(timestamp);
     } else {
-      const url = new URL(this.props.conf.cdxServer, window.location.origin);
-      url.searchParams.append('url', this.props.url);
-      url.searchParams.append('closest', this.props.timestamp);
+      const url = new URL(conf.cdxServer, window.location.origin);
+      url.searchParams.append('url', url);
+      url.searchParams.append('closest', timestamp);
       url.searchParams.append('filter', '!mimetype:warc/revisit');
       url.searchParams.append('sort', 'closest');
       url.searchParams.append('limit', '1');
@@ -113,12 +115,10 @@ export default class SunburstContainer extends React.Component {
       .then(response => response.json())
       .then(data => {
         const ts = data.toString();
-        if (this.props.timestamp !== ts) {
-          window.history.pushState({}, '', `${this.props.conf.diffgraphPrefix}${ts}/${this.props.url}`);
-          this.setState({ timestamp: ts });
-        } else {
-          this.setState({ timestamp: this.props.timestamp });
-        }
+        const newTimestamp = timestamp !== ts ? ts : timestamp;
+        const newUrl = `${conf.diffgraphPrefix}${ts}/${url}`;
+        window.history.pushState({}, '', newUrl);
+        this.setState({ timestamp: newTimestamp });
       })
       .catch(error => {
         if (error.message === 'Unexpected end of JSON input') {
@@ -134,8 +134,9 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchTimestampSimhashData () {
-    const url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&timestamp=' + this.state.timestamp;
-    fetchWithTimeout(url).then(checkResponse)
+    const { url, conf } = this.props;
+    const fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&timestamp=' + this.state.timestamp;
+    fetchWithTimeout(fetchUrl).then(checkResponse)
       .then(response => response.json())
       .then((jsonResponse) => {
         if (jsonResponse.status) {
@@ -149,20 +150,16 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchSimhashData (timestampJson) {
-    let url = this.props.conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(this.props.url) + '&year=' + this.state.timestamp.substring(0, 4);
-    if (this.props.conf.compressedSimhash) {
-      url += '&compress=1';
+    const { url, conf } = this.props;
+    let fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&year=' + this.state.timestamp.substring(0, 4);
+    if (conf.compressedSimhash) {
+      fetchUrl += '&compress=1';
     }
-    fetchWithTimeout(url).then(checkResponse)
+    fetchWithTimeout(fetchUrl).then(checkResponse)
       .then(response => response.json())
       .then((jsonResponse) => {
         this.setState({ isPending: jsonResponse.status === 'PENDING' });
-        let json;
-        if (this.props.conf.compressedSimhash) {
-          json = decodeCompressedJson(jsonResponse);
-        } else {
-          json = decodeUncompressedJson(jsonResponse);
-        }
+        const json = conf.compressedSimhash ? decodeCompressedJson(jsonResponse) : decodeUncompressedJson(jsonResponse);
         const data = this._calcDistanceAndScales(json, timestampJson);
         if (!isEmpty(data)) {
           this._createLevels(data, timestampJson);
@@ -182,16 +179,13 @@ export default class SunburstContainer extends React.Component {
   used to insert the timestamps into the diagram.
    */
   _calcDistanceAndScales (json, timestamp) {
-    const tempSimilarity = [];
-    for (let i = 0; i < json.length; i++) {
-      const similarity = similarityWithDistance(timestamp[1], json[i][1]);
-      json[i][1] = similarity * 100;
-      // Get an array with all the non-zero distance values
-      if (similarity !== 0) {
-        tempSimilarity.push(similarity * 100);
-      }
-    }
-    if (isEmpty(tempSimilarity)) {
+    const tempSimilarity = json.map(item => {
+      const similarity = similarityWithDistance(timestamp[1], item[1]);
+      item[1] = similarity * 100;
+      return similarity !== 0 ? similarity * 100 : null;
+    }).filter(Boolean);
+
+    if (tempSimilarity.length === 0) {
       this.errorHandled('NO_DIFFERENT_CAPTURES');
       return;
     }
@@ -199,8 +193,7 @@ export default class SunburstContainer extends React.Component {
     this._clusters = scaleCluster().domain(tempSimilarity)
       .range([1, 2, 3, 4, 5])
       .clusters();
-    // If the clusters are less than 5, push as many cells as needed, with 101
-    // which can never be reached, in order to avoid undefined var errors.
+    // Ensure there are at least 5 clusters
     while (this._clusters.length < 5) {
       this._clusters.push(101);
     }
