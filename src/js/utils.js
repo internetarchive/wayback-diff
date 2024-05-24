@@ -135,13 +135,6 @@ export function getKeyByValue (obj, value) {
   return Object.keys(obj).find(key => obj[key] === value);
 }
 
-export function selectHasValue (obj, value) {
-  if (obj !== null) {
-    return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
-  }
-  return false;
-}
-
 export function getUTCDateFormat (date) {
   const year = parseInt(date.substring(0, 4), 10);
   const month = parseInt(date.substring(4, 6), 10) - 1;

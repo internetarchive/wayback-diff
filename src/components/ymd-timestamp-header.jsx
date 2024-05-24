@@ -2,8 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, twoDigits, getKeyByValue, selectHasValue,
-  getUTCDateFormat, getShortUTCDateFormat, checkResponse
+  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, checkResponse
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -495,6 +494,7 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
+  // Note that this runs 3 times until it picks the right values. TODO optimise.
   _selectValues () {
     if (!isEmpty(this.state.leftSnapElements) && this.state.timestampA) {
       this.timestampSelectLeft.current.value = this.state.timestampA;
@@ -505,13 +505,12 @@ export default class YmdTimestampHeader extends React.Component {
     const monthLeft = this.monthSelectLeft.current;
     const monthRight = this.monthSelectRight.current;
 
-    // TODO maybe we could delete selectHasValue
-    if (selectHasValue(monthLeft, monthNames[this._leftMonthIndex])) {
+    if (Array.from(monthLeft.options).some(option => option.value === monthNames[this._leftMonthIndex])) {
       monthLeft.value = monthNames[this._leftMonthIndex];
     } else {
       monthLeft.selectedIndex = 0;
     }
-    if (selectHasValue(monthRight, monthNames[this._rightMonthIndex])) {
+    if (Array.from(monthRight.options).some(option => option.value === monthNames[this._rightMonthIndex])) {
       monthRight.value = monthNames[this._rightMonthIndex];
     } else {
       monthRight.selectedIndex = 0;
