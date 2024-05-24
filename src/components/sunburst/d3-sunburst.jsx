@@ -28,6 +28,7 @@ export default class D3Sunburst extends React.Component {
   }
 
   componentDidMount () {
+    const { simhashData, urlPrefix, url } = this.props;
     const width = getSize();
     const height = getSize();
     const radius = Math.min(width, height) / 2;
@@ -43,7 +44,7 @@ export default class D3Sunburst extends React.Component {
     const partition = d3.partition().size([2 * Math.PI, radius]);
 
     // Find data root
-    const root = d3.hierarchy(this.props.simhashData)
+    const root = d3.hierarchy(simhashData)
       .sum(function (d) { return 5; });
     // Size arcs
     partition(root);
@@ -52,8 +53,6 @@ export default class D3Sunburst extends React.Component {
       .endAngle(function (d) { return d.x1; })
       .innerRadius(function (d) { return d.y0; })
       .outerRadius(function (d) { return d.y1; });
-
-    const component = this;
 
     // Put it all together
     g.selectAll('path')
@@ -72,8 +71,8 @@ export default class D3Sunburst extends React.Component {
         component.setState({ hint: '' });
       })
       .on('click', function (e, d) {
-        if (d.data.timestamp !== component.props.simhashData.timestamp) {
-          const url = component.props.urlPrefix + d.data.timestamp + '/' + component.props.simhashData.timestamp + '/' + component.props.url;
+        if (d.data.timestamp !== simhashData.timestamp) {
+          const url = urlPrefix + d.data.timestamp + '/' + simhashData.timestamp + '/' + url;
           window.open(url, '_blank');
         }
       });
