@@ -49,7 +49,7 @@ export default class DiffContainer extends React.Component {
 
   errorHandled = (errorCode) => {
     this.setState({ error: errorCode });
-  };
+  }
 
   render () {
     const { url, noTimestamps, fetchSnapshotCallback, conf, loader } = this.props;
