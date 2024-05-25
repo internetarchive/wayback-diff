@@ -47,11 +47,11 @@ export default class YmdTimestampHeader extends React.Component {
 
   constructor (props) {
     super(props);
-
+    const { timestampA, timestampB } = this.props;
     this._abortController = new window.AbortController();
 
-    const leftYear = (this.props.timestampA === undefined) ? '' : this.props.timestampA.substring(0, 4);
-    const rightYear = (this.props.timestampB === undefined) ? '' : this.props.timestampB.substring(0, 4);
+    const leftYear = (timestampA === undefined) ? '' : timestampA.substring(0, 4);
+    const rightYear = (timestampB === undefined) ? '' : timestampB.substring(0, 4);
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
@@ -59,10 +59,10 @@ export default class YmdTimestampHeader extends React.Component {
     this.monthSelectRight = React.createRef();
 
     this.state = {
-      timestampA: this.props.timestampA,
-      timestampB: this.props.timestampB,
-      leftYear: leftYear,
-      rightYear: rightYear,
+      timestampA,
+      timestampB,
+      leftYear,
+      rightYear,
       showRestartBtn: false,
       showDiffBtn: false,
       timestampAttempt: 0,
@@ -275,18 +275,12 @@ export default class YmdTimestampHeader extends React.Component {
       .catch(error => { this.errorHandled(error.message); });
   }
 
-  _setNewURL (fetchedTimestampA, fetchedTimestampB) {
+  _setNewURL (timestampA = '', timestampB = '') {
     this._redirectToValidatedTimestamps = false;
-    if (fetchedTimestampA === undefined) {
-      fetchedTimestampA = '';
-    }
-    if (fetchedTimestampB === undefined) {
-      fetchedTimestampB = '';
-    }
-    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
     this.setState({
-      timestampA: fetchedTimestampA,
-      timestampB: fetchedTimestampB,
+      timestampA,
+      timestampB,
       finishedValidating: true,
       timestampAttempt: this.state.timestampAttempt + 1,
       showLoader: false
