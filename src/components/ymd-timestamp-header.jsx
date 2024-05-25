@@ -123,7 +123,7 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({
         showRestartBtn: true,
         showDiffBtn: true,
-        leftSnapElements: this._prepareOptionElements(allowedSnapshots)
+        leftSnapElements: this._prepareOptions(allowedSnapshots)
       });
     }
   }
@@ -135,7 +135,7 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({
         showRestartBtn: true,
         showDiffBtn: true,
-        rightSnapElements: this._prepareOptionElements(allowedSnapshots)
+        rightSnapElements: this._prepareOptions(allowedSnapshots)
       });
     }
   }
@@ -176,7 +176,7 @@ export default class YmdTimestampHeader extends React.Component {
       if (!isNaN(this.state.timestampA)) {
         const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
         if (this.state.timestampA > lastLeftFromCDX) {
-          const newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
+          const newLeft = this._prepareOptions([[this.state.timestampA, 0]]);
           this.setState({
             leftSnapElements: [...this.state.leftSnapElements, newLeft],
             leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
@@ -187,7 +187,7 @@ export default class YmdTimestampHeader extends React.Component {
       if (!isNaN(this.state.timestampB)) {
         const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
         if (this.state.timestampB > lastRightFromCDX) {
-          const newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
+          const newRight = this._prepareOptions([[this.state.timestampB, 0]]);
           this.setState({
             rightSnapElements: [...this.state.rightSnapElements, newRight],
             rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
@@ -366,25 +366,25 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _prepareCDXData (leftData, data) {
-    if (data) {
-      data.shift();
+  _prepareCDXData (leftSnaps, rightSnaps) {
+    if (rightSnaps) {
+      rightSnaps.shift();
     }
-    if (leftData) {
-      leftData.shift();
+    if (leftSnaps) {
+      leftSnaps.shift();
     }
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
       cdxData: true,
-      leftSnaps: leftData,
-      rightSnaps: data,
-      leftSnapElements: this._prepareOptionElements(leftData),
-      rightSnapElements: this._prepareOptionElements(data),
+      leftSnaps,
+      rightSnaps,
+      leftSnapElements: this._prepareOptions(leftSnaps),
+      rightSnapElements: this._prepareOptions(rightSnaps),
       showLoader: false
     });
   }
 
-  _prepareOptionElements (data) {
+  _prepareOptions (data) {
     return (
       data &&
       data.map((item, index) => {
@@ -407,8 +407,8 @@ export default class YmdTimestampHeader extends React.Component {
   _restartPressed () {
     this.setState({
       showRestartBtn: false,
-      leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
-      rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
+      leftSnapElements: this._prepareOptions(this.state.leftSnaps),
+      rightSnapElements: this._prepareOptions(this.state.rightSnaps)
     });
   }
 
