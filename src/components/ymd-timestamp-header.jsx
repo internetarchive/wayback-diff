@@ -63,7 +63,6 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB,
       leftYear,
       rightYear,
-      showRestartBtn: false,
       showDiffBtn: false,
       timestampAttempt: 0,
       isMounted: false,
@@ -72,7 +71,6 @@ export default class YmdTimestampHeader extends React.Component {
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
     this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
-    this._restartPressed = this._restartPressed.bind(this);
     this._showDiffs = this._showDiffs.bind(this);
     this._errorHandled = this._errorHandled.bind(this);
     this._showMonths = this._showMonths.bind(this);
@@ -121,7 +119,6 @@ export default class YmdTimestampHeader extends React.Component {
       const selectedDigest = this.state.rightSnaps[this.timestampSelectRight.current.selectedIndex - 1][1];
       const allowedSnapshots = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
-        showRestartBtn: true,
         showDiffBtn: true,
         leftSnapElements: this._prepareOptions(allowedSnapshots)
       });
@@ -133,7 +130,6 @@ export default class YmdTimestampHeader extends React.Component {
       const selectedDigest = this.state.leftSnaps[this.timestampSelectLeft.current.selectedIndex - 1][1];
       const allowedSnapshots = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
-        showRestartBtn: true,
         showDiffBtn: true,
         rightSnapElements: this._prepareOptions(allowedSnapshots)
       });
@@ -404,14 +400,6 @@ export default class YmdTimestampHeader extends React.Component {
     );
   }
 
-  _restartPressed () {
-    this.setState({
-      showRestartBtn: false,
-      leftSnapElements: this._prepareOptions(this.state.leftSnaps),
-      rightSnapElements: this._prepareOptions(this.state.rightSnaps)
-    });
-  }
-
   _showTimestampSelector () {
     return (
       <div className="wayback-ymd-timestamp">
@@ -441,7 +429,6 @@ export default class YmdTimestampHeader extends React.Component {
         </div>
         <div className="wayback-ymd-buttons">
           {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
-          {this.state.showRestartBtn && <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> }
         </div>
         <div className="wayback-timestamps">
           { !isEmpty(this.state.rightSnapElements) &&
