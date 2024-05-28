@@ -131,7 +131,7 @@ export default class YmdTimestampHeader extends React.Component {
       const rightSnaps = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
         showDiffBtn: true,
-        rightSnap
+        rightSnaps
       });
     }
   }
@@ -373,15 +373,6 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
-  _prepareOptions (data) {
-    return (
-      data &&
-      data.map((item, index) => {
-        return <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>;
-      })
-    );
-  }
-
   _monthOptions (data) {
     const limit = parseInt(this.props.conf.limit);
     return (
@@ -552,24 +543,12 @@ export default class YmdTimestampHeader extends React.Component {
     if (isNil(rightYear)) {
       rightYear = this.state.rightYear;
     }
-    const leftMonthsData = this._getMonthData(this.state.sparkline[leftYear]);
-    const rightMonthsData = this._getMonthData(this.state.sparkline[rightYear]);
+    const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+    const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
     this.setState({
-      leftMonthOptions: this._monthOptions(leftMonthsData),
-      rightMonthOptions: this._monthOptions(rightMonthsData)
+      leftMonthOptions: this._monthOptions(leftMonths),
+      rightMonthOptions: this._monthOptions(rightMonths)
     });
-  }
-
-  _getMonthData (data) {
-    if(!isEmpty(data)) {
-      const out = [];
-      for (let i=0; i<=11; i++) {
-        if (data[i] > 0) {
-          out.push([monthNames[i+1], data[i]]);
-        }
-      }
-      return out;
-    }
   }
 
   handleLeftMonthChange (e) {
