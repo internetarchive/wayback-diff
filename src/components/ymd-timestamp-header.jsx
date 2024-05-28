@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, checkResponse
+  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, jsonResponse
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -251,8 +251,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
     return promise
-      .then(checkResponse)
-      .then(response => response.json())
+      .then(jsonResponse)
       .then(data => {
         if (data) {
           fetchedTimestamps[position] = `${data}`;
@@ -289,9 +288,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('from', dt);
     url.searchParams.append('to', dt);
     url.searchParams.append('limit', this.props.conf.limit);
-    return fetchWithTimeout(url, { signal: this._abortController.signal })
-      .then(checkResponse)
-      .then(response => response.json());
+    return fetchWithTimeout(url, { signal: this._abortController.signal }).then(jsonResponse);
   }
 
   _fetchCDXData () {
@@ -300,9 +297,7 @@ export default class YmdTimestampHeader extends React.Component {
     let rightFetchPromise;
     this._saveMonthsIndex();
     if (this.props.fetchCDXCallback) {
-      leftFetchPromise = this.props.fetchCDXCallback()
-        .then(checkResponse)
-        .then(response => response.json());
+      leftFetchPromise = this.props.fetchCDXCallback().then(jsonResponse);
     } else {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         leftFetchPromise = this.createCDXRequest(
@@ -373,7 +368,7 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
-  _monthOptions (data) {
+  _showOptions (data) {
     const limit = parseInt(this.props.conf.limit);
     return (
       data &&
@@ -491,7 +486,7 @@ export default class YmdTimestampHeader extends React.Component {
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
     const first = getShortUTCDateFormat(firstTimestamp);
     const last = getShortUTCDateFormat(lastTimestamp);
-    return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection
+    return (<p id='explanation-middle'>Compare any two captures of {this.props.url} from our collection
       of {count.toLocaleString()} dating from {first} to {last}.</p>);
   }
 
@@ -502,8 +497,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
     fetchWithTimeout(url, { signal: this._abortController.signal })
-      .then(checkResponse)
-      .then(response => response.json())
+      .then(jsonResponse)
       .then((data) => {
         if (data) {
           this._prepareSparklineData(data);
@@ -531,7 +525,7 @@ export default class YmdTimestampHeader extends React.Component {
     this.setState({
       showLoader: false,
       sparkline: snapshots,
-      yearOptions: this._monthOptions(yearSum),
+      yearOptions: this._showOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)
     });
   }
@@ -546,8 +540,8 @@ export default class YmdTimestampHeader extends React.Component {
     const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
     const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
     this.setState({
-      leftMonthOptions: this._monthOptions(leftMonths),
-      rightMonthOptions: this._monthOptions(rightMonths)
+      leftMonthOptions: this._showOptions(leftMonths),
+      rightMonthOptions: this._showOptions(rightMonths)
     });
   }
 
