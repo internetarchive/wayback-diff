@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, checkResponse
+  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, jsonResponse
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -47,11 +47,11 @@ export default class YmdTimestampHeader extends React.Component {
 
   constructor (props) {
     super(props);
-
+    const { timestampA, timestampB } = this.props;
     this._abortController = new window.AbortController();
 
-    const leftYear = (this.props.timestampA === undefined) ? '' : this.props.timestampA.substring(0, 4);
-    const rightYear = (this.props.timestampB === undefined) ? '' : this.props.timestampB.substring(0, 4);
+    const leftYear = timestampA?.substring(0, 4) ?? '';
+    const rightYear = timestampB?.substring(0, 4) ?? '';
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
@@ -59,11 +59,10 @@ export default class YmdTimestampHeader extends React.Component {
     this.monthSelectRight = React.createRef();
 
     this.state = {
-      timestampA: this.props.timestampA,
-      timestampB: this.props.timestampB,
-      leftYear: leftYear,
-      rightYear: rightYear,
-      showRestartBtn: false,
+      timestampA,
+      timestampB,
+      leftYear,
+      rightYear,
       showDiffBtn: false,
       timestampAttempt: 0,
       isMounted: false,
@@ -72,7 +71,6 @@ export default class YmdTimestampHeader extends React.Component {
 
     this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
     this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
-    this._restartPressed = this._restartPressed.bind(this);
     this._showDiffs = this._showDiffs.bind(this);
     this._errorHandled = this._errorHandled.bind(this);
     this._showMonths = this._showMonths.bind(this);
@@ -117,25 +115,23 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _handleRightTimestampChange () {
-    if (!isEmpty(this.state.leftSnapElements)) {
+    if (!isEmpty(this.state.leftSnaps)) {
       const selectedDigest = this.state.rightSnaps[this.timestampSelectRight.current.selectedIndex - 1][1];
-      const allowedSnapshots = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
+      const leftSnaps = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
-        showRestartBtn: true,
         showDiffBtn: true,
-        leftSnapElements: this._prepareOptionElements(allowedSnapshots)
+        leftSnaps
       });
     }
   }
 
   _handleLeftTimestampChange () {
-    if (!isEmpty(this.state.rightSnapElements)) {
+    if (!isEmpty(this.state.rightSnaps)) {
       const selectedDigest = this.state.leftSnaps[this.timestampSelectLeft.current.selectedIndex - 1][1];
-      const allowedSnapshots = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
+      const rightSnaps = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
       this.setState({
-        showRestartBtn: true,
         showDiffBtn: true,
-        rightSnapElements: this._prepareOptionElements(allowedSnapshots)
+        rightSnaps
       });
     }
   }
@@ -149,7 +145,6 @@ export default class YmdTimestampHeader extends React.Component {
       if (this.state.yearOptions || this.state.cdxData) {
         return (
           <div className="timestamp-header-view">
-            {this._showInfo()}
             {this._showTimestampSelector()}
             <div>
               {this.state.timestampA &&
@@ -176,9 +171,7 @@ export default class YmdTimestampHeader extends React.Component {
       if (!isNaN(this.state.timestampA)) {
         const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
         if (this.state.timestampA > lastLeftFromCDX) {
-          const newLeft = this._prepareOptionElements([[this.state.timestampA, 0]]);
           this.setState({
-            leftSnapElements: [...this.state.leftSnapElements, newLeft],
             leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
             finishedValidating: false
           });
@@ -187,9 +180,7 @@ export default class YmdTimestampHeader extends React.Component {
       if (!isNaN(this.state.timestampB)) {
         const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
         if (this.state.timestampB > lastRightFromCDX) {
-          const newRight = this._prepareOptionElements([[this.state.timestampB, 0]]);
           this.setState({
-            rightSnapElements: [...this.state.rightSnapElements, newRight],
             rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
             finishedValidating: false
           });
@@ -231,9 +222,9 @@ export default class YmdTimestampHeader extends React.Component {
         }).catch(error => { this._errorHandled(error.message); });
     } else {
       if (side === 'left') {
-        this.setState({ leftSnapElements: null, leftSnaps: null });
+        this.setState({ leftSnaps: null });
       } else if (side === 'right') {
-        this.setState({ rightSnapElements: null, rightSnaps: null });
+        this.setState({ rightSnaps: null });
       }
       this.setState({ finishedValidating: true, showLoader: false });
     }
@@ -260,8 +251,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
     return promise
-      .then(checkResponse)
-      .then(response => response.json())
+      .then(jsonResponse)
       .then(data => {
         if (data) {
           fetchedTimestamps[position] = `${data}`;
@@ -275,18 +265,12 @@ export default class YmdTimestampHeader extends React.Component {
       .catch(error => { this.errorHandled(error.message); });
   }
 
-  _setNewURL (fetchedTimestampA, fetchedTimestampB) {
+  _setNewURL (timestampA = '', timestampB = '') {
     this._redirectToValidatedTimestamps = false;
-    if (fetchedTimestampA === undefined) {
-      fetchedTimestampA = '';
-    }
-    if (fetchedTimestampB === undefined) {
-      fetchedTimestampB = '';
-    }
-    window.history.pushState({}, '', this.props.conf.urlPrefix + fetchedTimestampA + '/' + fetchedTimestampB + '/' + this.props.url);
+    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
     this.setState({
-      timestampA: fetchedTimestampA,
-      timestampB: fetchedTimestampB,
+      timestampA,
+      timestampB,
       finishedValidating: true,
       timestampAttempt: this.state.timestampAttempt + 1,
       showLoader: false
@@ -304,9 +288,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('from', dt);
     url.searchParams.append('to', dt);
     url.searchParams.append('limit', this.props.conf.limit);
-    return fetchWithTimeout(url, { signal: this._abortController.signal })
-      .then(checkResponse)
-      .then(response => response.json());
+    return fetchWithTimeout(url, { signal: this._abortController.signal }).then(jsonResponse);
   }
 
   _fetchCDXData () {
@@ -315,9 +297,7 @@ export default class YmdTimestampHeader extends React.Component {
     let rightFetchPromise;
     this._saveMonthsIndex();
     if (this.props.fetchCDXCallback) {
-      leftFetchPromise = this.props.fetchCDXCallback()
-        .then(checkResponse)
-        .then(response => response.json());
+      leftFetchPromise = this.props.fetchCDXCallback().then(jsonResponse);
     } else {
       if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
         leftFetchPromise = this.createCDXRequest(
@@ -372,34 +352,23 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _prepareCDXData (leftData, data) {
-    if (data) {
-      data.shift();
+  _prepareCDXData (leftSnaps, rightSnaps) {
+    if (rightSnaps) {
+      rightSnaps.shift();
     }
-    if (leftData) {
-      leftData.shift();
+    if (leftSnaps) {
+      leftSnaps.shift();
     }
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
       cdxData: true,
-      leftSnaps: leftData,
-      rightSnaps: data,
-      leftSnapElements: this._prepareOptionElements(leftData),
-      rightSnapElements: this._prepareOptionElements(data),
+      leftSnaps,
+      rightSnaps,
       showLoader: false
     });
   }
 
-  _prepareOptionElements (data) {
-    return (
-      data &&
-      data.map((item, index) => {
-        return <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>;
-      })
-    );
-  }
-
-  _monthOptions (data) {
+  _showOptions (data) {
     const limit = parseInt(this.props.conf.limit);
     return (
       data &&
@@ -410,70 +379,73 @@ export default class YmdTimestampHeader extends React.Component {
     );
   }
 
-  _restartPressed () {
-    this.setState({
-      showRestartBtn: false,
-      leftSnapElements: this._prepareOptionElements(this.state.leftSnaps),
-      rightSnapElements: this._prepareOptionElements(this.state.rightSnaps)
-    });
-  }
-
   _showTimestampSelector () {
     return (
-      <div className="wayback-ymd-timestamp">
-        <div className="wayback-timestamps">
-          <select className="form-control input-sm mr-sm-1" id="year-select-left"
-            onChange={this._handleYearChange} title="Years and available captures"
-            value={this.state.leftYear}>
-            <option value="" disabled>Year</option>
-            {this.state.yearOptions}
-          </select>
-          <select className="form-control input-sm mr-sm-1 month-select"
-            ref={this.monthSelectLeft}
-            onChange={this.handleLeftMonthChange} title="Months and available captures"
-            defaultValue="">
-            <option value="" disabled>Month</option>
-            {this.state.leftMonthOptions}
-          </select>
-          { !isEmpty(this.state.leftSnapElements) &&
-            <select className="form-control input-sm mr-sm-1 timestamp-select"
-              ref={this.timestampSelectLeft}
-              onChange={this._handleLeftTimestampChange}
-              defaultValue="">
-              <option value="" disabled>Available captures</option>
-              {this.state.leftSnapElements}
+      <>
+        <div>
+          {this.state.headerInfo}
+          <div id="timestamp-left">Please select a capture</div>
+          <div id="timestamp-right">Please select a capture</div>
+          <br/>
+        </div>
+        <div className="wayback-ymd-timestamp">
+          <div className="wayback-timestamps">
+            <select className="form-control input-sm mr-sm-1" id="year-select-left"
+              onChange={this._handleYearChange} title="Years and available captures"
+              value={this.state.leftYear}>
+              <option value="" disabled>Year</option>
+              {this.state.yearOptions}
             </select>
-          }
-        </div>
-        <div className="wayback-ymd-buttons">
-          {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
-          {this.state.showRestartBtn && <button className="btn btn-default btn-sm" onClick={this._restartPressed}>Restart</button> }
-        </div>
-        <div className="wayback-timestamps">
-          { !isEmpty(this.state.rightSnapElements) &&
-            <select className="form-control input-sm mr-sm-1 timestamp-select"
-              ref={this.timestampSelectRight}
-              onChange={this._handleRightTimestampChange}
+            <select className="form-control input-sm mr-sm-1 month-select"
+              ref={this.monthSelectLeft}
+              onChange={this.handleLeftMonthChange} title="Months and available captures"
               defaultValue="">
-              <option value="" disabled>Available captures</option>
-              {this.state.rightSnapElements}
+              <option value="" disabled>Month</option>
+              {this.state.leftMonthOptions}
             </select>
-          }
-          <select className="form-control input-sm mr-sm-1 month-select"
-            ref={this.monthSelectRight}
-            onChange={this.handleRightMonthChange} title="Months and available captures"
-            defaultValue="">
-            <option value="" disabled>Month</option>
-            {this.state.rightMonthOptions}
-          </select>
-          <select className="form-control input-sm mr-sm-1" id="year-select-right"
-            onChange={this._handleYearChange} title="Years and available captures"
-            value={this.state.rightYear}>
-            <option value="" disabled>Year</option>
-            {this.state.yearOptions}
-          </select>
+            { !isEmpty(this.state.leftSnaps) &&
+              <select className="form-control input-sm mr-sm-1 timestamp-select"
+                ref={this.timestampSelectLeft}
+                onChange={this._handleLeftTimestampChange}
+                defaultValue="">
+                <option value="" disabled>Available captures</option>
+                {this.state.leftSnaps.map((item, index) => (
+                  <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>
+                ))}
+              </select>
+            }
+          </div>
+          <div className="wayback-ymd-buttons">
+            {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
+          </div>
+          <div className="wayback-timestamps">
+            { !isEmpty(this.state.rightSnaps) &&
+              <select className="form-control input-sm mr-sm-1 timestamp-select"
+                ref={this.timestampSelectRight}
+                onChange={this._handleRightTimestampChange}
+                defaultValue="">
+                <option value="" disabled>Available captures</option>
+                {this.state.rightSnaps.map((item, index) => (
+                  <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>
+                ))}
+              </select>
+            }
+            <select className="form-control input-sm mr-sm-1 month-select"
+              ref={this.monthSelectRight}
+              onChange={this.handleRightMonthChange} title="Months and available captures"
+              defaultValue="">
+              <option value="" disabled>Month</option>
+              {this.state.rightMonthOptions}
+            </select>
+            <select className="form-control input-sm mr-sm-1" id="year-select-right"
+              onChange={this._handleYearChange} title="Years and available captures"
+              value={this.state.rightYear}>
+              <option value="" disabled>Year</option>
+              {this.state.yearOptions}
+            </select>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -490,10 +462,10 @@ export default class YmdTimestampHeader extends React.Component {
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
   _selectValues () {
-    if (!isEmpty(this.state.leftSnapElements) && this.state.timestampA) {
+    if (!isEmpty(this.state.leftSnaps) && this.state.timestampA) {
       this.timestampSelectLeft.current.value = this.state.timestampA;
     }
-    if (!isEmpty(this.state.rightSnapElements) && this.state.timestampB) {
+    if (!isEmpty(this.state.rightSnaps) && this.state.timestampB) {
       this.timestampSelectRight.current.value = this.state.timestampB;
     }
     const monthLeft = this.monthSelectLeft.current;
@@ -514,7 +486,7 @@ export default class YmdTimestampHeader extends React.Component {
   _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
     const first = getShortUTCDateFormat(firstTimestamp);
     const last = getShortUTCDateFormat(lastTimestamp);
-    return (<p id='explanation-middle'> Compare any two captures of {this.props.url} from our collection
+    return (<p id='explanation-middle'>Compare any two captures of {this.props.url} from our collection
       of {count.toLocaleString()} dating from {first} to {last}.</p>);
   }
 
@@ -525,8 +497,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
     fetchWithTimeout(url, { signal: this._abortController.signal })
-      .then(checkResponse)
-      .then(response => response.json())
+      .then(jsonResponse)
       .then((data) => {
         if (data) {
           this._prepareSparklineData(data);
@@ -554,7 +525,7 @@ export default class YmdTimestampHeader extends React.Component {
     this.setState({
       showLoader: false,
       sparkline: snapshots,
-      yearOptions: this._monthOptions(yearSum),
+      yearOptions: this._showOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)
     });
   }
@@ -566,24 +537,12 @@ export default class YmdTimestampHeader extends React.Component {
     if (isNil(rightYear)) {
       rightYear = this.state.rightYear;
     }
-    const leftMonthsData = this._getMonthData(this.state.sparkline[leftYear]);
-    const rightMonthsData = this._getMonthData(this.state.sparkline[rightYear]);
+    const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+    const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
     this.setState({
-      leftMonthOptions: this._monthOptions(leftMonthsData),
-      rightMonthOptions: this._monthOptions(rightMonthsData)
+      leftMonthOptions: this._showOptions(leftMonths),
+      rightMonthOptions: this._showOptions(rightMonths)
     });
-  }
-
-  _getMonthData (data) {
-    if(!isEmpty(data)) {
-      const out = [];
-      for (let i=0; i<=11; i++) {
-        if (data[i] > 0) {
-          out.push([monthNames[i+1], data[i]]);
-        }
-      }
-      return out;
-    }
   }
 
   handleLeftMonthChange (e) {
@@ -604,23 +563,12 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
-  _showInfo () {
-    return (
-      <div>
-        {this.state.headerInfo}
-        <div id="timestamp-left">Please select a capture</div>
-        <div id="timestamp-right">Please select a capture</div>
-        <br/>
-      </div>
-    );
-  }
-
   _handleYearChange (e) {
     if (e.target.id === 'year-select-left') {
       this._leftMonthIndex = 0;
       this.setState({
         leftYear: e.target.value,
-        leftSnapElements: null,
+        leftSnaps: null,
         showDiffBtn: false
       });
       this._showMonths(e.target.value, null);
@@ -628,7 +576,7 @@ export default class YmdTimestampHeader extends React.Component {
       this._rightMonthIndex = 0;
       this.setState({
         rightYear: e.target.value,
-        rightSnapElements: null,
+        rightSnaps: null,
         showDiffBtn: false
       });
       this._showMonths(null, e.target.value);

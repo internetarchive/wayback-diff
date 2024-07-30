@@ -115,6 +115,15 @@ export function checkResponse (response) {
   }
 }
 
+export function jsonResponse (response) {
+  if (response) {
+    if (!response.ok) {
+      throw Error(response.status);
+    }
+    return response.json();
+  }
+}
+
 export function fetchWithTimeout (url, params) {
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
