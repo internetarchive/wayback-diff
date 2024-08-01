@@ -298,7 +298,7 @@ export default class YmdTimestampHeader extends React.Component {
    */
   fetchYearMonthCaptures (year1, month1) {
     const { conf, url } = this.props;
-    const requestUrl = new URL(conf.calendarURL);
+    const requestUrl = new URL(conf.calendarURL, window.location.origin);
     requestUrl.searchParams.append('url', url);
     requestUrl.searchParams.append('date', year1 + month1);
     requestUrl.searchParams.append('digest', 1);
