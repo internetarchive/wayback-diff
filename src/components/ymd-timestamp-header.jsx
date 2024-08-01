@@ -278,7 +278,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   /**
-   * Fetch captures for a specific YYYYMM.
+   * Fetch captures for a specific YYYYMM using CDX. Not used any more because
+   * we switched to the calendarcaptures API.
    */
   createCDXRequest (dt) {
     const url = new URL(this.props.conf.cdxServer, window.location.origin);
@@ -291,24 +292,42 @@ export default class YmdTimestampHeader extends React.Component {
     return fetchWithTimeout(url, { signal: this._abortController.signal }).then(jsonResponse);
   }
 
+  /**
+   * Note that the timestamp does not have YYYYMM and also its integer and not
+   * string. So, it could be 7040920 and we need to make it '07040920' (DDHHMMSS)
+   */
+  fetchYearMonthCaptures (year1, month1) {
+    const { conf, url } = this.props;
+    const requestUrl = new URL(conf.calendarURL);
+    requestUrl.searchParams.append('url', url);
+    requestUrl.searchParams.append('date', year1 + month1);
+    requestUrl.searchParams.append('digest', 1);
+
+    function formatTs (ts) {
+      ts = ts.toString();
+      if (ts.length == 7) {
+        return '0' + ts;
+      }
+      return ts;
+    }
+
+    return fetchWithTimeout(requestUrl, { signal: this._abortController.signal })
+      .then(jsonResponse)
+      .then(data => data['items'])
+      .then(data => data.map(item => [year1 + month1 + formatTs(item[0]), item[2]]))
+      .catch(error => { this._errorHandled(error.message); });
+  }
+
   _fetchCDXData () {
     this.setState({ showLoader: true });
     let leftFetchPromise;
     let rightFetchPromise;
     this._saveMonthsIndex();
-    if (this.props.fetchCDXCallback) {
-      leftFetchPromise = this.props.fetchCDXCallback().then(jsonResponse);
-    } else {
-      if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
-        leftFetchPromise = this.createCDXRequest(
-          this.state.leftYear + twoDigits(this._leftMonthIndex)
-        );
-      }
-      if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
-        rightFetchPromise = this.createCDXRequest(
-          this.state.rightYear + twoDigits(this._rightMonthIndex)
-        );
-      }
+    if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
+      leftFetchPromise = this.fetchYearMonthCaptures(this.state.leftYear, twoDigits(this._leftMonthIndex));
+    }
+    if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
+      rightFetchPromise = this.fetchYearMonthCaptures(this.state.rightYear, twoDigits(this._rightMonthIndex));
     }
 
     if (leftFetchPromise) {
@@ -353,12 +372,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _prepareCDXData (leftSnaps, rightSnaps) {
-    if (rightSnaps) {
-      rightSnaps.shift();
-    }
-    if (leftSnaps) {
-      leftSnaps.shift();
-    }
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
       cdxData: true,
