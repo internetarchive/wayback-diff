@@ -114,7 +114,8 @@ export default class YmdTimestampHeader extends React.Component {
     this._abortController.abort();
   }
 
-  _handleRightTimestampChange () {
+  _handleRightTimestampChange (event) {
+    this.setState({ timestampB: event.target.value });
     if (!isEmpty(this.state.leftSnaps)) {
       const selectedDigest = this.state.rightSnaps[this.timestampSelectRight.current.selectedIndex - 1][1];
       const leftSnaps = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
@@ -125,7 +126,8 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _handleLeftTimestampChange () {
+  _handleLeftTimestampChange (event) {
+    this.setState({ timestampA: event.target.value });
     if (!isEmpty(this.state.rightSnaps)) {
       const selectedDigest = this.state.leftSnaps[this.timestampSelectLeft.current.selectedIndex - 1][1];
       const rightSnaps = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
