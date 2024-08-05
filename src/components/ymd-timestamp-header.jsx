@@ -48,9 +48,6 @@ export default class YmdTimestampHeader extends React.Component {
     const { timestampA, timestampB } = this.props;
     this._abortController = new window.AbortController();
 
-    const leftYear = timestampA?.substring(0, 4) ?? '';
-    const rightYear = timestampB?.substring(0, 4) ?? '';
-
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
     this.monthSelectLeft = React.createRef();
@@ -59,11 +56,10 @@ export default class YmdTimestampHeader extends React.Component {
     this.state = {
       timestampA,
       timestampB,
-      leftYear,
-      rightYear,
+      leftYear: timestampA?.substring(0, 4) ?? '',
+      rightYear: timestampB?.substring(0, 4) ?? '',
       showDiffBtn: false,
       timestampAttempt: 0,
-      isMounted: false,
       redirectToValidatedTimestamps: false,
       shouldValidateTimestamp: true
     };
@@ -79,7 +75,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidMount () {
-    this.setState({ isMounted: true });
     if (!this.state.showError && this.state.timestampAttempt < 2) {
       if (this.state.cdxData) {
         this._areRequestedTimestampsSelected();
@@ -109,7 +104,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentWillUnmount () {
-    this.setState({ isMounted: false });
     this._abortController.abort();
   }
 
@@ -362,10 +356,8 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _errorHandled (error) {
-    if (this.state.isMounted) {
-      this.props.errorHandledCallback(error);
-      this.setState({ showError: true });
-    }
+    this.props.errorHandledCallback(error);
+    this.setState({ showError: true });
   }
 
   _prepareCDXData (leftSnaps, rightSnaps) {
