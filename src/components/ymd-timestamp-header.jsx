@@ -33,7 +33,6 @@ export default class YmdTimestampHeader extends React.Component {
   static propTypes = {
     loader: PropTypes.object,
     fetchSnapshotCallback: PropTypes.func,
-    fetchCDXCallback: PropTypes.func,
     errorHandledCallback: PropTypes.func,
     getTimestampsCallback: PropTypes.func,
     timestampA: PropTypes.string,

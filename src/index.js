@@ -16,25 +16,25 @@ ReactDOM.render(
         <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
             loader={null}
-            timestampB={match.params[1]} fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null} />
+            timestampB={match.params[1]} conf={conf} fetchSnapshotCallback={null} />
         } />
         <Route path='/diff/([0-9]{14})//(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
             loader={null}
-            fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
+            conf={conf} fetchSnapshotCallback={null}/>
         } />
         <Route path='/diff//([0-9]{14})/(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
             loader={null}
-            fetchCDXCallback={null} conf={conf} fetchSnapshotCallback={null}/>
+            conf={conf} fetchSnapshotCallback={null}/>
         } />
 
         <Route path='/diff///(.+)' render={({ match, location }) =>
-          <DiffContainer url={match.params[0] + location.search} conf={conf} noTimestamps={true} fetchCDXCallback={null}
+          <DiffContainer url={match.params[0] + location.search} conf={conf} noTimestamps={true}
             loader={null}/>
         } />
         <Route path='/diff/(.+)' render={({ match, location }) =>
-          <DiffContainer url={match.params[0] + location.search} fetchCDXCallback={null}
+          <DiffContainer url={match.params[0] + location.search}
             loader={null} conf={conf}/>}
         />
         <Route path='/diffgraph/([0-9]{14})/(.+)' render={({ match, location }) =>

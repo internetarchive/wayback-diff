@@ -20,7 +20,6 @@ export default class TimestampHeader extends React.Component {
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
     conf: PropTypes.object,
-    fetchCDXCallback: PropTypes.func,
     fetchSnapshotCallback: PropTypes.func,
     changeTimestampsCallback: PropTypes.func,
     errorHandledCallback: PropTypes.func,
@@ -166,19 +165,15 @@ export default class TimestampHeader extends React.Component {
   }
 
   _fetchCDXData () {
-    if (this.props.fetchCDXCallback) {
-      this._handleFetch(this.props.fetchCDXCallback());
-    } else {
-      const url = new URL(this.props.conf.cdxServer, window.location.origin);
-      url.searchParams.append('url', this.props.url);
-      url.searchParams.append('fl', 'timestamp,digest');
-      url.searchParams.append('output', 'json');
-      url.searchParams.append('sort', 'reverse');
-      if (this.props.conf.limit) {
-        url.searchParams.append('limit', this.props.conf.limit);
-      }
-      this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
+    const url = new URL(this.props.conf.cdxServer, window.location.origin);
+    url.searchParams.append('url', this.props.url);
+    url.searchParams.append('fl', 'timestamp,digest');
+    url.searchParams.append('output', 'json');
+    url.searchParams.append('sort', 'reverse');
+    if (this.props.conf.limit) {
+      url.searchParams.append('limit', this.props.conf.limit);
     }
+    this._handleFetch(fetchWithTimeout(url, { signal: this._abortController.signal }));
   }
 
   _handleFetch (promise) {

@@ -191,7 +191,6 @@ DiffContainer.propTypes = {
   timestampB: PropTypes.string,
   conf: PropTypes.object.isRequired,
   loader: PropTypes.element,
-  fetchCDXCallback: PropTypes.func,
   fetchSnapshotCallback: PropTypes.func,
 
   noTimestamps: (props, propName, componentName) => {
