@@ -64,6 +64,7 @@ export default class YmdTimestampHeader extends React.Component {
       showDiffBtn: false,
       timestampAttempt: 0,
       isMounted: false,
+      redirectToValidatedTimestamps: false,
       shouldValidateTimestamp: true
     };
 
@@ -190,31 +191,32 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _checkTimestamps (side = null) {
+    const { redirectToValidatedTimestamps, timestampA, timestampB } = this.state;
     this.setState({ shouldValidateTimestamp: false });
     const fetchedTimestamps = { a: '', b: '' };
-    if (this.state.timestampA && this.state.timestampB) {
-      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
-        .then(() => { return this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b'); })
+    if (timestampA && timestampB) {
+      this._validateTimestamp(timestampA, fetchedTimestamps, 'a')
+        .then(() => { return this._validateTimestamp(timestampB, fetchedTimestamps, 'b'); })
         .then(() => {
-          if (this._redirectToValidatedTimestamps) {
+          if (redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
             this.setState({ finishedValidating: true });
           }
         }).catch(error => { this._errorHandled(error.message); });
-    } else if (this.state.timestampA) {
-      this._validateTimestamp(this.state.timestampA, fetchedTimestamps, 'a')
+    } else if (timestampA) {
+      this._validateTimestamp(timestampA, fetchedTimestamps, 'a')
         .then(() => {
-          if (this._redirectToValidatedTimestamps) {
+          if (redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
             this.setState({ finishedValidating: true });
           }
         }).catch(error => { this._errorHandled(error.message); });
     } else if (this.state.timestampB) {
-      this._validateTimestamp(this.state.timestampB, fetchedTimestamps, 'b')
+      this._validateTimestamp(timestampB, fetchedTimestamps, 'b')
         .then(() => {
-          if (this._redirectToValidatedTimestamps) {
+          if (redirectToValidatedTimestamps) {
             this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
           } else {
             this.setState({ finishedValidating: true });
@@ -251,7 +253,7 @@ export default class YmdTimestampHeader extends React.Component {
         if (data) {
           fetchedTimestamps[position] = `${data}`;
           if (timestamp !== fetchedTimestamps[position]) {
-            this._redirectToValidatedTimestamps = true;
+            this.setState({ redirectToValidatedTimestamps: true});
           }
         } else {
           this._errorHandled('404');
@@ -261,11 +263,11 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _setNewURL (timestampA = '', timestampB = '') {
-    this._redirectToValidatedTimestamps = false;
     window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
     this.setState({
       timestampA,
       timestampB,
+      redirectToValidatedTimestamps: false,
       finishedValidating: true,
       timestampAttempt: this.state.timestampAttempt + 1,
       showLoader: false
