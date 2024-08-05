@@ -25,7 +25,6 @@ export default class SunburstContainer extends React.Component {
     timestamp: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
     conf: PropTypes.object.isRequired,
-    fetchSnapshotCallback: PropTypes.func,
     loader: PropTypes.element
   };
 
@@ -97,20 +96,16 @@ export default class SunburstContainer extends React.Component {
   }
 
   _validateTimestamp () {
-    const { url, conf, fetchSnapshotCallback, timestamp } = this.props;
-    let promise;
-    if (fetchSnapshotCallback) {
-      promise = fetchSnapshotCallback(timestamp);
-    } else {
-      const url = new URL(conf.cdxServer, window.location.origin);
-      url.searchParams.append('url', url);
-      url.searchParams.append('closest', timestamp);
-      url.searchParams.append('filter', '!mimetype:warc/revisit');
-      url.searchParams.append('sort', 'closest');
-      url.searchParams.append('limit', '1');
-      url.searchParams.append('fl', 'timestamp');
-      promise = fetchWithTimeout(url);
-    }
+    const { url, conf, timestamp } = this.props;
+    const reqUrl = new URL(conf.cdxServer, window.location.origin);
+    reqUrl.searchParams.append('url', url);
+    reqUrl.searchParams.append('closest', timestamp);
+    reqUrl.searchParams.append('filter', '!mimetype:warc/revisit');
+    reqUrl.searchParams.append('sort', 'closest');
+    reqUrl.searchParams.append('limit', '1');
+    reqUrl.searchParams.append('fl', 'timestamp');
+    let promise = fetchWithTimeout(reqUrl);
+
     promise.then(checkResponse)
       .then(response => response.json())
       .then(data => {

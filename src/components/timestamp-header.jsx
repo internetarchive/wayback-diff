@@ -20,7 +20,6 @@ export default class TimestampHeader extends React.Component {
     timestampA: PropTypes.string,
     timestampB: PropTypes.string,
     conf: PropTypes.object,
-    fetchSnapshotCallback: PropTypes.func,
     changeTimestampsCallback: PropTypes.func,
     errorHandledCallback: PropTypes.func,
     isInitial: PropTypes.bool
@@ -130,9 +129,6 @@ export default class TimestampHeader extends React.Component {
   }
 
   _validateTimestamp (timestamp, fetchedTimestamps, position) {
-    if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position);
-    }
     const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
       window.location.origin);
     return this._handleTimestampValidationFetch(fetchWithTimeout(url, { redirect: 'follow' }), timestamp, fetchedTimestamps, position);

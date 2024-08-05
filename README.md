@@ -53,8 +53,6 @@ Example request: http://localhost:3000/diagram/iskme.org/2018/20180813072115
 
 The **conf** prop receives a JSON file that contains the configuration of the wayback-diff component.
 
-The **fetchSnapshotCallback** prop is a callback function that is used to fetch the snapshots from the Wayback Machine.
-
 - If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
 
 - The callback function should return a fetch Promise.
@@ -79,8 +77,6 @@ The **timestamp** which is the timestamp whose simhash is compared to others.
 The **url** which is the webpage for which the the simhashes to be compared.
 
 The **conf** which is a JSON file that contains the configuration of the wayback-diff component.
-
-The **fetchSnapshotCallback** which is a callback function used to fetch the snapshots from the Wayback Machine. This is used to validate the timestamp in the URL.
 
 - If null is passed to either one of the fetchCallback props a default fallback method is going to be used instead.
 
@@ -147,17 +143,17 @@ After importing the component you might use it like any other React component:
       <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({match, location}) =>
         <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
           loader={LOADER_COMPONENT}
-          timestampB={match.params[1]} conf={this.conf} fetchSnapshotCallback={null} />
+          timestampB={match.params[1]} conf={this.conf} />
         } />
       <Route path='/diff/([0-9]{14})//(.+)' render={({match, location}) =>
         <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
           loader={LOADER_COMPONENT}
-          conf={this.conf} fetchSnapshotCallback={null}/>
+          conf={this.conf} />
         } />
       <Route path='/diff//([0-9]{14})/(.+)' render={({match, location}) =>
         <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
           loader={LOADER_COMPONENT}
-          conf={this.conf} fetchSnapshotCallback={null}/>
+          conf={this.conf} />
       } />
       <Route path='/diff///(.+)' render={({match, location}) =>
         <DiffContainer url={match.params[0] + location.search} conf={this.conf} noTimestamps={true}
@@ -170,7 +166,7 @@ After importing the component you might use it like any other React component:
       <Route path='/diffgraph/([0-9]{14})/(.+)' render={({match, location}) =>
         <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
           loader={LOADER_COMPONENT}
-          conf={this.conf} fetchSnapshotCallback={null}/>} 
+          conf={this.conf} />}
       />
     </Switch>
   </Router>

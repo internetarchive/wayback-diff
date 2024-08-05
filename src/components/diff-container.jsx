@@ -52,7 +52,7 @@ export default class DiffContainer extends React.Component {
   }
 
   render () {
-    const { url, noTimestamps, fetchSnapshotCallback, conf, loader } = this.props;
+    const { url, noTimestamps, conf, loader } = this.props;
 
     if (!isUrl(url)) {
       return this._invalidURL();
@@ -123,13 +123,9 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    if (this.props.fetchSnapshotCallback) {
-      this._handleSnapshotFetch(this.props.fetchSnapshotCallback(timestamp));
-    } else {
-      const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
-        window.location.origin);
-      this._handleSnapshotFetch(fetchWithTimeout(url.toString()));
-    }
+    const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
+      window.location.origin);
+    this._handleSnapshotFetch(fetchWithTimeout(url.toString()));
 
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     return <div className="loading"><Loader/></div>;
@@ -191,7 +187,6 @@ DiffContainer.propTypes = {
   timestampB: PropTypes.string,
   conf: PropTypes.object.isRequired,
   loader: PropTypes.element,
-  fetchSnapshotCallback: PropTypes.func,
 
   noTimestamps: (props, propName, componentName) => {
     // Disable linting that prompts changing "boolean" to 'boolean' because it will always return false.

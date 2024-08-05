@@ -32,7 +32,6 @@ const monthNames = {
 export default class YmdTimestampHeader extends React.Component {
   static propTypes = {
     loader: PropTypes.object,
-    fetchSnapshotCallback: PropTypes.func,
     errorHandledCallback: PropTypes.func,
     getTimestampsCallback: PropTypes.func,
     timestampA: PropTypes.string,
@@ -232,11 +231,6 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _validateTimestamp (timestamp, fetchedTimestamps, position) {
-    if (this.props.fetchSnapshotCallback) {
-      return this._handleTimestampValidationFetch(
-        this.props.fetchSnapshotCallback(timestamp), timestamp, fetchedTimestamps, position
-      );
-    }
     const url = new URL(this.props.conf.cdxServer, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('closest', timestamp);
