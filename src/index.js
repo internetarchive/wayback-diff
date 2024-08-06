@@ -16,17 +16,17 @@ ReactDOM.render(
         <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
             loader={null}
-            timestampB={match.params[1]} conf={conf} fetchSnapshotCallback={null} />
+            timestampB={match.params[1]} conf={conf} />
         } />
         <Route path='/diff/([0-9]{14})//(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[1] + location.search} timestampA={match.params[0]}
             loader={null}
-            conf={conf} fetchSnapshotCallback={null}/>
+            conf={conf} />
         } />
         <Route path='/diff//([0-9]{14})/(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[1] + location.search} timestampB={match.params[0]}
             loader={null}
-            conf={conf} fetchSnapshotCallback={null}/>
+            conf={conf} />
         } />
 
         <Route path='/diff///(.+)' render={({ match, location }) =>
@@ -40,7 +40,7 @@ ReactDOM.render(
         <Route path='/diffgraph/([0-9]{14})/(.+)' render={({ match, location }) =>
           <SunburstContainer url={match.params[1] + location.search} timestamp={match.params[0]}
             loader={null}
-            conf={conf} fetchSnapshotCallback={null}/>}
+            conf={conf} />}
         />
       </Switch>
     </Router>
