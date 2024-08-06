@@ -95,7 +95,7 @@ export default class YmdTimestampHeader extends React.Component {
         this._selectValues();
         if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
           if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
-            this._showMonths();
+            this._showMonths(this.state.leftYear, this.state.rightYear);
           }
         }
       }
@@ -524,18 +524,14 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _showMonths (leftYear, rightYear) {
-    if (isNil(leftYear)) {
-      leftYear = this.state.leftYear;
+    if (!isNil(leftYear)) {
+      const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+      this.setState({ leftMonthOptions: this._showOptions(leftMonths) });
     }
-    if (isNil(rightYear)) {
-      rightYear = this.state.rightYear;
+    if (!isNil(rightYear)) {
+      const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+      this.setState({ rightMonthOptions: this._showOptions(rightMonths) });
     }
-    const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
-    const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
-    this.setState({
-      leftMonthOptions: this._showOptions(leftMonths),
-      rightMonthOptions: this._showOptions(rightMonths)
-    });
   }
 
   _handleMonthChange (e) {
