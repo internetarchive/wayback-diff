@@ -70,8 +70,7 @@ export default class YmdTimestampHeader extends React.Component {
     this._errorHandled = this._errorHandled.bind(this);
     this._showMonths = this._showMonths.bind(this);
     this._handleYearChange = this._handleYearChange.bind(this);
-    this.handleLeftMonthChange = this.handleLeftMonthChange.bind(this);
-    this.handleRightMonthChange = this.handleRightMonthChange.bind(this);
+    this._handleMonthChange = this._handleMonthChange.bind(this);
   }
 
   componentDidMount () {
@@ -156,7 +155,7 @@ export default class YmdTimestampHeader extends React.Component {
                 </select>
                 <select className="form-control input-sm mr-sm-1 month-select"
                   ref={this.monthSelectLeft}
-                  onChange={this.handleLeftMonthChange} title="Months and available captures"
+                  onChange={this._handleMonthChange} title="Months and available captures"
                   defaultValue="">
                   <option value="" disabled>Month</option>
                   {  this.state.leftMonthOptions}
@@ -190,7 +189,7 @@ export default class YmdTimestampHeader extends React.Component {
                 }
                 <select className="form-control input-sm mr-sm-1 month-select"
                   ref={this.monthSelectRight}
-                  onChange={this.handleRightMonthChange} title="Months and available captures"
+                  onChange={this._handleMonthChange} title="Months and available captures"
                   defaultValue="">
                   <option value="" disabled>Month</option>
                   {this.state.rightMonthOptions}
@@ -539,16 +538,7 @@ export default class YmdTimestampHeader extends React.Component {
     });
   }
 
-  handleLeftMonthChange (e) {
-    this._fetchCDXData();
-    this.setState({
-      showDiffBtn: true,
-      timestampA: null,
-      timestampB: null
-    });
-  }
-
-  handleRightMonthChange (e) {
+  _handleMonthChange (e) {
     this._fetchCDXData();
     this.setState({
       showDiffBtn: true,
