@@ -76,7 +76,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   componentDidMount () {
     if (!this.state.showError && this.state.timestampAttempt < 2) {
-      if (this.state.cdxData) {
+      if (this.state.leftSnaps || this.state.rightSnaps) {
         this._areRequestedTimestampsSelected();
       } else {
         this._fetchCDXData();
@@ -88,7 +88,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (!this.state.sparkline && !this.state.showLoader) {
       this._fetchSparklineData();
     }
-    if (this.state.cdxData) {
+    if (this.state.leftSnaps || this.state.rightSnaps) {
       if (this.state.shouldValidateTimestamp) {
         this._checkTimestamps();
       }
@@ -137,7 +137,7 @@ export default class YmdTimestampHeader extends React.Component {
       return <div className="loading"><Loader/></div>;
     }
     if (!this.state.showError && this.state.timestampAttempt < 2) {
-      if (this.state.yearOptions || this.state.cdxData) {
+      if (this.state.yearOptions || this.state.leftSnaps || this.state.rightSnaps) {
         return (
           <div className="timestamp-header-view">
             {this._showTimestampSelector()}
@@ -363,7 +363,6 @@ export default class YmdTimestampHeader extends React.Component {
   _prepareCDXData (leftSnaps, rightSnaps) {
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
-      cdxData: true,
       leftSnaps,
       rightSnaps,
       showLoader: false
@@ -464,11 +463,12 @@ export default class YmdTimestampHeader extends React.Component {
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
   _selectValues () {
-    if (!isEmpty(this.state.leftSnaps) && this.state.timestampA) {
-      this.timestampSelectLeft.current.value = this.state.timestampA;
+    const { timestampA, timestampB, leftSnaps, rightSnaps } = this.state;
+    if (!isEmpty(leftSnaps) && timestampA) {
+      this.timestampSelectLeft.current.value = timestampA;
     }
-    if (!isEmpty(this.state.rightSnaps) && this.state.timestampB) {
-      this.timestampSelectRight.current.value = this.state.timestampB;
+    if (!isEmpty(rightSnaps) && timestampB) {
+      this.timestampSelectRight.current.value = timestampB;
     }
     const monthLeft = this.monthSelectLeft.current;
     const monthRight = this.monthSelectRight.current;
