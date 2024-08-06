@@ -59,8 +59,6 @@ export default class YmdTimestampHeader extends React.Component {
       leftYear: timestampA?.substring(0, 4) ?? '',
       rightYear: timestampB?.substring(0, 4) ?? '',
       showDiffBtn: false,
-      timestampAttempt: 0,
-      redirectToValidatedTimestamps: false,
       shouldValidateTimestamp: true
     };
 
@@ -74,7 +72,7 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidMount () {
-    if (!this.state.showError && this.state.timestampAttempt < 2) {
+    if (!this.state.showError) {
       if (this.state.leftSnaps || this.state.rightSnaps) {
         this._areRequestedTimestampsSelected();
       } else {
@@ -135,7 +133,7 @@ export default class YmdTimestampHeader extends React.Component {
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
     }
-    if (!this.state.showError && this.state.timestampAttempt < 2) {
+    if (!this.state.showError) {
       if (this.state.yearOptions || this.state.leftSnaps || this.state.rightSnaps) {
         return (
           <div className="timestamp-header-view">
@@ -246,86 +244,17 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _checkTimestamps (side = null) {
-    const { redirectToValidatedTimestamps, timestampA, timestampB } = this.state;
-    this.setState({ shouldValidateTimestamp: false });
-    const fetchedTimestamps = { a: '', b: '' };
-    if (timestampA && timestampB) {
-      this._validateTimestamp(timestampA, fetchedTimestamps, 'a')
-        .then(() => { return this._validateTimestamp(timestampB, fetchedTimestamps, 'b'); })
-        .then(() => {
-          if (redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
-    } else if (timestampA) {
-      this._validateTimestamp(timestampA, fetchedTimestamps, 'a')
-        .then(() => {
-          if (redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
-    } else if (this.state.timestampB) {
-      this._validateTimestamp(timestampB, fetchedTimestamps, 'b')
-        .then(() => {
-          if (redirectToValidatedTimestamps) {
-            this._setNewURL(fetchedTimestamps.a, fetchedTimestamps.b);
-          } else {
-            this.setState({ finishedValidating: true });
-          }
-        }).catch(error => { this._errorHandled(error.message); });
-    } else {
-      if (side === 'left') {
-        this.setState({ leftSnaps: null });
-      } else if (side === 'right') {
-        this.setState({ rightSnaps: null });
-      }
-      this.setState({ finishedValidating: true, showLoader: false });
+    const { timestampA, timestampB } = this.state;
+
+    if (side === 'left' && isNil(timestampA)) {
+      this.setState({ leftSnaps: null });
+    } else if (side === 'right' && isNil(timestampB)) {
+      this.setState({ rightSnaps: null });
     }
-  }
-
-  _validateTimestamp (timestamp, fetchedTimestamps, position) {
-    const url = new URL(this.props.conf.cdxServer, window.location.origin);
-    url.searchParams.append('url', this.props.url);
-    url.searchParams.append('closest', timestamp);
-    url.searchParams.append('filter', '!mimetype:warc/revisit');
-    url.searchParams.append('format', 'json');
-    url.searchParams.append('sort', 'closest');
-    url.searchParams.append('limit', '1');
-    url.searchParams.append('fl', 'timestamp');
-    return this._handleTimestampValidationFetch(
-      fetchWithTimeout(url, { signal: this._abortController.signal }), timestamp, fetchedTimestamps, position
-    );
-  }
-
-  _handleTimestampValidationFetch (promise, timestamp, fetchedTimestamps, position) {
-    return promise
-      .then(jsonResponse)
-      .then(data => {
-        if (data) {
-          fetchedTimestamps[position] = `${data}`;
-          if (timestamp !== fetchedTimestamps[position]) {
-            this.setState({ redirectToValidatedTimestamps: true});
-          }
-        } else {
-          this._errorHandled('404');
-        }
-      })
-      .catch(error => { this.errorHandled(error.message); });
-  }
-
-  _setNewURL (timestampA = '', timestampB = '') {
-    window.history.pushState({}, '', this.props.conf.urlPrefix + timestampA + '/' + timestampB + '/' + this.props.url);
     this.setState({
-      timestampA,
-      timestampB,
-      redirectToValidatedTimestamps: false,
       finishedValidating: true,
-      timestampAttempt: this.state.timestampAttempt + 1,
-      showLoader: false
+      showLoader: false,
+      shouldValidateTimestamp: false
     });
   }
 
