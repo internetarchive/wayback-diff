@@ -370,15 +370,32 @@ export default class YmdTimestampHeader extends React.Component {
       .catch(error => { this._errorHandled(error.message); });
   }
 
+  /**
+   * On component init get current month from timestamp because the months selects
+   * aren't rendered yet.
+   */
   _fetchCDXData () {
     this.setState({ showLoader: true });
+    if (this._leftMonthIndex !== -1) {
+      const monthLeft = this.monthSelectLeft.current.value;
+      this._leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
+    } else if (this.state.timestampA) {
+      this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
+    }
+    if (this._rightMonthIndex !== -1) {
+      const monthRight = this.monthSelectRight.current.value;
+      this._rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
+    } else if (this.state.timestampB) {
+      this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
+    }
+
     let leftFetchPromise;
     let rightFetchPromise;
-    this._saveMonthsIndex();
-    if (this._leftMonthIndex !== -1 && !isNaN(this._leftMonthIndex)) {
+
+    if (this._leftMonthIndex !== -1) {
       leftFetchPromise = this.fetchYearMonthCaptures(this.state.leftYear, twoDigits(this._leftMonthIndex));
     }
-    if (this._rightMonthIndex !== -1 && !isNaN(this._rightMonthIndex)) {
+    if (this._rightMonthIndex !== -1) {
       rightFetchPromise = this.fetchYearMonthCaptures(this.state.rightYear, twoDigits(this._rightMonthIndex));
     }
 
@@ -560,22 +577,6 @@ export default class YmdTimestampHeader extends React.Component {
         showDiffBtn: false
       });
       this._showMonths(null, e.target.value);
-    }
-  }
-
-  // TODO maybe there is some redundancy here.
-  _saveMonthsIndex () {
-    if (this._leftMonthIndex !== -1) {
-      const monthLeft = this.monthSelectLeft.current.value;
-      this._leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
-    } else if (this.state.timestampA) {
-      this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
-    }
-    if (this._rightMonthIndex !== -1) {
-      const monthRight = this.monthSelectRight.current.value;
-      this._rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
-    } else if (this.state.timestampB) {
-      this._rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
     }
   }
 }
