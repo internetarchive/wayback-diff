@@ -18,30 +18,29 @@ export default {
     sourcemap: true
   },
   plugins: [
-    terser(),
+    resolve({
+      browser: true
+    }),
+    commonjs({
+      include: 'node_modules/**',
+      exclude: 'node_modules/process-es6/**'
+    }),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      'preventAssignment': true
+    }),
     url(),
     postcss({
-      extensions: [ '.css' ]
+      extensions: [ '.css' ],
+      plugins: [cssnano()]
     }),
-    cssnano(),
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
-      presets: [ '@babel/env', '@babel/preset-react' ],
+      babelHelpers: 'bundled',
+      presets: [ '@babel/preset-env', '@babel/preset-react' ],
       plugins: [ '@babel/plugin-proposal-export-default-from' ]
     }),
-    replace({ 'process.env.NODE_ENV': JSON.stringify('development'),
-      'process.env': JSON.stringify(process.env),
-      'preventAssignment': true}),
-    resolve({
-      browser: true,
-      main: true
-    }),
-    commonjs({
-      include: [
-        'node_modules/**'
-      ],
-      exclude: 'node_modules/process-es6/**'
-    })
+    terser()
   ]
 };
