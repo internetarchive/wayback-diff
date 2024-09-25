@@ -44,7 +44,7 @@
     "jsdom": "^24.1.1",
     "postcss": "^8.4.40",
     "react-scripts": "^5.0.1",
-    "rollup": "3.29.4",
+    "rollup": "3.29.5",
     "rollup-plugin-postcss": "^4.0.2",
     "smbase64": "^1.0.2"
   },
