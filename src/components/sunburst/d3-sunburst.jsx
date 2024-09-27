@@ -53,6 +53,7 @@ export default class D3Sunburst extends React.Component {
       .endAngle(function (d) { return d.x1; })
       .innerRadius(function (d) { return d.y0; })
       .outerRadius(function (d) { return d.y1; });
+    const component = this;
 
     // Put it all together
     g.selectAll('path')
@@ -63,17 +64,17 @@ export default class D3Sunburst extends React.Component {
       .style('stroke', '#fff')
       .style('fill', function (d) { return d.data.clr; })
       .on('mouseover', function (e, d) {
-        d3.select(this).style('cursor', 'pointer').style('stroke', 'black');
+        d3.select(e.currentTarget).style('cursor', 'pointer').style('stroke', 'black');
         component.setState({ hint: getDistance(d.data) });
       })
       .on('mouseleave', function (e, d) {
-        d3.select(this).style('cursor', 'default').style('stroke', '');
+        d3.select(e.currentTarget).style('cursor', 'default').style('stroke', '');
         component.setState({ hint: '' });
       })
       .on('click', function (e, d) {
         if (d.data.timestamp !== simhashData.timestamp) {
-          const url = urlPrefix + d.data.timestamp + '/' + simhashData.timestamp + '/' + url;
-          window.open(url, '_blank');
+          const captureUrl = urlPrefix + d.data.timestamp + '/' + simhashData.timestamp + '/' + url;
+          window.open(captureUrl, '_blank');
         }
       });
   }
