@@ -11,12 +11,28 @@ import Loading from '../loading.jsx';
 import isNil from 'lodash/isNil';
 import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
+import take from 'lodash/take';
 
 const barStyle1 = { backgroundColor: 'rgb(241, 231, 119)', height: '4px' };
 const barStyle2 = { backgroundColor: 'rgb(197, 213, 108)', height: '6px' };
 const barStyle3 = { backgroundColor: 'rgb(159, 197, 99)', height: '8px' };
 const barStyle4 = { backgroundColor: 'rgb(141, 184, 101)', height: '10px' };
 const barStyle5 = { backgroundColor: 'rgb(107, 151, 117)', height: '12px' };
+
+const HeatMapLegend = () => (
+  <div className="heat-map-legend">
+    <div className="heat-map-legend-caption">Variation</div>
+    <div className="heat-map-legend-summary">
+      <div className="heat-map-legend-summary-min-caption">Low</div>
+      <div className="heat-map-legend-summary-graphics">
+        {[barStyle1, barStyle2, barStyle3, barStyle4, barStyle5].map((style, index) => (
+          <div key={index} className="heat-map-legend-bar" style={style} />
+        ))}
+      </div>
+      <div className="heat-map-legend-summary-max-caption">High</div>
+    </div>
+  </div>
+);
 
 export default class SunburstContainer extends React.Component {
   static displayName = 'SunburstContainer';
@@ -46,48 +62,35 @@ export default class SunburstContainer extends React.Component {
   }
 
   render () {
-    const { url, conf } = this.props;
+    const { url, conf, loader } = this.props;
+    const { countCaptures, error, simhashData, timestamp } = this.state;
 
-    if (this.state.error) {
+    if (error) {
       return (
-        <ErrorMessage url={url} code={this.state.error} timestamp={this.state.timestamp
-          ? this.state.timestamp
-          : this.props.timestamp}
-        conf={conf} errorHandledCallback={this.errorHandled}/>);
+        <ErrorMessage url={url} code={error} timestamp={timestamp ? timestamp : this.props.timestamp}
+          conf={conf} errorHandledCallback={this.errorHandled}/>);
     }
-    if (this.state.simhashData) {
+    if (simhashData) {
+      const year = this.state.timestamp.substring(0, 4);
       return (
         <div className="sunburst-container">
           {this.state.isPending &&
-            <p>The Simhash data for {url} and year {this.state.timestamp.substring(0, 4)} are
+            <p>The Simhash data for {url} and year {year} are
             still being generated. For more results please try again in a moment.</p>}
           <div>This diagram illustrates the differences of <a
-            href={`/web/*/${url}`}>{url}</a> capture <a href={conf.snapshotsPrefix + this.state.timestamp + '/' + url}>
-            {getUTCDateFormat(this.state.timestamp)}</a> compared to{' '}
-          {this.state.countCaptures} other captures of the same URL for {this.state.timestamp.substring(0, 4)}.</div>
-          <D3Sunburst urlPrefix={conf.urlPrefix} url={url} simhashData={this.state.simhashData}/>
+            href={`/web/*/${url}`}>{url}</a> capture <a href={conf.snapshotsPrefix + timestamp + '/' + url}>
+            {getUTCDateFormat(timestamp)}</a> compared to{' '}
+          {countCaptures} other captures of the same URL for {year}.</div>
+          <D3Sunburst urlPrefix={conf.urlPrefix} url={url} simhashData={simhashData}/>
           <div style={{ clear: 'both' }}>
-            <div className="heat-map-legend">
-              <div className="heat-map-legend-caption">Variation</div>
-              <div className="heat-map-legend-summary">
-                <div className="heat-map-legend-summary-min-caption">Low</div>
-                <div className="heat-map-legend-summary-graphics">
-                  <div className="heat-map-legend-bar" style={ barStyle1 }/>
-                  <div className="heat-map-legend-bar" style={ barStyle2 }/>
-                  <div className="heat-map-legend-bar" style={ barStyle3 }/>
-                  <div className="heat-map-legend-bar" style={ barStyle4 }/>
-                  <div className="heat-map-legend-bar" style={ barStyle5 }/>
-                </div>
-                <div className="heat-map-legend-summary-max-caption">High</div>
-              </div>
-            </div>
+            <HeatMapLegend />
           </div>
         </div>
       );
     }
     // TODO Must move this outside here.
-    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
-    if (this.state.timestamp) {
+    const Loader = () => isNil(loader) ? <Loading/> : loader;
+    if (timestamp) {
       this._fetchTimestampSimhashData();
     } else {
       this._validateTimestamp();
@@ -104,9 +107,9 @@ export default class SunburstContainer extends React.Component {
     reqUrl.searchParams.append('sort', 'closest');
     reqUrl.searchParams.append('limit', '1');
     reqUrl.searchParams.append('fl', 'timestamp');
-    let promise = fetchWithTimeout(reqUrl);
 
-    promise.then(checkResponse)
+    fetchWithTimeout(reqUrl)
+      .then(checkResponse)
       .then(response => response.json())
       .then(data => {
         const ts = data.toString();
@@ -130,7 +133,8 @@ export default class SunburstContainer extends React.Component {
 
   _fetchTimestampSimhashData () {
     const { url, conf } = this.props;
-    const fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&timestamp=' + this.state.timestamp;
+    const { timestamp } = this.state;
+    const fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&timestamp=' + timestamp;
     fetchWithTimeout(fetchUrl).then(checkResponse)
       .then(response => response.json())
       .then((jsonResponse) => {
@@ -138,7 +142,7 @@ export default class SunburstContainer extends React.Component {
           throw Error(jsonResponse.message);
         }
         this._fetchSimhashData(
-          decodeUncompressedJson(jsonResponse, this.state.timestamp)
+          decodeUncompressedJson(jsonResponse, timestamp)
         );
       })
       .catch(error => { this.errorHandled(error.message); });
@@ -146,7 +150,8 @@ export default class SunburstContainer extends React.Component {
 
   _fetchSimhashData (timestampJson) {
     const { url, conf } = this.props;
-    let fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&year=' + this.state.timestamp.substring(0, 4);
+    const { timestamp } = this.state;
+    let fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&year=' + timestamp.substring(0, 4);
     if (conf.compressedSimhash) {
       fetchUrl += '&compress=1';
     }
@@ -203,6 +208,7 @@ export default class SunburstContainer extends React.Component {
   between the selected snapshot and the rest of the snapshots
   for the same year. */
   _createLevels (json, timestamp) {
+    const { conf } = this.props;
     let firstLevel = [];
     let secondLevel = [];
     let thirdLevel = [];
@@ -286,48 +292,24 @@ export default class SunburstContainer extends React.Component {
       fifthLevel = [];
     }
 
-    firstLevel = sortBy(firstLevel, [function (o) { return o.timestamp; }]);
-    secondLevel = sortBy(secondLevel, [function (o) { return o.timestamp; }]);
-    thirdLevel = sortBy(thirdLevel, [function (o) { return o.timestamp; }]);
-    fourthLevel = sortBy(fourthLevel, [function (o) { return o.timestamp; }]);
-    fifthLevel = sortBy(fifthLevel, [function (o) { return o.timestamp; }]);
+    firstLevel = take(sortBy(firstLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
+    secondLevel = take(sortBy(secondLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
+    thirdLevel = take(sortBy(thirdLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
+    fourthLevel = take(sortBy(fourthLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
+    fifthLevel = take(sortBy(fifthLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
 
-    if (firstLevel.length > this.props.conf.maxSunburstLevelLength) {
-      firstLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (secondLevel.length > this.props.conf.maxSunburstLevelLength) {
-      secondLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (thirdLevel.length > this.props.conf.maxSunburstLevelLength) {
-      thirdLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (fourthLevel.length > this.props.conf.maxSunburstLevelLength) {
-      fourthLevel.length = this.props.conf.maxSunburstLevelLength;
-    }
-    if (fifthLevel.length > this.props.conf.maxSunburstLevelLength) {
-      fifthLevel.length = this.props.conf.maxSunburstLevelLength;
+    function assignChildrenToParent(parentLevel, childLevel) {
+      for (let i = 0; i < childLevel.length; i++) {
+        const mod = i % parentLevel.length;
+        parentLevel[mod].children.push(childLevel[i]);
+        parentLevel[mod].bigness = '';
+      }
     }
 
-    for (let i = 0; i < fifthLevel.length; i++) {
-      const mod = i % fourthLevel.length;
-      fourthLevel[mod].children.push(fifthLevel[i]);
-      fourthLevel[mod].bigness = '';
-    }
-    for (let i = 0; i < fourthLevel.length; i++) {
-      const mod = i % thirdLevel.length;
-      thirdLevel[mod].children.push(fourthLevel[i]);
-      thirdLevel[mod].bigness = '';
-    }
-    for (let i = 0; i < thirdLevel.length; i++) {
-      const mod = i % secondLevel.length;
-      secondLevel[mod].children.push(thirdLevel[i]);
-      secondLevel[mod].bigness = '';
-    }
-    for (let i = 0; i < secondLevel.length; i++) {
-      const mod = i % firstLevel.length;
-      firstLevel[mod].children.push(secondLevel[i]);
-      firstLevel[mod].bigness = '';
-    }
+    assignChildrenToParent(fourthLevel, fifthLevel);
+    assignChildrenToParent(thirdLevel, fourthLevel);
+    assignChildrenToParent(secondLevel, thirdLevel);
+    assignChildrenToParent(firstLevel, secondLevel);
 
     this.setState({
       simhashData: {

@@ -25,12 +25,9 @@ export default class DiffContainer extends React.Component {
       timestampB: this.props.timestampB
     };
     this._oneFrame = null;
-    this.errorHandled = this.errorHandled.bind(this);
-    this.getTimestamps = this.getTimestamps.bind(this);
-    this.prepareDiffView = this.prepareDiffView.bind(this);
   }
 
-  getTimestamps (timestampA, timestampB) {
+  getTimestamps = (timestampA, timestampB) => {
     if (timestampA !== undefined || timestampB !== undefined) {
       this.setState({
         fetchedRaw: null,
@@ -45,23 +42,24 @@ export default class DiffContainer extends React.Component {
         window.history.pushState({}, '', url);
       }
     }
-  }
+  };
 
   errorHandled = (errorCode) => {
     this.setState({ error: errorCode });
-  }
+  };
 
   render () {
     const { url, noTimestamps, conf, loader } = this.props;
+    const { timestampA, timestampB, showDiff, error } = this.state;
 
     if (!isUrl(url)) {
       return this._invalidURL();
     }
-    if (this.state.error) {
+    if (error) {
       return (
-        <ErrorMessage url={url} timestamp={this.state.timestampA} code={this.state.error}/>);
+        <ErrorMessage url={url} timestamp={timestampA} code={error}/>);
     }
-    if (!this.state.timestampA && !this.state.timestampB) {
+    if (!timestampA && !timestampB) {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
@@ -70,31 +68,31 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    if (this.state.timestampA && this.state.timestampB) {
+    if (timestampA && timestampB) {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader
             {...this.props} getTimestampsCallback={this.getTimestamps}
             errorHandledCallback={this.errorHandled}/>
-          {this.state.showDiff && this.prepareDiffView()}
+          {showDiff && this.prepareDiffView()}
           <DiffFooter/>
         </div>);
     }
-    if (this.state.timestampA) {
+    if (timestampA) {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader {...this.props} getTimestampsCallback={this.getTimestamps}
             errorHandledCallback={this.errorHandled}/>
-          {this.state.showDiff && this._showOneSnapshot(true, this.state.timestampA)}
+          {showDiff && this._showOneSnapshot(true, timestampA)}
         </div>);
     }
-    if (this.state.timestampB) {
+    if (timestampB) {
       return (
         <div className="diffcontainer-view">
           <YmdTimestampHeader {...this.props}
             errorHandledCallback={this.errorHandled}
             getTimestampsCallback={this.getTimestamps}/>
-          {this.state.showDiff && this._showOneSnapshot(false, this.state.timestampB)}
+          {showDiff && this._showOneSnapshot(false, timestampB)}
         </div>);
     }
   }
@@ -109,11 +107,14 @@ export default class DiffContainer extends React.Component {
   }
 
   _showOneSnapshot (isLeft, timestamp) {
-    if (this.state.fetchedRaw) {
+    const { fetchedRaw } = this.state;
+    const { conf, url, loader } = this.props;
+
+    if (fetchedRaw) {
       const iframeProps = {
         height: window.innerHeight,
-        onLoad: () => { this._handleHeight(); },
-        srcDoc: this.state.fetchedRaw,
+        onLoad: () => this._handleHeight,
+        srcDoc: fetchedRaw,
         ref: (frame) => { this._oneFrame = frame; }
       };
       return (
@@ -123,11 +124,10 @@ export default class DiffContainer extends React.Component {
         </div>
       );
     }
-    const url = new URL(this.props.conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(this.props.url),
-      window.location.origin);
-    this._handleSnapshotFetch(fetchWithTimeout(url.toString()));
+    const captureUrl = new URL(conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(url), window.location.origin);
+    this._handleSnapshotFetch(fetchWithTimeout(captureUrl.toString()));
 
-    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const Loader = () => isNil(loader) ? <Loading/> : loader;
     return <div className="loading"><Loader/></div>;
   }
 
@@ -148,20 +148,19 @@ export default class DiffContainer extends React.Component {
       .catch(error => { this.errorHandled(error.message); });
   }
 
-  prepareDiffView () {
+  prepareDiffView = () => {
+    const { timestampA, timestampB } = this.state;
+    const { conf, url, loader } = this.props;
     if (!this.state.error) {
-      const urlA = new URL(this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + encodeURIComponent(this.props.url),
-        window.location.origin);
-      const urlB = new URL(this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + encodeURIComponent(this.props.url),
-        window.location.origin);
-      const webMonURL = new URL(this.props.conf.webMonitoringProcessingURL,
-        window.location.origin);
+      const urlA = new URL(conf.snapshotsPrefix + timestampA + '/' + encodeURIComponent(url), window.location.origin);
+      const urlB = new URL(conf.snapshotsPrefix + timestampB + '/' + encodeURIComponent(url), window.location.origin);
+      const webMonURL = new URL(conf.webMonitoringProcessingURL, window.location.origin);
       return (<DiffView webMonitoringProcessingURL={webMonURL.toString()}
-        page={{ url: encodeURIComponent(this.props.url) }}
+        page={{ url: encodeURIComponent(url) }}
         diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
-        loader={this.props.loader} errorHandledCallback={this.errorHandled}/>);
+        loader={loader} errorHandledCallback={this.errorHandled}/>);
     }
-  }
+  };
 
   _handleHeight () {
     const offsetHeight = this._oneFrame.contentDocument.documentElement.scrollHeight;
