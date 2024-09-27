@@ -1,21 +1,6 @@
 import max from 'lodash/max';
 import zip from 'lodash/zip';
 
-/* eslint-disable no-useless-escape */
-const urlRegex = /[\w\.]{2,256}\.[a-z]{2,4}/gi;
-/* eslint-enable no-useless-escape */
-
-function looksLikeUrl (str) {
-  return !!str.match(urlRegex);
-}
-
-export function isUrl (str = '') {
-  const val = str.toLocaleLowerCase();
-  return (
-    (val.startsWith('ftp://') || val.startsWith('http://') ||
-     val.startsWith('https://') || looksLikeUrl(val)) && !val.includes(' ')
-  ) && !val.startsWith('site:');
-}
 
 export function similarityWithTanimoto (simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {

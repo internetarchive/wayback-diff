@@ -4,7 +4,7 @@ import DiffView from './diff-view.jsx';
 import '../css/diff-container.css';
 import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
-import { isUrl, checkResponse, fetchWithTimeout } from '../js/utils.js';
+import { checkResponse, fetchWithTimeout } from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
@@ -52,12 +52,8 @@ export default class DiffContainer extends React.Component {
     const { url, noTimestamps, conf, loader } = this.props;
     const { timestampA, timestampB, showDiff, error } = this.state;
 
-    if (!isUrl(url)) {
-      return this._invalidURL();
-    }
     if (error) {
-      return (
-        <ErrorMessage url={url} timestamp={timestampA} code={error}/>);
+      return (<ErrorMessage url={url} timestamp={timestampA} code={error}/>);
     }
     if (!timestampA && !timestampB) {
       return (
@@ -173,10 +169,6 @@ export default class DiffContainer extends React.Component {
     if (offsetWidth > this._oneFrame.clientWidth) {
       this._oneFrame.width = offsetWidth;
     }
-  }
-
-  _invalidURL () {
-    return (<div className="alert alert-danger" role="alert"><b>Oh snap!</b> Invalid URL {this.props.url}</div>);
   }
 }
 
