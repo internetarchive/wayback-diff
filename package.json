@@ -51,6 +51,9 @@
     "type": "git",
     "url": "git+https://github.com/internetarchive/wayback-diff"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "browserslist": [
     ">0.2%",
     "not dead",
