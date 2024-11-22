@@ -1,7 +1,6 @@
 {
-  "name": "wayback-diff",
+  "name": "@internetarchive/wayback-diff",
   "version": "0.3.2",
-  "private": true,
   "main": "build/app.js",
   "dependencies": {
     "d3": "7.9.0",
@@ -47,6 +46,10 @@
     "rollup": "3.29.5",
     "rollup-plugin-postcss": "^4.0.2",
     "smbase64": "^1.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/internetarchive/wayback-diff"
   },
   "browserslist": [
     ">0.2%",
