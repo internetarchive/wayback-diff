@@ -40,9 +40,11 @@
     "eslint-plugin-mocha": "^10.5",
     "eslint-plugin-promise": "^6.6",
     "eslint-plugin-react": "^7.35",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.1",
-    "rollup": "4.4.1",
+    "rollup": "4.31.0",
     "rollup-plugin-postcss": "^4.0.2",
     "smbase64": "^1.0.2"
   },
