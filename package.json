@@ -16,7 +16,7 @@
     "start": "HOST=vbanos-dev.us.archive.org PORT=8093 react-scripts start",
     "build": "rollup -c config/rollup.mjs",
     "build:dev": "rollup -c config/rollup.mjs -w",
-    "test": "react-scripts test --env=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
+    "test": "jest --testEnvironment=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
     "lint": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx"
   },
   "devDependencies": {
@@ -42,7 +42,6 @@
     "eslint-plugin-react": "^7.35",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.1",
-    "react-scripts": "^5.0.1",
     "rollup": "4.4.1",
     "rollup-plugin-postcss": "^4.0.2",
     "smbase64": "^1.0.2"
