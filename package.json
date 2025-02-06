@@ -1,14 +1,14 @@
 {
   "name": "@internetarchive/wayback-diff",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "main": "build/app.js",
   "dependencies": {
     "d3": "7.9.0",
     "d3-scale-cluster": "^2.0.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "react": "17",
-    "react-dom": "17",
+    "react": "18",
+    "react-dom": "18",
     "react-router-dom": "5.3.4",
     "simple-xpath-position": "^2.0.2"
   },
@@ -33,7 +33,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "@rollup/plugin-url": "^8.0.1",
     "@testing-library/jest-dom": "^6.2.0",
-    "@testing-library/react": "^12.1.5",
+    "@testing-library/react": "^14.3.1",
     "cssnano": "^7.0.4",
     "eslint": "^8.57",
     "eslint-plugin-import": "^2.26",
