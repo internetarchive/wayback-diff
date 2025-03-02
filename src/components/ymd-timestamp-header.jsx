@@ -327,11 +327,7 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   _showDiffs = () => {
-    const timestampA = this.timestampSelectLeft.current.value;
-    const timestampB = this.timestampSelectRight.current.value;
-
-    this.props.getTimestampsCallback(timestampA, timestampB);
-    this.setState({ timestampA, timestampB });
+    this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
   };
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
