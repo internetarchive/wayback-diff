@@ -74,13 +74,11 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidUpdate () {
-    if (this.state.leftSnaps || this.state.rightSnaps) {
-      if (!this.state.showError) {
-        this._selectValues();
-        if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
-          if (this.state.leftMonthIndex !== -1 || this.state.rightMonthIndex !== -1) {
-            this._showMonths(this.state.leftYear, this.state.rightYear);
-          }
+    if ((this.state.leftSnaps || this.state.rightSnaps) && !this.state.showError) {
+      this._selectValues();
+      if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
+        if (this.state.leftMonthIndex !== -1 || this.state.rightMonthIndex !== -1) {
+          this._showMonths(this.state.leftYear, this.state.rightYear);
         }
       }
     }
@@ -111,94 +109,95 @@ export default class YmdTimestampHeader extends React.Component {
   render () {
     const showDiffBtn = !isEmpty(this.state.timestampA) && !isEmpty(this.state.timestampB);
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
-    if (!this.state.showError && !this.state.leftSnaps && !this.state.rightSnaps) {
+    if (this.state.showError) {
+      return <div></div>;
+    }
+    if (!this.state.leftSnaps && !this.state.rightSnaps) {
       return <div className="loading"><Loader/></div>;
     }
-    if (!this.state.showError) {
-      if (this.state.yearOptions || this.state.leftSnaps || this.state.rightSnaps) {
-        return (
-          <div className="timestamp-header-view">
-            <div>
-              {this.state.headerInfo}
-              <div id="timestamp-left">Please select a capture</div>
-              <div id="timestamp-right">Please select a capture</div>
-              <br/>
-            </div>
-            <div className="wayback-ymd-timestamp">
-              <div className="wayback-timestamps">
-                <select className="form-control input-sm mr-sm-1" id="year-select-left"
-                  onChange={this._handleYearChange} title="Years and available captures"
-                  value={this.state.leftYear}>
-                  <option value="" disabled>Year</option>
-                  {this.state.yearOptions}
-                </select>
-                <select className="form-control input-sm mr-sm-1 month-select month-select-left"
-                  ref={this.monthSelectLeft}
-                  onChange={this._handleMonthChange} title="Months and available captures"
-                  defaultValue="">
-                  <option value="" disabled>Month</option>
-                  {  this.state.leftMonthOptions}
-                </select>
-                { !isEmpty(this.state.leftSnaps) &&
-                  <select className="form-control input-sm mr-sm-1 timestamp-select"
-                    ref={this.timestampSelectLeft}
-                    onChange={this._handleLeftTimestampChange}
-                    defaultValue="">
-                    <option value="" disabled>Available captures</option>
-                    {this.state.leftSnaps.map((item, index) => (
-                      <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>
-                    ))}
-                  </select>
-                }
-              </div>
-              <div className="wayback-ymd-buttons">
-                {showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
-              </div>
-              <div className="wayback-timestamps">
-                { !isEmpty(this.state.rightSnaps) &&
+    if (this.state.yearOptions || this.state.leftSnaps || this.state.rightSnaps) {
+      return (
+        <div className="timestamp-header-view">
+          <div>
+            {this.state.headerInfo}
+            <div id="timestamp-left">Please select a capture</div>
+            <div id="timestamp-right">Please select a capture</div>
+            <br/>
+          </div>
+          <div className="wayback-ymd-timestamp">
+            <div className="wayback-timestamps">
+              <select className="form-control input-sm mr-sm-1" id="year-select-left"
+                onChange={this._handleYearChange} title="Years and available captures"
+                value={this.state.leftYear}>
+                <option value="" disabled>Year</option>
+                {this.state.yearOptions}
+              </select>
+              <select className="form-control input-sm mr-sm-1 month-select month-select-left"
+                ref={this.monthSelectLeft}
+                onChange={this._handleMonthChange} title="Months and available captures"
+                defaultValue="">
+                <option value="" disabled>Month</option>
+                {  this.state.leftMonthOptions}
+              </select>
+              { !isEmpty(this.state.leftSnaps) &&
                 <select className="form-control input-sm mr-sm-1 timestamp-select"
-                  ref={this.timestampSelectRight}
-                  onChange={this._handleRightTimestampChange}
+                  ref={this.timestampSelectLeft}
+                  onChange={this._handleLeftTimestampChange}
                   defaultValue="">
                   <option value="" disabled>Available captures</option>
-                  {this.state.rightSnaps.map((item, index) => (
+                  {this.state.leftSnaps.map((item, index) => (
                     <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>
                   ))}
                 </select>
-                }
-                <select className="form-control input-sm mr-sm-1 month-select month-select-right"
-                  ref={this.monthSelectRight}
-                  onChange={this._handleMonthChange} title="Months and available captures"
-                  defaultValue="">
-                  <option value="" disabled>Month</option>
-                  {this.state.rightMonthOptions}
-                </select>
-                <select className="form-control input-sm mr-sm-1" id="year-select-right"
-                  onChange={this._handleYearChange} title="Years and available captures"
-                  value={this.state.rightYear}>
-                  <option value="" disabled>Year</option>
-                  {this.state.yearOptions}
-                </select>
-              </div>
+              }
             </div>
-            <div>
-              {this.state.timestampA &&
-                <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
-                  id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+            <div className="wayback-ymd-buttons">
+              {showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
+            </div>
+            <div className="wayback-timestamps">
+              { !isEmpty(this.state.rightSnaps) &&
+              <select className="form-control input-sm mr-sm-1 timestamp-select"
+                ref={this.timestampSelectRight}
+                onChange={this._handleRightTimestampChange}
+                defaultValue="">
+                <option value="" disabled>Available captures</option>
+                {this.state.rightSnaps.map((item, index) => (
+                  <option key={index} value={item[0]}>{getUTCDateFormat(item[0])}</option>
+                ))}
+              </select>
               }
-              {this.state.timestampB &&
-                <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
-                  id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
-              }
-              <br />
+              <select className="form-control input-sm mr-sm-1 month-select month-select-right"
+                ref={this.monthSelectRight}
+                onChange={this._handleMonthChange} title="Months and available captures"
+                defaultValue="">
+                <option value="" disabled>Month</option>
+                {this.state.rightMonthOptions}
+              </select>
+              <select className="form-control input-sm mr-sm-1" id="year-select-right"
+                onChange={this._handleYearChange} title="Years and available captures"
+                value={this.state.rightYear}>
+                <option value="" disabled>Year</option>
+                {this.state.yearOptions}
+              </select>
             </div>
           </div>
-        );
-      }
-      return (
-        <Loader/>
+          <div>
+            {this.state.timestampA &&
+              <a href={this.props.conf.snapshotsPrefix + this.state.timestampA + '/' + this.props.url}
+                id="timestamp-left" target="_blank" rel="noopener noreferrer"> Open in new window</a>
+            }
+            {this.state.timestampB &&
+              <a href={this.props.conf.snapshotsPrefix + this.state.timestampB + '/' + this.props.url}
+                id="timestamp-right" target="_blank" rel="noopener noreferrer">Open in new window</a>
+            }
+            <br />
+          </div>
+        </div>
       );
     }
+    return (
+      <Loader/>
+    );
   }
 
   _areRequestedTimestampsSelected = () => {
@@ -228,21 +227,6 @@ export default class YmdTimestampHeader extends React.Component {
     } else if (side === 'right' && isNil(timestampB)) {
       this.setState({ rightSnaps: null });
     }
-  };
-
-  /**
-   * Fetch captures for a specific YYYYMM using CDX. Not used any more because
-   * we switched to the calendarcaptures API.
-   */
-  createCDXRequest = (dt) => {
-    const url = new URL(this.props.conf.cdxServer, window.location.origin);
-    url.searchParams.append('url', this.props.url);
-    url.searchParams.append('fl', 'timestamp,digest');
-    url.searchParams.append('output', 'json');
-    url.searchParams.append('from', dt);
-    url.searchParams.append('to', dt);
-    url.searchParams.append('limit', this.props.conf.limit);
-    return fetchWithTimeout(url, { signal: this._abortController.signal }).then(jsonResponse);
   };
 
   /**
@@ -363,10 +347,7 @@ export default class YmdTimestampHeader extends React.Component {
     const timestampB = this.timestampSelectRight.current.value;
 
     this.props.getTimestampsCallback(timestampA, timestampB);
-    this.setState({
-      timestampA: timestampA,
-      timestampB: timestampB
-    });
+    this.setState({ timestampA, timestampB });
   };
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
