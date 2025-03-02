@@ -219,16 +219,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
   };
 
-  _checkTimestamps = (side = null) => {
-    const { timestampA, timestampB } = this.state;
-
-    if (side === 'left' && isNil(timestampA)) {
-      this.setState({ leftSnaps: null });
-    } else if (side === 'right' && isNil(timestampB)) {
-      this.setState({ rightSnaps: null });
-    }
-  };
-
   /**
    * Note that the timestamp does not have YYYYMM and also its integer and not
    * string. So, it could be 7040920 and we need to make it '07040920' (DDHHMMSS)
@@ -297,15 +287,11 @@ export default class YmdTimestampHeader extends React.Component {
                 .then((data) => {
                   if (data && data.length > 0) {
                     this._prepareCDXData(leftData, data);
-                  } else {
-                    this._checkTimestamps('right');
                   }
                 });
             } else {
               this._prepareCDXData(data, null);
             }
-          } else {
-            this._checkTimestamps('left');
           }
         })
         .catch(error => { this._errorHandled(error.message); });
@@ -314,8 +300,6 @@ export default class YmdTimestampHeader extends React.Component {
         .then((data) => {
           if (data && data.length > 0) {
             this._prepareCDXData(null, data);
-          } else {
-            this._checkTimestamps('right');
           }
         });
     }
