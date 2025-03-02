@@ -73,14 +73,14 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   componentDidUpdate () {
-    if (!this.state.sparkline && !this.state.showLoader) {
+    if (!this.state.sparkline && !this.state.showError) {
       this._fetchSparklineData();
     }
     if (this.state.leftSnaps || this.state.rightSnaps) {
       if (this.state.shouldValidateTimestamp) {
         this._checkTimestamps();
       }
-      if (!this.state.showLoader) {
+      if (!this.state.showError) {
         this._selectValues();
         if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
           if (this._leftMonthIndex !== -1 || this._rightMonthIndex !== -1) {
@@ -116,7 +116,7 @@ export default class YmdTimestampHeader extends React.Component {
   render () {
     const showDiffBtn = !isEmpty(this.state.timestampA) && !isEmpty(this.state.timestampB);
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
-    if (this.state.showLoader && !this.state.showError) {
+    if (!this.state.showError && !this.state.leftSnaps && !this.state.rightSnaps) {
       return <div className="loading"><Loader/></div>;
     }
     if (!this.state.showError) {
@@ -234,7 +234,6 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({ rightSnaps: null });
     }
     this.setState({
-      showLoader: false,
       shouldValidateTimestamp: false
     });
   };
@@ -285,14 +284,13 @@ export default class YmdTimestampHeader extends React.Component {
    * aren't rendered yet.
    */
   _fetchCDXData = () => {
-    this.setState({ showLoader: true });
-    if (this._leftMonthIndex !== -1) {
+    if (this._leftMonthIndex !== -1 && this.monthSelectLeft.current) {
       const monthLeft = this.monthSelectLeft.current.value;
       this._leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
     } else if (this.state.timestampA) {
       this._leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
     }
-    if (this._rightMonthIndex !== -1) {
+    if (this._rightMonthIndex !== -1 && this.monthSelectRight.current) {
       const monthRight = this.monthSelectRight.current.value;
       this._rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
     } else if (this.state.timestampB) {
@@ -350,11 +348,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   _prepareCDXData = (leftSnaps, rightSnaps) => {
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
-    this.setState({
-      leftSnaps,
-      rightSnaps,
-      showLoader: false
-    });
+    this.setState({ leftSnaps, rightSnaps });
   };
 
   _showOptions = (data) => {
@@ -408,7 +402,6 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   _fetchSparklineData = () => {
-    this.setState({ showLoader: true });
     const url = new URL(this.props.conf.sparklineURL, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
@@ -440,7 +433,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
 
     this.setState({
-      showLoader: false,
       sparkline: snapshots,
       yearOptions: this._showOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)

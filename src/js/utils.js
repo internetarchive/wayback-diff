@@ -92,21 +92,13 @@ function weight (x) {
 }
 
 export function checkResponse (response) {
-  if (response) {
-    if (!response.ok) {
-      throw Error(response.status);
-    }
-    return response;
-  }
+  if (response && !response.ok) throw Error(response.status);
+  return response;
 }
 
 export function jsonResponse (response) {
-  if (response) {
-    if (!response.ok) {
-      throw Error(response.status);
-    }
-    return response.json();
-  }
+  if (response && !response.ok) throw Error(response.status);
+  return response.json();
 }
 
 export function fetchWithTimeout (url, params) {
