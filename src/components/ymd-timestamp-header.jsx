@@ -407,18 +407,15 @@ export default class YmdTimestampHeader extends React.Component {
     if (!isEmpty(rightSnaps) && timestampB) {
       this.timestampSelectRight.current.value = timestampB;
     }
-    const monthLeft = this.monthSelectLeft.current;
-    const monthRight = this.monthSelectRight.current;
+    this._selectMonth(this.monthSelectLeft.current, this._leftMonthIndex);
+    this._selectMonth(this.monthSelectRight.current, this._rightMonthIndex);
+  }
 
-    if (Array.from(monthLeft.options).some(option => option.value === monthNames[this._leftMonthIndex])) {
-      monthLeft.value = monthNames[this._leftMonthIndex];
+  _selectMonth(monthSelect, monthIndex) {
+    if (Array.from(monthSelect.options).some(option => option.value === monthNames[monthIndex])) {
+      monthSelect.value = monthNames[monthIndex];
     } else {
-      monthLeft.selectedIndex = 0;
-    }
-    if (Array.from(monthRight.options).some(option => option.value === monthNames[this._rightMonthIndex])) {
-      monthRight.value = monthNames[this._rightMonthIndex];
-    } else {
-      monthRight.selectedIndex = 0;
+      monthSelect.selectedIndex = 0;
     }
   }
 
