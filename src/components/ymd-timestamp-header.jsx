@@ -57,8 +57,7 @@ export default class YmdTimestampHeader extends React.Component {
       timestampA,
       timestampB,
       leftYear: timestampA?.substring(0, 4) ?? '',
-      rightYear: timestampB?.substring(0, 4) ?? '',
-      shouldValidateTimestamp: true
+      rightYear: timestampB?.substring(0, 4) ?? ''
     };
   }
 
@@ -77,9 +76,6 @@ export default class YmdTimestampHeader extends React.Component {
       this._fetchSparklineData();
     }
     if (this.state.leftSnaps || this.state.rightSnaps) {
-      if (this.state.shouldValidateTimestamp) {
-        this._checkTimestamps();
-      }
       if (!this.state.showError) {
         this._selectValues();
         if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
@@ -137,7 +133,7 @@ export default class YmdTimestampHeader extends React.Component {
                   <option value="" disabled>Year</option>
                   {this.state.yearOptions}
                 </select>
-                <select className="form-control input-sm mr-sm-1 month-select"
+                <select className="form-control input-sm mr-sm-1 month-select month-select-left"
                   ref={this.monthSelectLeft}
                   onChange={this._handleMonthChange} title="Months and available captures"
                   defaultValue="">
@@ -171,7 +167,7 @@ export default class YmdTimestampHeader extends React.Component {
                   ))}
                 </select>
                 }
-                <select className="form-control input-sm mr-sm-1 month-select"
+                <select className="form-control input-sm mr-sm-1 month-select month-select-right"
                   ref={this.monthSelectRight}
                   onChange={this._handleMonthChange} title="Months and available captures"
                   defaultValue="">
@@ -233,9 +229,6 @@ export default class YmdTimestampHeader extends React.Component {
     } else if (side === 'right' && isNil(timestampB)) {
       this.setState({ rightSnaps: null });
     }
-    this.setState({
-      shouldValidateTimestamp: false
-    });
   };
 
   /**
@@ -451,11 +444,18 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   _handleMonthChange = (e) => {
+    if (e.target.className.includes('left')) {
+      this.setState({
+        timestampA: null,
+        leftSnaps: null
+      });
+    } else {
+      this.setState({
+        timestampB: null,
+        rightSnaps: null
+      });
+    }
     this._fetchCDXData();
-    this.setState({
-      timestampA: null,
-      timestampB: null
-    });
   };
 
   _handleYearChange = (e) => {
