@@ -106,26 +106,20 @@ export default class YmdTimestampHeader extends React.Component {
 
   _handleRightTimestampChange (event) {
     this.setState({ timestampB: event.target.value });
-    if (!isEmpty(this.state.leftSnaps)) {
-      const selectedDigest = this.state.rightSnaps[this.timestampSelectRight.current.selectedIndex - 1][1];
-      const leftSnaps = this.state.leftSnaps.filter(hash => hash[1] !== selectedDigest);
-      this.setState({
-        showDiffBtn: true,
-        leftSnaps
-      });
-    }
+    this._updateSnaps('right');
   }
 
   _handleLeftTimestampChange (event) {
     this.setState({ timestampA: event.target.value });
-    if (!isEmpty(this.state.rightSnaps)) {
-      const selectedDigest = this.state.leftSnaps[this.timestampSelectLeft.current.selectedIndex - 1][1];
-      const rightSnaps = this.state.rightSnaps.filter(hash => hash[1] !== selectedDigest);
-      this.setState({
-        showDiffBtn: true,
-        rightSnaps
-      });
-    }
+    this._updateSnaps('left');
+  }
+
+  _updateSnaps(side) {
+    const snapsKey = side === 'left' ? 'leftSnaps' : 'rightSnaps';
+    const otherSnapsKey = side === 'left' ? 'rightSnaps' : 'leftSnaps';
+    const selectedDigest = this.state[snapsKey][this['timestampSelect' + (side === 'left' ? 'Left' : 'Right')].current.selectedIndex - 1][1];
+    const filteredSnaps = this.state[otherSnapsKey].filter(hash => hash[1] !== selectedDigest);
+    this.setState({ showDiffBtn: true, [otherSnapsKey]: filteredSnaps });
   }
 
   render () {
