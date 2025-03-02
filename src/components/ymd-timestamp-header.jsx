@@ -67,13 +67,13 @@ export default class YmdTimestampHeader extends React.Component {
       } else {
         this._fetchCDXData();
       }
+      if (!this.state.sparkline) {
+        this._fetchSparklineData();
+      }
     }
   }
 
   componentDidUpdate () {
-    if (!this.state.sparkline && !this.state.showError) {
-      this._fetchSparklineData();
-    }
     if (this.state.leftSnaps || this.state.rightSnaps) {
       if (!this.state.showError) {
         this._selectValues();
