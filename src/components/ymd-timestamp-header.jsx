@@ -58,7 +58,6 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB,
       leftYear: timestampA?.substring(0, 4) ?? '',
       rightYear: timestampB?.substring(0, 4) ?? '',
-      showDiffBtn: false,
       shouldValidateTimestamp: true
     };
   }
@@ -111,10 +110,11 @@ export default class YmdTimestampHeader extends React.Component {
     const otherSnapsKey = side === 'left' ? 'rightSnaps' : 'leftSnaps';
     const selectedDigest = this.state[snapsKey][this['timestampSelect' + (side === 'left' ? 'Left' : 'Right')].current.selectedIndex - 1][1];
     const filteredSnaps = this.state[otherSnapsKey].filter(hash => hash[1] !== selectedDigest);
-    this.setState({ showDiffBtn: true, [otherSnapsKey]: filteredSnaps });
+    this.setState({ [otherSnapsKey]: filteredSnaps });
   };
 
   render () {
+    const showDiffBtn = !isEmpty(this.state.timestampA) && !isEmpty(this.state.timestampB);
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
     if (this.state.showLoader && !this.state.showError) {
       return <div className="loading"><Loader/></div>;
@@ -157,7 +157,7 @@ export default class YmdTimestampHeader extends React.Component {
                 }
               </div>
               <div className="wayback-ymd-buttons">
-                {this.state.showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
+                {showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
               </div>
               <div className="wayback-timestamps">
                 { !isEmpty(this.state.rightSnaps) &&
@@ -466,7 +466,6 @@ export default class YmdTimestampHeader extends React.Component {
   _handleMonthChange = (e) => {
     this._fetchCDXData();
     this.setState({
-      showDiffBtn: true,
       timestampA: null,
       timestampB: null
     });
@@ -478,7 +477,6 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({
         leftYear: e.target.value,
         leftSnaps: null,
-        showDiffBtn: false
       });
       this._showMonths(e.target.value, null);
     } else {
@@ -486,7 +484,6 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({
         rightYear: e.target.value,
         rightSnaps: null,
-        showDiffBtn: false
       });
       this._showMonths(null, e.target.value);
     }
