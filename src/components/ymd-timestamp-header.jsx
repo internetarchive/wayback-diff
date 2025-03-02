@@ -207,24 +207,20 @@ export default class YmdTimestampHeader extends React.Component {
   }
 
   _areRequestedTimestampsSelected = () => {
-    if (this.state.finishedValidating) {
-      if (!isNaN(this.state.timestampA)) {
-        const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
-        if (this.state.timestampA > lastLeftFromCDX) {
-          this.setState({
-            leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']],
-            finishedValidating: false
-          });
-        }
+    if (!isNaN(this.state.timestampA)) {
+      const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
+      if (this.state.timestampA > lastLeftFromCDX) {
+        this.setState({
+          leftSnaps: [...this.state.leftSnaps, [this.state.timestampA, '0']]
+        });
       }
-      if (!isNaN(this.state.timestampB)) {
-        const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
-        if (this.state.timestampB > lastRightFromCDX) {
-          this.setState({
-            rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
-            finishedValidating: false
-          });
-        }
+    }
+    if (!isNaN(this.state.timestampB)) {
+      const lastRightFromCDX = this.state.rightSnaps.slice(-1)[0];
+      if (this.state.timestampB > lastRightFromCDX) {
+        this.setState({
+          rightSnaps: [...this.state.rightSnaps, [this.state.timestampB, '1']],
+        });
       }
     }
   };
@@ -238,7 +234,6 @@ export default class YmdTimestampHeader extends React.Component {
       this.setState({ rightSnaps: null });
     }
     this.setState({
-      finishedValidating: true,
       showLoader: false,
       shouldValidateTimestamp: false
     });
