@@ -61,14 +61,6 @@ export default class YmdTimestampHeader extends React.Component {
       showDiffBtn: false,
       shouldValidateTimestamp: true
     };
-
-    this._handleLeftTimestampChange = this._handleLeftTimestampChange.bind(this);
-    this._handleRightTimestampChange = this._handleRightTimestampChange.bind(this);
-    this._showDiffs = this._showDiffs.bind(this);
-    this._errorHandled = this._errorHandled.bind(this);
-    this._showMonths = this._showMonths.bind(this);
-    this._handleYearChange = this._handleYearChange.bind(this);
-    this._handleMonthChange = this._handleMonthChange.bind(this);
   }
 
   componentDidMount () {
@@ -104,23 +96,23 @@ export default class YmdTimestampHeader extends React.Component {
     this._abortController.abort();
   }
 
-  _handleRightTimestampChange (event) {
+  _handleRightTimestampChange = (event) => {
     this.setState({ timestampB: event.target.value });
     this._updateSnaps('right');
-  }
+  };
 
-  _handleLeftTimestampChange (event) {
+  _handleLeftTimestampChange = (event) => {
     this.setState({ timestampA: event.target.value });
     this._updateSnaps('left');
-  }
+  };
 
-  _updateSnaps(side) {
+  _updateSnaps = (side) => {
     const snapsKey = side === 'left' ? 'leftSnaps' : 'rightSnaps';
     const otherSnapsKey = side === 'left' ? 'rightSnaps' : 'leftSnaps';
     const selectedDigest = this.state[snapsKey][this['timestampSelect' + (side === 'left' ? 'Left' : 'Right')].current.selectedIndex - 1][1];
     const filteredSnaps = this.state[otherSnapsKey].filter(hash => hash[1] !== selectedDigest);
     this.setState({ showDiffBtn: true, [otherSnapsKey]: filteredSnaps });
-  }
+  };
 
   render () {
     const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
@@ -214,7 +206,7 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  _areRequestedTimestampsSelected () {
+  _areRequestedTimestampsSelected = () => {
     if (this.state.finishedValidating) {
       if (!isNaN(this.state.timestampA)) {
         const lastLeftFromCDX = this.state.leftSnaps.slice(-1)[0];
@@ -235,9 +227,9 @@ export default class YmdTimestampHeader extends React.Component {
         }
       }
     }
-  }
+  };
 
-  _checkTimestamps (side = null) {
+  _checkTimestamps = (side = null) => {
     const { timestampA, timestampB } = this.state;
 
     if (side === 'left' && isNil(timestampA)) {
@@ -250,13 +242,13 @@ export default class YmdTimestampHeader extends React.Component {
       showLoader: false,
       shouldValidateTimestamp: false
     });
-  }
+  };
 
   /**
    * Fetch captures for a specific YYYYMM using CDX. Not used any more because
    * we switched to the calendarcaptures API.
    */
-  createCDXRequest (dt) {
+  createCDXRequest = (dt) => {
     const url = new URL(this.props.conf.cdxServer, window.location.origin);
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('fl', 'timestamp,digest');
@@ -265,13 +257,13 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('to', dt);
     url.searchParams.append('limit', this.props.conf.limit);
     return fetchWithTimeout(url, { signal: this._abortController.signal }).then(jsonResponse);
-  }
+  };
 
   /**
    * Note that the timestamp does not have YYYYMM and also its integer and not
    * string. So, it could be 7040920 and we need to make it '07040920' (DDHHMMSS)
    */
-  fetchYearMonthCaptures (year1, month1) {
+  fetchYearMonthCaptures = (year1, month1) => {
     const { conf, url } = this.props;
     const requestUrl = new URL(conf.calendarURL, window.location.origin);
     requestUrl.searchParams.append('url', url);
@@ -291,13 +283,13 @@ export default class YmdTimestampHeader extends React.Component {
       .then(data => data['items'])
       .then(data => data.map(item => [year1 + month1 + formatTs(item[0]), item[2]]))
       .catch(error => { this._errorHandled(error.message); });
-  }
+  };
 
   /**
    * On component init get current month from timestamp because the months selects
    * aren't rendered yet.
    */
-  _fetchCDXData () {
+  _fetchCDXData = () => {
     this.setState({ showLoader: true });
     if (this._leftMonthIndex !== -1) {
       const monthLeft = this.monthSelectLeft.current.value;
@@ -354,23 +346,23 @@ export default class YmdTimestampHeader extends React.Component {
           }
         });
     }
-  }
+  };
 
-  _errorHandled (error) {
+  _errorHandled = (error) => {
     this.props.errorHandledCallback(error);
     this.setState({ showError: true });
-  }
+  };
 
-  _prepareCDXData (leftSnaps, rightSnaps) {
+  _prepareCDXData = (leftSnaps, rightSnaps) => {
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
     this.setState({
       leftSnaps,
       rightSnaps,
       showLoader: false
     });
-  }
+  };
 
-  _showOptions (data) {
+  _showOptions = (data) => {
     const limit = parseInt(this.props.conf.limit);
     return (
       data &&
@@ -379,9 +371,9 @@ export default class YmdTimestampHeader extends React.Component {
         return <option key={index} value={item[0]}>{`${item[0]} (${count})`}</option>;
       })
     );
-  }
+  };
 
-  _showDiffs () {
+  _showDiffs = () => {
     const timestampA = this.timestampSelectLeft.current.value;
     const timestampB = this.timestampSelectRight.current.value;
 
@@ -390,10 +382,10 @@ export default class YmdTimestampHeader extends React.Component {
       timestampA: timestampA,
       timestampB: timestampB
     });
-  }
+  };
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
-  _selectValues () {
+  _selectValues = () => {
     const { timestampA, timestampB, leftSnaps, rightSnaps } = this.state;
     if (!isEmpty(leftSnaps) && timestampA) {
       this.timestampSelectLeft.current.value = timestampA;
@@ -403,24 +395,24 @@ export default class YmdTimestampHeader extends React.Component {
     }
     this._selectMonth(this.monthSelectLeft.current, this._leftMonthIndex);
     this._selectMonth(this.monthSelectRight.current, this._rightMonthIndex);
-  }
+  };
 
-  _selectMonth(monthSelect, monthIndex) {
+  _selectMonth = (monthSelect, monthIndex) => {
     if (Array.from(monthSelect.options).some(option => option.value === monthNames[monthIndex])) {
       monthSelect.value = monthNames[monthIndex];
     } else {
       monthSelect.selectedIndex = 0;
     }
-  }
+  };
 
-  _getHeaderInfo (firstTimestamp, lastTimestamp, count) {
+  _getHeaderInfo = (firstTimestamp, lastTimestamp, count) => {
     const first = getShortUTCDateFormat(firstTimestamp);
     const last = getShortUTCDateFormat(lastTimestamp);
     return (<p id='explanation-middle'>Compare any two captures of {this.props.url} from our collection
       of {count.toLocaleString()} dating from {first} to {last}.</p>);
-  }
+  };
 
-  _fetchSparklineData () {
+  _fetchSparklineData = () => {
     this.setState({ showLoader: true });
     const url = new URL(this.props.conf.sparklineURL, window.location.origin);
     url.searchParams.append('url', this.props.url);
@@ -436,9 +428,9 @@ export default class YmdTimestampHeader extends React.Component {
         }
       })
       .catch(error => { this._errorHandled(error.message); });
-  }
+  };
 
-  _prepareSparklineData (data) {
+  _prepareSparklineData = (data) => {
     const snapshots = data.years;
     const yearSum = new Array(snapshots.length);
     let j = 0;
@@ -458,9 +450,9 @@ export default class YmdTimestampHeader extends React.Component {
       yearOptions: this._showOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)
     });
-  }
+  };
 
-  _showMonths (leftYear, rightYear) {
+  _showMonths = (leftYear, rightYear) => {
     if (!isNil(leftYear)) {
       const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
       this.setState({ leftMonthOptions: this._showOptions(leftMonths) });
@@ -469,18 +461,18 @@ export default class YmdTimestampHeader extends React.Component {
       const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
       this.setState({ rightMonthOptions: this._showOptions(rightMonths) });
     }
-  }
+  };
 
-  _handleMonthChange (e) {
+  _handleMonthChange = (e) => {
     this._fetchCDXData();
     this.setState({
       showDiffBtn: true,
       timestampA: null,
       timestampB: null
     });
-  }
+  };
 
-  _handleYearChange (e) {
+  _handleYearChange = (e) => {
     if (e.target.id === 'year-select-left') {
       this._leftMonthIndex = 0;
       this.setState({
@@ -498,5 +490,5 @@ export default class YmdTimestampHeader extends React.Component {
       });
       this._showMonths(null, e.target.value);
     }
-  }
+  };
 }
