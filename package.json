@@ -44,6 +44,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.1",
+    "react-scripts": "^5.0.1",
     "rollup": "4.31.0",
     "rollup-plugin-postcss": "^4.0.2",
     "smbase64": "^1.0.2"
