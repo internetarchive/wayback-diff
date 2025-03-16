@@ -47,8 +47,6 @@ export default class YmdTimestampHeader extends React.Component {
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
-    this.monthSelectLeft = React.createRef();
-    this.monthSelectRight = React.createRef();
 
     this.state = {
       timestampA,
@@ -128,7 +126,6 @@ export default class YmdTimestampHeader extends React.Component {
                 {this.state.yearOptions}
               </select>
               <select className="form-control input-sm mr-sm-1 month-select month-select-left"
-                ref={this.monthSelectLeft}
                 onChange={this._handleMonthChange} title="Months and available captures"
                 value={this.state.leftMonth}>
                 <option value="" disabled>Month</option>
@@ -162,7 +159,6 @@ export default class YmdTimestampHeader extends React.Component {
               </select>
               }
               <select className="form-control input-sm mr-sm-1 month-select month-select-right"
-                ref={this.monthSelectRight}
                 onChange={this._handleMonthChange} title="Months and available captures"
                 value={this.state.rightMonth}>
                 <option value="" disabled>Month</option>
@@ -232,9 +228,9 @@ export default class YmdTimestampHeader extends React.Component {
       .catch(error => { this._errorHandled(error.message); });
   };
 
-  _getMonth = (currentMonth, monthSelectRef, timestamp) => {
-    if (currentMonth !== '' && monthSelectRef.current) {
-      return monthSelectRef.current.value;
+  _getMonth = (currentMonth, timestamp) => {
+    if (currentMonth !== '') {
+      return currentMonth;
     } else if (timestamp) {
       return timestamp.substring(4, 6);
     }
@@ -246,10 +242,8 @@ export default class YmdTimestampHeader extends React.Component {
    * aren't rendered yet.
    */
   _fetchCDXData = () => {
-    const leftMonth = this._getMonth(this.state.leftMonth, this.monthSelectLeft, this.state.timestampA);
-    const rightMonth = this._getMonth(this.state.rightMonth, this.monthSelectRight, this.state.timestampB);
-
-    this.setState({ leftMonth, rightMonth });
+    const leftMonth = this._getMonth(this.state.leftMonth, this.state.timestampA);
+    const rightMonth = this._getMonth(this.state.rightMonth, this.state.timestampB);
 
     const leftFetchPromise = leftMonth !== '' ? this.fetchYearMonthCaptures(this.state.leftYear, leftMonth) : null;
     const rightFetchPromise = rightMonth !== '' ? this.fetchYearMonthCaptures(this.state.rightYear, rightMonth) : null;
@@ -303,11 +297,9 @@ export default class YmdTimestampHeader extends React.Component {
     const { timestampA, timestampB, leftSnaps, rightSnaps } = this.state;
     if (!isEmpty(leftSnaps) && timestampA) {
       this.timestampSelectLeft.current.value = timestampA;
-      this.monthSelectLeft.current.value = this.state.leftMonth;
     }
     if (!isEmpty(rightSnaps) && timestampB) {
       this.timestampSelectRight.current.value = timestampB;
-      this.monthSelectRight.current.value = this.state.rightMonth;
     }
 
     if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
@@ -376,16 +368,19 @@ export default class YmdTimestampHeader extends React.Component {
   _handleMonthChange = (e) => {
     if (e.target.className.includes('left')) {
       this.setState({
-        timestampA: null,
+        leftMonth: e.target.value,
         leftSnaps: null
+      }, () => {
+        this._fetchCDXData();
       });
     } else {
       this.setState({
-        timestampB: null,
+        rightMonth: e.target.value,
         rightSnaps: null
+      }, () => {
+        this._fetchCDXData();
       });
     }
-    this._fetchCDXData();
   };
 
   _handleYearChange = (e) => {
