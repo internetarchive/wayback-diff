@@ -230,18 +230,10 @@ export default class YmdTimestampHeader extends React.Component {
     requestUrl.searchParams.append('date', year1 + month1);
     requestUrl.searchParams.append('digest', 1);
 
-    function formatTs (ts) {
-      ts = ts.toString();
-      if (ts.length == 7) {
-        return '0' + ts;
-      }
-      return ts;
-    }
-
     return fetchWithTimeout(requestUrl, { signal: this._abortController.signal })
       .then(jsonResponse)
       .then(data => data['items'])
-      .then(data => data.map(item => [year1 + month1 + formatTs(item[0]), item[2]]))
+      .then(data => data.map(item => [year1 + month1 + String(item[0]).padStart(8, '0'), item[2]]))
       .catch(error => { this._errorHandled(error.message); });
   };
 
