@@ -76,11 +76,6 @@ export default class YmdTimestampHeader extends React.Component {
   componentDidUpdate () {
     if ((this.state.leftSnaps || this.state.rightSnaps) && !this.state.showError) {
       this._selectValues();
-      if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
-        if (this.state.leftMonthIndex !== -1 || this.state.rightMonthIndex !== -1) {
-          this._showMonths(this.state.leftYear, this.state.rightYear);
-        }
-      }
     }
   }
 
@@ -333,6 +328,12 @@ export default class YmdTimestampHeader extends React.Component {
     }
     this._selectMonth(this.monthSelectLeft.current, this.state.leftMonthIndex);
     this._selectMonth(this.monthSelectRight.current, this.state.rightMonthIndex);
+
+    if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
+      if (this.state.leftMonthIndex !== -1 || this.state.rightMonthIndex !== -1) {
+        this._showMonths(this.state.leftYear, this.state.rightYear);
+      }
+    }
   };
 
   _selectMonth = (monthSelect, monthIndex) => {
