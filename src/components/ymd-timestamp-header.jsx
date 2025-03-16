@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
 import {
-  fetchWithTimeout, twoDigits, getKeyByValue, getUTCDateFormat, getShortUTCDateFormat, jsonResponse
+  fetchWithTimeout, getUTCDateFormat, getShortUTCDateFormat, jsonResponse
 } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
@@ -55,8 +55,8 @@ export default class YmdTimestampHeader extends React.Component {
       timestampB,
       leftYear: timestampA?.substring(0, 4) ?? '',
       rightYear: timestampB?.substring(0, 4) ?? '',
-      leftMonthIndex: -1,
-      rightMonthIndex: -1
+      leftMonth: timestampA?.substring(4, 6) ?? '',
+      rightMonth: timestampB?.substring(4, 6) ?? ''
     };
   }
 
@@ -130,7 +130,7 @@ export default class YmdTimestampHeader extends React.Component {
               <select className="form-control input-sm mr-sm-1 month-select month-select-left"
                 ref={this.monthSelectLeft}
                 onChange={this._handleMonthChange} title="Months and available captures"
-                defaultValue="">
+                value={this.state.leftMonth}>
                 <option value="" disabled>Month</option>
                 {  this.state.leftMonthOptions}
               </select>
@@ -164,7 +164,7 @@ export default class YmdTimestampHeader extends React.Component {
               <select className="form-control input-sm mr-sm-1 month-select month-select-right"
                 ref={this.monthSelectRight}
                 onChange={this._handleMonthChange} title="Months and available captures"
-                defaultValue="">
+                value={this.state.rightMonth}>
                 <option value="" disabled>Month</option>
                 {this.state.rightMonthOptions}
               </select>
@@ -237,31 +237,29 @@ export default class YmdTimestampHeader extends React.Component {
    * aren't rendered yet.
    */
   _fetchCDXData = () => {
-    let leftMonthIndex = -1;
-    let rightMonthIndex = -1;
-    if (this.state.leftMonthIndex !== -1 && this.monthSelectLeft.current) {
-      const monthLeft = this.monthSelectLeft.current.value;
-      leftMonthIndex = parseInt(getKeyByValue(monthNames, monthLeft));
+    let leftMonth = '';
+    let rightMonth = '';
+    if (this.state.leftMonth !== '' && this.monthSelectLeft.current) {
+      leftMonth = this.monthSelectLeft.current.value;
     } else if (this.state.timestampA) {
-      leftMonthIndex = parseInt(this.state.timestampA.substring(4, 6));
+      leftMonth = this.state.timestampA.substring(4, 6);
     }
-    if (this.state.rightMonthIndex !== -1 && this.monthSelectRight.current) {
-      const monthRight = this.monthSelectRight.current.value;
-      rightMonthIndex = parseInt(getKeyByValue(monthNames, monthRight));
+    if (this.state.rightMonth !== '' && this.monthSelectRight.current) {
+      rightMonth = this.monthSelectRight.current.value;
     } else if (this.state.timestampB) {
-      rightMonthIndex = parseInt(this.state.timestampB.substring(4, 6));
+      rightMonth = this.state.timestampB.substring(4, 6);
     }
 
-    this.setState({ leftMonthIndex, rightMonthIndex });
+    this.setState({ leftMonth, rightMonth });
 
     let leftFetchPromise;
     let rightFetchPromise;
 
-    if (leftMonthIndex !== -1) {
-      leftFetchPromise = this.fetchYearMonthCaptures(this.state.leftYear, twoDigits(leftMonthIndex));
+    if (leftMonth !== '') {
+      leftFetchPromise = this.fetchYearMonthCaptures(this.state.leftYear, leftMonth);
     }
-    if (rightMonthIndex !== -1) {
-      rightFetchPromise = this.fetchYearMonthCaptures(this.state.rightYear, twoDigits(rightMonthIndex));
+    if (rightMonth !== '') {
+      rightFetchPromise = this.fetchYearMonthCaptures(this.state.rightYear, rightMonth);
     }
 
     if (leftFetchPromise) {
@@ -302,13 +300,24 @@ export default class YmdTimestampHeader extends React.Component {
     this.setState({ leftSnaps, rightSnaps });
   };
 
+  /** Each item has [key, value, counter] **/
   _showOptions = (data) => {
     const limit = parseInt(this.props.conf.limit);
     return (
       data &&
       data.slice(0).reverse().map((item, index) => {
-        const count = Math.min(item[1], limit);
-        return <option key={index} value={item[0]}>{`${item[0]} (${count})`}</option>;
+        let key = '', val = '', cnt = 0;
+        if (item.length == 3) {
+          key = item[0];
+          val = item[1];
+          cnt = item[2];
+        } else {
+          key = item[0];
+          val = item[0];
+          cnt = item[1];
+        }
+        const count = Math.min(cnt, limit);
+        return <option key={index} value={key}>{`${val} (${count})`}</option>;
       })
     );
   };
@@ -322,25 +331,17 @@ export default class YmdTimestampHeader extends React.Component {
     const { timestampA, timestampB, leftSnaps, rightSnaps } = this.state;
     if (!isEmpty(leftSnaps) && timestampA) {
       this.timestampSelectLeft.current.value = timestampA;
+      this.monthSelectLeft.current.value = this.state.leftMonth;
     }
     if (!isEmpty(rightSnaps) && timestampB) {
       this.timestampSelectRight.current.value = timestampB;
+      this.monthSelectRight.current.value = this.state.rightMonth;
     }
-    this._selectMonth(this.monthSelectLeft.current, this.state.leftMonthIndex);
-    this._selectMonth(this.monthSelectRight.current, this.state.rightMonthIndex);
 
     if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
-      if (this.state.leftMonthIndex !== -1 || this.state.rightMonthIndex !== -1) {
+      if (this.state.leftMonth !== '' || this.state.rightMonth !== '') {
         this._showMonths(this.state.leftYear, this.state.rightYear);
       }
-    }
-  };
-
-  _selectMonth = (monthSelect, monthIndex) => {
-    if (Array.from(monthSelect.options).some(option => option.value === monthNames[monthIndex])) {
-      monthSelect.value = monthNames[monthIndex];
-    } else {
-      monthSelect.selectedIndex = 0;
     }
   };
 
@@ -391,11 +392,11 @@ export default class YmdTimestampHeader extends React.Component {
 
   _showMonths = (leftYear, rightYear) => {
     if (!isNil(leftYear)) {
-      const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+      const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [String(idx+1).padStart(2, '0'), monthNames[idx+1], val]);
       this.setState({ leftMonthOptions: this._showOptions(leftMonths) });
     }
     if (!isNil(rightYear)) {
-      const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [monthNames[idx+1], val]);
+      const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [String(idx+1).padStart(2, '0'), monthNames[idx+1], val]);
       this.setState({ rightMonthOptions: this._showOptions(rightMonths) });
     }
   };
@@ -418,14 +419,14 @@ export default class YmdTimestampHeader extends React.Component {
   _handleYearChange = (e) => {
     if (e.target.id === 'year-select-left') {
       this.setState({
-        leftMonthIndex: 0,
+        leftMonth: '',
         leftYear: e.target.value,
         leftSnaps: null,
       });
       this._showMonths(e.target.value, null);
     } else {
       this.setState({
-        rightMonthIndex: 0,
+        rightMonth: '',
         rightYear: e.target.value,
         rightSnaps: null,
       });
