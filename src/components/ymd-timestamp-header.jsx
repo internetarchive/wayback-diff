@@ -232,72 +232,44 @@ export default class YmdTimestampHeader extends React.Component {
       .catch(error => { this._errorHandled(error.message); });
   };
 
+  _getMonth = (currentMonth, monthSelectRef, timestamp) => {
+    if (currentMonth !== '' && monthSelectRef.current) {
+      return monthSelectRef.current.value;
+    } else if (timestamp) {
+      return timestamp.substring(4, 6);
+    }
+    return '';
+  };
+
   /**
    * On component init get current month from timestamp because the months selects
    * aren't rendered yet.
    */
   _fetchCDXData = () => {
-    let leftMonth = '';
-    let rightMonth = '';
-    if (this.state.leftMonth !== '' && this.monthSelectLeft.current) {
-      leftMonth = this.monthSelectLeft.current.value;
-    } else if (this.state.timestampA) {
-      leftMonth = this.state.timestampA.substring(4, 6);
-    }
-    if (this.state.rightMonth !== '' && this.monthSelectRight.current) {
-      rightMonth = this.monthSelectRight.current.value;
-    } else if (this.state.timestampB) {
-      rightMonth = this.state.timestampB.substring(4, 6);
-    }
+    const leftMonth = this._getMonth(this.state.leftMonth, this.monthSelectLeft, this.state.timestampA);
+    const rightMonth = this._getMonth(this.state.rightMonth, this.monthSelectRight, this.state.timestampB);
 
     this.setState({ leftMonth, rightMonth });
 
-    let leftFetchPromise;
-    let rightFetchPromise;
+    const leftFetchPromise = leftMonth !== '' ? this.fetchYearMonthCaptures(this.state.leftYear, leftMonth) : null;
+    const rightFetchPromise = rightMonth !== '' ? this.fetchYearMonthCaptures(this.state.rightYear, rightMonth) : null;
 
-    if (leftMonth !== '') {
-      leftFetchPromise = this.fetchYearMonthCaptures(this.state.leftYear, leftMonth);
-    }
-    if (rightMonth !== '') {
-      rightFetchPromise = this.fetchYearMonthCaptures(this.state.rightYear, rightMonth);
-    }
+    Promise.allSettled([leftFetchPromise, rightFetchPromise])
+      .then(([leftResult, rightResult]) => {
+        const leftSnaps = leftResult?.value || [];
+        const rightSnaps = rightResult?.value || [];
 
-    if (leftFetchPromise) {
-      leftFetchPromise
-        .then((data) => {
-          if (data && data.length > 0) {
-            if (rightFetchPromise) {
-              const leftData = data;
-              rightFetchPromise
-                .then((data) => {
-                  if (data && data.length > 0) {
-                    this._prepareCDXData(leftData, data);
-                  }
-                });
-            } else {
-              this._prepareCDXData(data, null);
-            }
-          }
-        })
-        .catch(error => { this._errorHandled(error.message); });
-    } else if (rightFetchPromise) {
-      rightFetchPromise
-        .then((data) => {
-          if (data && data.length > 0) {
-            this._prepareCDXData(null, data);
-          }
-        });
-    }
+        if (leftSnaps.length > 0 || rightSnaps.length > 0) {
+          this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
+          this.setState({ leftSnaps, rightSnaps });
+        }
+      })
+      .catch(error => { this._errorHandled(error.message); });
   };
 
   _errorHandled = (error) => {
     this.props.errorHandledCallback(error);
     this.setState({ showError: true });
-  };
-
-  _prepareCDXData = (leftSnaps, rightSnaps) => {
-    this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
-    this.setState({ leftSnaps, rightSnaps });
   };
 
   /** Each item has [key, value, counter] **/
