@@ -71,12 +71,6 @@ export default class YmdTimestampHeader extends React.Component {
     }
   }
 
-  componentDidUpdate () {
-    if ((this.state.leftSnaps || this.state.rightSnaps) && !this.state.showError) {
-      this._selectValues();
-    }
-  }
-
   componentWillUnmount () {
     this._abortController.abort();
   }
@@ -294,17 +288,6 @@ export default class YmdTimestampHeader extends React.Component {
     this.props.getTimestampsCallback(this.state.timestampA, this.state.timestampB);
   };
 
-  // Note that this runs 3 times until it picks the right values. TODO optimise.
-  _selectValues = () => {
-    const { leftSnaps, rightSnaps } = this.state;
-
-    if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
-      if (this.state.leftMonth !== '' || this.state.rightMonth !== '') {
-        this._showMonths(this.state.leftYear, this.state.rightYear);
-      }
-    }
-  };
-
   _getHeaderInfo = (firstTimestamp, lastTimestamp, count) => {
     const first = getShortUTCDateFormat(firstTimestamp);
     const last = getShortUTCDateFormat(lastTimestamp);
@@ -347,6 +330,8 @@ export default class YmdTimestampHeader extends React.Component {
       sparkline: snapshots,
       yearOptions: this._showOptions(yearSum),
       headerInfo: this._getHeaderInfo(data.first_ts, data.last_ts, allSum)
+    }, () => {
+      this._showMonths(this.state.leftYear, this.state.rightYear);
     });
   };
 
