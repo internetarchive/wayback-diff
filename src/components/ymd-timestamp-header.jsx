@@ -135,6 +135,7 @@ export default class YmdTimestampHeader extends React.Component {
                 <select className="form-control input-sm mr-sm-1 timestamp-select"
                   ref={this.timestampSelectLeft}
                   onChange={this._handleLeftTimestampChange}
+                  value={this.state.timestampA}
                   defaultValue="">
                   <option value="" disabled>Available captures</option>
                   {this.state.leftSnaps.map((item, index) => (
@@ -151,6 +152,7 @@ export default class YmdTimestampHeader extends React.Component {
               <select className="form-control input-sm mr-sm-1 timestamp-select"
                 ref={this.timestampSelectRight}
                 onChange={this._handleRightTimestampChange}
+                value={this.state.timestampB}
                 defaultValue="">
                 <option value="" disabled>Available captures</option>
                 {this.state.rightSnaps.map((item, index) => (
@@ -294,13 +296,7 @@ export default class YmdTimestampHeader extends React.Component {
 
   // Note that this runs 3 times until it picks the right values. TODO optimise.
   _selectValues = () => {
-    const { timestampA, timestampB, leftSnaps, rightSnaps } = this.state;
-    if (!isEmpty(leftSnaps) && timestampA) {
-      this.timestampSelectLeft.current.value = timestampA;
-    }
-    if (!isEmpty(rightSnaps) && timestampB) {
-      this.timestampSelectRight.current.value = timestampB;
-    }
+    const { leftSnaps, rightSnaps } = this.state;
 
     if (this.state.sparkline && !this.state.leftMonthOptions && !this.state.rightMonthOptions) {
       if (this.state.leftMonth !== '' || this.state.rightMonth !== '') {
@@ -369,14 +365,16 @@ export default class YmdTimestampHeader extends React.Component {
     if (e.target.className.includes('left')) {
       this.setState({
         leftMonth: e.target.value,
-        leftSnaps: null
+        leftSnaps: null,
+        timestampA: null
       }, () => {
         this._fetchCDXData();
       });
     } else {
       this.setState({
         rightMonth: e.target.value,
-        rightSnaps: null
+        rightSnaps: null,
+        timestampB: null
       }, () => {
         this._fetchCDXData();
       });
