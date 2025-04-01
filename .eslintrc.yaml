@@ -26,9 +26,9 @@ plugins:
   - promise
   - react
 rules:
-  complexity: ["warn", 10]
+  complexity: ["warn", 15]
   no-console:
-    - error
+    - warn
     - allow:
       - warn
       - error

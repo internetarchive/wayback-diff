@@ -25,7 +25,7 @@ const ErrorMessage = ({ code, url, timestamp, conf, errorHandledCallback }) => {
     break;
   case '422':
     // https://github.com/edgi-govdata-archiving/web-monitoring-diff/blob/be748a7f0bbdd4251f680e22d3e433d1be93f858/web_monitoring_diff/server/server.py#L568
-    msg = `The captures of ${url} cannot be compared. Note that we support only HTML capture comparison.`;
+    msg = `The captures of ${url} cannot be compared because we support only HTML comparison.`;
     simhash = false;
     break;
   case 'CAPTURE_NOT_FOUND':

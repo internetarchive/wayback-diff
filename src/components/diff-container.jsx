@@ -45,6 +45,7 @@ export default class DiffContainer extends React.Component {
   };
 
   errorHandled = (errorCode) => {
+    console.log('Error handled:', errorCode);
     this.setState({ error: errorCode });
   };
 
