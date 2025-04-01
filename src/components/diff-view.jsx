@@ -208,11 +208,15 @@ export default class DiffView extends React.Component {
     url.searchParams.append('b', b);
     fetchWithTimeout(url, { credentials: 'include' })
       .then(checkResponse)
-      .then(response => response.json())
-      .then((data) => {
-        this.setState({
-          diffData: data
-        });
+      .then((response) => {
+        if (response.status == 200) {
+          const data = response.json();
+          this.setState({
+            diffData: data
+          });
+        } else {
+          this._errorHandled(error.status);
+        }
       })
       .catch(error => { this._errorHandled(error.message); });
   }

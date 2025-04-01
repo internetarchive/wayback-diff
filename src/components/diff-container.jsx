@@ -54,7 +54,7 @@ export default class DiffContainer extends React.Component {
     const { timestampA, timestampB, showDiff, error } = this.state;
 
     if (error) {
-      return (<ErrorMessage url={url} timestamp={timestampA} code={error}/>);
+      return (<ErrorMessage url={url} timestamp={timestampA} code={error} />);
     }
     if (!timestampA && !timestampB) {
       return (
