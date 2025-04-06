@@ -1,5 +1,3 @@
-import { twoDigits } from '../../js/utils';
-
 export function getSize () {
   const w = window.innerWidth || document.documentElement.clientWidth ||
     document.body.clientWidth;
@@ -38,7 +36,7 @@ export function decodeCompressedJson (json) {
       for (let y = 1; y < json.captures[0][i][j].length; y++) {
         const [time, simhashIndex] = json.captures[0][i][j][y];
         const simhash = json.hashes[simhashIndex];
-        const timestamp = `${year}${twoDigits(month)}${twoDigits(day)}${time}`;
+        const timestamp = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}${time}`;
         newJson.push([timestamp, simhash]);
       }
     }

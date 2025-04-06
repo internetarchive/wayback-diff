@@ -110,13 +110,6 @@ export function fetchWithTimeout (url, params) {
   });
 }
 
-export function twoDigits (n) {
-  if (typeof n === 'string') {
-    return n;
-  }
-  return n > 9 ? '' + n : '0' + n;
-}
-
 export function getKeyByValue (obj, value) {
   return Object.keys(obj).find(key => obj[key] === value);
 }
