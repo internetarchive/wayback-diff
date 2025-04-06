@@ -4,7 +4,7 @@ import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
 import { similarityWithDistance, checkResponse, fetchWithTimeout, getUTCDateFormat }
   from '../../js/utils.js';
-import { getSize, decodeCompressedJson, decodeUncompressedJson } from './sunburst-container-utils.js';
+import { decodeCompressedJson, decodeUncompressedJson } from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
@@ -47,18 +47,10 @@ export default class SunburstContainer extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      isUpdate: 0,
       isPending: false,
       simhashData: null
     };
     this._clusters = [];
-  }
-
-  componentDidUpdate () {
-    if (this.state.isUpdate < 2) {
-      getSize();
-      this.setState({ isUpdate: this.state.isUpdate + 1 });
-    }
   }
 
   render () {
