@@ -2,7 +2,7 @@ import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
 import scaleCluster from 'd3-scale-cluster';
 import '../../css/diffgraph.css';
-import { similarityWithDistance, checkResponse, fetchWithTimeout, getUTCDateFormat }
+import { similarityWithDistance, checkResponse, getUTCDateFormat }
   from '../../js/utils.js';
 import { decodeCompressedJson, decodeUncompressedJson } from './sunburst-container-utils.js';
 import ErrorMessage from '../errors.jsx';
@@ -47,15 +47,25 @@ export default class SunburstContainer extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      timestamp: this.props.timestamp,
       isPending: false,
       simhashData: null
     };
     this._clusters = [];
   }
 
+  componentDidMount () {
+    if (this.state.timestamp) {
+      this._fetchTimestampSimhashData();
+    } else {
+      this._validateTimestamp();
+    }
+  }
+
   render () {
     const { url, conf, loader } = this.props;
     const { countCaptures, error, simhashData, timestamp } = this.state;
+    const Loader = () => isNil(loader) ? <Loading/> : loader;
 
     if (error) {
       return (
@@ -80,13 +90,6 @@ export default class SunburstContainer extends React.Component {
         </div>
       );
     }
-    // TODO Must move this outside here.
-    const Loader = () => isNil(loader) ? <Loading/> : loader;
-    if (timestamp) {
-      this._fetchTimestampSimhashData();
-    } else {
-      this._validateTimestamp();
-    }
     return <div className="loading"><Loader/></div>;
   }
 
@@ -100,7 +103,7 @@ export default class SunburstContainer extends React.Component {
     reqUrl.searchParams.append('limit', '1');
     reqUrl.searchParams.append('fl', 'timestamp');
 
-    fetchWithTimeout(reqUrl)
+    fetch(reqUrl)
       .then(checkResponse)
       .then(response => response.json())
       .then(data => {
@@ -124,10 +127,11 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchTimestampSimhashData () {
+    console.log('_fetchTimestampSimhashData');
     const { url, conf } = this.props;
     const { timestamp } = this.state;
     const fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&timestamp=' + timestamp;
-    fetchWithTimeout(fetchUrl).then(checkResponse)
+    fetch(fetchUrl).then(checkResponse)
       .then(response => response.json())
       .then((jsonResponse) => {
         if (jsonResponse.status) {
@@ -141,13 +145,14 @@ export default class SunburstContainer extends React.Component {
   }
 
   _fetchSimhashData (timestampJson) {
+    console.log('_fetchSimhashData');
     const { url, conf } = this.props;
     const { timestamp } = this.state;
     let fetchUrl = conf.waybackDiscoverDiff + '/simhash?url=' + encodeURIComponent(url) + '&year=' + timestamp.substring(0, 4);
     if (conf.compressedSimhash) {
       fetchUrl += '&compress=1';
     }
-    fetchWithTimeout(fetchUrl).then(checkResponse)
+    fetch(fetchUrl).then(checkResponse)
       .then(response => response.json())
       .then((jsonResponse) => {
         this.setState({ isPending: jsonResponse.status === 'PENDING' });
