@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import '../css/diff-container.css';
-import {
-  fetchWithTimeout, getUTCDateFormat, getShortUTCDateFormat, jsonResponse
-} from '../js/utils.js';
+import { getUTCDateFormat, getShortUTCDateFormat, jsonResponse } from '../js/utils.js';
 import Loading from './loading.jsx';
 import isNil from 'lodash/isNil';
 import isEmpty from 'lodash/isEmpty';
@@ -43,7 +41,6 @@ export default class YmdTimestampHeader extends React.Component {
   constructor (props) {
     super(props);
     const { timestampA, timestampB } = this.props;
-    this._abortController = new window.AbortController();
 
     this.timestampSelectLeft = React.createRef();
     this.timestampSelectRight = React.createRef();
@@ -69,10 +66,6 @@ export default class YmdTimestampHeader extends React.Component {
         this._fetchSparklineData();
       }
     }
-  }
-
-  componentWillUnmount () {
-    this._abortController.abort();
   }
 
   _handleRightTimestampChange = (event) => {
@@ -217,7 +210,7 @@ export default class YmdTimestampHeader extends React.Component {
     requestUrl.searchParams.append('date', year1 + month1);
     requestUrl.searchParams.append('digest', 1);
 
-    return fetchWithTimeout(requestUrl, { signal: this._abortController.signal })
+    return fetch(requestUrl)
       .then(jsonResponse)
       .then(data => data['items'])
       .then(data => data.map(item => [year1 + month1 + String(item[0]).padStart(8, '0'), item[2]]))
@@ -300,7 +293,7 @@ export default class YmdTimestampHeader extends React.Component {
     url.searchParams.append('url', this.props.url);
     url.searchParams.append('collection', 'web');
     url.searchParams.append('output', 'json');
-    fetchWithTimeout(url, { signal: this._abortController.signal })
+    fetch(url)
       .then(jsonResponse)
       .then((data) => {
         if (data) {
