@@ -1,6 +1,6 @@
 {
   "name": "@internetarchive/wayback-diff",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "main": "build/app.js",
   "dependencies": {
     "d3": "7.9.0",
