@@ -3,13 +3,15 @@ import React, { StrictMode } from 'react';
 /* eslint-enable no-unused-vars */
 
 import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import DiffContainer from './components/diff-container.jsx';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import SunburstContainer from './components/sunburst/sunburst-container.jsx';
 
 const conf = require('./conf.json');
+const root = createRoot(document.getElementById('wayback-diff'));
 
-ReactDOM.render(
+root.render(
   <StrictMode>
     <Router>
       <Switch>
@@ -44,4 +46,4 @@ ReactDOM.render(
         />
       </Switch>
     </Router>
-  </StrictMode>, document.getElementById('wayback-diff'));
+  </StrictMode>);
