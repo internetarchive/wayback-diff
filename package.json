@@ -13,7 +13,7 @@
     "simple-xpath-position": "^2.0.2"
   },
   "scripts": {
-    "start": "HOST=vbanos.gr PORT=5000 react-scripts start",
+    "start": "rollup -c config/rollup.mjs -w",
     "build": "rollup -c config/rollup.mjs",
     "build:dev": "rollup -c config/rollup.mjs -w",
     "test": "jest --testEnvironment=jsdom --testPathIgnorePatterns=src/components/__tests__/setup.js",
@@ -25,7 +25,7 @@
     "@babel/plugin-proposal-export-default-from": "^7.27",
     "@babel/plugin-transform-private-property-in-object": "^7.27",
     "@babel/preset-env": "^7.28",
-    "@babel/preset-react": "^7.27",
+    "@babel/preset-react": "^7.28",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -46,9 +46,10 @@
     "jest-environment-jsdom": "^30.0.0",
     "jsdom": "^27.0.0",
     "postcss": "^8.5.6",
-    "react-scripts": "^5.0.1",
     "rollup": "4.31.0",
+    "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-serve": "^3.0.0",
     "smbase64": "^1.0.2"
   },
   "repository": {
