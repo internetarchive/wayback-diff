@@ -8,7 +8,7 @@
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -26,5 +26,7 @@
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="wayback-diff">This</div>
+	<!-- Include your Rollup bundle -->
+	<script type="module" src="/app.js"></script>
   </body>
 </html>

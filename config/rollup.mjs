@@ -1,5 +1,7 @@
+import fs from 'fs';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
@@ -14,7 +16,7 @@ import livereload from 'rollup-plugin-livereload';
 const isDev = process.env.ROLLUP_WATCH === 'true';
 
 export default {
-  input: 'src/index-build.js',
+  input: isDev ? 'src/index.js' : 'src/index-build.js',
   output: {
     name: 'waybackDiff',
     file: 'build/app.js',
@@ -38,6 +40,7 @@ export default {
       extensions: ['.css'],
       plugins: [cssnano()]
     }),
+    json(),
     babel({
       babelrc: false,
       exclude: 'node_modules/**',
@@ -45,12 +48,22 @@ export default {
       presets: ['@babel/preset-env', '@babel/preset-react'],
       plugins: ['@babel/plugin-proposal-export-default-from']
     }),
-    !isDev && terser(), // only minify in production
+    terser(),
     isDev && serve({
       open: true,
       contentBase: ['build', 'public'],
       host: '0.0.0.0',
-      port: 5000
+      port: 5000,
+      historyApiFallback: true,
+      //
+      // To enable https you need:
+      // mkdir cert
+      // openssl req -x509 -newkey rsa:4096 -nodes -keyout cert/key.pem -out cert/cert.pem -days 36
+      //
+      // https: {
+      //   key: fs.readFileSync('cert/key.pem'),
+      //   cert: fs.readFileSync('cert/cert.pem')
+      // }
     }),
     isDev && livereload({ watch: 'build' })
   ].filter(Boolean)

@@ -8,13 +8,17 @@ import DiffContainer from './components/diff-container.jsx';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import SunburstContainer from './components/sunburst/sunburst-container.jsx';
 
-const conf = require('./conf.json');
+import conf from './conf.json';
 const root = createRoot(document.getElementById('wayback-diff'));
+
+// /hello endpoint is to test that React routing works.
 
 root.render(
   <StrictMode>
     <Router>
       <Switch>
+        <Route path="/hello" component={() => <div>Hello, this is static text!</div>} />
+
         <Route path='/diff/([0-9]{14})/([0-9]{14})/(.+)' render={({ match, location }) =>
           <DiffContainer url={match.params[2] + location.search} timestampA={match.params[0]}
             loader={null}
