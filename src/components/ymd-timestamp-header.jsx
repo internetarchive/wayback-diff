@@ -212,7 +212,14 @@ export default class YmdTimestampHeader extends React.Component {
 
     return fetch(requestUrl)
       .then(jsonResponse)
-      .then(data => data['items'])
+      .then(data => {
+        const items = data.items || [];
+        const allErrors = items.length > 0 && items.every(item => item[1] >= 400);
+        if (allErrors) {
+          throw new Error(`Year ${year1} month ${month1} has no status=200 captures and cannot be used for comparison.`);
+        }
+        return items;
+	  })
       .then(data => data.map(item => [year1 + month1 + String(item[0]).padStart(8, '0'), item[2]]))
       .catch(error => { this._errorHandled(error.message); });
   };
