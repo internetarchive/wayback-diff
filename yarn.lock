@@ -2345,11 +2345,6 @@ cjs-module-lexer@^2.1.0:
   resolved "https://registry.yarnpkg.com/cjs-module-lexer/-/cjs-module-lexer-2.1.1.tgz#bff23b0609cc9afa428bd35f1918f7d03b448562"
   integrity sha512-+CmxIZ/L2vNcEfvNtLdU0ZQ6mbq3FZnwAP2PPTiKP+1QOoKwlKlPgb8UKV0Dds7QVaMnHm+FwSft2VB0s/SLjQ==
 
-ckmeans@^2.0.1:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/ckmeans/-/ckmeans-2.1.0.tgz#ad981cbb1af8da79bebbe82fca441ef1dc0b2fe7"
-  integrity sha512-xLKsOWXy2QqD8kzyddAV3N87dWZk1sscaUjJmjUccJ7OMddCYJKGR+ff2QIu3sN5uhmuB7prtmYLLV5t6V1cYw==
-
 cliui@^8.0.1:
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-8.0.1.tgz#0c04b075db02cbfe60dc8e6cf2f5486b1a3608aa"
@@ -2778,13 +2773,6 @@ d3-scale-chromatic@3:
   dependencies:
     d3-color "1 - 3"
     d3-interpolate "1 - 3"
-
-d3-scale-cluster@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/d3-scale-cluster/-/d3-scale-cluster-2.0.1.tgz#7ebfc146204b1d96a129903ead9dfc4d2d781191"
-  integrity sha512-1ll05baOigYr4rh4uIE15J4DA+JnGy8HutZUvj6VcBJmHrbEsmTAnwdb1KrxX/bT9cS7oxG/w5ONFtOP2pSKrQ==
-  dependencies:
-    ckmeans "^2.0.1"
 
 d3-scale@4:
   version "4.0.2"
