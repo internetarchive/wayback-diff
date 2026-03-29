@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DiffView from './diff-view.jsx';
+import { diffTypesFor } from '../js/constants/diff-types';
 import '../css/diff-container.css';
 import YmdTimestampHeader from './ymd-timestamp-header.jsx';
 import DiffFooter from './footer.jsx';
@@ -150,10 +151,16 @@ export default class DiffContainer extends React.Component {
     if (!this.state.error) {
       const urlA = new URL(conf.snapshotsPrefix + timestampA + '/' + encodeURIComponent(url), window.location.origin);
       const urlB = new URL(conf.snapshotsPrefix + timestampB + '/' + encodeURIComponent(url), window.location.origin);
-      const webMonURL = new URL(conf.webMonitoringProcessingURL, window.location.origin);
-      return (<DiffView webMonitoringProcessingURL={webMonURL.toString()}
+      const ext = '.' + url.split('.').pop();
+      const availableTypes = diffTypesFor(ext);
+      const isPdf = availableTypes.length > 0 && ext === '.pdf';
+      const diffType = availableTypes.length > 0 ? availableTypes[0].value : 'SIDE_BY_SIDE_RENDERED';
+      const backendURL = isPdf
+        ? new URL(conf.pdfMonitoringProcessingURL, window.location.origin)
+        : new URL(conf.webMonitoringProcessingURL, window.location.origin);
+      return (<DiffView webMonitoringProcessingURL={backendURL.toString()}
         page={{ url: encodeURIComponent(url) }}
-        diffType={'SIDE_BY_SIDE_RENDERED'} a={urlA} b={urlB}
+        diffType={diffType} a={urlA} b={urlB}
         loader={loader} errorHandledCallback={this.errorHandled}/>);
     }
   };
