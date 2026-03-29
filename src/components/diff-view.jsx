@@ -128,6 +128,7 @@ export default class DiffView extends React.Component {
         <InlineRenderedDiff diffData={this.state.diffData} page={this.props.page} />
       );
     case diffTypes.SIDE_BY_SIDE_RENDERED.value:
+    case diffTypes.PDF_SIDE_BY_SIDE_RENDERED.value:
       return (
         <SideBySideRenderedDiff diffData={this.state.diffData} page={this.props.page}
           loader={this.props.loader}/>
