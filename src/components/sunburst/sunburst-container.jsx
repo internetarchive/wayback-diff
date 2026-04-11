@@ -1,6 +1,6 @@
 import React from 'react';
 import D3Sunburst from './d3-sunburst.jsx';
-import scaleCluster from 'd3-scale-cluster';
+import scaleCluster from '../../js/scale-cluster.js';
 import '../../css/diffgraph.css';
 import { similarityWithDistance, checkResponse, getUTCDateFormat }
   from '../../js/utils.js';
