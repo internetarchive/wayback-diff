@@ -149,7 +149,14 @@ export default function scaleCluster() {
   };
 
   function rescale() {
-    if (range.length <= 2) return;
+    if (range.length <= 2) {
+      breakpoints = [];
+      return;
+    }
+    if (!domain.length) {
+      breakpoints = [];
+      return;
+    }
     const clusters = ckmeans(domain, Math.min(domain.length, range.length));
     breakpoints = clusters.slice(); // store full cluster mins
   }

@@ -103,4 +103,21 @@ describe('scaleCluster', function () {
     expect(scale.domain()).toEqual(d);
     expect(scale.range()).toEqual(r);
   });
+
+  it('does not throw when range is set before domain or domain is empty', function () {
+    const scale = scaleCluster().range([1, 2, 3, 4, 5]);
+    expect(scale.clusters()).toEqual([]);
+    expect(scale(0)).toBeUndefined();
+    scale.domain([10, 20, 30]);
+    expect(scale.clusters().length).toBeGreaterThanOrEqual(0);
+    expect(scale(20)).toBeDefined();
+  });
+
+  it('clears breakpoints when range shrinks to two or fewer buckets', function () {
+    const scale = scaleCluster().domain([1, 2, 10, 20]).range([1, 2, 3]);
+    expect(scale.clusters().length).toBeGreaterThan(0);
+    scale.range([1, 2]);
+    expect(scale.clusters()).toEqual([]);
+    expect(scale(10)).toBeUndefined();
+  });
 });
