@@ -8,10 +8,6 @@ import { decodeCompressedJson, decodeUncompressedJson } from './sunburst-contain
 import ErrorMessage from '../errors.jsx';
 import PropTypes from 'prop-types';
 import Loading from '../loading.jsx';
-import isNil from 'lodash/isNil';
-import isEmpty from 'lodash/isEmpty';
-import sortBy from 'lodash/sortBy';
-import take from 'lodash/take';
 
 const barStyle1 = { backgroundColor: 'rgb(241, 231, 119)', height: '4px' };
 const barStyle2 = { backgroundColor: 'rgb(197, 213, 108)', height: '6px' };
@@ -65,7 +61,7 @@ export default class SunburstContainer extends React.Component {
   render () {
     const { url, conf, loader } = this.props;
     const { countCaptures, error, simhashData, timestamp } = this.state;
-    const Loader = () => isNil(loader) ? <Loading/> : loader;
+    const Loader = () => loader == null ? <Loading/> : loader;
 
     if (error) {
       return (
@@ -158,7 +154,7 @@ export default class SunburstContainer extends React.Component {
         this.setState({ isPending: jsonResponse.status === 'PENDING' });
         const json = conf.compressedSimhash ? decodeCompressedJson(jsonResponse) : decodeUncompressedJson(jsonResponse);
         const data = this._calcDistanceAndScales(json, timestampJson);
-        if (!isEmpty(data)) {
+        if (data.length > 0) {
           this._createLevels(data, timestampJson);
         }
       })
@@ -289,11 +285,12 @@ export default class SunburstContainer extends React.Component {
       fifthLevel = [];
     }
 
-    firstLevel = take(sortBy(firstLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
-    secondLevel = take(sortBy(secondLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
-    thirdLevel = take(sortBy(thirdLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
-    fourthLevel = take(sortBy(fourthLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
-    fifthLevel = take(sortBy(fifthLevel, [function (o) { return o.timestamp; }]), conf.maxSunburstLevelLength);
+    const sortAndTake = (arr) => arr.sort((a, b) => a.timestamp < b.timestamp ? -1 : +(a.timestamp > b.timestamp)).slice(0, conf.maxSunburstLevelLength);
+    firstLevel = sortAndTake(firstLevel);
+    secondLevel = sortAndTake(secondLevel);
+    thirdLevel = sortAndTake(thirdLevel);
+    fourthLevel = sortAndTake(fourthLevel);
+    fifthLevel = sortAndTake(fifthLevel);
 
     function assignChildrenToParent(parentLevel, childLevel) {
       for (let i = 0; i < childLevel.length; i++) {

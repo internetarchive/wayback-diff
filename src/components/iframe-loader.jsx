@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import isNil from 'lodash/isNil';
 import Loading from './loading.jsx';
 
 export default class IframeLoader extends React.PureComponent {
@@ -14,7 +13,7 @@ export default class IframeLoader extends React.PureComponent {
   }
 
   render () {
-    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const Loader = () => this.props.loader == null ? <Loading/> : this.props.loader;
     return (
       <div style={this.state.loaderStyle}>
         {this.state.loaderStyle && <Loader/>}

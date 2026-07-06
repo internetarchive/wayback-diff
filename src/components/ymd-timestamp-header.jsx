@@ -3,8 +3,6 @@ import React from 'react';
 import '../css/diff-container.css';
 import { getUTCDateFormat, getShortUTCDateFormat, jsonResponse } from '../js/utils.js';
 import Loading from './loading.jsx';
-import isNil from 'lodash/isNil';
-import isEmpty from 'lodash/isEmpty';
 
 const monthNames = {
   1: 'January',
@@ -87,8 +85,8 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   render () {
-    const showDiffBtn = !isEmpty(this.state.timestampA) && !isEmpty(this.state.timestampB);
-    const Loader = () => isNil(this.props.loader) ? <Loading/> : this.props.loader;
+    const showDiffBtn = !!this.state.timestampA && !!this.state.timestampB;
+    const Loader = () => this.props.loader == null ? <Loading/> : this.props.loader;
     if (this.state.showError) {
       return <div></div>;
     }
@@ -118,7 +116,7 @@ export default class YmdTimestampHeader extends React.Component {
                 <option value="" disabled>Month</option>
                 {  this.state.leftMonthOptions}
               </select>
-              { !isEmpty(this.state.leftSnaps) &&
+              { this.state.leftSnaps && this.state.leftSnaps.length > 0 &&
                 <select className="form-control input-sm mr-sm-1 timestamp-select"
                   ref={this.timestampSelectLeft}
                   onChange={this._handleLeftTimestampChange}
@@ -135,7 +133,7 @@ export default class YmdTimestampHeader extends React.Component {
               {showDiffBtn && <button className="btn btn-default btn-sm" onClick={this._showDiffs}>Show differences</button> }
             </div>
             <div className="wayback-timestamps">
-              { !isEmpty(this.state.rightSnaps) &&
+              { this.state.rightSnaps && this.state.rightSnaps.length > 0 &&
               <select className="form-control input-sm mr-sm-1 timestamp-select"
                 ref={this.timestampSelectRight}
                 onChange={this._handleRightTimestampChange}
@@ -336,11 +334,11 @@ export default class YmdTimestampHeader extends React.Component {
   };
 
   _showMonths = (leftYear, rightYear) => {
-    if (!isNil(leftYear)) {
+    if (leftYear != null) {
       const leftMonths = this.state.sparkline[leftYear].filter(val => val > 0).map((val, idx) => [String(idx+1).padStart(2, '0'), monthNames[idx+1], val]);
       this.setState({ leftMonthOptions: this._showOptions(leftMonths) });
     }
-    if (!isNil(rightYear)) {
+    if (rightYear != null) {
       const rightMonths = this.state.sparkline[rightYear].filter(val => val > 0).map((val, idx) => [String(idx+1).padStart(2, '0'), monthNames[idx+1], val]);
       this.setState({ rightMonthOptions: this._showOptions(rightMonths) });
     }

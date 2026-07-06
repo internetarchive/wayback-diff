@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
-import round from 'lodash/round';
 import { select } from 'd3-selection';
 import { hierarchy, partition } from 'd3-hierarchy';
 import { arc } from 'd3-shape';
@@ -8,7 +7,7 @@ import { getSize } from './sunburst-container-utils.js';
 
 function getDistance(capture) {
   if (capture.similarity !== -1) {
-    return `${capture.name} - Differences: ${round(capture.similarity, 2)}%`;
+    return `${capture.name} - Differences: ${+capture.similarity.toFixed(2)}%`;
   }
 }
 

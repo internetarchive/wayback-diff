@@ -1,7 +1,24 @@
-import isNil from 'lodash/isNil';
-import filter from 'lodash/filter';
-import isEqual from 'lodash/isEqual';
-import { fromNode } from 'simple-xpath-position';
+
+function xpathNodeName (node) {
+  switch (node.nodeName) {
+    case '#text': return 'text()';
+    case '#comment': return 'comment()';
+    case '#cdata-section': return 'cdata-section()';
+    default: return node.nodeName.toLowerCase();
+  }
+}
+
+function fromNode (node, root = node.ownerDocument) {
+  let path = '/';
+  while (node !== root) {
+    if (!node) throw new Error('Node not contained by root');
+    let pos = 1, sib = node.previousSibling;
+    while (sib) { if (sib.nodeName === node.nodeName) pos++; sib = sib.previousSibling; }
+    path = `/${xpathNodeName(node)}[${pos}]${path}`;
+    node = node.parentNode;
+  }
+  return path.replace(/\/$/, '');
+}
 
 const absoluteUrlRegex = new RegExp(/\/\/web\.archive\.org\/web\/\d{14}/gm);
 const relativeUrlRegex = new RegExp(window.location.origin + '/web/\\d{14}', 'gm');
@@ -24,7 +41,7 @@ export function getTimestampCleanDiff (insertions, deletions) {
   // Get all of web-monitoring-processing's del elements that link to a
   // resource and have at least one child, meaning that they highlight content
   for (let i = 0, len = del.length; i < len; i++) {
-    if (isEqual(del[i].className, 'wm-diff') && del[i].childNodes.length > 0) {
+    if (del[i].className === 'wm-diff' && del[i].childNodes.length > 0) {
       del[i].childNodes.forEach(function (child) {
         const result = checkTimestampInLink(child);
         // constant result might be nil, so we wouldn't want to add nill values to the array
@@ -35,7 +52,7 @@ export function getTimestampCleanDiff (insertions, deletions) {
   // Get all of web-monitoring-processing's ins elements that link to a
   // resource and have at least one child, meaning that they highlight content.
   for (let i = 0, len = ins.length; i < len; i++) {
-    if (isEqual(ins[i].className, 'wm-diff') && ins[i].childNodes.length > 0) {
+    if (ins[i].className === 'wm-diff' && ins[i].childNodes.length > 0) {
       ins[i].childNodes.forEach(function (child) {
         const result = checkTimestampInLink(child);
         addNotNill(foundIns, result);
@@ -52,13 +69,13 @@ export function getTimestampCleanDiff (insertions, deletions) {
       j = foundIns.length - 1;
       while (j >= 0) {
         // If their linked resource is the same
-        if (isEqual(foundDel[k][1], foundIns[j][1])) {
+        if (foundDel[k][1] === foundIns[j][1]) {
           try {
             const dirtyDelXpath = fromNode(foundDel[k][0], domDel);
             const dirtyInsXpath = fromNode(foundIns[j][0], domIns);
             const delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
             const insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
-            if (isEqual(delxpath, insxpath)) {
+            if (delxpath === insxpath) {
               deleteNodes(foundIns[j][0], foundDel[k][0]);
               j--;
             }
@@ -74,8 +91,8 @@ export function getTimestampCleanDiff (insertions, deletions) {
     }
   }
 
-  del = filter(del, isNotAResource);
-  ins = filter(ins, isNotAResource);
+  del = Array.from(del).filter(isNotAResource);
+  ins = Array.from(ins).filter(isNotAResource);
 
   if (del.length > 0 && ins.length > 0) {
     k = del.length - 1;
@@ -84,13 +101,13 @@ export function getTimestampCleanDiff (insertions, deletions) {
       j = ins.length - 1;
       while (j >= 0) {
         // If their contents are identical
-        if (isEqual(del[k].innerHTML, ins[j].innerHTML)) {
+        if (del[k].innerHTML === ins[j].innerHTML) {
           try {
             const dirtyDelXpath = fromNode(del[k], domDel);
             const dirtyInsXpath = fromNode(ins[j], domIns);
             const delxpath = removeDiffXPATH(dirtyDelXpath, 'del');
             const insxpath = removeDiffXPATH(dirtyInsXpath, 'ins');
-            if (isEqual(delxpath, insxpath)) {
+            if (delxpath === insxpath) {
               deleteNodes(ins[j], del[k]);
               break;
             } else {
@@ -111,10 +128,10 @@ export function getTimestampCleanDiff (insertions, deletions) {
 }
 
 export function getLinkFromElement (hasLink) {
-  if (!isNil(hasLink.src)) {
+  if (null != (hasLink.src)) {
     return hasLink.src;
   }
-  if (!isNil(hasLink.href)) {
+  if (null != (hasLink.href)) {
     return hasLink.href;
   }
   return hasLink.action;
@@ -126,10 +143,10 @@ export function isNotAResource (element) {
 
 export function checkTimestampInLink (element) {
   let link = getLinkFromElement(element);
-  if (isNil(link)) {
+  if (null == (link)) {
     link = getLinkFromElement(element.parentNode.parentNode);
   }
-  if (!isNil(link)) {
+  if (null != (link)) {
     if (link.match(absoluteUrlRegex)) {
       return element;
     }
@@ -157,25 +174,25 @@ function removeMarkup (node) {
 }
 
 function addNotNill (array, element) {
-  if (!isNil(element)) {
+  if (null != (element)) {
     let url = getWBMCleanURL(element);
-    if (isNil(url)) {
+    if (null == (url)) {
       url = getWBMCleanURL(element.parentNode.parentNode);
     }
-    if (!isNil(url)) {
+    if (null != (url)) {
       array.push([element, normalizeURL(url)]);
     }
   }
 }
 
 export function getWBMCleanURL (element) {
-  if (!isNil(element.src)) {
+  if (null != (element.src)) {
     return removeWBM(element.src);
   }
-  if (!isNil(element.href)) {
+  if (null != (element.href)) {
     return removeWBM(element.href);
   }
-  if (!isNil(element.action)) {
+  if (null != (element.action)) {
     return removeWBM(element.action);
   }
 }

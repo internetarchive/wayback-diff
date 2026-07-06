@@ -8,7 +8,6 @@ import { checkResponse, fetchWithTimeout } from '../js/utils.js';
 import NoSnapshotURL from './no-snapshot-url.jsx';
 import ErrorMessage from './errors.jsx';
 import Loading from './loading.jsx';
-import isNil from 'lodash/isNil';
 
 /**
  * Display a change between two versions of a page.
@@ -123,7 +122,7 @@ export default class DiffContainer extends React.Component {
     const captureUrl = new URL(conf.snapshotsPrefix + timestamp + '/' + encodeURIComponent(url), window.location.origin);
     this._handleSnapshotFetch(fetchWithTimeout(captureUrl.toString()));
 
-    const Loader = () => isNil(loader) ? <Loading/> : loader;
+    const Loader = () => loader == null ? <Loading/> : loader;
     return <div className="loading"><Loader/></div>;
   }
 

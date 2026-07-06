@@ -1,6 +1,3 @@
-import max from 'lodash/max';
-import zip from 'lodash/zip';
-
 
 export function similarityWithTanimoto (simhash1, simhash2) {
   if (Number.isInteger(simhash1) && Number.isInteger(simhash2)) {
@@ -29,9 +26,10 @@ function distanceOfInts (x, y) {
 }
 
 function distanceOfUint8Array (x, y) {
-  return zip(x, y)
-    .map(([i, j]) => weightOfInt(i ^ j))
-    .reduce((acc, w) => acc + w, 0);
+  let sum = 0;
+  const len = Math.max(x.length, y.length);
+  for (let i = 0; i < len; i++) sum += weightOfInt((x[i] ?? 0) ^ (y[i] ?? 0));
+  return sum;
 }
 
 export function similarityWithDistance (simhash1, simhash2) {
@@ -42,7 +40,7 @@ export function similarityWithDistance (simhash1, simhash2) {
   }
   const simhash1Size = 8 * atob(simhash1).length;
   const simhash2Size = 8 * atob(simhash2).length;
-  const maxSize = max([simhash1Size, simhash2Size]);
+  const maxSize = Math.max(simhash1Size, simhash2Size);
   const distance = distanceOfUint8Array(b64ToArray(simhash1), b64ToArray(simhash2));
   return distance / maxSize;
 }
