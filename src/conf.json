@@ -1,5 +1,6 @@
 {
   "webMonitoringProcessingURL": "http://localhost:8888",
+  "pdfMonitoringProcessingURL": "http://localhost:8889",
   "limit": "1000",
   "snapshotsPrefix": "http://web.archive.org/web/",
   "urlPrefix": "/diff/",

@@ -42,6 +42,10 @@ export const diffTypes = {
   CHANGES_ONLY_SOURCE: {
     description: 'Changes Only Source',
     diffService: 'html_source_dmp'
+  },
+  PDF_SIDE_BY_SIDE_RENDERED: {
+    description: 'Side-by-Side Rendered for PDF',
+    diffService: 'pdf_rendered'
   }
 };
 
@@ -69,6 +73,10 @@ const diffTypesByMediaType = {
     diffTypes.RAW_SIDE_BY_SIDE,
     diffTypes.RAW_FROM_CONTENT,
     diffTypes.RAW_TO_CONTENT
+  ],
+
+  'application/pdf': [
+    diffTypes.PDF_SIDE_BY_SIDE_RENDERED
   ]
 };
 
