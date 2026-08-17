@@ -18,7 +18,7 @@
     "lint": "./node_modules/.bin/eslint ./src --ext .js --ext .jsx"
   },
   "devDependencies": {
-    "@babel/core": "^7.28",
+    "@babel/core": "^7.29",
     "@babel/eslint-parser": "^7.28",
     "@babel/plugin-proposal-export-default-from": "^7.27",
     "@babel/plugin-transform-private-property-in-object": "^7.27",
