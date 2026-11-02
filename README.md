@@ -15,7 +15,7 @@ compared to other captures for the same year at the Wayback Machine.
 
 ## Installation and Requirements
 
-Install node dependencies with: `yarn install`
+Install node dependencies with: `npm install`
 
 [web-monitoring-processing](https://github.com/edgi-govdata-archiving/web-monitoring-processing) server must be running with CORS mechanism enabled.
 
@@ -27,7 +27,7 @@ You need to have a CORS-enabled browser for this component to work stand alone.
 
 ## Usage
 
-Run the server with: `yarn start`
+Run the server with: `npm start`
 
 There are three types of URL calls:
  
@@ -106,14 +106,14 @@ The configuration file should have the following format:
 
 ## Build the project
 
-Run `yarn build:dev`
+Run `npm run build:dev`
 
 ### Install the library
 
 To install the component library, inside your new project directory you should run:
 
 ```
-yarn add file:[PATH_TO]/wayback-diff
+npm install file:[PATH_TO]/wayback-diff
 ```
 
 where [PATH_TO] equals with the path where you have wayback-diff saved.
@@ -122,7 +122,7 @@ where [PATH_TO] equals with the path where you have wayback-diff saved.
 If you are installing this component as a library from this Github repository:
 
 ```
-yarn add https://github.com/ftsalamp/wayback-diff
+npm install https://github.com/ftsalamp/wayback-diff
 ```
 
 ### Import the component

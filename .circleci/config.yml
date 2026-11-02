@@ -3,26 +3,26 @@ jobs:
   build:
     working_directory: ~/wayback-diff
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:22.22
     steps:
       - checkout
       - restore_cache:
-          key: dependency-cache-2-{{ checksum "yarn.lock" }}
+          key: dependency-cache-2-{{ checksum "package-lock.json" }}
       - run:
           name: Dependencies
-          command: yarn install --dev
+          command: npm ci
       - save_cache:
-          key: dependency-cache-2-{{ checksum "yarn.lock" }}
+          key: dependency-cache-2-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
       - run:
           name: Build
-          command: yarn build
+          command: npm run build
       - run:
           # Note that eslint run before every test run due to `pretest` in
           # `package.json`.
           name: Test
-          command: CI=true yarn test
+          command: CI=true npm test
 
 workflows:
   version: 2
