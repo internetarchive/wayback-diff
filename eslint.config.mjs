@@ -1,6 +1,4 @@
 import babelParser from '@babel/eslint-parser';
-import importPlugin from 'eslint-plugin-import';
-import promise from 'eslint-plugin-promise';
 import react from 'eslint-plugin-react';
 import globals from 'globals';
 
@@ -27,10 +25,6 @@ export default [
         ...globals.es2015,
         ...globals.jest,
       },
-    },
-    plugins: {
-      import: importPlugin,
-      promise,
     },
     rules: {
       complexity: ['warn', 15],
